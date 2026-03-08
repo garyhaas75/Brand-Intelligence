@@ -1179,7 +1179,7 @@ function AgenticSearchTab({ agenticSearch }) {
               </div>
               {positiveContexts.map((p, j) => (
                 <div key={j} style={{ fontSize: 12, color: '#6b7280', background: '#f9fafb', borderRadius: 6, padding: '6px 10px', lineHeight: 1.5, fontStyle: 'italic' }}>
-                  "…{p.context.substring(0, 200)}…"
+                  "…{p.visibility?.[c.brand]?.context?.substring(0, 200)}…"
                   <span style={{ display: 'block', fontSize: 11, color: '#9ca3af', marginTop: 2 }}>from query: "{p.query}"</span>
                 </div>
               ))}
