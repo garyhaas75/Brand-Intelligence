@@ -174,7 +174,7 @@ Analyze these emails across all email types and return a JSON object with the fo
   try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
+      max_tokens: 8000,
       system: systemPrompt,
       messages: [{ role: 'user', content: prompt }],
     });

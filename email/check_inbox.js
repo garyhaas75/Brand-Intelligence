@@ -18,6 +18,7 @@ const LOG_FILE = path.join(__dirname, '../logs/check_inbox.log');
 const OUTPUT_FILE = path.join(__dirname, '../data/email_inbox.json');
 
 const COMPETITOR_DOMAINS = [
+  { id: 'anne_klein',    name: 'Anne Klein',              domain: 'anneklein.com' },
   { id: 'donna_karan',   name: 'Donna Karan',             domain: 'donnakaran.com' },
   { id: 'jones_new_york',name: 'Jones New York',          domain: 'jny.com' },
   { id: 'ann_taylor',    name: 'Ann Taylor',              domain: 'anntaylor.com' },

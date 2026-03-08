@@ -1,8 +1,35 @@
 {
-  "generatedAt": "2026-03-07T20:15:27.663Z",
+  "generatedAt": "2026-03-08T14:04:39.406Z",
   "signupEmail": "garyclaudeai@gmail.com",
-  "totalEmailsFound": 5,
+  "totalEmailsFound": 8,
   "brands": [
+    {
+      "id": "anneklein",
+      "name": "Anne Klein",
+      "domain": "anneklein.com",
+      "emails": [
+        {
+          "id": "19ccd54437593f5a",
+          "subject": "Welcome to Anne Klein 🩷",
+          "snippet": "We&#39;re So Glad You&#39;re Here! ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
+          "from": "Anne Klein <customercare@anneklein.com>",
+          "date": "Sun, 08 Mar 2026 12:02:55 +0000 (UTC)",
+          "category": "Welcome",
+          "offer": null
+        }
+      ],
+      "summary": {
+        "count": 1,
+        "categories": {
+          "Welcome": 1
+        },
+        "offersFound": [],
+        "sendFrequency": "Not enough data",
+        "mostRecentSubject": "Welcome to Anne Klein 🩷",
+        "mostRecentDate": "Sun, 08 Mar 2026 12:02:55 +0000 (UTC)"
+      },
+      "error": null
+    },
     {
       "id": "donnakaran",
       "name": "Donna Karan",
@@ -20,29 +47,43 @@
       "domain": "jny.com",
       "emails": [
         {
+          "id": "19ccd5f7f7c3f204",
+          "subject": "40% Off | Cheers to the Women Who Do It All! 🥂",
+          "snippet": "Happy International Women&#39;s Day, From Us! ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ",
+          "from": "Jones New York <jny@jny.com>",
+          "date": "Sun, 08 Mar 2026 12:15:12 +0000 (UTC)",
+          "category": "Promotion",
+          "offer": "40% Off"
+        },
+        {
           "id": "19cc8e5ae50dff95",
           "subject": "Welcome! Here's 40% Off Your First Order",
           "snippet": "So Happy You Joined Us ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
           "from": "Jones New York <jny@jny.com>",
           "date": "Sat, 07 Mar 2026 15:23:39 +0000 (UTC)",
-          "category": "Promotion",
+          "category": "Welcome",
           "offer": "40% Off"
         }
       ],
       "summary": {
-        "count": 1,
+        "count": 2,
         "categories": {
-          "Promotion": 1
+          "Promotion": 1,
+          "Welcome": 1
         },
         "offersFound": [
+          {
+            "subject": "40% Off | Cheers to the Women Who Do It All! 🥂",
+            "offer": "40% Off"
+          },
           {
             "subject": "Welcome! Here's 40% Off Your First Order",
             "offer": "40% Off"
           }
         ],
-        "sendFrequency": "Not enough data",
-        "mostRecentSubject": "Welcome! Here's 40% Off Your First Order",
-        "mostRecentDate": "Sat, 07 Mar 2026 15:23:39 +0000 (UTC)"
+        "sendFrequency": "~1 emails/month (est.)",
+        "mostRecentSubject": "40% Off | Cheers to the Women Who Do It All! 🥂",
+        "mostRecentDate": "Sun, 08 Mar 2026 12:15:12 +0000 (UTC)"
       },
       "error": null
     },
@@ -84,24 +125,39 @@
       "domain": "talbots.com",
       "emails": [
         {
+          "id": "19ccd31a65506568",
+          "subject": "⚡ Flash Sale ⚡ 40% off 1 + 30% off everything else*",
+          "snippet": "It&#39;s time to “spring ahead” and get ready for the warm weather coming soon! ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌",
+          "from": "TALBOTS <talbots@e.talbots.com>",
+          "date": "8 Mar 2026 11:21:50 +0000",
+          "category": "Promotion",
+          "offer": "40% off"
+        },
+        {
           "id": "19cc8e7a794d5e9f",
           "subject": "Thanks for joining us!",
           "snippet": "Welcome! Now you&#39;ll never miss out on the styles you love. ‌ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏",
           "from": "Talbots <talbots@em.talbots.com>",
           "date": "Sat, 07 Mar 2026 15:25:49 +0000 (UTC)",
-          "category": "General",
+          "category": "Welcome",
           "offer": null
         }
       ],
       "summary": {
-        "count": 1,
+        "count": 2,
         "categories": {
-          "General": 1
+          "Promotion": 1,
+          "Welcome": 1
         },
-        "offersFound": [],
-        "sendFrequency": "Not enough data",
-        "mostRecentSubject": "Thanks for joining us!",
-        "mostRecentDate": "Sat, 07 Mar 2026 15:25:49 +0000 (UTC)"
+        "offersFound": [
+          {
+            "subject": "⚡ Flash Sale ⚡ 40% off 1 + 30% off everything else*",
+            "offer": "40% off"
+          }
+        ],
+        "sendFrequency": "~1 emails/month (est.)",
+        "mostRecentSubject": "⚡ Flash Sale ⚡ 40% off 1 + 30% off everything else*",
+        "mostRecentDate": "8 Mar 2026 11:21:50 +0000"
       },
       "error": null
     },
@@ -116,7 +172,7 @@
           "snippet": "Congrats! You&#39;ll get first dibs See whbm.com for our current shipping offers. View in web browser. Not a Loyalty Member? Join Here Congrats You&#39;re In! Get first dibs on new arrivals, sales and",
           "from": "White House Black Market <Whitehouseblackmarket@c.whitehouseblackmarket.com>",
           "date": "Sat, 07 Mar 2026 09:27:09 -0600",
-          "category": "Promotion",
+          "category": "Welcome",
           "offer": "20% off"
         },
         {
@@ -125,14 +181,14 @@
           "snippet": "Congrats! You&#39;ll get first dibs To view this email as a web page, go here. See whbm.com for our current shipping offers. View in web browser. Not a Loyalty Member? Join Here Congrats You&#39;re In",
           "from": "White House Black Market <Whitehouseblackmarket@t.whitehouseblackmarket.com>",
           "date": "Sat, 07 Mar 2026 09:27:01 -0600",
-          "category": "Promotion",
+          "category": "Welcome",
           "offer": "20% off"
         }
       ],
       "summary": {
         "count": 2,
         "categories": {
-          "Promotion": 2
+          "Welcome": 2
         },
         "offersFound": [
           {
@@ -155,6 +211,11 @@
     "allOffers": [
       {
         "brand": "Jones New York",
+        "subject": "40% Off | Cheers to the Women Who Do It All! 🥂",
+        "offer": "40% Off"
+      },
+      {
+        "brand": "Jones New York",
         "subject": "Welcome! Here's 40% Off Your First Order",
         "offer": "40% Off"
       },
@@ -162,6 +223,11 @@
         "brand": "Ann Taylor",
         "subject": "We're Happy to Have You",
         "offer": "10% Off"
+      },
+      {
+        "brand": "Talbots",
+        "subject": "⚡ Flash Sale ⚡ 40% off 1 + 30% off everything else*",
+        "offer": "40% off"
       },
       {
         "brand": "White House Black Market",
@@ -176,14 +242,19 @@
     ],
     "sendFrequencies": [
       {
+        "brand": "Anne Klein",
+        "frequency": "Not enough data",
+        "count": 1
+      },
+      {
         "brand": "Donna Karan",
         "frequency": "No emails yet",
         "count": 0
       },
       {
         "brand": "Jones New York",
-        "frequency": "Not enough data",
-        "count": 1
+        "frequency": "~1 emails/month (est.)",
+        "count": 2
       },
       {
         "brand": "Ann Taylor",
@@ -192,8 +263,8 @@
       },
       {
         "brand": "Talbots",
-        "frequency": "Not enough data",
-        "count": 1
+        "frequency": "~1 emails/month (est.)",
+        "count": 2
       },
       {
         "brand": "White House Black Market",
@@ -203,13 +274,20 @@
     ],
     "categoryBreakdown": [
       {
+        "brand": "Anne Klein",
+        "categories": {
+          "Welcome": 1
+        }
+      },
+      {
         "brand": "Donna Karan",
         "categories": {}
       },
       {
         "brand": "Jones New York",
         "categories": {
-          "Promotion": 1
+          "Promotion": 1,
+          "Welcome": 1
         }
       },
       {
@@ -221,13 +299,14 @@
       {
         "brand": "Talbots",
         "categories": {
-          "General": 1
+          "Promotion": 1,
+          "Welcome": 1
         }
       },
       {
         "brand": "White House Black Market",
         "categories": {
-          "Promotion": 2
+          "Welcome": 2
         }
       }
     ]
