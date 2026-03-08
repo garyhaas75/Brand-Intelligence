@@ -12,6 +12,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
 const { archive } = require('../utils/archive');
+const { getBrandContext } = require('../utils/brand_context');
 
 const LOG_FILE    = path.join(__dirname, '../logs/personas.log');
 const OUTPUT_FILE = path.join(__dirname, '../data/personas.json');
@@ -100,9 +101,14 @@ async function run() {
 
   const combinedIntel = intelSummary.join('\n\n---\n\n');
 
+  const brandContext = getBrandContext();
   const prompt = `You are a consumer insights researcher specializing in women's fashion. Based on all the intelligence data below about Anne Klein and its competitive landscape, build 4 detailed customer personas for Anne Klein shoppers.
 
-BRAND INTELLIGENCE:
+ANNE KLEIN BRAND GUIDELINES:
+${brandContext}
+
+---
+COMPETITIVE INTELLIGENCE DATA:
 ${combinedIntel}
 
 Create exactly 4 personas. For each persona include:

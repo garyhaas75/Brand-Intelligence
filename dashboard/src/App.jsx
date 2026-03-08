@@ -1529,7 +1529,7 @@ function BrandGuidelinesTab({ guidelines }) {
     )
   }
 
-  const { brandVoice, targetCustomer, writingRules, keywords, copyFormats, writingSamples } = data
+  const { brandVoice, brandValues, brandHeritage, brandPillars, toneByChannel, targetCustomer, writingRules, keywords, copyFormats, writingSamples } = data
 
   return (
     <div>
@@ -1600,6 +1600,108 @@ function BrandGuidelinesTab({ guidelines }) {
           </div>
         </div>
       </Card>
+
+      {/* Brand Values */}
+      {brandValues?.length > 0 && (
+        <>
+          <SectionHeader>Brand Values</SectionHeader>
+          <Card>
+            {!editing && brandValues.map((v, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: i < brandValues.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                <span style={{ color: '#6366f1', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>◆</span>
+                <span style={{ fontSize: 13, color: '#374151' }}>{v}</span>
+              </div>
+            ))}
+            {editing && <EList items={brandValues} path="brandValues" />}
+          </Card>
+        </>
+      )}
+
+      {/* Brand Heritage */}
+      {brandHeritage && (
+        <>
+          <SectionHeader>Brand Heritage</SectionHeader>
+          <Card>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Founded</div>
+                  <ET val={brandHeritage.founded || ''} path="brandHeritage.founded" />
+                  {' by '}
+                  <ET val={brandHeritage.founder || ''} path="brandHeritage.founder" />
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Legacy</div>
+                  <span style={{ fontSize: 13, color: '#374151' }}><ET val={brandHeritage.legacy || ''} path="brandHeritage.legacy" multiline /></span>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Design Philosophy</div>
+                  <span style={{ fontSize: 13, color: '#374151', fontStyle: editing ? 'normal' : 'italic' }}><ET val={brandHeritage.designPhilosophy || ''} path="brandHeritage.designPhilosophy" multiline /></span>
+                </div>
+              </div>
+              <div>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Modern Mission</div>
+                  <span style={{ fontSize: 13, color: '#374151' }}><ET val={brandHeritage.modernMission || ''} path="brandHeritage.modernMission" multiline /></span>
+                </div>
+                {brandHeritage.keyFacts?.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Key Facts</div>
+                    {!editing && brandHeritage.keyFacts.map((f, i) => (
+                      <div key={i} style={{ fontSize: 13, color: '#374151', padding: '4px 0', borderBottom: i < brandHeritage.keyFacts.length - 1 ? '1px solid #f3f4f6' : 'none' }}>• {f}</div>
+                    ))}
+                    {editing && <EList items={brandHeritage.keyFacts} path="brandHeritage.keyFacts" />}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </>
+      )}
+
+      {/* Brand Pillars */}
+      {brandPillars?.length > 0 && (
+        <>
+          <SectionHeader>Brand Pillars</SectionHeader>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+            {brandPillars.map((p, i) => (
+              <div key={i} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, borderTop: '3px solid #6366f1' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
+                  {editing ? <input style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%' }} value={p.pillar} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].pillar = e.target.value; setDraft(next); }} /> : p.pillar}
+                </div>
+                <div style={{ fontSize: 13, color: '#374151', marginBottom: 8 }}>
+                  {editing ? <textarea style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', minHeight: 50, resize: 'vertical' }} value={p.description} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].description = e.target.value; setDraft(next); }} /> : p.description}
+                </div>
+                {p.inCopy && (
+                  <div style={{ fontSize: 12, color: '#6366f1', background: '#ede9fe', borderRadius: 6, padding: '6px 10px' }}>
+                    <span style={{ fontWeight: 700 }}>In copy: </span>
+                    {editing ? <input style={{ border: 'none', background: 'transparent', color: '#6366f1', fontSize: 12, width: '80%' }} value={p.inCopy} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].inCopy = e.target.value; setDraft(next); }} /> : p.inCopy}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Tone by Channel */}
+      {toneByChannel && Object.keys(toneByChannel).length > 0 && (
+        <>
+          <SectionHeader>Tone by Channel</SectionHeader>
+          <Card>
+            {Object.entries(toneByChannel).map(([channel, guidance], i, arr) => (
+              <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid #f3f4f6' : 'none', alignItems: 'flex-start' }}>
+                <div style={{ minWidth: 160, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
+                <div style={{ flex: 1, fontSize: 13, color: '#374151' }}>
+                  {editing
+                    ? <textarea style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', resize: 'vertical', minHeight: 40 }} value={guidance} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.toneByChannel[channel] = e.target.value; setDraft(next); }} />
+                    : guidance}
+                </div>
+              </div>
+            ))}
+          </Card>
+        </>
+      )}
 
       {/* Writing Rules */}
       <SectionHeader>Writing Rules</SectionHeader>

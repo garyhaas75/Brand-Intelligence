@@ -18,6 +18,57 @@
       "Soft CTAs — 'shop the look', not 'buy now'"
     ]
   },
+  "brandValues": [
+    "Quality that endures — Anne Klein is built to last, not to be replaced next season",
+    "Effortless versatility — one piece, multiple occasions, zero overthinking",
+    "Accessible elegance — refinement at a price that respects the customer",
+    "Confidence through craft — the right clothes help women show up fully",
+    "Timeless over trendy — AK designs for the woman's life, not the algorithm"
+  ],
+  "brandHeritage": {
+    "founded": "1968",
+    "founder": "Anne Klein",
+    "legacy": "Anne Klein revolutionized American women's fashion by introducing the concept of sportswear separates — mix-and-match pieces that gave professional women flexibility and polish without sacrificing practicality. She pioneered the idea that working women deserved clothes designed for their actual lives.",
+    "designPhilosophy": "Separates that work together. Clothes that solve real problems. Quality that justifies the price. Anne Klein believed fashion should serve the woman, not the other way around.",
+    "modernMission": "Carry forward AK's founding philosophy for today's professional woman — versatile, polished, practical clothing at a price point that reflects the real household budget of the women who actually wear it.",
+    "keyFacts": [
+      "Founded 1968 — one of the first major American sportswear brands for women",
+      "Pioneered the 'wardrobe separates' concept in professional women's fashion",
+      "Price range $50–$300 — positioned between fast fashion and luxury",
+      "Core categories: Clothing, Shoes, Handbags, Jewelry",
+      "Primary channel: anneklein.com (Shopify) + wholesale partners"
+    ]
+  },
+  "brandPillars": [
+    {
+      "pillar": "Effortless Polish",
+      "description": "Looking put-together should not require effort. AK solves the morning decision problem.",
+      "inCopy": "Use scenarios: 'ready in minutes', 'from desk to dinner', 'zero overthinking'"
+    },
+    {
+      "pillar": "Timeless Quality",
+      "description": "AK is an investment, not a trend. Pieces that outlast seasons.",
+      "inCopy": "Use: 'built to last', 'investment piece', 'wears across years not just seasons'"
+    },
+    {
+      "pillar": "Accessible Refinement",
+      "description": "Elegance at a price that respects the customer's real budget.",
+      "inCopy": "Never say 'affordable' or 'budget'. Say 'exceptional value', 'worth every dollar'"
+    },
+    {
+      "pillar": "The Working Woman's Brand",
+      "description": "Designed for professional life — meetings, commutes, client dinners, real days.",
+      "inCopy": "Root copy in real occasions. Never use lifestyle fantasy or aspirational abstraction."
+    }
+  ],
+  "toneByChannel": {
+    "productDescription": "Refined and practical. 1 paragraph + 4–6 bullets. Lead with feel/occasion, not the product name. Active verbs in bullets.",
+    "emailSubjectLine": "Direct and specific. Under 45 chars. Offer-forward or occasion-led. No clickbait. No exclamation marks unless used sparingly for sales.",
+    "emailBody": "Warm peer-to-peer. Short paragraphs. One clear CTA per email. Never salesy. Brand story > discount language.",
+    "instagramCaption": "Punchy and grounded. Real scenario in first line. Soft CTA. 5–8 hashtags. No hashtag stuffing.",
+    "heroHeadline": "3–7 words. Bold, specific, speaks to the customer's reality. Subhead adds context in 1 sentence.",
+    "seoDescription": "Natural language with target keywords woven in. Occasion + fabric + silhouette. Avoid keyword stuffing."
+  },
   "targetCustomer": {
     "name": "The Polished Professional",
     "age": "38–55",

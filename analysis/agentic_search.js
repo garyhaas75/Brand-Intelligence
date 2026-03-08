@@ -16,6 +16,7 @@ require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
+const { getBrandContextShort } = require('../utils/brand_context');
 
 const LOG_FILE = path.join(__dirname, '../logs/agentic_search.log');
 const OUTPUT_FILE = path.join(__dirname, '../data/agentic_search.json');
@@ -176,7 +177,13 @@ async function generateRecommendations(client, scores, results) {
   const topCompetitor = scores.competitorVisibility[0];
   const akRate = scores.visibilityRate;
 
+  const brandContext = getBrandContextShort();
   const prompt = `Anne Klein's AI search visibility audit results:
+
+BRAND CONTEXT:
+${brandContext}
+
+---
 
 - AK mentioned in ${akRate}% of shopping queries tested (${scores.queriesMentioned}/${scores.queriesTested} queries)
 - Top competitor ${topCompetitor?.brand} mentioned in ${topCompetitor?.rate}% of queries

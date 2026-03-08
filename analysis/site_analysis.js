@@ -10,6 +10,7 @@
  */
 
 require('dotenv').config();
+const { getBrandContext } = require('../utils/brand_context');
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
@@ -57,15 +58,12 @@ async function run() {
   const siteIntel = loadJSON(SITE_INTEL_FILE, 'Site intelligence');
   const productCatalog = loadJSON(PRODUCT_CATALOG_FILE, 'Product catalog');
 
-  const systemPrompt = `You are a senior brand strategist for Anne Klein, a women's workwear brand founded in 1968.
-Anne Klein serves the Polished Professional — women aged 38–55, income $55K–$95K, working as managers, teachers, healthcare admins, HR directors, accountants, and coordinators.
-She wants to look polished and credible at work without overthinking it. She values versatility, quality, and fair price.
-She is NOT a CEO, C-suite exec, luxury shopper, or trend-chaser.
+  const brandContext = getBrandContext();
+  const systemPrompt = `You are a senior brand strategist for Anne Klein.
 
-Anne Klein's voice: Approachable authority. Warm, practical, classic. Never stiff.
-Price range: $50–$300.
+${brandContext}
 
-Competitors in scope: Donna Karan (premium/aspirational ceiling), Jones New York (basic/dated — our floor), Calvin Klein Women's (minimalist, younger), Tahari ASL (direct workwear competitor), Liz Claiborne (value/broad distribution).
+Competitors in scope: Donna Karan (premium/aspirational ceiling), Jones New York (basic/dated — our floor), Ann Taylor (direct workwear competitor), Talbots (classic/mature), White House Black Market (contemporary).
 
 Provide specific, actionable recommendations that Anne Klein can realistically implement. Be direct and concise.`;
 

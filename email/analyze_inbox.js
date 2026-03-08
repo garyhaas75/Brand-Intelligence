@@ -10,6 +10,7 @@
 
 require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
+const { getBrandContextShort } = require('../utils/brand_context');
 const fs = require('fs');
 const path = require('path');
 
@@ -75,7 +76,10 @@ async function run() {
 
   const emailSummary = buildEmailSummary(inboxData);
 
-  const systemPrompt = `You are a senior email marketing strategist and competitive intelligence analyst for Anne Klein, a women's workwear brand (price range $50–$300, target: women 38–55, polished professional).
+  const brandContext = getBrandContextShort();
+  const systemPrompt = `You are a senior email marketing strategist and competitive intelligence analyst for Anne Klein.
+
+${brandContext}
 
 Your job is to extract strategic intelligence from competitor emails to help Anne Klein improve its entire email program — across all email types, not just welcome emails.`;
 

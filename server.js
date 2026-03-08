@@ -12,6 +12,7 @@ const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 const basicAuth = require('express-basic-auth');
+const { getBrandContext } = require('./utils/brand_context');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -139,9 +140,10 @@ app.post('/api/generate', async (req, res) => {
   const contentRecs    = loadData('content_recommendations.json');
   const personas       = loadData('personas.json');
 
-  const systemPrompt = `You are a marketing strategist and copywriter for Anne Klein, the women's fashion brand.
-Anne Klein targets sophisticated women (35-60) seeking elegant, professional, and versatile fashion.
-Use the brand intelligence below to inform your output.
+  const brandContext = getBrandContext();
+  const systemPrompt = `You are a marketing strategist and copywriter for Anne Klein.
+
+${brandContext}
 
 ${siteAnalysis ? `COMPETITIVE LANDSCAPE:\n${JSON.stringify(siteAnalysis.messagingAnalysis || {}, null, 2)}` : ''}
 ${priceIntel ? `CURRENT SALE RATE: ${priceIntel.akSaleRate}% of products on sale (avg ${priceIntel.akAvgSaleDepth}% off)` : ''}

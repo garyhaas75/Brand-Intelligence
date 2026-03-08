@@ -13,6 +13,7 @@ require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
+const { getBrandContext } = require('../utils/brand_context');
 
 const LOG_FILE = path.join(__dirname, '../logs/content_generator.log');
 const OUTPUT_FILE = path.join(__dirname, '../data/content_recommendations.json');
@@ -159,12 +160,10 @@ async function run() {
 
   const context = buildContext(data);
 
-  const systemPrompt = `You are a senior brand and content strategist for Anne Klein, a women's workwear brand founded in 1968.
+  const brandContext = getBrandContext();
+  const systemPrompt = `You are a senior brand and content strategist for Anne Klein.
 
-BRAND VOICE: Approachable authority. Warm, practical, classic. Never stiff, never trendy, never corporate jargon.
-TARGET: The Polished Professional — women 38–55, income $55K–$95K (managers, teachers, healthcare admins, HR directors, accountants). She wants to look credible and polished at work without overthinking it.
-PRICE: $50–$300. Quality that lasts. NOT luxury.
-AVOID: Buzzwords like "empower", "slay", "girlboss". Keep it real and warm.
+${brandContext}
 
 You have access to live intelligence from competitor sites, GSC keyword data, social feeds, and the full product catalog.
 Generate content that is immediately usable — specific, on-brand, and grounded in the data provided.`;
