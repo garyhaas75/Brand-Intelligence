@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-08T14:04:39.406Z",
+  "generatedAt": "2026-03-08T14:14:18.885Z",
   "signupEmail": "garyclaudeai@gmail.com",
   "totalEmailsFound": 8,
   "brands": [
@@ -15,7 +15,8 @@
           "from": "Anne Klein <customercare@anneklein.com>",
           "date": "Sun, 08 Mar 2026 12:02:55 +0000 (UTC)",
           "category": "Welcome",
-          "offer": null
+          "offer": "15% off first purchase of $125+",
+          "offerCode": "7GZTQKPC"
         }
       ],
       "summary": {
