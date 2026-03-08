@@ -29,20 +29,6 @@ const users = rawUsers
   ? Object.fromEntries(rawUsers.split(',').map(pair => pair.trim().split(':')))
   : { admin: process.env.DASHBOARD_PASSWORD || 'changeme' };
 
-app.use(basicAuth({
-  users,
-  challenge: true,
-  realm: 'Anne Klein Intel',
-}));
-
-// Rate limit API routes — 200 req/min per IP
-app.use('/api/', rateLimit({
-  windowMs: 60 * 1000,
-  max: 200,
-  standardHeaders: true,
-  legacyHeaders: false,
-}));
-
 app.use(cors());
 app.use(express.json());
 
@@ -56,7 +42,7 @@ function loadData(filename) {
   }
 }
 
-// Health check
+// Health check — BEFORE basicAuth so Railway healthcheck works unauthenticated
 app.get('/api/status', (req, res) => {
   const files = [
     'site_intelligence.json',
@@ -79,6 +65,21 @@ app.get('/api/status', (req, res) => {
   });
   res.json({ ok: true, dataFiles: status, serverTime: new Date().toISOString() });
 });
+
+// Password protection — applied AFTER /api/status so Railway healthcheck passes
+app.use(basicAuth({
+  users,
+  challenge: true,
+  realm: 'Anne Klein Intel',
+}));
+
+// Rate limit API routes — 200 req/min per IP
+app.use('/api/', rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
 
 app.get('/api/site-intelligence',      (req, res) => res.json(loadData('site_intelligence.json') || {}));
 app.get('/api/product-catalog',        (req, res) => res.json(loadData('product_catalog.json') || {}));
