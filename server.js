@@ -20,6 +20,33 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const DATA_DIR = path.join(__dirname, 'data');
 
+// On startup: merge any new top-level keys from seed_data into live data files.
+// This lets us ship new fields without overwriting existing user edits on the volume.
+(function mergeSeedData() {
+  const seedDir = path.join(__dirname, 'seed_data');
+  if (!fs.existsSync(seedDir)) return;
+  for (const file of fs.readdirSync(seedDir).filter(f => f.endsWith('.json'))) {
+    const livePath = path.join(DATA_DIR, file);
+    const seedPath = path.join(seedDir, file);
+    try {
+      const seed = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
+      if (!fs.existsSync(livePath)) {
+        fs.copyFileSync(seedPath, livePath);
+        continue;
+      }
+      const live = JSON.parse(fs.readFileSync(livePath, 'utf8'));
+      let changed = false;
+      for (const key of Object.keys(seed)) {
+        if (!(key in live)) {
+          live[key] = seed[key];
+          changed = true;
+        }
+      }
+      if (changed) fs.writeFileSync(livePath, JSON.stringify(live, null, 2));
+    } catch {}
+  }
+})();
+
 // Security headers
 app.use(helmet({ contentSecurityPolicy: false }));
 
