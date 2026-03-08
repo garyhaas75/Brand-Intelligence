@@ -6,6 +6,7 @@
 # Scraped data — lives on the server volume, not in git
 data/*.json
 
+
 # Logs
 logs/
 *.log
