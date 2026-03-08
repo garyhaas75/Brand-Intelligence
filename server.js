@@ -193,6 +193,371 @@ Respond with the requested content only — no meta-commentary.`;
   }
 });
 
+// ─── Persona Chat (streaming SSE) ────────────────────────────────────────────
+app.post('/api/persona-chat', async (req, res) => {
+  const { personaIndex, messages } = req.body || {};
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'messages array required' });
+  }
+
+  const personasData = loadData('personas.json');
+  const persona = personasData?.personas?.[personaIndex ?? 0];
+  if (!persona) return res.status(404).json({ error: 'Persona not found' });
+
+  const brandContext = getBrandContext();
+  const system = `You are roleplaying as a real customer named ${persona.name}.
+
+Here is everything about you:
+- Age range: ${persona.ageRange}
+- Income: ${persona.income}
+- Occupation: ${(persona.occupation || []).join(', ')}
+- Location: ${persona.location}
+- Lifestyle: ${(persona.lifestyle || []).join(' | ')}
+- Values: ${(persona.values || []).join(' | ')}
+- Fashion goals: ${(persona.fashionGoals || []).join(' | ')}
+- Shopping behaviors: ${(persona.shoppingBehaviors || []).join(' | ')}
+- Pain points: ${(persona.painPoints || []).join(' | ')}
+- Motivators: ${(persona.motivators || []).join(' | ')}
+- Preferred channels: ${(persona.preferredChannels || []).join(', ')}
+
+Brand you are being asked about: Anne Klein
+${brandContext}
+
+Rules:
+- Speak as this person would — naturally, conversationally, from lived experience
+- Reference your specific pain points, values, and shopping behaviors when relevant
+- Do not use marketing language or brand voice
+- If asked what you think about Anne Klein, answer honestly from your character's perspective
+- Keep answers to 2-4 sentences unless the question requires more
+- Never break character or acknowledge you are an AI`;
+
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  try {
+    const stream = anthropic.messages.stream({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 512,
+      system,
+      messages,
+    });
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+        res.write(`data: ${JSON.stringify({ token: event.delta.text })}\n\n`);
+      }
+    }
+    res.write('data: [DONE]\n\n');
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+  }
+  res.end();
+});
+
+// ─── Suggest Adjacent Personas ───────────────────────────────────────────────
+app.post('/api/suggest-personas', async (req, res) => {
+  const personasData = loadData('personas.json');
+  const existing = personasData?.personas || [];
+  const brandContext = getBrandContext();
+  const intel = {
+    siteAnalysis: loadData('site_analysis.json'),
+    gscKeywords: loadData('gsc_keywords.json'),
+    socialIntel: loadData('social_intelligence.json'),
+  };
+
+  const prompt = `Based on the brand context and existing personas below, identify 2-3 adjacent customer segments that Anne Klein is not currently addressing but should consider.
+
+BRAND CONTEXT:
+${brandContext}
+
+EXISTING PERSONAS (do not duplicate these):
+${existing.map(p => `- ${p.name}: ${p.ageRange}, ${p.income}, ${(p.occupation||[]).join('/')}`).join('\n')}
+
+AVAILABLE INTEL:
+${intel.gscKeywords?.keywords ? `Top search queries: ${intel.gscKeywords.keywords.slice(0,15).map(k=>k.query||k).join(', ')}` : ''}
+
+Return JSON with this exact structure:
+{
+  "suggestions": [
+    {
+      "name": "evocative label like The Executive Achiever",
+      "ageRange": "",
+      "income": "",
+      "occupation": [],
+      "rationale": "1-2 sentences on why AK should address this segment",
+      "opportunitySize": "high/medium/low",
+      "keyDifference": "1 sentence on how they differ from existing personas"
+    }
+  ]
+}`;
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = msg.content[0].text;
+    const start = raw.indexOf('{');
+    let result = { suggestions: [] };
+    if (start !== -1) {
+      let depth = 0, end = -1;
+      for (let i = start; i < raw.length; i++) {
+        if (raw[i] === '{') depth++;
+        else if (raw[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+      }
+      if (end !== -1) result = JSON.parse(raw.slice(start, end + 1));
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Campaigns CRUD ───────────────────────────────────────────────────────────
+const CAMPAIGNS_FILE = path.join(DATA_DIR, 'campaigns.json');
+
+function loadCampaigns() {
+  if (!fs.existsSync(CAMPAIGNS_FILE)) return [];
+  try { return JSON.parse(fs.readFileSync(CAMPAIGNS_FILE, 'utf8')); } catch { return []; }
+}
+function saveCampaigns(data) {
+  fs.writeFileSync(CAMPAIGNS_FILE, JSON.stringify(data, null, 2));
+}
+
+app.get('/api/campaigns', (req, res) => res.json(loadCampaigns()));
+
+app.post('/api/campaigns', (req, res) => {
+  const campaigns = loadCampaigns();
+  const item = { ...req.body, id: `campaign_${Date.now()}`, createdAt: new Date().toISOString(), calendarItemIds: [] };
+  campaigns.push(item);
+  saveCampaigns(campaigns);
+  res.json(item);
+});
+
+app.put('/api/campaigns/:id', (req, res) => {
+  const campaigns = loadCampaigns();
+  const idx = campaigns.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  campaigns[idx] = { ...campaigns[idx], ...req.body, id: req.params.id };
+  saveCampaigns(campaigns);
+  res.json(campaigns[idx]);
+});
+
+app.delete('/api/campaigns/:id', (req, res) => {
+  const campaigns = loadCampaigns();
+  const filtered = campaigns.filter(c => c.id !== req.params.id);
+  saveCampaigns(filtered);
+  res.json({ ok: true });
+});
+
+app.post('/api/campaigns/:id/generate-brief', async (req, res) => {
+  const campaigns = loadCampaigns();
+  const campaign = campaigns.find(c => c.id === req.params.id);
+  if (!campaign) return res.status(404).json({ error: 'Not found' });
+
+  const brandContext = getBrandContext();
+  const prompt = `Write a campaign brief for this Anne Klein marketing campaign.
+
+CAMPAIGN:
+Name: ${campaign.name}
+Dates: ${campaign.startDate} to ${campaign.endDate}
+Target persona: ${campaign.persona || 'The Polished Professional'}
+Status: ${campaign.status}
+
+STYLE GUIDE:
+Color direction: ${campaign.styleGuide?.colorDirection || 'not specified'}
+Mood: ${(campaign.styleGuide?.moodKeywords || []).join(', ') || 'not specified'}
+Avoid: ${(campaign.styleGuide?.avoidWords || []).join(', ') || 'none specified'}
+Hero image direction: ${campaign.styleGuide?.heroImageDirection || 'not specified'}
+
+BRAND CONTEXT:
+${brandContext}
+
+Write a 3-paragraph campaign brief covering:
+1. Campaign objective and strategic rationale
+2. Creative direction (tone, visual language, key message)
+3. Channel execution notes (email, Instagram, site)
+
+Be specific and actionable. No generic marketing language.`;
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const brief = msg.content[0].text;
+    const idx = campaigns.findIndex(c => c.id === req.params.id);
+    campaigns[idx].brief = brief;
+    saveCampaigns(campaigns);
+    res.json({ brief });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Calendar CRUD ────────────────────────────────────────────────────────────
+const CALENDAR_FILE = path.join(DATA_DIR, 'content_calendar.json');
+
+function loadCalendar() {
+  if (!fs.existsSync(CALENDAR_FILE)) return [];
+  try { return JSON.parse(fs.readFileSync(CALENDAR_FILE, 'utf8')); } catch { return []; }
+}
+function saveCalendar(data) {
+  fs.writeFileSync(CALENDAR_FILE, JSON.stringify(data, null, 2));
+}
+
+app.get('/api/calendar', (req, res) => res.json(loadCalendar()));
+
+app.post('/api/calendar/item', (req, res) => {
+  const items = loadCalendar();
+  const item = {
+    id: `cal_${Date.now()}`,
+    date: '',
+    channel: 'email',
+    status: 'brief',
+    campaignId: null,
+    personaTarget: '',
+    theme: '',
+    brief: '',
+    subjectLine: '',
+    previewText: '',
+    heroImageBrief: null,
+    selectedProducts: [],
+    assignedTo: '',
+    notes: '',
+    ...req.body,
+    createdAt: new Date().toISOString(),
+  };
+  items.push(item);
+  saveCalendar(items);
+  res.json(item);
+});
+
+app.put('/api/calendar/item/:id', (req, res) => {
+  const items = loadCalendar();
+  const idx = items.findIndex(i => i.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  items[idx] = { ...items[idx], ...req.body, id: req.params.id };
+  saveCalendar(items);
+  res.json(items[idx]);
+});
+
+app.delete('/api/calendar/item/:id', (req, res) => {
+  const items = loadCalendar();
+  saveCalendar(items.filter(i => i.id !== req.params.id));
+  res.json({ ok: true });
+});
+
+app.post('/api/calendar/item/:id/generate-brief', async (req, res) => {
+  const items = loadCalendar();
+  const item = items.find(i => i.id === req.params.id);
+  if (!item) return res.status(404).json({ error: 'Not found' });
+
+  const campaigns = loadCampaigns();
+  const campaign = item.campaignId ? campaigns.find(c => c.id === item.campaignId) : null;
+  const brandContext = getBrandContext();
+  const personas = loadData('personas.json');
+  const persona = personas?.personas?.find(p => p.name === item.personaTarget) || personas?.personas?.[0];
+
+  const prompt = `Write a content brief for this ${item.channel} piece.
+
+ITEM:
+Date: ${item.date}
+Channel: ${item.channel}
+Theme: ${item.theme}
+Persona: ${item.personaTarget || persona?.name}
+${item.subjectLine ? `Subject line: ${item.subjectLine}` : ''}
+${item.previewText ? `Preview text: ${item.previewText}` : ''}
+
+${campaign ? `CAMPAIGN CONTEXT:\n${campaign.brief || `Campaign: ${campaign.name}, ${campaign.startDate}–${campaign.endDate}\nColor direction: ${campaign.styleGuide?.colorDirection || ''}\nMood: ${(campaign.styleGuide?.moodKeywords||[]).join(', ')}`}` : ''}
+
+${persona ? `PERSONA:\n${persona.name} — ${persona.ageRange}, ${persona.income}\nKey motivators: ${(persona.motivators||[]).slice(0,2).join(' | ')}\nPain points: ${(persona.painPoints||[]).slice(0,2).join(' | ')}` : ''}
+
+BRAND CONTEXT:
+${brandContext}
+
+Write a brief covering:
+- What to feature and why (specific products/categories if relevant)
+- Key message (1 sentence the customer should feel after reading)
+- Tone notes specific to this piece
+- CTA recommendation
+
+Keep it tight — this is a working brief, not an essay.`;
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const brief = msg.content[0].text;
+    const idx = items.findIndex(i => i.id === req.params.id);
+    items[idx].brief = brief;
+    saveCalendar(items);
+    res.json({ brief });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/calendar/item/:id/generate-hero-brief', async (req, res) => {
+  const items = loadCalendar();
+  const item = items.find(i => i.id === req.params.id);
+  if (!item) return res.status(404).json({ error: 'Not found' });
+
+  const campaigns = loadCampaigns();
+  const campaign = item.campaignId ? campaigns.find(c => c.id === item.campaignId) : null;
+  const brandContext = getBrandContext();
+
+  const selectedProductNames = (item.selectedProducts || []).map(p => p.name).join(', ');
+
+  const prompt = `Write a hero image creative brief for this Anne Klein ${item.channel} piece.
+
+PIECE:
+Theme: ${item.theme}
+Channel: ${item.channel}
+Date: ${item.date}
+${selectedProductNames ? `Products featured: ${selectedProductNames}` : ''}
+
+${campaign?.styleGuide ? `CAMPAIGN STYLE:\nColor direction: ${campaign.styleGuide.colorDirection || ''}\nMood: ${(campaign.styleGuide.moodKeywords||[]).join(', ')}\nHero direction: ${campaign.styleGuide.heroImageDirection || ''}` : ''}
+
+BRAND CONTEXT:
+${brandContext}
+
+Write a concise hero image brief with these sections:
+- Subject: (who is in the shot — model type, age range, styling)
+- Setting: (location, background, lighting mood)
+- Wardrobe: (specific pieces, how they're styled)
+- Mood: (3 adjectives)
+- Avoid: (what NOT to include)
+- AI image prompt: (a single prompt sentence usable for image generation)
+
+Be specific and visual. No abstract concepts.`;
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const heroImageBrief = msg.content[0].text;
+    const idx = items.findIndex(i => i.id === req.params.id);
+    items[idx].heroImageBrief = heroImageBrief;
+    saveCalendar(items);
+    res.json({ heroImageBrief });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Apify usage
 app.get('/api/apify-usage', async (req, res) => {
   const token = process.env.APIFY_API_TOKEN;

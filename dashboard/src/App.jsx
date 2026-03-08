@@ -1291,7 +1291,186 @@ function PersonaSection({ label, items, borderColor, bullet }) {
   )
 }
 
+// ─── Persona Card with Chat ───────────────────────────────────────────────────
+function PersonaCard({ p, index, color }) {
+  const [chatOpen, setChatOpen] = useState(false)
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [streaming, setStreaming] = useState(false)
+  const [streamText, setStreamText] = useState('')
+  const chatEndRef = React.useRef(null)
+  const occupations = Array.isArray(p.occupation) ? p.occupation.join(' · ') : p.occupation
+
+  React.useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, streamText])
+
+  async function sendMessage() {
+    const text = input.trim()
+    if (!text || streaming) return
+    const userMsg = { role: 'user', content: text }
+    const next = [...messages, userMsg]
+    setMessages(next)
+    setInput('')
+    setStreaming(true)
+    setStreamText('')
+
+    try {
+      const res = await fetch('/api/persona-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ personaIndex: index, messages: next }),
+      })
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let full = ''
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value)
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data: ')) continue
+          const payload = line.slice(6)
+          if (payload === '[DONE]') break
+          try {
+            const { token, error } = JSON.parse(payload)
+            if (error) { full = `Error: ${error}`; break }
+            full += token
+            setStreamText(full)
+          } catch {}
+        }
+      }
+      setMessages(prev => [...prev, { role: 'assistant', content: full }])
+      setStreamText('')
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${e.message}` }])
+    }
+    setStreaming(false)
+  }
+
+  return (
+    <Card accent={color}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: 20, color: '#111827', marginBottom: 4 }}>{p.name}</div>
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 2 }}>
+            {[p.ageRange || p.age, p.income, p.location].filter(Boolean).join(' · ')}
+          </div>
+          {occupations && <div style={{ fontSize: 13, color: '#9ca3af' }}>{occupations}</div>}
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
+          <button onClick={() => { setChatOpen(o => !o); setMessages([]); setStreamText('') }}
+            style={{ padding: '5px 14px', borderRadius: 8, border: `1px solid ${color}`, background: chatOpen ? color : '#fff', color: chatOpen ? '#fff' : color, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+            {chatOpen ? 'Close Chat' : '💬 Chat'}
+          </button>
+          <div style={{ background: color, color: '#fff', borderRadius: 8, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>
+            Persona {index + 1}
+          </div>
+        </div>
+      </div>
+
+      {/* Quote */}
+      {p.quoteExample && (
+        <div style={{ background: '#f9fafb', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 14, fontStyle: 'italic', color: '#374151', lineHeight: 1.6, borderLeft: `3px solid ${color}` }}>
+          "{p.quoteExample}"
+        </div>
+      )}
+
+      {/* Chat Panel */}
+      {chatOpen && (
+        <div style={{ border: `1px solid ${color}30`, borderRadius: 10, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ background: color, color: '#fff', padding: '8px 14px', fontSize: 12, fontWeight: 700 }}>
+            Chatting with {p.name} · Responses reset on refresh
+          </div>
+          <div style={{ height: 260, overflowY: 'auto', padding: 14, background: '#fafafa', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {messages.length === 0 && !streaming && (
+              <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', marginTop: 60 }}>
+                Ask {p.name} anything — about shopping, style, what she wants from a brand…
+              </div>
+            )}
+            {messages.map((m, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                <div style={{
+                  maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
+                  background: m.role === 'user' ? color : '#fff',
+                  color: m.role === 'user' ? '#fff' : '#374151',
+                  border: m.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
+                }}>
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {(streaming || streamText) && (
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{ maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: '#fff', color: '#374151', border: '1px solid #e5e7eb' }}>
+                  {streamText || <span style={{ color: '#9ca3af' }}>…</span>}
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, padding: 10, background: '#fff', borderTop: '1px solid #e5e7eb' }}>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && sendMessage()}
+              placeholder={`Ask ${p.name} something…`}
+              style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '7px 12px', fontSize: 13, outline: 'none' }}
+            />
+            <button onClick={sendMessage} disabled={streaming || !input.trim()}
+              style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: color, color: '#fff', cursor: streaming ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, opacity: streaming || !input.trim() ? 0.5 : 1 }}>
+              Send
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 2-column grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20, marginBottom: 16 }}>
+        <PersonaSection label="CORE VALUES"         items={p.values}            borderColor={color}     bullet />
+        <PersonaSection label="FASHION GOALS"       items={p.fashionGoals}      borderColor="#d1d5db" />
+        <PersonaSection label="PURCHASE MOTIVATORS" items={p.motivators}        borderColor={color} />
+        <PersonaSection label="PAIN POINTS"         items={p.painPoints}        borderColor="#fca5a5" />
+        <PersonaSection label="SHOPPING BEHAVIOR"   items={p.shoppingBehaviors} borderColor="#6ee7b7" />
+        {p.contentTopics?.length > 0 && (
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', letterSpacing: '0.05em', marginBottom: 8 }}>CONTENT THAT RESONATES</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {p.contentTopics.map((t, j) => (
+                <div key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: 5 }} />
+                  <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.55 }}>{t}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {p.annKleinFit && (
+        <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>WHY ANNE KLEIN FITS</div>
+          <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{p.annKleinFit}</p>
+        </div>
+      )}
+
+      {p.preferredChannels?.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>Preferred channels:</span>
+          {p.preferredChannels.map((ch, j) => (
+            <span key={j} style={{ fontSize: 12, background: '#f3f4f6', color: '#374151', borderRadius: 6, padding: '2px 10px' }}>{j + 1}. {ch}</span>
+          ))}
+        </div>
+      )}
+    </Card>
+  )
+}
+
 function PersonasTab({ personas }) {
+  const [suggestions, setSuggestions] = useState(null)
+  const [suggesting, setSuggesting] = useState(false)
+
   if (!personas?.personas?.length) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
@@ -1304,9 +1483,25 @@ function PersonasTab({ personas }) {
 
   const PERSONA_COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981']
 
+  async function discoverPersonas() {
+    setSuggesting(true)
+    try {
+      const res = await fetch('/api/suggest-personas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      const data = await res.json()
+      setSuggestions(data.suggestions || [])
+    } catch {}
+    setSuggesting(false)
+  }
+
   return (
     <div>
-      <SectionHeader>Customer Personas</SectionHeader>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+        <SectionHeader>Customer Personas</SectionHeader>
+        <button onClick={discoverPersonas} disabled={suggesting}
+          style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: suggesting ? 0.6 : 1 }}>
+          {suggesting ? 'Analyzing…' : '✨ Discover Adjacent Personas'}
+        </button>
+      </div>
       <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
         AI-generated from competitive intel, product catalog, social data, and email intelligence.
         {personas.generatedAt && <span> Last updated {new Date(personas.generatedAt).toLocaleDateString()}.</span>}
@@ -1323,74 +1518,511 @@ function PersonasTab({ personas }) {
         </Card>
       )}
 
-      {personas.personas.map((p, i) => {
-        const color = PERSONA_COLORS[i % PERSONA_COLORS.length]
-        const occupations = Array.isArray(p.occupation) ? p.occupation.join(' · ') : p.occupation
-        return (
-          <Card key={i} accent={color}>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 800, fontSize: 20, color: '#111827', marginBottom: 4 }}>{p.name}</div>
-                <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 2 }}>
-                  {[p.ageRange || p.age, p.income, p.location].filter(Boolean).join(' · ')}
+      {suggestions && (
+        <div style={{ marginBottom: 24 }}>
+          <SectionHeader>Adjacent Persona Opportunities</SectionHeader>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            {suggestions.map((s, i) => (
+              <div key={i} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, borderTop: '3px solid #8b5cf6' }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#111827', marginBottom: 4 }}>{s.name}</div>
+                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>{s.ageRange} · {s.income}</div>
+                <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, lineHeight: 1.5 }}>{s.rationale}</div>
+                <div style={{ fontSize: 12, color: '#6366f1', background: '#ede9fe', borderRadius: 6, padding: '4px 10px', marginBottom: 8 }}>{s.keyDifference}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: s.opportunitySize === 'high' ? '#059669' : s.opportunitySize === 'medium' ? '#d97706' : '#6b7280', textTransform: 'uppercase' }}>
+                  {s.opportunitySize} opportunity
                 </div>
-                {occupations && <div style={{ fontSize: 13, color: '#9ca3af' }}>{occupations}</div>}
               </div>
-              <div style={{ background: color, color: '#fff', borderRadius: 8, padding: '4px 14px', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-                Persona {i + 1}
+            ))}
+          </div>
+        </div>
+      )}
+
+      {personas.personas.map((p, i) => (
+        <PersonaCard key={i} p={p} index={i} color={PERSONA_COLORS[i % PERSONA_COLORS.length]} />
+      ))}
+    </div>
+  )
+}
+
+// ─── Campaigns Tab ────────────────────────────────────────────────────────────
+const CAMPAIGN_STATUSES = ['planning', 'active', 'complete', 'paused']
+const STATUS_COLORS = { planning: '#6366f1', active: '#10b981', complete: '#6b7280', paused: '#f59e0b' }
+const CHANNELS = ['email', 'instagram', 'site', 'hero', 'sms', 'other']
+
+function CampaignsTab({ campaigns, setCampaigns, personas }) {
+  const [showForm, setShowForm] = useState(false)
+  const [editId, setEditId] = useState(null)
+  const [form, setForm] = useState({})
+  const [generatingBrief, setGeneratingBrief] = useState(null)
+  const personaNames = personas?.personas?.map(p => p.name) || []
+
+  function openNew() {
+    setForm({ name: '', status: 'planning', startDate: '', endDate: '', persona: personaNames[0] || '', styleGuide: { colorDirection: '', moodKeywords: [], avoidWords: [], heroImageDirection: '' } })
+    setEditId(null)
+    setShowForm(true)
+  }
+
+  function openEdit(c) {
+    setForm(JSON.parse(JSON.stringify(c)))
+    setEditId(c.id)
+    setShowForm(true)
+  }
+
+  async function save() {
+    const method = editId ? 'PUT' : 'POST'
+    const url = editId ? `/api/campaigns/${editId}` : '/api/campaigns'
+    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    const saved = await res.json()
+    setCampaigns(prev => editId ? prev.map(c => c.id === editId ? saved : c) : [...prev, saved])
+    setShowForm(false)
+  }
+
+  async function deleteCampaign(id) {
+    if (!confirm('Delete this campaign?')) return
+    await fetch(`/api/campaigns/${id}`, { method: 'DELETE' })
+    setCampaigns(prev => prev.filter(c => c.id !== id))
+  }
+
+  async function generateBrief(id) {
+    setGeneratingBrief(id)
+    const res = await fetch(`/api/campaigns/${id}/generate-brief`, { method: 'POST' })
+    const { brief } = await res.json()
+    setCampaigns(prev => prev.map(c => c.id === id ? { ...c, brief } : c))
+    setGeneratingBrief(null)
+  }
+
+  const setFormIn = (path, val) => {
+    const keys = path.split('.')
+    setForm(prev => {
+      const next = JSON.parse(JSON.stringify(prev))
+      let obj = next
+      for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]]
+      obj[keys[keys.length - 1]] = val
+      return next
+    })
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <SectionHeader>Campaigns</SectionHeader>
+        <button onClick={openNew} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
+          + New Campaign
+        </button>
+      </div>
+
+      {/* Campaign Form */}
+      {showForm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 20 }}>{editId ? 'Edit Campaign' : 'New Campaign'}</div>
+            {[
+              { label: 'Campaign Name', key: 'name', type: 'text' },
+              { label: 'Start Date', key: 'startDate', type: 'date' },
+              { label: 'End Date', key: 'endDate', type: 'date' },
+            ].map(f => (
+              <div key={f.key} style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>{f.label}</div>
+                <input type={f.type} value={form[f.key] || ''} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                  style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+              </div>
+            ))}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Target Persona</div>
+              <select value={form.persona || ''} onChange={e => setForm(p => ({ ...p, persona: e.target.value }))}
+                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+                <option value="">— none —</option>
+                {personaNames.map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Status</div>
+              <select value={form.status || 'planning'} onChange={e => setForm(p => ({ ...p, status: e.target.value }))}
+                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+                {CAMPAIGN_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 10, marginTop: 4 }}>Style Guide</div>
+            {[
+              { label: 'Color Direction (e.g. "Navy, blush, bone")', key: 'styleGuide.colorDirection' },
+              { label: 'Hero Image Direction (1 sentence)', key: 'styleGuide.heroImageDirection' },
+            ].map(f => (
+              <div key={f.key} style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>{f.label}</div>
+                <input value={(f.key.includes('.') ? form.styleGuide?.[f.key.split('.')[1]] : form[f.key]) || ''}
+                  onChange={e => setFormIn(f.key, e.target.value)}
+                  style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+              </div>
+            ))}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Mood Keywords (comma separated)</div>
+              <input value={(form.styleGuide?.moodKeywords || []).join(', ')}
+                onChange={e => setFormIn('styleGuide.moodKeywords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Avoid Words (comma separated)</div>
+              <input value={(form.styleGuide?.avoidWords || []).join(', ')}
+                onChange={e => setFormIn('styleGuide.avoidWords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowForm(false)} style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button onClick={save} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {campaigns.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🗂️</div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>No campaigns yet</div>
+          <div style={{ fontSize: 13 }}>Create a campaign to group content under shared creative direction.</div>
+        </div>
+      )}
+
+      {campaigns.map(c => (
+        <Card key={c.id} accent={STATUS_COLORS[c.status] || '#6366f1'}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 18, color: '#111827', marginBottom: 4 }}>{c.name}</div>
+              <div style={{ fontSize: 13, color: '#6b7280' }}>
+                {[c.startDate, c.endDate].filter(Boolean).join(' → ')}
+                {c.persona && <span> · {c.persona}</span>}
               </div>
             </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+              <span style={{ background: STATUS_COLORS[c.status] + '20', color: STATUS_COLORS[c.status], borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>{c.status}</span>
+              <button onClick={() => openEdit(c)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 12 }}>Edit</button>
+              <button onClick={() => deleteCampaign(c.id)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
+            </div>
+          </div>
 
-            {/* Quote */}
-            {p.quoteExample && (
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 14, fontStyle: 'italic', color: '#374151', lineHeight: 1.6, borderLeft: `3px solid ${color}` }}>
-                "{p.quoteExample}"
-              </div>
-            )}
+          {c.styleGuide && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+              {c.styleGuide.colorDirection && <span style={{ fontSize: 12, background: '#f3f4f6', borderRadius: 6, padding: '3px 10px' }}>🎨 {c.styleGuide.colorDirection}</span>}
+              {(c.styleGuide.moodKeywords || []).map((k, i) => <span key={i} style={{ fontSize: 12, background: '#ede9fe', color: '#6366f1', borderRadius: 6, padding: '3px 10px' }}>{k}</span>)}
+              {(c.styleGuide.avoidWords || []).map((k, i) => <span key={i} style={{ fontSize: 12, background: '#fee2e2', color: '#ef4444', borderRadius: 6, padding: '3px 10px' }}>✕ {k}</span>)}
+            </div>
+          )}
 
-            {/* 2-column grid — stacks on narrow viewports */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20, marginBottom: 16 }}>
-              <PersonaSection label="CORE VALUES"        items={p.values}            borderColor={color}     bullet />
-              <PersonaSection label="FASHION GOALS"      items={p.fashionGoals}      borderColor="#d1d5db" />
-              <PersonaSection label="PURCHASE MOTIVATORS" items={p.motivators}       borderColor={color} />
-              <PersonaSection label="PAIN POINTS"        items={p.painPoints}        borderColor="#fca5a5" />
-              <PersonaSection label="SHOPPING BEHAVIOR"  items={p.shoppingBehaviors} borderColor="#6ee7b7" />
-              {p.contentTopics?.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', letterSpacing: '0.05em', marginBottom: 8 }}>CONTENT THAT RESONATES</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                    {p.contentTopics.map((t, j) => (
-                      <div key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: 5 }} />
-                        <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.55 }}>{t}</div>
-                      </div>
-                    ))}
+          {c.brief ? (
+            <div style={{ background: '#f9fafb', borderRadius: 8, padding: 14, fontSize: 13, color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{c.brief}</div>
+          ) : (
+            <button onClick={() => generateBrief(c.id)} disabled={generatingBrief === c.id}
+              style={{ padding: '7px 16px', borderRadius: 8, border: '1px dashed #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, opacity: generatingBrief === c.id ? 0.6 : 1 }}>
+              {generatingBrief === c.id ? '✨ Generating brief…' : '✨ Generate Campaign Brief'}
+            </button>
+          )}
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+// ─── Calendar Tab ─────────────────────────────────────────────────────────────
+const CHANNEL_COLORS = { email: '#6366f1', instagram: '#ec4899', site: '#f59e0b', hero: '#3b82f6', sms: '#10b981', other: '#6b7280' }
+const CHANNEL_ICONS  = { email: '📧', instagram: '📸', site: '🌐', hero: '🖼️', sms: '💬', other: '📌' }
+const ITEM_STATUSES  = ['brief', 'ready', 'sent']
+const STATUS_BG      = { brief: '#ede9fe', ready: '#d1fae5', sent: '#f3f4f6' }
+const STATUS_FG      = { brief: '#6366f1', ready: '#059669', sent: '#6b7280' }
+
+function getWeekDates(baseDate) {
+  const d = new Date(baseDate)
+  const day = d.getDay()
+  const start = new Date(d)
+  start.setDate(d.getDate() - day)
+  return Array.from({ length: 7 }, (_, i) => {
+    const dt = new Date(start)
+    dt.setDate(start.getDate() + i)
+    return dt
+  })
+}
+
+function dateKey(d) {
+  return d.toISOString().slice(0, 10)
+}
+
+function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, personas, catalog }) {
+  const [draft, setDraft] = useState(JSON.parse(JSON.stringify(item)))
+  const [saving, setSaving] = useState(false)
+  const [genBrief, setGenBrief] = useState(false)
+  const [genHero, setGenHero] = useState(false)
+  const [productSearch, setProductSearch] = useState('')
+  const personaNames = personas?.personas?.map(p => p.name) || []
+
+  const allProducts = catalog?.products || []
+  const filteredProducts = allProducts
+    .filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()) || p.category?.toLowerCase().includes(productSearch.toLowerCase()))
+    .slice(0, 24)
+
+  const isSelected = (p) => draft.selectedProducts?.some(s => s.href === p.href)
+
+  function toggleProduct(p) {
+    setDraft(prev => {
+      const sel = prev.selectedProducts || []
+      const exists = sel.some(s => s.href === p.href)
+      return { ...prev, selectedProducts: exists ? sel.filter(s => s.href !== p.href) : [...sel, { name: p.name, href: p.href, image: p.image, price: p.price, category: p.category }] }
+    })
+  }
+
+  async function save() {
+    setSaving(true)
+    const res = await fetch(`/api/calendar/item/${draft.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) })
+    const saved = await res.json()
+    onSave(saved)
+    setSaving(false)
+  }
+
+  async function doGenBrief() {
+    setSaving(true); setGenBrief(true)
+    const res = await fetch(`/api/calendar/item/${draft.id}/generate-brief`, { method: 'POST' })
+    const { brief } = await res.json()
+    setDraft(p => ({ ...p, brief }))
+    setSaving(false); setGenBrief(false)
+  }
+
+  async function doGenHero() {
+    setSaving(true); setGenHero(true)
+    const res = await fetch(`/api/calendar/item/${draft.id}/generate-hero-brief`, { method: 'POST' })
+    const { heroImageBrief } = await res.json()
+    setDraft(p => ({ ...p, heroImageBrief }))
+    setSaving(false); setGenHero(false)
+  }
+
+  const iStyle = { width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }
+  const taStyle = { ...iStyle, resize: 'vertical', minHeight: 70 }
+  const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4, marginTop: 12 }}>{children}</div>
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
+      <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)' }} onClick={onClose} />
+      <div style={{ width: 520, background: '#fff', overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
+        {/* Drawer header */}
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9fafb' }}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>
+            {CHANNEL_ICONS[draft.channel] || '📌'} {draft.theme || 'New Item'}
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => { if (confirm('Delete this item?')) onDelete(draft.id) }} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
+            <button onClick={onClose} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 12 }}>Close</button>
+            <button onClick={save} disabled={saving} style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>{saving ? 'Saving…' : 'Save'}</button>
+          </div>
+        </div>
+
+        <div style={{ padding: '16px 20px', flex: 1 }}>
+          {/* Row: date + channel + status */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+            <div><Label>Date</Label><input type="date" value={draft.date || ''} onChange={e => setDraft(p => ({ ...p, date: e.target.value }))} style={iStyle} /></div>
+            <div><Label>Channel</Label>
+              <select value={draft.channel || 'email'} onChange={e => setDraft(p => ({ ...p, channel: e.target.value }))} style={iStyle}>
+                {CHANNELS.map(c => <option key={c} value={c}>{CHANNEL_ICONS[c]} {c}</option>)}
+              </select>
+            </div>
+            <div><Label>Status</Label>
+              <select value={draft.status || 'brief'} onChange={e => setDraft(p => ({ ...p, status: e.target.value }))} style={iStyle}>
+                {ITEM_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <Label>Theme / Campaign Angle</Label>
+          <input value={draft.theme || ''} onChange={e => setDraft(p => ({ ...p, theme: e.target.value }))} style={iStyle} placeholder="e.g. Spring Into Work — Monday-to-Friday formula" />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div><Label>Target Persona</Label>
+              <select value={draft.personaTarget || ''} onChange={e => setDraft(p => ({ ...p, personaTarget: e.target.value }))} style={iStyle}>
+                <option value="">— none —</option>
+                {personaNames.map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div><Label>Campaign</Label>
+              <select value={draft.campaignId || ''} onChange={e => setDraft(p => ({ ...p, campaignId: e.target.value || null }))} style={iStyle}>
+                <option value="">— none —</option>
+                {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div><Label>Assigned To</Label><input value={draft.assignedTo || ''} onChange={e => setDraft(p => ({ ...p, assignedTo: e.target.value }))} style={iStyle} placeholder="Name or team" /></div>
+          </div>
+
+          {(draft.channel === 'email' || draft.channel === 'sms') && <>
+            <Label>Subject Line</Label>
+            <input value={draft.subjectLine || ''} onChange={e => setDraft(p => ({ ...p, subjectLine: e.target.value }))} style={iStyle} placeholder="Under 45 characters" />
+            <Label>Preview Text</Label>
+            <input value={draft.previewText || ''} onChange={e => setDraft(p => ({ ...p, previewText: e.target.value }))} style={iStyle} placeholder="Under 90 characters" />
+          </>}
+
+          {/* Brief */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 4 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>CONTENT BRIEF</div>
+            <button onClick={doGenBrief} disabled={genBrief || saving}
+              style={{ fontSize: 12, color: '#6366f1', border: '1px dashed #6366f1', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', opacity: genBrief ? 0.6 : 1 }}>
+              {genBrief ? '✨ Generating…' : '✨ Generate Brief'}
+            </button>
+          </div>
+          <textarea value={draft.brief || ''} onChange={e => setDraft(p => ({ ...p, brief: e.target.value }))} style={{ ...taStyle, minHeight: 100 }} placeholder="What to feature, key message, CTA, tone notes…" />
+
+          {/* Hero image brief */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 4 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>HERO IMAGE BRIEF</div>
+            <button onClick={doGenHero} disabled={genHero || saving}
+              style={{ fontSize: 12, color: '#3b82f6', border: '1px dashed #3b82f6', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', opacity: genHero ? 0.6 : 1 }}>
+              {genHero ? '✨ Generating…' : '✨ Generate Hero Brief'}
+            </button>
+          </div>
+          <textarea value={draft.heroImageBrief || ''} onChange={e => setDraft(p => ({ ...p, heroImageBrief: e.target.value }))} style={taStyle} placeholder="Subject, setting, wardrobe, mood, AI image prompt…" />
+
+          <Label>Notes</Label>
+          <textarea value={draft.notes || ''} onChange={e => setDraft(p => ({ ...p, notes: e.target.value }))} style={taStyle} placeholder="Internal notes…" />
+
+          {/* Product Picker */}
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>FEATURED PRODUCTS
+              {draft.selectedProducts?.length > 0 && <span style={{ marginLeft: 8, background: '#6366f1', color: '#fff', borderRadius: 10, padding: '1px 8px', fontSize: 11 }}>{draft.selectedProducts.length} selected</span>}
+            </div>
+            {draft.selectedProducts?.length > 0 && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                {draft.selectedProducts.map(p => (
+                  <div key={p.href} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#ede9fe', borderRadius: 8, padding: '4px 8px' }}>
+                    {p.image && <img src={p.image} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />}
+                    <span style={{ fontSize: 12, color: '#6366f1', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                    <span onClick={() => toggleProduct(p)} style={{ cursor: 'pointer', color: '#6366f1', fontWeight: 700, fontSize: 14 }}>×</span>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* AK Fit */}
-            {p.annKleinFit && (
-              <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', marginBottom: 10 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>WHY ANNE KLEIN FITS</div>
-                <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{p.annKleinFit}</p>
-              </div>
-            )}
-
-            {/* Preferred Channels */}
-            {p.preferredChannels?.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>Preferred channels:</span>
-                {p.preferredChannels.map((ch, j) => (
-                  <span key={j} style={{ fontSize: 12, background: '#f3f4f6', color: '#374151', borderRadius: 6, padding: '2px 10px' }}>{j + 1}. {ch}</span>
                 ))}
               </div>
             )}
-          </Card>
-        )
-      })}
+            <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Search products by name or category…"
+              style={{ ...iStyle, marginBottom: 8 }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
+              {filteredProducts.map(p => (
+                <div key={p.href} onClick={() => toggleProduct(p)}
+                  style={{ border: `2px solid ${isSelected(p) ? '#6366f1' : '#e5e7eb'}`, borderRadius: 8, padding: 6, cursor: 'pointer', background: isSelected(p) ? '#ede9fe' : '#fff', textAlign: 'center' }}>
+                  {p.image && <img src={p.image} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 4, marginBottom: 4 }} />}
+                  <div style={{ fontSize: 10, color: '#374151', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</div>
+                  <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>${p.price}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
+  const [weekStart, setWeekStart] = useState(() => {
+    const today = new Date()
+    const d = new Date(today)
+    d.setDate(today.getDate() - today.getDay())
+    return dateKey(d)
+  })
+  const [drawerItem, setDrawerItem] = useState(null)
+
+  const weekDates = getWeekDates(new Date(weekStart + 'T12:00:00'))
+  const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+  function prevWeek() {
+    const d = new Date(weekStart + 'T12:00:00')
+    d.setDate(d.getDate() - 7)
+    setWeekStart(dateKey(d))
+  }
+  function nextWeek() {
+    const d = new Date(weekStart + 'T12:00:00')
+    d.setDate(d.getDate() + 7)
+    setWeekStart(dateKey(d))
+  }
+
+  const monthLabel = weekDates[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+
+  async function addItem(date) {
+    const res = await fetch('/api/calendar/item', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date, channel: 'email', status: 'brief', theme: '' }),
+    })
+    const item = await res.json()
+    setCalItems(prev => [...prev, item])
+    setDrawerItem(item)
+  }
+
+  async function deleteItem(id) {
+    await fetch(`/api/calendar/item/${id}`, { method: 'DELETE' })
+    setCalItems(prev => prev.filter(i => i.id !== id))
+    setDrawerItem(null)
+  }
+
+  function onSave(updated) {
+    setCalItems(prev => prev.map(i => i.id === updated.id ? updated : i))
+    setDrawerItem(updated)
+  }
+
+  const today = dateKey(new Date())
+
+  return (
+    <div>
+      {/* Week nav */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <SectionHeader style={{ margin: 0 }}>Content Calendar</SectionHeader>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={prevWeek} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>← Prev</button>
+          <div style={{ fontWeight: 700, fontSize: 14, minWidth: 160, textAlign: 'center' }}>{monthLabel}</div>
+          <button onClick={nextWeek} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>Next →</button>
+        </div>
+      </div>
+
+      {/* Week grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8 }}>
+        {weekDates.map((date, di) => {
+          const dk = dateKey(date)
+          const dayItems = calItems.filter(i => i.date === dk)
+          const isToday = dk === today
+          return (
+            <div key={dk} style={{ minHeight: 120, background: '#fff', borderRadius: 10, border: `1px solid ${isToday ? '#6366f1' : '#e5e7eb'}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
+              {/* Day header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>{DAY_NAMES[di]}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: isToday ? '#6366f1' : '#111827' }}>{date.getDate()}</div>
+                </div>
+                <button onClick={() => addItem(dk)}
+                  style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', lineHeight: 1 }}>+</button>
+              </div>
+
+              {/* Items */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+                {dayItems.map(item => (
+                  <div key={item.id} onClick={() => setDrawerItem(item)}
+                    style={{ background: (CHANNEL_COLORS[item.channel] || '#6b7280') + '18', borderLeft: `3px solid ${CHANNEL_COLORS[item.channel] || '#6b7280'}`, borderRadius: 5, padding: '4px 7px', cursor: 'pointer', fontSize: 11 }}>
+                    <div style={{ fontWeight: 700, color: CHANNEL_COLORS[item.channel] || '#6b7280', textTransform: 'uppercase', fontSize: 10 }}>{item.channel}</div>
+                    <div style={{ color: '#374151', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.theme || '(no theme)'}</div>
+                    <div style={{ marginTop: 2 }}>
+                      <span style={{ fontSize: 10, background: STATUS_BG[item.status], color: STATUS_FG[item.status], borderRadius: 4, padding: '1px 5px', fontWeight: 600 }}>{item.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Drawer */}
+      {drawerItem && (
+        <CalendarItemDrawer
+          item={drawerItem}
+          onClose={() => setDrawerItem(null)}
+          onSave={onSave}
+          onDelete={deleteItem}
+          campaigns={campaigns}
+          personas={personas}
+          catalog={catalog}
+        />
+      )}
     </div>
   )
 }
@@ -1806,17 +2438,19 @@ function BrandGuidelinesTab({ guidelines }) {
 }
 
 const TABS = [
-  { id: 'overview',  label: '🏠 Overview' },
-  { id: 'catalog',   label: '👗 Catalog' },
-  { id: 'site',      label: '🔍 Site Intel' },
-  { id: 'email',     label: '📧 Email' },
-  { id: 'social',    label: '📱 Social' },
-  { id: 'seo',       label: '📊 SEO' },
-  { id: 'content',   label: '✍️ Content' },
-  { id: 'price',     label: '💰 Pricing' },
-  { id: 'ai',        label: '🤖 AI Search' },
-  { id: 'personas',  label: '👥 Personas' },
-  { id: 'brand',     label: '📘 Brand Guidelines' },
+  { id: 'overview',   label: '🏠 Overview' },
+  { id: 'calendar',   label: '📅 Calendar' },
+  { id: 'campaigns',  label: '🗂️ Campaigns' },
+  { id: 'catalog',    label: '👗 Catalog' },
+  { id: 'site',       label: '🔍 Site Intel' },
+  { id: 'email',      label: '📧 Email' },
+  { id: 'social',     label: '📱 Social' },
+  { id: 'seo',        label: '📊 SEO' },
+  { id: 'content',    label: '✍️ Content' },
+  { id: 'price',      label: '💰 Pricing' },
+  { id: 'ai',         label: '🤖 AI Search' },
+  { id: 'personas',   label: '👥 Personas' },
+  { id: 'brand',      label: '📘 Brand' },
 ]
 
 export default function App() {
@@ -1824,11 +2458,13 @@ export default function App() {
   const [data, setData] = useState({})
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [campaigns, setCampaigns] = useState([])
+  const [calItems, setCalItems] = useState([])
 
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const [siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines] = await Promise.all([
+      const [siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines, campaignsData, calendarData] = await Promise.all([
         fetchEndpoint('/site-intelligence'),
         fetchEndpoint('/product-catalog'),
         fetchEndpoint('/site-analysis'),
@@ -1843,8 +2479,12 @@ export default function App() {
         fetchEndpoint('/personas'),
         fetchEndpoint('/apify-usage'),
         fetchEndpoint('/brand-guidelines'),
+        fetchEndpoint('/campaigns'),
+        fetchEndpoint('/calendar'),
       ])
       setData({ siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines })
+      setCampaigns(Array.isArray(campaignsData) ? campaignsData : [])
+      setCalItems(Array.isArray(calendarData) ? calendarData : [])
       setLastUpdated(new Date().toLocaleTimeString())
       setLoading(false)
     }
@@ -1883,17 +2523,19 @@ export default function App() {
           </div>
         ) : (
           <>
-            {tab === 'overview' && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
-            {tab === 'catalog'  && <CatalogTab catalog={data.catalog} />}
-            {tab === 'site'     && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
-            {tab === 'email'    && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} />}
-            {tab === 'social'   && <SocialTab socialIntel={data.socialIntel} />}
-            {tab === 'seo'      && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
-            {tab === 'content'  && <ContentTab content={data.content} catalog={data.catalog} />}
-            {tab === 'price'    && <PriceTab priceIntel={data.priceIntel} />}
-            {tab === 'ai'       && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
-            {tab === 'personas' && <PersonasTab personas={data.personas} />}
-            {tab === 'brand'    && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
+            {tab === 'overview'  && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
+            {tab === 'calendar'  && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
+            {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} />}
+            {tab === 'catalog'   && <CatalogTab catalog={data.catalog} />}
+            {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
+            {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} />}
+            {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
+            {tab === 'seo'       && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
+            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} />}
+            {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
+            {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
+            {tab === 'personas'  && <PersonasTab personas={data.personas} />}
+            {tab === 'brand'     && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
           </>
         )}
       </div>
