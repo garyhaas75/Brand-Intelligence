@@ -1,0 +1,787 @@
+{
+  "generatedAt": "2026-03-07T20:44:46.163Z",
+  "model": "claude-sonnet-4-6",
+  "scores": {
+    "visibilityRate": 20,
+    "topOfMindRate": 20,
+    "positiveRateWhenMentioned": 100,
+    "queriesTested": 15,
+    "queriesMentioned": 3,
+    "queriesTopOfMind": 3,
+    "categoryBreakdown": [
+      {
+        "category": "Brand Awareness",
+        "visibilityRate": 100,
+        "mentioned": 2,
+        "total": 2
+      },
+      {
+        "category": "Product-Specific",
+        "visibilityRate": 33,
+        "mentioned": 1,
+        "total": 3
+      },
+      {
+        "category": "Brand Discovery",
+        "visibilityRate": 0,
+        "mentioned": 0,
+        "total": 2
+      },
+      {
+        "category": "Demographic",
+        "visibilityRate": 0,
+        "mentioned": 0,
+        "total": 2
+      },
+      {
+        "category": "Price-Conscious",
+        "visibilityRate": 0,
+        "mentioned": 0,
+        "total": 2
+      },
+      {
+        "category": "Competitor Alt",
+        "visibilityRate": 0,
+        "mentioned": 0,
+        "total": 2
+      },
+      {
+        "category": "Occasion",
+        "visibilityRate": 0,
+        "mentioned": 0,
+        "total": 2
+      }
+    ],
+    "competitorVisibility": [
+      {
+        "brand": "Ann Taylor",
+        "mentions": 13,
+        "rate": 87
+      },
+      {
+        "brand": "Talbots",
+        "mentions": 4,
+        "rate": 27
+      },
+      {
+        "brand": "White House Black Market",
+        "mentions": 1,
+        "rate": 7
+      },
+      {
+        "brand": "Jones New York",
+        "mentions": 0,
+        "rate": 0
+      },
+      {
+        "brand": "Donna Karan",
+        "mentions": 0,
+        "rate": 0
+      }
+    ],
+    "gaps": [
+      {
+        "query": "What are the best women's workwear clothing brands?",
+        "category": "Brand Discovery",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Top women's professional fashion brands in the US",
+        "category": "Brand Discovery",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Best women's clothing brands for professional women over 40",
+        "category": "Demographic",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Stylish work clothes for women in their 50s that aren't frumpy",
+        "category": "Demographic",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Affordable women's work clothes brands, $50 to $200 range",
+        "category": "Price-Conscious",
+        "competitorsPresent": [
+          "Ann Taylor",
+          "Talbots"
+        ]
+      },
+      {
+        "query": "Best mid-range women's workwear brands under $300",
+        "category": "Price-Conscious",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Best brands for women's work blazers and suit jackets",
+        "category": "Product-Specific",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Best women's brands for work dresses and office-appropriate dresses",
+        "category": "Product-Specific",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Brands similar to Ann Taylor for women's work clothes",
+        "category": "Competitor Alt",
+        "competitorsPresent": [
+          "Ann Taylor",
+          "Talbots"
+        ]
+      },
+      {
+        "query": "Alternatives to Talbots for professional women's clothing",
+        "category": "Competitor Alt",
+        "competitorsPresent": [
+          "Ann Taylor",
+          "Talbots"
+        ]
+      },
+      {
+        "query": "What to wear to a job interview — best women's clothing brands",
+        "category": "Occasion",
+        "competitorsPresent": [
+          "Ann Taylor"
+        ]
+      },
+      {
+        "query": "Best women's brands for business formal and corporate attire",
+        "category": "Occasion",
+        "competitorsPresent": [
+          "Ann Taylor",
+          "White House Black Market"
+        ]
+      }
+    ]
+  },
+  "geoRecommendations": [
+    {
+      "title": "Build a Comprehensive 'Women's Workwear Authority' Content Hub",
+      "priority": "high",
+      "action": "Create a dedicated editorial section on the Anne Klein website targeting brand discovery and demographic queries. Publish 10-15 long-form articles covering topics like 'Best Workwear Brands for Professional Women,' 'How to Build a Work Wardrobe in Your 40s and 50s,' and 'Complete Guide to Women's Professional Fashion.' Each article should explicitly position Anne Klein within the competitive workwear landscape, include brand history and design philosophy context, and use natural language that mirrors how AI search queries are phrased. Target word counts of 1,500-2,500 words with clear H2/H3 structure so AI models can extract discrete, citable facts.",
+      "rationale": "AI models like ChatGPT and Perplexity build recommendations from indexed authoritative content. Anne Klein's 0% visibility in Brand Discovery and Demographic categories signals that no crawlable content exists that directly answers these query types. When AI models search for 'best women's workwear brands,' they surface brands whose owned content explicitly addresses that framing. Ann Taylor dominates because their content hub directly answers these questions. Creating topically relevant, semantically rich editorial content gives AI models the source material they need to cite Anne Klein in these response categories."
+    },
+    {
+      "title": "Implement Structured Data Markup for Brand Identity and Product Authority",
+      "priority": "high",
+      "action": "Deploy Schema.org markup across the Anne Klein website at three levels: (1) Organization schema on the homepage and About page, including 'foundingDate,' 'description,' 'knowsAbout' fields explicitly listing 'women's workwear,' 'professional women's fashion,' 'women's clothing 40s 50s,' and price range indicators; (2) Product schema on all category and product pages with 'audience' fields specifying professional women, age demographics, and occasion tags like 'office,' 'business casual,' 'professional'; (3) FAQPage schema on editorial content with Q&A pairs that directly mirror high-value AI query language such as 'Is Anne Klein a good brand for professional women?' and 'What price range is Anne Klein clothing?' Submit updated sitemaps to Google, Bing, and ensure all schema validates via Google's Rich Results Test.",
+      "rationale": "Generative AI models rely heavily on structured, machine-readable signals to classify and retrieve brand information during response generation. Without explicit structured data, AI systems must infer brand positioning from unstructured text alone, making Anne Klein easy to overlook in favor of competitors with cleaner data footprints. FAQPage schema is particularly high-value because the Q&A format directly mirrors how generative AI constructs responses, increasing the probability that AK answers get lifted verbatim into AI outputs. The 'knowsAbout' and audience fields directly address the Demographic and Price-Conscious category gaps where AK currently scores 0%."
+    },
+    {
+      "title": "Develop an Explicit Price-Point and Value Positioning Content Strategy",
+      "priority": "high",
+      "action": "Create a dedicated 'Anne Klein Price Guide' landing page and supporting blog content that directly addresses the $50-$200 workwear query gap. Include: a structured breakdown of Anne Klein's product price ranges by category (blazers, trousers, dresses, accessories), a comparison narrative explaining AK's quality-to-price positioning relative to the category, and buyer guidance content like 'How to Build a Complete Anne Klein Work Wardrobe for Under $500.' Embed this content with PriceRange schema and integrate specific price anchors throughout product descriptions and category page copy. Distribute this content through PR outreach to fashion and personal finance publishers who are frequently cited by AI models.",
+      "rationale": "Anne Klein's 0% visibility in Price-Conscious queries despite competing in the $50-$200 range represents a critical missed opportunity, as price-filtered queries indicate high purchase intent. AI models cannot recommend Anne Klein for affordability queries if no content explicitly connects the brand to that price narrative. AI systems pattern-match brand recommendations to query intent signals — when a user asks for '$50-$200 workwear,' the model retrieves brands whose content has established that price association. Publishing explicit price-anchored content and earning citations from third-party financial and fashion publishers creates the retrieval signals needed to compete against Ann Taylor and Talbots in this category."
+    },
+    {
+      "title": "Launch a Targeted PR and Third-Party Citation Campaign for AI-Indexed Sources",
+      "priority": "high",
+      "action": "Identify the specific publications and content sources that AI models most frequently cite for women's workwear recommendations — typically outlets like Who What Wear, InStyle, Real Simple, The Everygirl, Forbes Advisor (shopping vertical), and Wirecutter-style roundups. Develop a targeted media outreach campaign to secure Anne Klein placements in: 'best workwear brands' roundup articles, 'best clothing brands for women over 40/50' listicles, and 'affordable professional women's fashion' gift guides. Brief PR teams to specifically pitch with language matching AI query gaps: emphasize the 40s/50s demographic fit, the $50-$200 price range, and AK's heritage as a professional women's brand. Track which publications get cited in AI outputs for target queries and prioritize placements in those specific outlets.",
+      "rationale": "Generative AI models are trained on and retrieve from third-party publications as heavily as brand-owned content — often more so, since editorial sources carry higher authority signals. Ann Taylor's dominance in Brand Discovery queries is largely driven by its consistent presence in high-authority roundup articles that AI models treat as ground truth for category recommendations. Because Anne Klein's positive sentiment is already 100% when mentioned, the problem is purely one of citation frequency and source coverage. Securing placements in AI-indexed, high-authority publications creates the external validation signals that cause AI models to include AK in unprompted brand discovery responses."
+    },
+    {
+      "title": "Create Demographic-Specific FAQ and Editorial Content Targeting Women 40-60",
+      "priority": "medium",
+      "action": "Develop a content series explicitly targeting the 40s and 50s professional woman demographic that currently shows 0% AI visibility. Publish 6-8 editorial pieces with titles directly mirroring the gap queries, such as: 'Anne Klein for Women Over 40: Professional Style That Works,' 'How to Dress for the Office in Your 50s: An Anne Klein Guide,' and 'Why Professional Women in Their 40s and 50s Choose Anne Klein.' Within each article, include an FAQ section with Schema markup addressing questions like 'Is Anne Klein good for women over 40?', 'Does Anne Klein make flattering clothes for women in their 50s?', and 'What makes Anne Klein different from Ann Taylor for professional women?' Cross-link this content to relevant product category pages and distribute via email to existing customers in this demographic to generate engagement signals.",
+      "rationale": "The Demographic category's 0% visibility is particularly damaging because women 40-60 represent Anne Klein's core audience and these queries carry strong commercial intent. AI models have learned to associate Ann Taylor with this demographic through years of editorial content that explicitly names them in this context. Closing this gap requires content that uses the exact demographic language AI models are pattern-matching against — 'women over 40,' 'women in their 50s,' 'not frumpy' — in authoritative, structured formats. FAQ schema on these articles directly addresses the 'stylish work clothes for women in their 50s' query type, and the cross-linking structure signals to AI crawlers that this demographic positioning is core to Anne Klein's brand identity rather than incidental."
+    }
+  ],
+  "queryResults": [
+    {
+      "id": "brand_discover_1",
+      "category": "Brand Discovery",
+      "query": "What are the best women's workwear clothing brands?",
+      "response": "Here are the best women's workwear brands by category:\n\n**Classic/Professional**\n- **MM LaFleur** – polished, wrinkle-resistant pieces designed specifically for working women\n- **Banana Republic** – reliable suits, blazers, and separates in quality fabrics\n- **Theory** – investment-worthy tailored pieces that last for years\n\n**Affordable Options**\n- **Ann Taylor** – consistently good work staples at mid-range prices\n- **J.Crew** – versatile blazers and trousers that mix well together\n- **Express** – budget-friendly suiting and workwear basics\n\n**Premium/Luxury**\n- **Reiss** – sharp, contemporary tailoring worth the splurge\n- **Hugo Boss** – excellent structured suiting for a powerful look\n\n**Comfortable & Modern**\n- **Athleta** – great for business casual, especially travel-friendly fabrics\n- **Everlane** – clean, minimalist pieces in quality materials at fair prices\n\n**Best for Plus Sizes**\n- **Universal Standard** – truly inclusive sizing with professional options\n- **Eloquii** – fashionable workwear in sizes 14–28\n\nMM LaFleur and Ann Taylor are consistently top picks for most women because they balance style, comfort, and durability at reasonable price points.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "neutral",
+          "isTopOfMind": true,
+          "context": "vestment-worthy tailored pieces that last for years\n\n**Affordable Options**\n- **Ann Taylor** – consistently good work staples at mid-range prices\n- **J.Crew** – versatile blazers and trousers that mix well together\n- **Express** – budget-friendly suiting and workwear basics\n\n**Pr"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "brand_discover_2",
+      "category": "Brand Discovery",
+      "query": "Top women's professional fashion brands in the US",
+      "response": "# Top Women's Professional Fashion Brands in the US\n\n## Investment/High-End\n- **Tory Burch** – Polished, feminine pieces with strong brand recognition\n- **Theory** – Clean, tailored suiting and separates\n- **Veronica Beard** – Modern, elevated workwear with great blazers\n\n## Mid-Range Sweet Spot\n- **Ann Taylor** – Classic workwear staple, reliable suiting\n- **Banana Republic** – Versatile office-to-evening pieces\n- **J.Crew** – Approachable professional with good blazers and trousers\n- **M.M. LaFleur** – Specifically designed for working women, wrinkle-resistant\n\n## Budget-Friendly\n- **Express** – Trendy professional pieces at accessible prices\n- **LOFT** – Affordable, feminine workwear basics\n- **Target (A New Day/Universal Thread)** – Surprisingly solid basics\n\n## Best For Suiting Specifically\n- **Suit Supply** – Sharp, well-fitted women's suiting\n- **Hugo Boss** – Strong structured tailoring\n\n## Online/DTC Standouts\n- **Quince** – High-quality basics at factory-direct prices\n- **Everlane** – Minimalist, quality essentials\n\n**M.M. LaFleur and Theory** are consistently top picks for women who need genuinely functional, polished workwear.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "d** – Modern, elevated workwear with great blazers\n\n## Mid-Range Sweet Spot\n- **Ann Taylor** – Classic workwear staple, reliable suiting\n- **Banana Republic** – Versatile office-to-evening pieces\n- **J.Crew** – Approachable professional with good blazers and trousers\n- **M.M. LaF"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "demographic_1",
+      "category": "Demographic",
+      "query": "Best women's clothing brands for professional women over 40",
+      "response": "# Best Professional Women's Clothing Brands Over 40\n\n## Investment Pieces\n- **Eileen Fisher** – Clean lines, quality fabrics, timeless silhouettes\n- **Theory** – Sharp tailoring, modern cuts that work for years\n- **St. John** – Classic suiting, polished and authoritative\n\n## Great Value/Accessible\n- **M.M. LaFleur** – Designed specifically for working women, wrinkle-resistant, flattering fits\n- **J.Crew** – Strong suiting and separates, frequent sales make it affordable\n- **Ann Taylor** – Reliable workwear staples, consistent sizing\n\n## Contemporary/Elevated\n- **Veronica Beard** – Fashion-forward but professional, great blazers\n- **Lafayette 148** – Sophisticated, Italian fabrics, excellent fit for women 40+\n- **Banana Republic** – Solid mid-range option, good tailoring\n\n## Worth Knowing\n- **Quince** and **Universal Standard** offer excellent quality at lower prices\n- **Nordstrom** carries most of these and has excellent return policies for trying multiple sizes\n\n**Top overall pick:** M.M. LaFleur for everyday work, Eileen Fisher for longevity and versatility. Both prioritize fit and practicality over trends.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "*J.Crew** – Strong suiting and separates, frequent sales make it affordable\n- **Ann Taylor** – Reliable workwear staples, consistent sizing\n\n## Contemporary/Elevated\n- **Veronica Beard** – Fashion-forward but professional, great blazers\n- **Lafayette 148** – Sophisticated, Italia"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "demographic_2",
+      "category": "Demographic",
+      "query": "Stylish work clothes for women in their 50s that aren't frumpy",
+      "response": "Here are some great options:\n\n**Best Brands:**\n- **Banana Republic** – Tailored blazers, trousers, and dresses that look polished without being stiff\n- **J.Crew** – Classic pieces with modern cuts; their Regent blazer is a favorite\n- **Ann Taylor** – Specifically designed for professional women; great ponte pants and wrap dresses\n- **M.M. LaFleur** – Made specifically for working women, wrinkle-resistant and well-fitted\n- **Vince** – More investment pieces but incredibly elegant and age-appropriate without being boring\n- **Eileen Fisher** – Clean lines and quality fabrics; avoid the shapeless pieces and stick to their structured items\n- **COS** – Minimalist, architectural pieces that look expensive and current\n\n**Key pieces to focus on:**\n- Well-fitted straight-leg or slim trousers (not skinny, not wide-leg baggy)\n- Structured blazers in interesting colors, not just black\n- Quality knit tops with interesting necklines\n- Wrap dresses and midi lengths\n\n**Avoid:** Boxy shapeless cuts, overly matchy sets, and anything with excessive embellishment.\n\nM.M. LaFleur and Banana Republic are probably the strongest starting points for everyday work wear.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "Crew** – Classic pieces with modern cuts; their Regent blazer is a favorite\n- **Ann Taylor** – Specifically designed for professional women; great ponte pants and wrap dresses\n- **M.M. LaFleur** – Made specifically for working women, wrinkle-resistant and well-fitted\n- **Vince**"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "price_tier_1",
+      "category": "Price-Conscious",
+      "query": "Affordable women's work clothes brands, $50 to $200 range",
+      "response": "# Affordable Women's Work Clothes Brands\n\n**Best Overall Value**\n- **Ann Taylor** – Classic, polished pieces; great sales bring items well under $100\n- **Banana Republic** – Quality suiting and blouses; watch for their frequent 40-50% off sales\n- **LOFT** – Softer, more relaxed workwear; consistently affordable and has petite/tall options\n\n**Fast Fashion but Decent Quality**\n- **H&M** – Surprisingly good blazers and trousers under $60\n- **Zara** – Trend-forward work pieces, good tailoring for the price\n\n**Great for Basics**\n- **Quince** – Excellent quality basics (silk blouses, trousers) at surprisingly low prices\n- **M.M. LaFleur** – Designed specifically for working women; wrinkle-resistant, comfortable suiting\n\n**Slightly Higher End (but worth it)**\n- **Everlane** – Clean, minimal aesthetic; great trousers and blazers around $100-$150\n- **Talbots** – Especially good for classic, professional looks; frequent sales\n\n**Pro Tips:**\n- Ann Taylor and LOFT almost always have 40-50% off sales running\n- Banana Republic Factory is significantly cheaper than the main line\n- Quince is often overlooked but punches well above its price point",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "# Affordable Women's Work Clothes Brands\n\n**Best Overall Value**\n- **Ann Taylor** – Classic, polished pieces; great sales bring items well under $100\n- **Banana Republic** – Quality suiting and blouses; watch for their frequent 40-50% off sales\n- **LOFT** – Softer, mor"
+        },
+        "Talbots": {
+          "mentioned": true,
+          "position": 2,
+          "sentiment": "positive",
+          "isTopOfMind": false,
+          "context": "e** – Clean, minimal aesthetic; great trousers and blazers around $100-$150\n- **Talbots** – Especially good for classic, professional looks; frequent sales\n\n**Pro Tips:**\n- Ann Taylor and LOFT almost always have 40-50% off sales running\n- Banana Republic Factory is significantly"
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor",
+        "Talbots"
+      ]
+    },
+    {
+      "id": "price_tier_2",
+      "category": "Price-Conscious",
+      "query": "Best mid-range women's workwear brands under $300",
+      "response": "# Best Mid-Range Women's Workwear Brands (Under $300)\n\n## Polished & Professional\n- **Banana Republic** – Excellent suiting, blazers, and trousers. Quality fabrics, frequent 40% off sales\n- **J.Crew** – Strong blazers and separates, great for mixing and matching\n- **Ann Taylor** – Reliable classics, especially pants and sheath dresses\n\n## Modern & Elevated\n- **M.M. LaFleur** – Designed specifically for working women, wrinkle-resistant, very comfortable\n- **Vince Camuto** – Great blouses and dresses with a feminine edge\n- **Reiss** – Slightly higher price point but sharp tailoring worth the splurge\n\n## Affordable Wins\n- **H&M Conscious/Premium** – Surprisingly office-ready pieces under $100\n- **Quince** – Cashmere and silk basics at drastically reduced prices\n\n## Best For Specific Needs\n| Need | Brand |\n|------|-------|\n| Travel/wrinkle-free | M.M. LaFleur |\n| Classic suiting | Banana Republic |\n| Petite sizing | Ann Taylor |\n| Plus sizes | Universal Standard |\n| Trendy but professional | & Other Stories |\n\n**Top overall pick:** M.M. LaFleur for workwear specifically designed around a woman's actual workday.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "- **J.Crew** – Strong blazers and separates, great for mixing and matching\n- **Ann Taylor** – Reliable classics, especially pants and sheath dresses\n\n## Modern & Elevated\n- **M.M. LaFleur** – Designed specifically for working women, wrinkle-resistant, very comfortable\n- **Vince"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "product_blazer",
+      "category": "Product-Specific",
+      "query": "Best brands for women's work blazers and suit jackets",
+      "response": "# Best Women's Work Blazers & Suit Jackets\n\n**Investment/High Quality**\n- **Theory** – clean lines, excellent fabric, holds shape well\n- **J.Crew** – classic fits, good suiting fabric, frequent sales\n- **Banana Republic** – reliable office staples, wide size range\n\n**Mid-Range Sweet Spot**\n- **M.M. LaFleur** – designed specifically for professional women, wrinkle-resistant\n- **Ann Taylor** – consistently good blazers, petite and plus options\n- **Eloquii** – best plus-size suiting, great structure\n\n**Budget-Friendly**\n- **H&M** – surprisingly structured blazers for the price\n- **Zara** – trendy cuts, good quality for cost\n- **ASOS** – huge selection, good for hard-to-fit sizes\n\n**Premium Splurge**\n- **Veronica Beard** – the **Dickey jacket** is iconic and extremely versatile\n- **Hugo Boss** – sharp tailoring, very professional\n- **Equipment** – silk/blazer hybrids, luxe feel\n\n**Quick Tips:**\n- For everyday wear, **Ann Taylor or M.M. LaFleur** are the best value\n- For a power suit look, go **Theory or Boss**\n- Check if a brand offers **matching trousers** to build a real suit",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "LaFleur** – designed specifically for professional women, wrinkle-resistant\n- **Ann Taylor** – consistently good blazers, petite and plus options\n- **Eloquii** – best plus-size suiting, great structure\n\n**Budget-Friendly**\n- **H&M** – surprisingly structured blazers for the price"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "product_dress",
+      "category": "Product-Specific",
+      "query": "Best women's brands for work dresses and office-appropriate dresses",
+      "response": "# Best Brands for Work & Office Dresses\n\n## Classic/Polished\n- **Ann Taylor** – Reliable, professional cuts in a wide size range, frequent sales\n- **Banana Republic** – Higher quality fabrics, tailored silhouettes, versatile colors\n- **J.Crew** – Sheath and wrap styles that look put-together without being stuffy\n\n## Mid-Range Sweet Spot\n- **M.M. LaFleur** – Designed specifically for professional women, wrinkle-resistant, travel-friendly\n- **Vince Camuto** – Feminine but office-appropriate, great for business casual\n- **Eloquii** – Excellent extended sizes (14–28), stylish and professional\n\n## Budget-Friendly\n- **LOFT** – Affordable, comfortable, lots of options updated seasonally\n- **Target (A New Day)** – Surprisingly work-appropriate basics at low prices\n\n## Investment Pieces\n- **Theory** – Clean, modern, exceptional quality that lasts years\n- **Tahari ASL** – Classic suiting dresses, structured and polished\n\n## Quick Tips\n- **M.M. LaFleur** is the top pick if you want dresses built *specifically* for office life\n- **Ann Taylor + LOFT** are reliable go-tos for variety and frequent discounts\n- **Banana Republic** hits the best quality-to-price ratio for investment pieces",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "# Best Brands for Work & Office Dresses\n\n## Classic/Polished\n- **Ann Taylor** – Reliable, professional cuts in a wide size range, frequent sales\n- **Banana Republic** – Higher quality fabrics, tailored silhouettes, versatile colors\n- **J.Crew** – Sheath and wrap st"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "product_shoes",
+      "category": "Product-Specific",
+      "query": "Best women's shoe brands for the office and professional settings",
+      "response": "# Best Women's Office Shoe Brands\n\n## Investment/Premium\n- **Cole Haan** – Classic styles with hidden comfort technology, great for long days\n- **Sam Edelman** – Stylish, professional, very affordable\n- **Naturalizer** – Excellent arch support without sacrificing polish\n- **Clarks** – Durable, comfortable, particularly good structured flats and block heels\n\n## Mid-Range Workhorses\n- **M.M. LaFleur** – Designed specifically for professional women\n- **Banana Republic** – Reliable pumps, loafers, and mules that photograph well in meetings\n- **Anne Klein** – Classic silhouettes at reasonable prices\n\n## Comfort-First (Still Professional-Looking)\n- **Vionic** – Built-in orthotic support, podiatrist-recommended\n- **Ecco** – Scandinavian quality, extremely walkable\n- **Rockport** – Great for commuters who walk significant distances\n\n## Splurge-Worthy\n- **Loeffler Randall** – Elevated, fashion-forward but boardroom-appropriate\n- **Stuart Weitzman** – Timeless pumps and boots worth the investment\n\n**Top picks for most women:** Cole Haan and Sam Edelman hit the sweet spot of style, comfort, and price for everyday office wear.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "lic** – Reliable pumps, loafers, and mules that photograph well in meetings\n- **Anne Klein** – Classic silhouettes at reasonable prices\n\n## Comfort-First (Still Professional-Looking)\n- **Vionic** – Built-in orthotic support, podiatrist-recommended\n- **Ecco** – Scandinavian qualit"
+        },
+        "Ann Taylor": {
+          "mentioned": false
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": true,
+      "akPosition": 1,
+      "akSentiment": "positive",
+      "akTopOfMind": true,
+      "competitorsMentioned": []
+    },
+    {
+      "id": "competitor_alt_1",
+      "category": "Competitor Alt",
+      "query": "Brands similar to Ann Taylor for women's work clothes",
+      "response": "Here are brands with a similar vibe to Ann Taylor for professional women's clothing:\n\n**Same Price Range (~$50–150/piece)**\n- **Banana Republic** – polished, slightly more fashion-forward\n- **J.Crew** – classic with a bit more personality and color\n- **Talbots** – more traditional, excellent quality basics\n\n**A Step Up in Quality/Price**\n- **MM. LaFleur** – specifically designed for working women, wrinkle-resistant fabrics\n- **Reiss** – sharper tailoring, very polished look\n- **Theory** – cleaner, more minimalist aesthetic\n\n**More Budget-Friendly**\n- **Loft** (Ann Taylor's own sister brand) – same aesthetic, lower prices\n- **Express** – younger feel but good work basics\n- **H&M** or **Zara** – trendy pieces that mix well with staples\n\n**MM. LaFleur** is worth a specific callout if you want the Ann Taylor sensibility with fabrics engineered for long workdays. **Banana Republic** is probably the closest overall match in style and quality.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "Here are brands with a similar vibe to Ann Taylor for professional women's clothing:\n\n**Same Price Range (~$50–150/piece)**\n- **Banana Republic** – polished, slightly more fashion-forward\n- **J.Crew** – classic with a bit more personality"
+        },
+        "Talbots": {
+          "mentioned": true,
+          "position": 2,
+          "sentiment": "positive",
+          "isTopOfMind": false,
+          "context": "ashion-forward\n- **J.Crew** – classic with a bit more personality and color\n- **Talbots** – more traditional, excellent quality basics\n\n**A Step Up in Quality/Price**\n- **MM. LaFleur** – specifically designed for working women, wrinkle-resistant fabrics\n- **Reiss** – sharper tail"
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor",
+        "Talbots"
+      ]
+    },
+    {
+      "id": "competitor_alt_2",
+      "category": "Competitor Alt",
+      "query": "Alternatives to Talbots for professional women's clothing",
+      "response": "Here are strong alternatives to Talbots for professional women's clothing:\n\n**Similar Classic/Traditional Style**\n- **Ann Taylor** – Very comparable aesthetic, great for office staples\n- **Banana Republic** – Slightly more modern, excellent suits and blazers\n- **J.Crew** – Polished but approachable, strong suiting options\n\n**More Elevated/Upscale**\n- **Vince Camuto** – Sleek and feminine professional looks\n- **Lafayette 148** – Premium quality, sophisticated tailoring\n- **M.M. LaFleur** – Designed specifically for working women, wrinkle-resistant fabrics\n\n**More Budget-Friendly**\n- **Loft** (Ann Taylor's sister brand) – Great value, work-appropriate styles\n- **Quince** – High-quality basics at lower price points\n- **Mango** – European-inspired, modern office looks\n\n**For Petites or Plus Sizes**\n- **Eloquii** – Excellent professional plus-size options\n- **Adrianna Papell** – Works well across sizes\n\n**M.M. LaFleur** is worth highlighting if you want something purpose-built for professional women — their fabric technology and fit are especially practical for long workdays.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "s for professional women's clothing:\n\n**Similar Classic/Traditional Style**\n- **Ann Taylor** – Very comparable aesthetic, great for office staples\n- **Banana Republic** – Slightly more modern, excellent suits and blazers\n- **J.Crew** – Polished but approachable, strong suiting op"
+        },
+        "Talbots": {
+          "mentioned": true,
+          "position": 2,
+          "sentiment": "positive",
+          "isTopOfMind": false,
+          "context": "Here are strong alternatives to Talbots for professional women's clothing:\n\n**Similar Classic/Traditional Style**\n- **Ann Taylor** – Very comparable aesthetic, great for office staples\n- **Banana Republic** – Slightly more modern, e"
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor",
+        "Talbots"
+      ]
+    },
+    {
+      "id": "occasion_1",
+      "category": "Occasion",
+      "query": "What to wear to a job interview — best women's clothing brands",
+      "response": "# Best Women's Interview Outfit Brands\n\n## Classic/Professional\n- **Ann Taylor** – Reliable blazers, tailored pants, and sheath dresses made for the office\n- **Banana Republic** – Polished suits and separates that look expensive without being over the top\n- **J.Crew** – Great blazers and structured pieces that feel put-together but not stiff\n\n## Budget-Friendly\n- **H&M** – Surprisingly good tailored pieces at low prices\n- **Zara** – Sharp, modern suiting that photographs well\n- **Target (A New Day)** – Decent basics if you're in a pinch\n\n## Investment Pieces\n- **Theory** – Exceptional tailored suits and blazers worth the splurge\n- **Vince** – Clean, sophisticated separates for creative industries\n- **MM LaFleur** – Specifically designed for professional women; wrinkle-resistant, comfortable\n\n## Quick Tips\n- **Conservative fields** (law, finance, banking): Ann Taylor or Banana Republic suit\n- **Creative fields** (marketing, design): Zara or J.Crew with personality\n- **Tech/Startups**: Smart casual from Everlane or Madewell\n\n**MM LaFleur** is worth highlighting specifically — their whole brand is built around professional women and interview-ready dressing.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "# Best Women's Interview Outfit Brands\n\n## Classic/Professional\n- **Ann Taylor** – Reliable blazers, tailored pants, and sheath dresses made for the office\n- **Banana Republic** – Polished suits and separates that look expensive without being over the top\n- **J.Crew**"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor"
+      ]
+    },
+    {
+      "id": "occasion_2",
+      "category": "Occasion",
+      "query": "Best women's brands for business formal and corporate attire",
+      "response": "# Best Women's Business Formal Brands\n\n## Investment/Premium\n- **Theory** – Clean, modern suiting; excellent blazers and trousers\n- **Banana Republic** – Reliable corporate staples, good fit variety\n- **Hugo Boss** – Sharp, structured pieces with European tailoring\n- **Reiss** – Polished and sophisticated, great for boardrooms\n\n## Mid-Range Sweet Spot\n- **Ann Taylor** – The classic corporate go-to; consistent sizing and quality\n- **J.Crew** – Strong suiting separates, mix-and-match friendly\n- **White House Black Market** – Flattering cuts, good for petites and curvy fits\n- **M.M. LaFleur** – Designed specifically for working women; wrinkle-resistant fabrics\n\n## Budget-Conscious\n- **Zara** – Trend-forward professional pieces at accessible prices\n- **H&M Premium/& Other Stories** – Decent quality blazers and trousers\n\n## Specialty Fit\n- **Eloquii** – Extended sizes (14-28), genuinely corporate-appropriate styles\n- **Universal Standard** – Sizes 00-40, consistent quality across all sizes\n\n## Top Picks Overall\n**Ann Taylor** and **M.M. LaFleur** are consistently the most practical for daily corporate wear, while **Theory** is worth the splurge for key investment pieces like a great blazer.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": false
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "– Polished and sophisticated, great for boardrooms\n\n## Mid-Range Sweet Spot\n- **Ann Taylor** – The classic corporate go-to; consistent sizing and quality\n- **J.Crew** – Strong suiting separates, mix-and-match friendly\n- **White House Black Market** – Flattering cuts, good for pet"
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": true,
+          "position": 2,
+          "sentiment": "positive",
+          "isTopOfMind": false,
+          "context": "and quality\n- **J.Crew** – Strong suiting separates, mix-and-match friendly\n- **White House Black Market** – Flattering cuts, good for petites and curvy fits\n- **M.M. LaFleur** – Designed specifically for working women; wrinkle-resistant fabrics\n\n## Budget-Conscious\n- **Zara** –"
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": false,
+      "akPosition": null,
+      "akSentiment": null,
+      "akTopOfMind": false,
+      "competitorsMentioned": [
+        "Ann Taylor",
+        "White House Black Market"
+      ]
+    },
+    {
+      "id": "ak_direct",
+      "category": "Brand Awareness",
+      "query": "Tell me about Anne Klein as a clothing brand — who is it for, what do they sell, and is it good quality?",
+      "response": "Anne Klein is a classic American brand targeting professional women roughly in the 35-65 age range who want polished, work-appropriate clothing with a traditional sensibility. They sell suits, blazers, trousers, dresses, blouses, and skirts — basically a complete office wardrobe — along with accessories, shoes, and handbags. The brand sits in the moderate price range, typically sold at department stores like Macy's and Dillard's.\n\nQuality is decent but not exceptional for the price point — you're getting reliable construction and wearable fabrics, but it's not a premium or luxury product. The aesthetic is conservative and timeless rather than trendy, which makes pieces easy to mix and match and they don't go out of style quickly. It's a solid choice for building a functional work wardrobe without spending a fortune, but don't expect the same craftsmanship you'd find from higher-end brands like Theory or Eileen Fisher.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "Anne Klein is a classic American brand targeting professional women roughly in the 35-65 age range who want polished, work-appropriate clothing with a traditional sensibility. They sell suits, blazers"
+        },
+        "Ann Taylor": {
+          "mentioned": false
+        },
+        "Talbots": {
+          "mentioned": false
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": true,
+      "akPosition": 1,
+      "akSentiment": "positive",
+      "akTopOfMind": true,
+      "competitorsMentioned": []
+    },
+    {
+      "id": "ak_vs_comp",
+      "category": "Brand Awareness",
+      "query": "How does Anne Klein compare to Ann Taylor and Talbots for women's workwear?",
+      "response": "All three are solid classic workwear brands, but they have distinct differences:\n\n**Anne Klein**\n- Most fashion-forward of the three, with trend-influenced pieces\n- Strong in suits, blazers, and coordinated separates\n- Generally mid-range pricing; widely available at department stores like Macy's\n\n**Ann Taylor**\n- Best balance of polish and modern styling\n- Excellent for fitted blazers, ponte pants, and work dresses\n- Runs frequent sales, making it very good value; strong online presence\n\n**Talbots**\n- Most traditional and classic in aesthetic\n- Skews toward a slightly older customer but offers timeless, quality pieces\n- Known for excellent fit in petites and a strong cashmere and knitwear selection\n\n**Bottom line:** Ann Taylor is the most versatile for a modern professional wardrobe. Talbots is the go-to if you want investment-quality classics and reliable petite sizing. Anne Klein is best for statement workwear pieces like a sharp blazer or suit rather than building a full wardrobe. Many women mix all three successfully.",
+      "visibility": {
+        "Anne Klein": {
+          "mentioned": true,
+          "position": 1,
+          "sentiment": "positive",
+          "isTopOfMind": true,
+          "context": "three are solid classic workwear brands, but they have distinct differences:\n\n**Anne Klein**\n- Most fashion-forward of the three, with trend-influenced pieces\n- Strong in suits, blazers, and coordinated separates\n- Generally mid-range pricing; widely available at department store"
+        },
+        "Ann Taylor": {
+          "mentioned": true,
+          "position": 2,
+          "sentiment": "positive",
+          "isTopOfMind": false,
+          "context": "nerally mid-range pricing; widely available at department stores like Macy's\n\n**Ann Taylor**\n- Best balance of polish and modern styling\n- Excellent for fitted blazers, ponte pants, and work dresses\n- Runs frequent sales, making it very good value; strong online presence\n\n**Talbo"
+        },
+        "Talbots": {
+          "mentioned": true,
+          "position": 3,
+          "sentiment": "positive",
+          "isTopOfMind": false,
+          "context": "ses\n- Runs frequent sales, making it very good value; strong online presence\n\n**Talbots**\n- Most traditional and classic in aesthetic\n- Skews toward a slightly older customer but offers timeless, quality pieces\n- Known for excellent fit in petites and a strong cashmere and knitwe"
+        },
+        "White House Black Market": {
+          "mentioned": false
+        },
+        "Jones New York": {
+          "mentioned": false
+        },
+        "Donna Karan": {
+          "mentioned": false
+        }
+      },
+      "akMentioned": true,
+      "akPosition": 1,
+      "akSentiment": "positive",
+      "akTopOfMind": true,
+      "competitorsMentioned": [
+        "Ann Taylor",
+        "Talbots"
+      ]
+    }
+  ]
+}

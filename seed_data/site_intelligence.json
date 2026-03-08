@@ -1,0 +1,2642 @@
+{
+  "generatedAt": "2026-03-07T22:15:01.463Z",
+  "brandCount": 6,
+  "brands": [
+    {
+      "id": "anne_klein",
+      "name": "Anne Klein",
+      "url": "https://www.anneklein.com",
+      "role": "ours",
+      "scrapedAt": "2026-03-07T22:10:16.735Z",
+      "navigation": [
+        {
+          "text": "View Cart",
+          "href": "https://anneklein.com/cart"
+        },
+        {
+          "text": "NEW",
+          "href": "https://anneklein.com/collections/new"
+        },
+        {
+          "text": "New Arrivals",
+          "href": "https://anneklein.com/collections/new"
+        },
+        {
+          "text": "View All",
+          "href": "https://anneklein.com/collections/new"
+        },
+        {
+          "text": "Clothing",
+          "href": "https://anneklein.com/collections/clothing"
+        },
+        {
+          "text": "SHOES",
+          "href": "https://anneklein.com/collections/shoes"
+        },
+        {
+          "text": "HANDBAGS",
+          "href": "https://anneklein.com/collections/handbags-1"
+        },
+        {
+          "text": "Jewelry",
+          "href": "https://anneklein.com/collections/jewelry"
+        },
+        {
+          "text": "Best Sellers",
+          "href": "https://anneklein.com/collections/best-seller-jewelry"
+        },
+        {
+          "text": "Fall Campaign Collection",
+          "href": "https://anneklein.com/collections/fall-25-campaign"
+        },
+        {
+          "text": "Powerful Prints",
+          "href": "https://anneklein.com/collections/powerful-prints"
+        },
+        {
+          "text": "Executive Collection",
+          "href": "https://anneklein.com/collections/executive-collection"
+        },
+        {
+          "text": "Consider it Sustainable",
+          "href": "https://anneklein.com/collections/consider-it"
+        },
+        {
+          "text": "Campaign Lookbook",
+          "href": "https://anneklein.com/pages/spring-summer-campaign-2025"
+        },
+        {
+          "text": "Dresses & Jumpsuits",
+          "href": "https://anneklein.com/collections/dresses"
+        },
+        {
+          "text": "Blazers & Jackets",
+          "href": "https://anneklein.com/collections/blazers-jackets"
+        },
+        {
+          "text": "Tops",
+          "href": "https://anneklein.com/collections/tops"
+        },
+        {
+          "text": "Bottoms",
+          "href": "https://anneklein.com/collections/pants"
+        },
+        {
+          "text": "Outerwear",
+          "href": "https://anneklein.com/collections/outerwear"
+        },
+        {
+          "text": "Sweaters",
+          "href": "https://anneklein.com/collections/sweaters"
+        },
+        {
+          "text": "Plus Size",
+          "href": "https://anneklein.com/collections/plus-sizes"
+        },
+        {
+          "text": "Petite",
+          "href": "https://anneklein.com/collections/petite"
+        },
+        {
+          "text": "View All Clothing",
+          "href": "https://anneklein.com/collections/clothing"
+        },
+        {
+          "text": "Shop All Shoes",
+          "href": "https://anneklein.com/collections/shoes"
+        },
+        {
+          "text": "Boots",
+          "href": "https://anneklein.com/collections/boots"
+        },
+        {
+          "text": "Sandals & Slides",
+          "href": "https://anneklein.com/collections/sandals-slides"
+        },
+        {
+          "text": "Heels",
+          "href": "https://anneklein.com/collections/heels"
+        },
+        {
+          "text": "Wedges",
+          "href": "https://anneklein.com/collections/wedges"
+        },
+        {
+          "text": "Flats & Loafers",
+          "href": "https://anneklein.com/collections/flats"
+        },
+        {
+          "text": "View all Shoes",
+          "href": "https://anneklein.com/collections/shoes"
+        },
+        {
+          "text": "Shop All Handbags",
+          "href": "https://anneklein.com/collections/handbags-1"
+        },
+        {
+          "text": "Tote Bags",
+          "href": "https://anneklein.com/collections/tote-bags"
+        },
+        {
+          "text": "Shoulder Bags",
+          "href": "https://anneklein.com/collections/shoulder-bags"
+        },
+        {
+          "text": "Crossbody Bags",
+          "href": "https://anneklein.com/collections/crossbody-bags"
+        },
+        {
+          "text": "Mini Bags",
+          "href": "https://anneklein.com/collections/mini-bags"
+        },
+        {
+          "text": "Wallets & Wristlets",
+          "href": "https://anneklein.com/collections/wallets-wristlets"
+        },
+        {
+          "text": "Satchel Bags",
+          "href": "https://anneklein.com/collections/satchels-top-handles"
+        },
+        {
+          "text": "Gift Sets",
+          "href": "https://anneklein.com/collections/gift-sets"
+        },
+        {
+          "text": "View all Handbags",
+          "href": "https://anneklein.com/collections/handbags-1"
+        },
+        {
+          "text": "JEWELRY & ACCESSORIES",
+          "href": "https://anneklein.com/collections/accessories"
+        },
+        {
+          "text": "Accessories",
+          "href": "https://anneklein.com/collections/accessories"
+        },
+        {
+          "text": "Watches",
+          "href": "https://anneklein.com/collections/watches-1"
+        },
+        {
+          "text": "Sunglasses",
+          "href": "https://anneklein.com/collections/sunglasses"
+        },
+        {
+          "text": "Shop Accessories",
+          "href": "https://anneklein.com/collections/accessories"
+        },
+        {
+          "text": "Apple Accessories",
+          "href": "https://anneklein.com/collections/apple-accessories"
+        },
+        {
+          "text": "Apple Watch® Accessories",
+          "href": "https://anneklein.com/collections/apple-watch-accessories"
+        },
+        {
+          "text": "Apple AirPods® Accessories",
+          "href": "https://anneklein.com/collections/apple-airpods%C2%AE-accessories"
+        },
+        {
+          "text": "Apple iPhone® Accessories",
+          "href": "https://anneklein.com/collections/apple-iphone%C2%AE-accessories"
+        },
+        {
+          "text": "View All Apple Accessories",
+          "href": "https://anneklein.com/collections/apple-accessories"
+        },
+        {
+          "text": "Clip Earrings",
+          "href": "https://anneklein.com/collections/clip-earrings"
+        },
+        {
+          "text": "Pierced Earrings",
+          "href": "https://anneklein.com/collections/pierced-earrings"
+        },
+        {
+          "text": "Necklaces",
+          "href": "https://anneklein.com/collections/necklaces"
+        },
+        {
+          "text": "Bracelets",
+          "href": "https://anneklein.com/collections/bracelets"
+        },
+        {
+          "text": "Brooches",
+          "href": "https://anneklein.com/collections/brooches"
+        },
+        {
+          "text": "Jewelry Sets",
+          "href": "https://anneklein.com/collections/jewelry-sets"
+        },
+        {
+          "text": "Home",
+          "href": "https://anneklein.com/collections/home"
+        },
+        {
+          "text": "Bedding",
+          "href": "https://anneklein.com/collections/bedding"
+        },
+        {
+          "text": "Towels",
+          "href": "https://anneklein.com/collections/towels"
+        },
+        {
+          "text": "All Home",
+          "href": "https://anneklein.com/collections/home"
+        },
+        {
+          "text": "INSIDER'S CLUB",
+          "href": "https://anneklein.com/pages/loyalty-rewards"
+        },
+        {
+          "text": "Insider's Club Access",
+          "href": "https://anneklein.com/pages/loyalty-rewards"
+        },
+        {
+          "text": "Log in | Create Account",
+          "href": "https://anneklein.com/pages/loyalty-rewards"
+        },
+        {
+          "text": "Refer a Friend",
+          "href": "https://anneklein.com/pages/loyalty-refer"
+        },
+        {
+          "text": "Insider's Club FAQ",
+          "href": "https://anneklein.com/pages/loyalty-faq"
+        },
+        {
+          "text": "E-Gift Cards",
+          "href": "https://anneklein.com/products/anne-klein-gift-card"
+        },
+        {
+          "text": "Anne Klein History",
+          "href": "https://anneklein.com/pages/ak-history"
+        },
+        {
+          "text": "Blogs",
+          "href": "https://anneklein.com/blogs/fashion-tips-and-trends"
+        },
+        {
+          "text": "Breast Cancer Research Foundation®",
+          "href": "https://anneklein.com/collections/shop-pink"
+        },
+        {
+          "text": "Loyalty & Rewards",
+          "href": "https://anneklein.com/pages/loyalty-rewards"
+        },
+        {
+          "text": "Login",
+          "href": "https://anneklein.com/customer_authentication/redirect?locale=en&region_country=US"
+        },
+        {
+          "text": "Shop All Watches",
+          "href": "https://anneklein.com/collections/watch-collection"
+        },
+        {
+          "text": "Smartwatches",
+          "href": "https://anneklein.com/collections/smart-watches-1"
+        },
+        {
+          "text": "Everyday Watches",
+          "href": "https://anneklein.com/collections/everyday-watches"
+        },
+        {
+          "text": "Occasion Watches",
+          "href": "https://anneklein.com/collections/occasion-watches"
+        },
+        {
+          "text": "Watch Rings",
+          "href": "https://anneklein.com/collections/ring-watches"
+        },
+        {
+          "text": "View All Watches",
+          "href": "https://anneklein.com/collections/watches"
+        },
+        {
+          "text": "Shop by Material",
+          "href": "https://anneklein.com/collections/watches-1"
+        },
+        {
+          "text": "Metal & Mesh",
+          "href": "https://anneklein.com/collections/metals"
+        },
+        {
+          "text": "Leather",
+          "href": "https://anneklein.com/collections/leathers"
+        },
+        {
+          "text": "Ceramic",
+          "href": "https://anneklein.com/collections/ceramics"
+        },
+        {
+          "text": "Gemstone",
+          "href": "https://anneklein.com/collections/gemstone-collection"
+        },
+        {
+          "text": "Shop by Shape",
+          "href": "https://anneklein.com/collections/watch-collection"
+        },
+        {
+          "text": "Round",
+          "href": "https://anneklein.com/collections/round-watches"
+        },
+        {
+          "text": "Rectangular",
+          "href": "https://anneklein.com/collections/rectangular"
+        },
+        {
+          "text": "Octagonal",
+          "href": "https://anneklein.com/collections/octagonal-watches"
+        },
+        {
+          "text": "Square",
+          "href": "https://anneklein.com/collections/square-watches"
+        },
+        {
+          "text": "Oval",
+          "href": "https://anneklein.com/collections/oval-watches"
+        },
+        {
+          "text": "Privacy Policy",
+          "href": "https://anneklein.com/pages/privacy-policy"
+        },
+        {
+          "text": "Terms & Conditions",
+          "href": "https://anneklein.com/pages/terms-conditions"
+        },
+        {
+          "text": "Accessibility Statement",
+          "href": "https://anneklein.com/pages/accessibility-statement"
+        },
+        {
+          "text": "Your Privacy Choices",
+          "href": "https://anneklein.com/pages/us-laws-compliance"
+        },
+        {
+          "text": "Cookie Preferences",
+          "href": ""
+        },
+        {
+          "text": "Returns and Exchanges",
+          "href": "https://anneklein.myshopify.com/apps/redo/returns-portal/login"
+        },
+        {
+          "text": "FAQ / Customer Service",
+          "href": "https://anneklein.com/pages/faq-customer-service"
+        },
+        {
+          "text": "Loyalty and Rewards",
+          "href": "https://anneklein.com/pages/loyalty-rewards"
+        },
+        {
+          "text": "Store Locator",
+          "href": "https://anneklein.com/pages/store-locator"
+        },
+        {
+          "text": "Size Guide",
+          "href": "https://anneklein.com/pages/size-guide"
+        }
+      ],
+      "heroContent": {
+        "headline": "Anne Klein",
+        "allText": [
+          "Anne Klein"
+        ]
+      },
+      "promoBanners": [
+        "You're $125.00 away from FREE Ground Shipping!",
+        "$125.00",
+        "$('.top-bar__slider').slick({ slidesToShow: 1, slidesToScroll: 1, speed: 500, autoplay: true, autoplaySpeed: 4500, infinite: true, fade: true, arrows: false, dots: false })"
+      ],
+      "featuredCategories": [
+        "View Cart",
+        "NEW",
+        "New Arrivals",
+        "View All",
+        "Clothing",
+        "SHOES",
+        "HANDBAGS",
+        "Jewelry",
+        "Best Sellers",
+        "Fall Campaign Collection",
+        "Powerful Prints",
+        "Executive Collection",
+        "Consider it Sustainable",
+        "Campaign Lookbook",
+        "Dresses & Jumpsuits",
+        "Blazers & Jackets",
+        "Tops",
+        "Bottoms",
+        "Outerwear",
+        "Sweaters",
+        "Plus Size",
+        "Petite",
+        "View All Clothing",
+        "Shop All Shoes",
+        "Boots",
+        "Sandals & Slides",
+        "Heels",
+        "Wedges",
+        "Flats & Loafers",
+        "View all Shoes",
+        "Shop All Handbags",
+        "Tote Bags",
+        "Shoulder Bags",
+        "Crossbody Bags",
+        "Mini Bags",
+        "Wallets & Wristlets",
+        "Satchel Bags",
+        "Gift Sets",
+        "View all Handbags",
+        "JEWELRY & ACCESSORIES"
+      ],
+      "error": null
+    },
+    {
+      "id": "donna_karan",
+      "name": "Donna Karan",
+      "url": "https://www.donnakaran.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-07T22:10:21.281Z",
+      "navigation": [
+        {
+          "text": "COMPLIMENTARY SHIPPING ON U.S. ORDERS $99+",
+          "href": "https://www.donnakaran.com/pages/shipping-delivery?NAB"
+        },
+        {
+          "text": "SHOP NOW",
+          "href": "https://www.donnakaran.com/collections/new?announcement"
+        },
+        {
+          "text": "United States / EN",
+          "href": "https://www.donnakaran.com/#"
+        },
+        {
+          "text": ".logo-mini_st0{fill:#FFFFFF;}",
+          "href": "https://www.donnakaran.com/"
+        },
+        {
+          "text": "NEW",
+          "href": "https://www.donnakaran.com/collections/new"
+        },
+        {
+          "text": "New Arrivals",
+          "href": "https://www.donnakaran.com/collections/new-donna-karan-weekend"
+        },
+        {
+          "text": "New Clothing",
+          "href": "https://www.donnakaran.com/collections/new-clothing"
+        },
+        {
+          "text": "New Dresses",
+          "href": "https://www.donnakaran.com/collections/new-dresses"
+        },
+        {
+          "text": "New Bags",
+          "href": "https://www.donnakaran.com/collections/new-bags"
+        },
+        {
+          "text": "New Shoes",
+          "href": "https://www.donnakaran.com/collections/new-shoes"
+        },
+        {
+          "text": "SPRING 2026 COLLECTION",
+          "href": "https://www.donnakaran.com/collections/new"
+        },
+        {
+          "text": "Clothing",
+          "href": "https://www.donnakaran.com/collections/sale-clothing"
+        },
+        {
+          "text": "Event Dressing",
+          "href": "https://www.donnakaran.com/collections/special-occasions"
+        },
+        {
+          "text": "DK WEEKEND",
+          "href": "https://www.donnakaran.com/collections/donna-karan-weekend"
+        },
+        {
+          "text": "Matching Sets",
+          "href": "https://www.donnakaran.com/collections/matching-sets"
+        },
+        {
+          "text": "Suits and Separates",
+          "href": "https://www.donnakaran.com/collections/suits-separates"
+        },
+        {
+          "text": "View All",
+          "href": "https://www.donnakaran.com/collections/fragrance"
+        },
+        {
+          "text": "Dresses and Jumpsuits",
+          "href": "https://www.donnakaran.com/collections/sale-dresses-and-jumpsuits"
+        },
+        {
+          "text": "Tops",
+          "href": "https://www.donnakaran.com/collections/tops"
+        },
+        {
+          "text": "Blazers and Vests",
+          "href": "https://www.donnakaran.com/collections/jackets-and-blazers"
+        },
+        {
+          "text": "Coats and Jackets",
+          "href": "https://www.donnakaran.com/collections/sale-coats"
+        },
+        {
+          "text": "Pants",
+          "href": "https://www.donnakaran.com/collections/pants"
+        },
+        {
+          "text": "Sweaters",
+          "href": "https://www.donnakaran.com/collections/sweaters"
+        },
+        {
+          "text": "Skirts",
+          "href": "https://www.donnakaran.com/collections/skirts"
+        },
+        {
+          "text": "SPRING 2026 CAMPAIGN",
+          "href": "https://www.donnakaran.com/pages/spring-2026-campaign"
+        },
+        {
+          "text": "Spring 2026: The Edit",
+          "href": "https://www.donnakaran.com/pages/spring-2026-campaign"
+        },
+        {
+          "text": "Shop Grace's Edit",
+          "href": "https://www.donnakaran.com/collections/grace-edit"
+        },
+        {
+          "text": "Shop Joan's Edit",
+          "href": "https://www.donnakaran.com/pages/joan-edit"
+        },
+        {
+          "text": "Shop Adriana's Edit",
+          "href": "https://www.donnakaran.com/collections/adriana-edit"
+        },
+        {
+          "text": "Discover The Collection",
+          "href": "https://www.donnakaran.com/pages/dk-weekend"
+        },
+        {
+          "text": "Dresses",
+          "href": "https://www.donnakaran.com/collections/weekend-dresses"
+        },
+        {
+          "text": "Tops & Sweaters",
+          "href": "https://www.donnakaran.com/collections/weekend-tops-and-sweaters"
+        },
+        {
+          "text": "Bottoms",
+          "href": "https://www.donnakaran.com/collections/weekend-pants-and-skirts"
+        },
+        {
+          "text": "Coats & Jackets",
+          "href": "https://www.donnakaran.com/collections/weekend-coats-and-jackets"
+        },
+        {
+          "text": "Bags",
+          "href": "https://www.donnakaran.com/collections/sale-bags"
+        },
+        {
+          "text": "SHOP DONNA KARAN WEEKEND",
+          "href": "https://www.donnakaran.com/collections/donna-karan-weekend"
+        },
+        {
+          "text": "Bags & Accessories",
+          "href": "https://www.donnakaran.com/collections/bags"
+        },
+        {
+          "text": "Totes",
+          "href": "https://www.donnakaran.com/collections/totes"
+        },
+        {
+          "text": "Crossbody Bags",
+          "href": "https://www.donnakaran.com/collections/crossbodies-and-satchels"
+        },
+        {
+          "text": "Satchels",
+          "href": "https://www.donnakaran.com/collections/satchel-bags"
+        },
+        {
+          "text": "Shoulder and Hobo Bags",
+          "href": "https://www.donnakaran.com/collections/shoulder-and-hobo-bags"
+        },
+        {
+          "text": "Bucket Bags",
+          "href": "https://www.donnakaran.com/collections/bucket-bags"
+        },
+        {
+          "text": "Clutches",
+          "href": "https://www.donnakaran.com/collections/clutches"
+        },
+        {
+          "text": "Wallets",
+          "href": "https://www.donnakaran.com/collections/wallets"
+        },
+        {
+          "text": "Bag Collections",
+          "href": "https://www.donnakaran.com/collections/bags"
+        },
+        {
+          "text": "Baldwin",
+          "href": "https://www.donnakaran.com/collections/baldwin"
+        },
+        {
+          "text": "Amagansett",
+          "href": "https://www.donnakaran.com/collections/amagansett"
+        },
+        {
+          "text": "Glenwood",
+          "href": "https://www.donnakaran.com/collections/glenwood"
+        },
+        {
+          "text": "Bridgehampton",
+          "href": "https://www.donnakaran.com/collections/bridgehampton"
+        },
+        {
+          "text": "Bellmore",
+          "href": "https://www.donnakaran.com/collections/bellmore"
+        },
+        {
+          "text": "Valley Stream",
+          "href": "https://www.donnakaran.com/collections/valley"
+        },
+        {
+          "text": "Weekend",
+          "href": "https://www.donnakaran.com/collections/donna-karan-weekend-bags"
+        },
+        {
+          "text": "Jewelry",
+          "href": "https://www.donnakaran.com/collections/jewelry"
+        },
+        {
+          "text": "Explore The Collection",
+          "href": "https://www.donnakaran.com/pages/dk-jewelry"
+        },
+        {
+          "text": "Necklaces",
+          "href": "https://www.donnakaran.com/collections/necklaces"
+        },
+        {
+          "text": "Bracelets",
+          "href": "https://www.donnakaran.com/collections/bracelets"
+        },
+        {
+          "text": "Earrings",
+          "href": "https://www.donnakaran.com/collections/earrings"
+        },
+        {
+          "text": "Shoes",
+          "href": "https://www.donnakaran.com/collections/sale-shoes"
+        },
+        {
+          "text": "Heels and Wedges",
+          "href": "https://www.donnakaran.com/collections/heels-and-wedges"
+        },
+        {
+          "text": "Sandals",
+          "href": "https://www.donnakaran.com/collections/sandals"
+        },
+        {
+          "text": "Flats and Loafers",
+          "href": "https://www.donnakaran.com/collections/flats-and-loafers"
+        },
+        {
+          "text": "Boots and Booties",
+          "href": "https://www.donnakaran.com/collections/boots-and-booties"
+        },
+        {
+          "text": "Fragrance",
+          "href": "https://www.donnakaran.com/collections/fragrance"
+        },
+        {
+          "text": "Cashmere Mist",
+          "href": "https://www.donnakaran.com/collections/cashmere-mist"
+        },
+        {
+          "text": "Cashmere Collection",
+          "href": "https://www.donnakaran.com/collections/cashmere-collection"
+        },
+        {
+          "text": "Cashmere Mist Campaign",
+          "href": "https://www.donnakaran.com/pages/cashmere-collection"
+        },
+        {
+          "text": "Gifts",
+          "href": "https://www.donnakaran.com/pages/gift-guide"
+        },
+        {
+          "text": "Sale",
+          "href": "https://www.donnakaran.com/collections/sale"
+        },
+        {
+          "text": "New Sale",
+          "href": "https://www.donnakaran.com/collections/new-sale"
+        },
+        {
+          "text": "Tops and Sweaters",
+          "href": "https://www.donnakaran.com/collections/sale-tops-and-sweaters"
+        },
+        {
+          "text": "Pants and Skirts",
+          "href": "https://www.donnakaran.com/collections/sale-pants-and-skirts"
+        },
+        {
+          "text": "Last Chance",
+          "href": "https://www.donnakaran.com/collections/last-chance"
+        },
+        {
+          "text": "Shop ALL Sale",
+          "href": "https://www.donnakaran.com/collections/sale"
+        },
+        {
+          "text": "WORLD OF DK",
+          "href": "https://www.donnakaran.com/#"
+        },
+        {
+          "text": "OUR BRAND",
+          "href": "https://www.donnakaran.com/pages/our-brand"
+        },
+        {
+          "text": "TO BE CONTINUED...",
+          "href": "https://www.donnakaran.com/pages/to-be-continued"
+        },
+        {
+          "text": "Featured Shops",
+          "href": "https://www.donnakaran.com/collections/suits-separates"
+        },
+        {
+          "text": "Women's Collection",
+          "href": "https://www.donnakaran.com/collections/clothing"
+        },
+        {
+          "text": "0",
+          "href": "https://www.donnakaran.com/#"
+        },
+        {
+          "text": "Search",
+          "href": ""
+        },
+        {
+          "text": "Back",
+          "href": "https://www.donnakaran.com/collections/suits-separates"
+        },
+        {
+          "text": "Blazers",
+          "href": "https://www.donnakaran.com/collections/jackets-and-blazers"
+        },
+        {
+          "text": "Collections",
+          "href": "https://www.donnakaran.com/collections/bags"
+        },
+        {
+          "text": "Sunglasses",
+          "href": "https://www.donnakaran.com/collections/eyewear"
+        },
+        {
+          "text": "World of Donna Karan",
+          "href": "https://www.donnakaran.com/#"
+        },
+        {
+          "text": "CAREERS",
+          "href": "https://www.donnakaran.com/pages/careers"
+        },
+        {
+          "text": "FAQ",
+          "href": "https://www.donnakaran.com/pages/faq"
+        },
+        {
+          "text": "RETURNS & EXCHANGES",
+          "href": "https://www.donnakaran.com/pages/returns-exchanges"
+        },
+        {
+          "text": "SHIPPING & DELIVERY",
+          "href": "https://www.donnakaran.com/pages/shipping-delivery"
+        },
+        {
+          "text": "CONTACT US",
+          "href": "https://www.donnakaran.com/pages/contact"
+        },
+        {
+          "text": "Live Chat",
+          "href": "https://www.donnakaran.com/#liveChat"
+        },
+        {
+          "text": "TERMS OF USE",
+          "href": "https://www.donnakaran.com/pages/terms-of-use"
+        },
+        {
+          "text": "PRIVACY POLICY",
+          "href": "https://www.donnakaran.com/pages/privacy-policy"
+        },
+        {
+          "text": "ACCESSIBILITY",
+          "href": "https://www.donnakaran.com/pages/accessibility"
+        },
+        {
+          "text": "EUROPEAN PRIVACY NOTICE",
+          "href": "https://www.donnakaran.com/pages/eu-privacy-notice"
+        },
+        {
+          "text": "UK TAX STRATEGY",
+          "href": "https://www.donnakaran.com/pages/uk-tax-strategy"
+        },
+        {
+          "text": "CALIFORNIA SB 657",
+          "href": "https://www.donnakaran.com/pages/california-sb-657"
+        },
+        {
+          "text": "COOKIE POLICY",
+          "href": "https://www.donnakaran.com/pages/cookie-policy"
+        },
+        {
+          "text": "COOKIE PREFERENCES",
+          "href": "https://www.donnakaran.com/#CookiePreferences"
+        },
+        {
+          "text": "DO NOT SELL OR SHARE MY INFORMATION",
+          "href": "http://optout.dkny.com/"
+        }
+      ],
+      "heroContent": {
+        "headline": "",
+        "allText": []
+      },
+      "promoBanners": [
+        "COMPLIMENTARY SHIPPING ON U.S. ORDERS $99+ SHOP NEW ARRIVALS SHOP NOW",
+        "COMPLIMENTARY SHIPPING ON U.S. ORDERS $99+",
+        "SHOP NEW ARRIVALS SHOP NOW",
+        "SHOP NEW ARRIVALS",
+        "SHOP NOW",
+        "SHIP TO:",
+        "UNITED STATES / EN",
+        "Ship to:",
+        "United States / EN",
+        "#main-content { margin-top: 0px !important; } .persistent-banner .collapsible-row--wrapper { border: unset !important; }"
+      ],
+      "featuredCategories": [
+        "SHOP NOW",
+        "United States / EN",
+        ".logo-mini_st0{fill:#FFFFFF;}",
+        "NEW",
+        "New Arrivals",
+        "New Clothing",
+        "New Dresses",
+        "New Bags",
+        "New Shoes",
+        "SPRING 2026 COLLECTION",
+        "Clothing",
+        "Event Dressing",
+        "DK WEEKEND",
+        "Matching Sets",
+        "Suits and Separates",
+        "View All",
+        "Dresses and Jumpsuits",
+        "Tops",
+        "Blazers and Vests",
+        "Coats and Jackets",
+        "Pants",
+        "Sweaters",
+        "Skirts",
+        "SPRING 2026 CAMPAIGN",
+        "Spring 2026: The Edit",
+        "Shop Grace's Edit",
+        "Shop Joan's Edit",
+        "Shop Adriana's Edit",
+        "Discover The Collection",
+        "Dresses",
+        "Tops & Sweaters",
+        "Bottoms",
+        "Coats & Jackets",
+        "SHOP DONNA KARAN WEEKEND",
+        "Totes",
+        "Crossbody Bags",
+        "Satchels",
+        "Shoulder and Hobo Bags",
+        "Bucket Bags",
+        "Clutches"
+      ],
+      "error": null
+    },
+    {
+      "id": "jones_new_york",
+      "name": "Jones New York",
+      "url": "https://www.jny.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-07T22:10:23.997Z",
+      "navigation": [
+        {
+          "text": "NEW ARRIVALS",
+          "href": "https://www.jny.com/collections/new-arrivals"
+        },
+        {
+          "text": "CLOTHING",
+          "href": "https://www.jny.com/collections/womens-clothing"
+        },
+        {
+          "text": "Lightweight Jackets for Spring",
+          "href": "https://www.jny.com/collections/jackets"
+        },
+        {
+          "text": "New essentials for the Spring",
+          "href": "https://www.jny.com/collections/office-ready-styles"
+        },
+        {
+          "text": "The Sutton Collection",
+          "href": "https://www.jny.com/collections/the-sutton-collection"
+        },
+        {
+          "text": "Wear to Work",
+          "href": "https://www.jny.com/collections/office-ready-styles"
+        },
+        {
+          "text": "Weekend Edit",
+          "href": "https://www.jny.com/collections/weekend-edit"
+        },
+        {
+          "text": "Night Out",
+          "href": "https://www.jny.com/collections/night-out"
+        },
+        {
+          "text": "Matching Sets",
+          "href": "https://www.jny.com/collections/matching-sets"
+        },
+        {
+          "text": "Best Sellers",
+          "href": "https://www.jny.com/collections/best-sellers"
+        },
+        {
+          "text": "Suiting",
+          "href": "https://www.jny.com/collections/womens-suits"
+        },
+        {
+          "text": "Denim",
+          "href": "https://www.jny.com/collections/denim"
+        },
+        {
+          "text": "Shop All Clothing",
+          "href": "https://www.jny.com/collections/womens-clothing"
+        },
+        {
+          "text": "Tops",
+          "href": "https://www.jny.com/collections/womens-tops"
+        },
+        {
+          "text": "Sweaters & Cardigans",
+          "href": "https://www.jny.com/collections/sweaters-sale"
+        },
+        {
+          "text": "Blazers & Jackets",
+          "href": "https://www.jny.com/collections/jackets"
+        },
+        {
+          "text": "Pants & Skirts",
+          "href": "https://www.jny.com/collections/bottoms-sale"
+        },
+        {
+          "text": "Jeans",
+          "href": "https://www.jny.com/collections/jeans"
+        },
+        {
+          "text": "Dresses",
+          "href": "https://www.jny.com/collections/dresses-sale"
+        },
+        {
+          "text": "Outerwear",
+          "href": "https://www.jny.com/collections/outerwear-sale"
+        },
+        {
+          "text": "Our Classic Pairs",
+          "href": "https://www.jny.com/collections/straight-leg-jeans"
+        },
+        {
+          "text": "Our Denim",
+          "href": "https://www.jny.com/collections/denim"
+        },
+        {
+          "text": "Shop All Denim",
+          "href": "https://www.jny.com/collections/denim"
+        },
+        {
+          "text": "Straight Leg Jeans",
+          "href": "https://www.jny.com/collections/straight-leg-jeans"
+        },
+        {
+          "text": "Flare & Wide Leg Jeans",
+          "href": "https://www.jny.com/collections/flare-wide-leg-jeans"
+        },
+        {
+          "text": "Cropped Jeans",
+          "href": "https://www.jny.com/collections/cropped-jeans"
+        },
+        {
+          "text": "Denim Jackets",
+          "href": "https://www.jny.com/collections/denim-jackets"
+        },
+        {
+          "text": "MORE SIZES",
+          "href": "https://www.jny.com/#"
+        },
+        {
+          "text": "New In Petites",
+          "href": "https://www.jny.com/collections/petite-size"
+        },
+        {
+          "text": "New Plus Size Pieces",
+          "href": "https://www.jny.com/collections/plus-size"
+        },
+        {
+          "text": "Petite Shop All",
+          "href": "https://www.jny.com/collections/petite-size"
+        },
+        {
+          "text": "Petite New Arrivals",
+          "href": "https://www.jny.com/collections/petite-size-new-arrivals"
+        },
+        {
+          "text": "Petite Denim",
+          "href": "https://www.jny.com/collections/denim-petite-size"
+        },
+        {
+          "text": "Petite Tops",
+          "href": "https://www.jny.com/collections/tops-petite-size"
+        },
+        {
+          "text": "Petite Sweaters & Cardigans",
+          "href": "https://www.jny.com/collections/sweaters-cardigans-petite-size"
+        },
+        {
+          "text": "Petite Pants & Skirts",
+          "href": "https://www.jny.com/collections/pants-skirts-petite-size"
+        },
+        {
+          "text": "Petite Sale",
+          "href": "https://www.jny.com/collections/petite-size-sale"
+        },
+        {
+          "text": "Plus Shop All",
+          "href": "https://www.jny.com/collections/plus-size"
+        },
+        {
+          "text": "Plus New Arrivals",
+          "href": "https://www.jny.com/collections/new-arrivals-plus-size"
+        },
+        {
+          "text": "Plus Denim",
+          "href": "https://www.jny.com/collections/denim-plus-size"
+        },
+        {
+          "text": "Plus Tops",
+          "href": "https://www.jny.com/collections/tops-plus-size"
+        },
+        {
+          "text": "Plus Sweaters & Cardigans",
+          "href": "https://www.jny.com/collections/sweaters-cardigans-plus-size"
+        },
+        {
+          "text": "Plus Pants & Skirts",
+          "href": "https://www.jny.com/collections/pants-skirts-plus-size"
+        },
+        {
+          "text": "Plus Sale",
+          "href": "https://www.jny.com/collections/plus-size-sale"
+        },
+        {
+          "text": "SALE",
+          "href": "https://www.jny.com/collections/sale"
+        },
+        {
+          "text": "Effortless Every Day",
+          "href": "https://www.jny.com/collections/weekend-edit"
+        },
+        {
+          "text": "Jeans, Your Favorite Layer",
+          "href": "https://www.jny.com/collections/jeans"
+        },
+        {
+          "text": "Shop All Sale",
+          "href": "https://www.jny.com/collections/sale"
+        },
+        {
+          "text": "New to Sale",
+          "href": "https://www.jny.com/collections/new-to-sale"
+        },
+        {
+          "text": "Plus Size Sale",
+          "href": "https://www.jny.com/collections/plus-size-sale"
+        },
+        {
+          "text": "Denim Sale",
+          "href": "https://www.jny.com/collections/denim-sale"
+        },
+        {
+          "text": "Final Sale",
+          "href": "https://www.jny.com/collections/final-sale"
+        },
+        {
+          "text": "Tops & Blouses",
+          "href": "https://www.jny.com/collections/tops-sale"
+        },
+        {
+          "text": "Jackets",
+          "href": "https://www.jny.com/collections/jackets-sale"
+        },
+        {
+          "text": ".cls-1{fill:#231f20;stroke-width:0px;}",
+          "href": "https://www.jny.com/"
+        },
+        {
+          "text": "Search",
+          "href": "https://www.jny.com/search"
+        },
+        {
+          "text": "Sign In",
+          "href": "https://www.jny.com/account"
+        },
+        {
+          "text": "Wishlist",
+          "href": "https://www.jny.com/#swym-wishlist"
+        },
+        {
+          "text": "Size Guide",
+          "href": "https://www.jny.com/pages/size-guide"
+        },
+        {
+          "text": "Who We Are",
+          "href": "https://www.jny.com/pages/who-we-are"
+        },
+        {
+          "text": "Jones Journal",
+          "href": "https://www.jny.com/blogs/jones-journal"
+        },
+        {
+          "text": "Gift Cards",
+          "href": "https://www.jny.com/products/jones-new-york-gift-card"
+        },
+        {
+          "text": "Contact Us",
+          "href": "https://www.jny.com/pages/contact-us"
+        },
+        {
+          "text": "Returns & Exchanges",
+          "href": "https://www.jny.com/pages/returns-exchanges"
+        },
+        {
+          "text": "Shipping Information",
+          "href": "https://www.jny.com/pages/shipping"
+        },
+        {
+          "text": "FAQs",
+          "href": "https://www.jny.com/pages/faq"
+        },
+        {
+          "text": "Privacy Policy",
+          "href": "https://www.jny.com/pages/privacy-policy"
+        },
+        {
+          "text": "Terms & Conditions",
+          "href": "https://www.jny.com/pages/terms-of-use"
+        },
+        {
+          "text": "Sitemap",
+          "href": "https://www.jny.com/apps/sitemap"
+        }
+      ],
+      "heroContent": {
+        "headline": "The Optimist's Palette",
+        "allText": [
+          "The Optimist's Palette",
+          "Reset the Foundation",
+          "Embrace the season with The Optimist’s Palette—a collection defined by the soft power of Petal Pink and the energetic warmth of Coral Canyon.",
+          "Rediscover your staple pieces, styled with a new, polished confidence.",
+          "SHOP NEW",
+          "SHOP SUITING"
+        ]
+      },
+      "promoBanners": [],
+      "featuredCategories": [
+        "NEW ARRIVALS",
+        "CLOTHING",
+        "Lightweight Jackets for Spring",
+        "New essentials for the Spring",
+        "The Sutton Collection",
+        "Wear to Work",
+        "Weekend Edit",
+        "Night Out",
+        "Matching Sets",
+        "Best Sellers",
+        "Suiting",
+        "Denim",
+        "Shop All Clothing",
+        "Tops",
+        "Sweaters & Cardigans",
+        "Blazers & Jackets",
+        "Pants & Skirts",
+        "Jeans",
+        "Dresses",
+        "Outerwear",
+        "Our Classic Pairs",
+        "Our Denim",
+        "Shop All Denim",
+        "Straight Leg Jeans",
+        "Flare & Wide Leg Jeans",
+        "Cropped Jeans",
+        "Denim Jackets",
+        "MORE SIZES",
+        "New In Petites",
+        "New Plus Size Pieces",
+        "Petite Shop All",
+        "Petite New Arrivals",
+        "Petite Denim",
+        "Petite Tops",
+        "Petite Sweaters & Cardigans",
+        "Petite Pants & Skirts",
+        "Petite Sale",
+        "Plus Shop All",
+        "Plus New Arrivals",
+        "Plus Denim"
+      ],
+      "error": null
+    },
+    {
+      "id": "ann_taylor",
+      "name": "Ann Taylor",
+      "url": "https://www.anntaylor.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-07T22:10:26.745Z",
+      "navigation": [],
+      "heroContent": {},
+      "promoBanners": [],
+      "featuredCategories": [],
+      "error": null,
+      "#error": true,
+      "#debug": {
+        "requestId": "3QJSlfqr1fP32sl",
+        "url": "https://www.anntaylor.com",
+        "method": "GET",
+        "retryCount": 3,
+        "errorMessages": [
+          "Error: Navigation timed out after 60 seconds.\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:360:46)\n    at PlaywrightCrawler._handleNavigation (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:337:24)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:260:13)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/playwright/internals/playwright-crawler.js:114:9)\n    at async wrap (/home/myuser/node_modules/@apify/timeout/cjs/index.cjs:54:21)",
+          "Error: Navigation timed out after 60 seconds.\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:360:46)\n    at PlaywrightCrawler._handleNavigation (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:337:24)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:260:13)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/playwright/internals/playwright-crawler.js:114:9)\n    at async wrap (/home/myuser/node_modules/@apify/timeout/cjs/index.cjs:54:21)",
+          "Error: Navigation timed out after 60 seconds.\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:360:46)\n    at PlaywrightCrawler._handleNavigation (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:337:24)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:260:13)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/playwright/internals/playwright-crawler.js:114:9)\n    at async wrap (/home/myuser/node_modules/@apify/timeout/cjs/index.cjs:54:21)",
+          "Error: Navigation timed out after 60 seconds.\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:360:46)\n    at PlaywrightCrawler._handleNavigation (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:337:24)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:260:13)\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/playwright/internals/playwright-crawler.js:114:9)\n    at async wrap (/home/myuser/node_modules/@apify/timeout/cjs/index.cjs:54:21)"
+        ]
+      },
+      "botBlocked": true,
+      "note": "Site returned no navigation — likely bot-protected. Use Apify actor for this brand."
+    },
+    {
+      "id": "talbots",
+      "name": "Talbots",
+      "url": "https://www.talbots.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-07T22:14:32.722Z",
+      "navigation": [
+        {
+          "text": "Logo Talbots",
+          "href": "https://www.talbots.com/home"
+        },
+        {
+          "text": "New Arrivals",
+          "href": "https://www.talbots.com/haven-well-within/new-arrivals"
+        },
+        {
+          "text": "View All",
+          "href": "https://www.talbots.com/sale/view-all"
+        },
+        {
+          "text": "Sweaters",
+          "href": "https://www.talbots.com/sale/sweaters"
+        },
+        {
+          "text": "Blouses and Shirts",
+          "href": "https://www.talbots.com/sale/blouses-and-shirts"
+        },
+        {
+          "text": "Tees and Knits",
+          "href": "https://www.talbots.com/sale/tees-and-knits"
+        },
+        {
+          "text": "Pants",
+          "href": "https://www.talbots.com/sale/pants"
+        },
+        {
+          "text": "Jeans",
+          "href": "https://www.talbots.com/sale/jeans"
+        },
+        {
+          "text": "Shorts",
+          "href": "https://www.talbots.com/sale/shorts"
+        },
+        {
+          "text": "Dresses",
+          "href": "https://www.talbots.com/sale/dresses"
+        },
+        {
+          "text": "Skirts",
+          "href": "https://www.talbots.com/sale/skirts"
+        },
+        {
+          "text": "Jackets and Coats",
+          "href": "https://www.talbots.com/sale/jackets-and-coats"
+        },
+        {
+          "text": "Suiting",
+          "href": "https://www.talbots.com/sale/suiting"
+        },
+        {
+          "text": "Loungewear",
+          "href": "https://www.talbots.com/sale/loungewear"
+        },
+        {
+          "text": "Sleepwear",
+          "href": "https://www.talbots.com/sale/sleepwear"
+        },
+        {
+          "text": "Swimwear",
+          "href": "https://www.talbots.com/sale/swimwear"
+        },
+        {
+          "text": "Intimates",
+          "href": "https://www.talbots.com/sale/intimates"
+        },
+        {
+          "text": "Shoes",
+          "href": "https://www.talbots.com/sale/shoes"
+        },
+        {
+          "text": "Accessories",
+          "href": "https://www.talbots.com/sale/accessories"
+        },
+        {
+          "text": "The Work/Life Edit",
+          "href": "https://www.talbots.com/plus/collections/the-work-life-edit?intcmp=20230117_plus-sizecollections_workwear"
+        },
+        {
+          "text": "Cocktail & Party",
+          "href": "https://www.talbots.com/sale/collections/cocktail-and-party?intcmp=20260218_salecollections_salersvp"
+        },
+        {
+          "text": "T by Talbots",
+          "href": "https://www.talbots.com/sale/collections/t-by-talbots?intcmp=20190103_salecollections_tbytalbots"
+        },
+        {
+          "text": "Spring-Forward Color",
+          "href": "https://www.talbots.com/new-arrivals/collections/spring-forward-color?intcmp=20230304_newarrivalmenuimg_springforwardcolor"
+        },
+        {
+          "text": "Vibrant Green",
+          "href": "https://www.talbots.com/new-arrivals/collections/vibrant-green?intcmp=20230117_newarrivalcollection_vibrantgreen"
+        },
+        {
+          "text": "Ways to Wear Leopard",
+          "href": "https://www.talbots.com/new-arrivals/collections/ways-to-wear-leopard?intcmp=20230117_newarrivalmenuimg_leopard"
+        },
+        {
+          "text": "Misses",
+          "href": "https://www.talbots.com/sale?prefn1=sizeType&prefv1=Misses&intcmp=salecollections_misses"
+        },
+        {
+          "text": "Petite",
+          "href": "https://www.talbots.com/sale?prefn1=sizeType&prefv1=Petite&intcmp=%27salecollections_petite"
+        },
+        {
+          "text": "Plus Size",
+          "href": "https://www.talbots.com/sale?prefn1=sizeType&prefv1=Plus&intcmp=%27salecollections_plussize"
+        },
+        {
+          "text": "Plus Size Petite",
+          "href": "https://www.talbots.com/sale?prefn1=sizeType&prefv1=Plus%20Petite&intcmp=%27salecollections_pluspetite"
+        },
+        {
+          "text": "Clothing",
+          "href": "https://www.talbots.com/clothing"
+        },
+        {
+          "text": "Everyday Casual",
+          "href": "https://www.talbots.com/plus/collections/everyday-casual?intcmp=20260116_plussizecollections_casualforeveryday"
+        },
+        {
+          "text": "Travel Capsules",
+          "href": "https://www.talbots.com/plus/collections/travel-capsules?intcmp=20240425_plussizecollections_travelcapsules"
+        },
+        {
+          "text": "Matching Sets",
+          "href": "https://www.talbots.com/clothing/collections/matching-sets?intcmp=20240116_apparelcollection_matchingsets"
+        },
+        {
+          "text": "The Classics",
+          "href": "https://www.talbots.com/the-edit/the-classics"
+        },
+        {
+          "text": "Trending On Social",
+          "href": "https://www.talbots.com/clothing/collections/trending-on-social?intcmp=20250616_apparelcollection_trendingonsocial"
+        },
+        {
+          "text": "Work/Life Edit",
+          "href": "https://www.talbots.com/clothing/collections/the-work-life-edit?intcmp=20250217_apparelmenuimg_workwear"
+        },
+        {
+          "text": "Boots",
+          "href": "https://www.talbots.com/shoes/boots"
+        },
+        {
+          "text": "Flats",
+          "href": "https://www.talbots.com/shoes/flats"
+        },
+        {
+          "text": "Heels",
+          "href": "https://www.talbots.com/shoes/heels"
+        },
+        {
+          "text": "Sneakers",
+          "href": "https://www.talbots.com/shoes/sneakers"
+        },
+        {
+          "text": "Sandals",
+          "href": "https://www.talbots.com/shoes/sandals"
+        },
+        {
+          "text": "Slippers",
+          "href": "https://www.talbots.com/shoes/slippers"
+        },
+        {
+          "text": "Sorel™",
+          "href": "https://www.talbots.com/shoes/brands-we-love/sorel?intcmp=20251013_shoescollections_sorel"
+        },
+        {
+          "text": "Tretorn®",
+          "href": "https://www.talbots.com/shoes/brands-we-love/tretorn?intcmp=20240816_shoescollections_tretorn"
+        },
+        {
+          "text": "Gola®",
+          "href": "https://www.talbots.com/shoes/brands-we-love/gola?intcmp=20250819_shoescollections_gola"
+        },
+        {
+          "text": "Shop All Shoes",
+          "href": "https://www.talbots.com/shoes?intcmp=20231116_shoesmenuimage_shoes"
+        },
+        {
+          "text": "Shop All Sneakers",
+          "href": "https://www.talbots.com/shoes/sneakers?intcmp=20231116_shoesmenuimage_shoes-sneakers"
+        },
+        {
+          "text": "Jewelry",
+          "href": "https://www.talbots.com/accessories/jewelry"
+        },
+        {
+          "text": "Scarves",
+          "href": "https://www.talbots.com/accessories/scarves"
+        },
+        {
+          "text": "Handbags",
+          "href": "https://www.talbots.com/accessories/handbags"
+        },
+        {
+          "text": "Belts",
+          "href": "https://www.talbots.com/accessories/belts"
+        },
+        {
+          "text": "Socks",
+          "href": "https://www.talbots.com/socks-view-all"
+        },
+        {
+          "text": "Ponchos & Wraps",
+          "href": "https://www.talbots.com/accessories/ponchos-and-wraps"
+        },
+        {
+          "text": "Shrugs & Vests",
+          "href": "https://www.talbots.com/accessories/shrugs-and-vests"
+        },
+        {
+          "text": "Hats",
+          "href": "https://www.talbots.com/accessories/hats"
+        },
+        {
+          "text": "Gloves",
+          "href": "https://www.talbots.com/accessories/gloves"
+        },
+        {
+          "text": "Cold Weather Accessories",
+          "href": "https://www.talbots.com/accessories/cold-weather-accessories"
+        },
+        {
+          "text": "Home & More",
+          "href": "https://www.talbots.com/accessories/home-and-more"
+        },
+        {
+          "text": "Beauty",
+          "href": "https://www.talbots.com/accessories/beauty"
+        },
+        {
+          "text": "Hair Accessories",
+          "href": "https://www.talbots.com/accessories/hair-accessories"
+        },
+        {
+          "text": "Sunglasses",
+          "href": "https://www.talbots.com/accessories/sunglasses"
+        },
+        {
+          "text": "Swim Accessories",
+          "href": "https://www.talbots.com/accessories/swim-accessories"
+        },
+        {
+          "text": "Brands We Love",
+          "href": "https://www.talbots.com/accessories/brands-we-love"
+        },
+        {
+          "text": "Shop All Accessories",
+          "href": "https://www.talbots.com/accessories?intcmp=20260213_accmenuimage_accessories"
+        },
+        {
+          "text": "Shop Jewelry",
+          "href": "https://www.talbots.com/accessories/jewelry?intcmp=20260112_accmenuimage_jewelry"
+        },
+        {
+          "text": "View All Petites",
+          "href": "https://www.talbots.com/petite/view-all-petites"
+        },
+        {
+          "text": "Petite Collection",
+          "href": "https://www.talbots.com/petite?intcmp=20260217_petitemenuimage_petite"
+        },
+        {
+          "text": "Plus - Size",
+          "href": "https://www.talbots.com/plus"
+        },
+        {
+          "text": "View All Plus Size",
+          "href": "https://www.talbots.com/plus/view-all-plus-size"
+        },
+        {
+          "text": "Plus Petite",
+          "href": "https://www.talbots.com/plus/plus-petite"
+        },
+        {
+          "text": "Plus Collection",
+          "href": "https://www.talbots.com/plus?intcmp=20250217_plussizemenuimage_plus"
+        },
+        {
+          "text": "Plus Petite Collection",
+          "href": "https://www.talbots.com/plus/plus-petite?intcmp=20250217_plusmenuimage_plussizepetite"
+        },
+        {
+          "text": "Tops and Tees",
+          "href": "https://www.talbots.com/t-by-talbots/tops-and-tees"
+        },
+        {
+          "text": "Jackets",
+          "href": "https://www.talbots.com/t-by-talbots/jackets"
+        },
+        {
+          "text": "Pants and Shorts",
+          "href": "https://www.talbots.com/t-by-talbots/pants-and-shorts"
+        },
+        {
+          "text": "Skirts and Skorts",
+          "href": "https://www.talbots.com/t-by-talbots/skirts-and-skorts"
+        },
+        {
+          "text": "Shoes and Accessories",
+          "href": "https://www.talbots.com/t-by-talbots/shoes-and-accessories"
+        },
+        {
+          "text": "Sale",
+          "href": "https://www.talbots.com/sale?intcmp=20251225_salemenuimage_clearance"
+        },
+        {
+          "text": "AirKnit Stretch",
+          "href": "https://www.talbots.com/t-by-talbots/collections/airknit-stretch?intcmp=20251209_tbytalbotsmenuimage_airknitstretch"
+        },
+        {
+          "text": "All Day Active",
+          "href": "https://www.talbots.com/t-by-talbots/collections/all-day-active?intcmp=20250312_tbytalbotscollections_alldayactive"
+        },
+        {
+          "text": "Luxe Loungewear",
+          "href": "https://www.talbots.com/t-by-talbots/collections/luxe-loungewear?intcmp=20251119_tbytalbotscollections_luxeloungewear"
+        },
+        {
+          "text": "Workout Ready",
+          "href": "https://www.talbots.com/t-by-talbots/collections/workout-ready?intcmp=20250312_tbytalbotscollections_workout"
+        },
+        {
+          "text": "Yoga Studio",
+          "href": "https://www.talbots.com/t-by-talbots/collections/yoga-studio?intcmp=20250815_tbytalbotscollections_yogastudio"
+        },
+        {
+          "text": "Shop All T by Talbots",
+          "href": "https://www.talbots.com/t-by-talbots?intcmp=20241116_tbytalbotsmenuimage_tbytalbots"
+        },
+        {
+          "text": "Tankini & Bikini Tops",
+          "href": "https://www.talbots.com/swimwear/tankini-and-bikini-tops"
+        },
+        {
+          "text": "Swimsuit Bottoms",
+          "href": "https://www.talbots.com/swimwear/swimsuit-bottoms"
+        },
+        {
+          "text": "One Pieces",
+          "href": "https://www.talbots.com/swimwear/one-pieces"
+        },
+        {
+          "text": "Rashguards & Swim Tees",
+          "href": "https://www.talbots.com/swimwear/rashguards-and-swim-tees"
+        },
+        {
+          "text": "Swimsuit Cover-Ups",
+          "href": "https://www.talbots.com/swimwear/swimsuit-cover-ups?intcmp=202450211_swimmenuimage_coverups"
+        },
+        {
+          "text": "Aqua Club",
+          "href": "https://www.talbots.com/swimwear/aqua-club"
+        },
+        {
+          "text": "Miraclesuit®",
+          "href": "https://www.talbots.com/swimwear/miraclesuit"
+        },
+        {
+          "text": "Sun Ocean Sand",
+          "href": "https://www.talbots.com/swimwear/sun-ocean-sand"
+        },
+        {
+          "text": "Shop Aqua Club",
+          "href": "https://www.talbots.com/swimwear/aqua-club?intcmp=20250211_swimmenuimage_aquaclub"
+        },
+        {
+          "text": "Haven Well Within",
+          "href": "https://www.talbots.com/sale/collections/haven-well-within?intcmp=20240117_salecollections_havenwellwithin"
+        },
+        {
+          "text": "Tops",
+          "href": "https://www.talbots.com/haven-well-within/tops"
+        },
+        {
+          "text": "Bottoms",
+          "href": "https://www.talbots.com/haven-well-within/bottoms"
+        },
+        {
+          "text": "Dresses & Skirts",
+          "href": "https://www.talbots.com/haven-well-within/dresses-and-skirts"
+        },
+        {
+          "text": "Activewear",
+          "href": "https://www.talbots.com/haven-well-within/activewear"
+        },
+        {
+          "text": "Shoes & Accessories",
+          "href": "https://www.talbots.com/haven-well-within/shoes-and-accessories"
+        },
+        {
+          "text": "The Edit",
+          "href": "https://www.talbots.com/the-edit"
+        },
+        {
+          "text": "Lookbook",
+          "href": "https://www.talbots.com/the-edit/lookbook?intcmp=20250218_lifestylemenuimage_lookbook"
+        },
+        {
+          "text": "#MYTALBOTS",
+          "href": "https://www.talbots.com/the-edit/mytalbots"
+        },
+        {
+          "text": "Talbots Live Events",
+          "href": "https://www.talbots.com/the-edit/talbots-live-events"
+        },
+        {
+          "text": "Lucy's Picks",
+          "href": "https://www.talbots.com/the-edit/lucys-picks"
+        },
+        {
+          "text": "Dress for Success",
+          "href": "https://www.talbots.com/the-edit/dress-for-success?intcmp=20260304_lifestylemenuimage_dressforsuccess"
+        },
+        {
+          "text": "More to Explore",
+          "href": "https://www.talbots.com/the-edit/more-to-explore"
+        },
+        {
+          "text": "Love Your Store",
+          "href": "https://www.talbots.com/the-edit/style/love-your-store?intcmp=20201019_lifeandstylecollection_loveyourstore"
+        },
+        {
+          "text": "Book a Style Appointment",
+          "href": "https://www.talbots.com/personalstyling?intcmp=20230221_yourstore_stylebyappt_link"
+        },
+        {
+          "text": "Learn More : Talbots live events",
+          "href": "https://www.talbots.com/the-edit/talbots-live-events?intcmp=202511268_lifestylemenuimage_talbotslive"
+        },
+        {
+          "text": "New to Sale",
+          "href": "https://www.talbots.com/sale/new-to-sale?intcmp=20260304_salemenuimage_newtosale"
+        },
+        {
+          "text": "Clearance",
+          "href": "https://www.talbots.com/sale-clearance"
+        },
+        {
+          "text": "Sign In",
+          "href": "https://www.talbots.com/account"
+        },
+        {
+          "text": "Bag (0)",
+          "href": "https://www.talbots.com/cart"
+        },
+        {
+          "text": "Book an Appointment",
+          "href": "https://www.talbots.com/personalstyling?intcmp=homepage_bookappointment_link_bf"
+        },
+        {
+          "text": "Store Locator Icon Store Locator",
+          "href": "https://www.talbots.com/storelocator"
+        },
+        {
+          "text": "Classic Awards",
+          "href": "https://www.talbots.com/classic-awards/classic-awards.html"
+        },
+        {
+          "text": "Gift Cards",
+          "href": "https://www.talbots.com/gift-card/PGIFTCARD.html"
+        },
+        {
+          "text": "Wish List",
+          "href": "https://www.talbots.com/wishlist"
+        },
+        {
+          "text": "View Catalogs",
+          "href": "https://www.talbots.com/view-catalog/view-catalog.html"
+        },
+        {
+          "text": "Coupons & Promotions",
+          "href": "https://www.talbots.com/clothing/coupons-and-promotions/coupons-and-promotions"
+        },
+        {
+          "text": "Outlet Stores",
+          "href": "https://www.talbots.com/outlets"
+        },
+        {
+          "text": "Contact Us",
+          "href": "https://www.talbots.com/contactus"
+        },
+        {
+          "text": "Shipping & Handling",
+          "href": "https://www.talbots.com/shipping/shipping.html"
+        },
+        {
+          "text": "Returns & Price Adjustments",
+          "href": "https://www.talbots.com/returns/returns.html"
+        },
+        {
+          "text": "Order Status & Tracking",
+          "href": "https://www.talbots.com/login"
+        },
+        {
+          "text": "Size Charts",
+          "href": "https://www.talbots.com/size-charts/size-charts.html"
+        },
+        {
+          "text": "FAQs",
+          "href": "https://www.talbots.com/faqs/faqs.html"
+        },
+        {
+          "text": "Gift Services",
+          "href": "https://www.talbots.com/gift-services/gift-services.html"
+        },
+        {
+          "text": "Pay My Bill",
+          "href": "https://d.comenity.net/talbots/"
+        },
+        {
+          "text": "Card Benefits",
+          "href": "https://www.talbots.com/classic-awards/classic-awards.html"
+        },
+        {
+          "text": "About Us",
+          "href": "https://www.talbots.com/clothing/about-us/about-us"
+        },
+        {
+          "text": "We Care",
+          "href": "https://www.talbots.com/clothing/about-us/we-care"
+        },
+        {
+          "text": "Philanthropy",
+          "href": "https://www.talbots.com/clothing/about-us/philanthropy"
+        },
+        {
+          "text": "Careers",
+          "href": "https://jobs.knitwellgroup.com/talbots"
+        }
+      ],
+      "heroContent": {
+        "headline": "",
+        "allText": []
+      },
+      "promoBanners": [
+        "Accessible Carousel",
+        "TODAY ONLY! 3x Style Points for Classic Awards Members Shop Now | Details about TODAY ONLY! 3x Style Points for Classic Awards Members - (Opens Dialog)",
+        "TODAY ONLY! 3x Style Points for Classic Awards Members",
+        "Shop Now",
+        "Details about TODAY ONLY! 3x Style Points for Classic Awards Members - (Opens Dialog)",
+        "Details",
+        "about TODAY ONLY! 3x Style Points for Classic Awards Members - (Opens Dialog)",
+        "ENDS TODAY! Select DRESSES just $99.50 Shop Now | Details about ENDS TODAY! Select DRESSES just $99.50 - (Opens Dialog)",
+        "ENDS TODAY! Select DRESSES just $99.50",
+        "Details about ENDS TODAY! Select DRESSES just $99.50 - (Opens Dialog)"
+      ],
+      "featuredCategories": [
+        "Logo Talbots",
+        "New Arrivals",
+        "View All",
+        "Sweaters",
+        "Blouses and Shirts",
+        "Tees and Knits",
+        "Pants",
+        "Jeans",
+        "Shorts",
+        "Dresses",
+        "Skirts",
+        "Jackets and Coats",
+        "Suiting",
+        "Loungewear",
+        "Sleepwear",
+        "Swimwear",
+        "Intimates",
+        "Shoes",
+        "Accessories",
+        "The Work/Life Edit",
+        "Cocktail & Party",
+        "T by Talbots",
+        "Spring-Forward Color",
+        "Vibrant Green",
+        "Ways to Wear Leopard",
+        "Misses",
+        "Petite",
+        "Plus Size",
+        "Plus Size Petite",
+        "Clothing",
+        "Everyday Casual",
+        "Travel Capsules",
+        "Matching Sets",
+        "The Classics",
+        "Trending On Social",
+        "Work/Life Edit",
+        "Boots",
+        "Flats",
+        "Heels",
+        "Sneakers"
+      ],
+      "error": null,
+      "#error": false,
+      "#debug": {
+        "requestId": "2f4h2cud4y9ZwA1",
+        "url": "https://www.talbots.com",
+        "loadedUrl": "https://www.talbots.com/",
+        "method": "GET",
+        "retryCount": 0,
+        "errorMessages": [],
+        "statusCode": 200
+      }
+    },
+    {
+      "id": "whbm",
+      "name": "White House Black Market",
+      "url": "https://www.whitehouseblackmarket.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-07T22:14:58.480Z",
+      "navigation": [
+        {
+          "text": "NEW!",
+          "href": "https://www.whitehouseblackmarket.com/store/category/new/cat210006"
+        },
+        {
+          "text": "CLOTHING",
+          "href": "https://www.whitehouseblackmarket.com/store/category/clothing/cat11389313"
+        },
+        {
+          "text": "TOPS",
+          "href": "https://www.whitehouseblackmarket.com/store/category/tops/cat210001"
+        },
+        {
+          "text": "DRESSES",
+          "href": "https://www.whitehouseblackmarket.com/store/category/dresses/cat210002"
+        },
+        {
+          "text": "DENIM",
+          "href": "https://www.whitehouseblackmarket.com/store/category/denim/cat19579275"
+        },
+        {
+          "text": "JEWELRY + ACCESSORIES",
+          "href": "https://www.whitehouseblackmarket.com/store/category/shoes-accessories/cat210019"
+        },
+        {
+          "text": "WORK",
+          "href": "https://www.whitehouseblackmarket.com/store/category/work-wear/cat5959275"
+        },
+        {
+          "text": "PETITES",
+          "href": "https://www.whitehouseblackmarket.com/store/category/petites/cat8739284"
+        },
+        {
+          "text": "SALE",
+          "href": "https://www.whitehouseblackmarket.com/store/category/sale/catsaleswhbm"
+        },
+        {
+          "text": "0",
+          "href": "https://www.whitehouseblackmarket.com/store/checkout/cart"
+        },
+        {
+          "text": "SHOP NOW",
+          "href": "https://www.whitehouseblackmarket.com/store/category/clothing/cat11389313"
+        },
+        {
+          "text": "Account",
+          "href": "https://www.whitehouseblackmarket.com/api/auth/login"
+        },
+        {
+          "text": "Orders & Returns",
+          "href": "https://www.whitehouseblackmarket.com/store/order-lookup"
+        },
+        {
+          "text": "Find a Boutique",
+          "href": "https://www.whitehouseblackmarket.com/locations"
+        },
+        {
+          "text": "SIGN IN",
+          "href": "https://login.whitehouseblackmarket.com/u/login?state=hKFo2SBsWjhNTWpaSVduRlBsZ3JFam5JNlFSNjBFQ3cwaDVJQ6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIF9JOG94b1hFaTNFOFFiTnRBY1ZWTHdrYkd5djlKZU5ao2NpZNkgVzNrTHBYb0hTNGhheDIxY3dOSHI0dkdjU2dlVE5WcU4"
+        },
+        {
+          "text": "TOPS + SWEATERS",
+          "href": "https://www.whitehouseblackmarket.com/store/category/tops/cat210001"
+        },
+        {
+          "text": "JEANS",
+          "href": "https://www.whitehouseblackmarket.com/store/category/denim/cat19579275"
+        },
+        {
+          "text": "JACKETS + BLAZERS",
+          "href": "https://www.whitehouseblackmarket.com/store/category/jackets-blazers/cat210004"
+        },
+        {
+          "text": "PANTS",
+          "href": "https://www.whitehouseblackmarket.com/store/category/pants/cat210003"
+        }
+      ],
+      "heroContent": {
+        "headline": "",
+        "allText": []
+      },
+      "promoBanners": [],
+      "featuredCategories": [
+        "NEW!",
+        "CLOTHING",
+        "TOPS",
+        "DRESSES",
+        "DENIM",
+        "JEWELRY + ACCESSORIES",
+        "WORK",
+        "PETITES",
+        "SALE",
+        "SHOP NOW",
+        "Orders & Returns",
+        "Find a Boutique",
+        "TOPS + SWEATERS",
+        "JEANS",
+        "JACKETS + BLAZERS",
+        "PANTS"
+      ],
+      "error": null
+    }
+  ],
+  "categoryGapAnalysis": {
+    "akCategoryCount": 40,
+    "gaps": [
+      {
+        "category": "Matching Sets",
+        "seenAt": [
+          "Donna Karan",
+          "Jones New York",
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Dresses",
+        "seenAt": [
+          "Donna Karan",
+          "Jones New York",
+          "Talbots"
+        ]
+      },
+      {
+        "category": "SHOP NOW",
+        "seenAt": [
+          "Donna Karan",
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "Pants",
+        "seenAt": [
+          "Donna Karan",
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Skirts",
+        "seenAt": [
+          "Donna Karan",
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Suiting",
+        "seenAt": [
+          "Jones New York",
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Jeans",
+        "seenAt": [
+          "Jones New York",
+          "Talbots"
+        ]
+      },
+      {
+        "category": "United States / EN",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": ".logo-mini_st0{fill:#FFFFFF;}",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "New Clothing",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "New Dresses",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "New Bags",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "New Shoes",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "SPRING 2026 COLLECTION",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Event Dressing",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "DK WEEKEND",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Suits and Separates",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Dresses and Jumpsuits",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Blazers and Vests",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Coats and Jackets",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "SPRING 2026 CAMPAIGN",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Spring 2026: The Edit",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Shop Grace's Edit",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Shop Joan's Edit",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Shop Adriana's Edit",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Discover The Collection",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Tops & Sweaters",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Coats & Jackets",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "SHOP DONNA KARAN WEEKEND",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Totes",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Satchels",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Shoulder and Hobo Bags",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Bucket Bags",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Clutches",
+        "seenAt": [
+          "Donna Karan"
+        ]
+      },
+      {
+        "category": "Lightweight Jackets for Spring",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "New essentials for the Spring",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "The Sutton Collection",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Wear to Work",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Weekend Edit",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Night Out",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Denim",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Shop All Clothing",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Sweaters & Cardigans",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Pants & Skirts",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Our Classic Pairs",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Our Denim",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Shop All Denim",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Straight Leg Jeans",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Flare & Wide Leg Jeans",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Cropped Jeans",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Denim Jackets",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "MORE SIZES",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "New In Petites",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "New Plus Size Pieces",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite Shop All",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite New Arrivals",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite Denim",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite Tops",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite Sweaters & Cardigans",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite Pants & Skirts",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Petite Sale",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Plus Shop All",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Plus New Arrivals",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Plus Denim",
+        "seenAt": [
+          "Jones New York"
+        ]
+      },
+      {
+        "category": "Logo Talbots",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Blouses and Shirts",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Tees and Knits",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Shorts",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Jackets and Coats",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Loungewear",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Sleepwear",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Swimwear",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Intimates",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Accessories",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "The Work/Life Edit",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Cocktail & Party",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "T by Talbots",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Spring-Forward Color",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Vibrant Green",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Ways to Wear Leopard",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Misses",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Plus Size Petite",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Everyday Casual",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Travel Capsules",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "The Classics",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Trending On Social",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Work/Life Edit",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Flats",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "Sneakers",
+        "seenAt": [
+          "Talbots"
+        ]
+      },
+      {
+        "category": "NEW!",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "DRESSES",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "DENIM",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "JEWELRY + ACCESSORIES",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "WORK",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "PETITES",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "SALE",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "Orders & Returns",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "Find a Boutique",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "TOPS + SWEATERS",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "JEANS",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "JACKETS + BLAZERS",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      },
+      {
+        "category": "PANTS",
+        "seenAt": [
+          "White House Black Market"
+        ]
+      }
+    ],
+    "summary": "102 categories found on competitor sites not present in AK navigation"
+  }
+}

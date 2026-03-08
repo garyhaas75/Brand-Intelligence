@@ -1,0 +1,108 @@
+{
+  "generatedAt": "2026-03-07T14:50:53.081Z",
+  "signupEmail": "garyclaudeai@gmail.com",
+  "totalAttempted": 5,
+  "submitted": 1,
+  "noFormFound": 2,
+  "errors": 1,
+  "signupOffers": [
+    {
+      "brand": "Donna Karan",
+      "offer": "SIGN UP FOR NEWSLETTER FOR 10% OFF YOUR FIRST ORDER"
+    }
+  ],
+  "signups": [
+    {
+      "id": "donna_karan",
+      "name": "Donna Karan",
+      "url": "https://www.donnakaran.com",
+      "email": "garyclaudeai@gmail.com",
+      "attemptedAt": "2026-03-07T14:48:58.966Z",
+      "status": "submitted",
+      "promoTexts": [
+        "SIGN UP FOR NEWSLETTER FOR 10% OFF YOUR FIRST ORDER",
+        "Your Email SIGN UP By subscribing, you accept our Terms & Conditions and Privacy Policy This site is protected by hCaptcha and the hCaptcha Privacy Policy and Terms of Service apply.",
+        "Your Email SIGN UP",
+        "Your Email",
+        "SIGN UP",
+        "By subscribing, you accept our Terms & Conditions and Privacy Policy",
+        "Terms & Conditions",
+        "Privacy Policy",
+        "This site is protected by hCaptcha and the hCaptcha Privacy Policy and Terms of Service apply.",
+        "Terms of Service"
+      ],
+      "signupOffer": "SIGN UP FOR NEWSLETTER FOR 10% OFF YOUR FIRST ORDER",
+      "inputSelector": "footer input[type=\"email\"]",
+      "submitSelector": "footer button[type=\"submit\"]",
+      "error": null
+    },
+    {
+      "id": "jones_new_york",
+      "name": "Jones New York",
+      "url": "https://www.jny.com",
+      "email": "garyclaudeai@gmail.com",
+      "attemptedAt": "2026-03-07T14:49:07.436Z",
+      "status": "no_submit_found",
+      "promoTexts": [
+        "Sign up for our newsletter! Subscribe to receive updates, access to exclusive deals, and more. Email SIGN UP",
+        "Sign up for our newsletter! Subscribe to receive updates, access to exclusive deals, and more.",
+        "Sign up for our newsletter!",
+        "Subscribe to receive updates, access to exclusive deals, and more.",
+        "Email SIGN UP",
+        "Email",
+        "SIGN UP",
+        "Thanks for subscribing! Check your email for a confirmation message.",
+        "Thanks for subscribing!",
+        "Check your email for a confirmation message.",
+        "Free Standard Shipping on Orders $75 or More 🚚 Need Assistance? Call Us At: 1-855-562-1835 ☎️ Save Up to 70% Off Our Latest Markdowns 🏷️",
+        "Free Standard Shipping on Orders $75 or More 🚚",
+        "Need Assistance? Call Us At: 1-855-562-1835 ☎️",
+        "Save Up to 70% Off Our Latest Markdowns 🏷️",
+        "International Women’s Day Savings! Now 40% Off Use Code: EMPOWER Save Now"
+      ],
+      "signupOffer": "",
+      "inputSelector": "footer input[type=\"email\"]",
+      "submitSelector": null,
+      "error": null
+    },
+    {
+      "id": "ann_taylor",
+      "name": "Ann Taylor",
+      "url": "https://www.anntaylor.com",
+      "email": "garyclaudeai@gmail.com",
+      "attemptedAt": "2026-03-07T14:50:42.782Z",
+      "status": "no_form_found",
+      "promoTexts": [],
+      "signupOffer": "",
+      "inputSelector": null,
+      "submitSelector": null,
+      "error": null
+    },
+    {
+      "id": "talbots",
+      "name": "Talbots",
+      "url": "https://www.talbots.com",
+      "email": "garyclaudeai@gmail.com",
+      "attemptedAt": "2026-03-07T14:50:47.817Z",
+      "status": "no_form_found",
+      "promoTexts": [],
+      "signupOffer": "",
+      "inputSelector": null,
+      "submitSelector": null,
+      "error": null
+    },
+    {
+      "id": "whbm",
+      "name": "White House Black Market",
+      "url": "https://www.whbm.com",
+      "email": "garyclaudeai@gmail.com",
+      "attemptedAt": "2026-03-07T14:50:52.847Z",
+      "status": "error",
+      "promoTexts": [],
+      "signupOffer": "",
+      "inputSelector": null,
+      "submitSelector": null,
+      "error": "page.goto: net::ERR_SSL_UNRECOGNIZED_NAME_ALERT at https://www.whbm.com/\nCall log:\n  - navigating to \"https://www.whbm.com/\", waiting until \"domcontentloaded\"\n"
+    }
+  ]
+}

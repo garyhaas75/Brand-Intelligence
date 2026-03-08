@@ -1,0 +1,519 @@
+{
+  "generatedAt": "2026-03-07T15:53:09.080Z",
+  "modulesUsed": [
+    "productCatalog",
+    "siteAnalysis",
+    "siteIntelligence",
+    "socialIntelligence",
+    "gscKeywords",
+    "emailSignups"
+  ],
+  "content": {
+    "emailCampaigns": {
+      "emailCampaigns": [
+        {
+          "week": 1,
+          "dayOfWeek": "Tuesday",
+          "theme": "Wear to Work Launch — The Outfit That Does the Work For You",
+          "subjectLine": "Dressed for the job. Done.",
+          "previewText": "No second-guessing. These are the pieces your workweek is built on.",
+          "brief": "Feature 4–6 top-performing Clothing and Shoes SKUs styled as complete work outfits. CTA: 'Shop Wear to Work' linking to a curated collection landing page.",
+          "sendTiming": "Tuesday 8:30–9:00 AM local — catches her during her morning coffee before the day escalates.",
+          "ctaButton": "Shop Wear to Work"
+        },
+        {
+          "week": 1,
+          "dayOfWeek": "Thursday",
+          "theme": "The Bag That Goes Everywhere She Does",
+          "subjectLine": "Your bag works as hard as you do.",
+          "previewText": "Totes, satchels, and structured bags — for the desk, the commute, and everything in between.",
+          "brief": "Spotlight Handbags (Tote, Satchel, Wallet) with lifestyle copy focused on function-meets-polish. CTA: 'Find Your Work Bag' with a filter-forward landing page sorted by bag type.",
+          "sendTiming": "Thursday 12:00–12:30 PM — midweek lunch scroll, high open rates for accessories-focused sends.",
+          "ctaButton": "Find Your Work Bag"
+        },
+        {
+          "week": 1,
+          "dayOfWeek": "Saturday",
+          "theme": "Weekend Edit Soft Launch — She Doesn't Stop on Saturday",
+          "subjectLine": "Off the clock. Still you.",
+          "previewText": "Casual doesn't mean careless. Weekend pieces worth actually wearing.",
+          "brief": "Introduce lifestyle-adjacent clothing and shoes suited for weekend wear — brunch, errands, low-key social. Position as the 'other side' of her wardrobe. CTA: 'Shop the Weekend Edit.'",
+          "sendTiming": "Saturday 9:00–10:00 AM — weekend browsing window peaks before noon; she's relaxed and receptive.",
+          "ctaButton": "Shop the Weekend Edit"
+        },
+        {
+          "week": 2,
+          "dayOfWeek": "Tuesday",
+          "theme": "Matching Sets & Suits — Stop Thinking. Start Getting Dressed.",
+          "subjectLine": "Two pieces. One decision. Done.",
+          "previewText": "Coordinated sets that look intentional without the effort. Workweek, solved.",
+          "brief": "Feature coordinated Clothing separates and suiting pieces styled together; lean into the decision-fatigue angle — this is for the woman who wants to look pulled-together without the mental overhead. CTA: 'Shop Suits & Sets.'",
+          "sendTiming": "Tuesday 8:30–9:00 AM — strong open rates for solution-oriented messaging early in the workweek.",
+          "ctaButton": "Shop Suits & Sets"
+        },
+        {
+          "week": 2,
+          "dayOfWeek": "Wednesday",
+          "theme": "Mid-Week Jewelry Moment — The Details That Finish the Look",
+          "subjectLine": "The earrings that complete everything.",
+          "previewText": "Simple, polished, and under $75. The finishing touch your outfit's been waiting for.",
+          "brief": "Curate 6–8 Jewelry SKUs under $75 positioned as the easy add-on to work outfits she already owns — use real product names and price points. CTA: 'Shop Jewelry Under $75.'",
+          "sendTiming": "Wednesday 12:00 PM — 'hump day' treat-yourself mindset drives impulse accessory purchases at lunch.",
+          "ctaButton": "Shop Jewelry Under $75"
+        },
+        {
+          "week": 2,
+          "dayOfWeek": "Friday",
+          "theme": "Fall Campaign Collection — A Season That Means Business",
+          "subjectLine": "Fall's here. Your wardrobe is ready.",
+          "previewText": "New arrivals grounded in what actually works — classic pieces for the season ahead.",
+          "brief": "Tie the Fall Campaign Collection SKU into a broader seasonal push featuring Clothing, Shoes, and Handbags in fall tones; copy should feel warm and grounded, not trend-hyped. CTA: 'Explore the Fall Collection.'",
+          "sendTiming": "Friday 9:00 AM — end-of-week browse traffic is high; she's thinking about the week ahead and weekend plans simultaneously.",
+          "ctaButton": "Explore the Fall Collection"
+        },
+        {
+          "week": 3,
+          "dayOfWeek": "Tuesday",
+          "theme": "Petite Professionals — A Whole Wardrobe, Built for You",
+          "subjectLine": "Finally. Workwear that actually fits.",
+          "previewText": "Petite sizing that doesn't feel like an afterthought — because you're not one.",
+          "brief": "Elevate the Petite category with dedicated messaging; feature Petite Clothing SKUs styled as complete outfits with copy that acknowledges the frustration of fit without being patronizing. CTA: 'Shop Petite' linking to a Petite-only landing page.",
+          "sendTiming": "Tuesday 8:30 AM — workweek mindset is strong; petite customers are a loyal segment with high repeat purchase intent when spoken to directly.",
+          "ctaButton": "Shop Petite"
+        },
+        {
+          "week": 3,
+          "dayOfWeek": "Thursday",
+          "theme": "Dresses That Work — Effortless From Monday to Friday",
+          "subjectLine": "One piece. The whole week handled.",
+          "previewText": "Dresses that work as hard as she does — polished, comfortable, and always ready.",
+          "brief": "Feature Dresses & Jumpsuits with styling notes on how to dress them up or down across a workweek; emphasize ease and versatility over trends. CTA: 'Shop Work Dresses.'",
+          "sendTiming": "Thursday 12:00–12:30 PM — midweek, she's already thinking about what she's wearing to Friday's meeting.",
+          "ctaButton": "Shop Work Dresses"
+        },
+        {
+          "week": 3,
+          "dayOfWeek": "Saturday",
+          "theme": "Sale — Good Work Deserves a Good Deal",
+          "subjectLine": "Sale: Pieces worth every penny.",
+          "previewText": "Quality you'll wear for years — at prices that make the decision easy.",
+          "brief": "Surface sale inventory across Clothing, Shoes, and Handbags with copy that centers quality and value — not desperation. Avoid 'up to X% off' language; instead lead with specific price points. CTA: 'Shop the Sale.'",
+          "sendTiming": "Saturday 9:00–10:00 AM — weekend browse sessions convert well for value-driven sends; she has time to shop without the workweek rush.",
+          "ctaButton": "Shop the Sale"
+        },
+        {
+          "week": 4,
+          "dayOfWeek": "Tuesday",
+          "theme": "Powerful Prints — Color That Means Business",
+          "subjectLine": "Bold, not loud. This is the difference.",
+          "previewText": "Prints that walk into the room with authority — styled for real workdays.",
+          "brief": "Feature the Powerful Prints collection SKU alongside printed Clothing and Dresses; copy should position pattern as a confidence tool, not a fashion risk. CTA: 'Shop Powerful Prints.'",
+          "sendTiming": "Tuesday 8:30–9:00 AM — start-of-week sends perform well for statement pieces she's planning to wear.",
+          "ctaButton": "Shop Powerful Prints"
+        },
+        {
+          "week": 4,
+          "dayOfWeek": "Wednesday",
+          "theme": "The Work Shoe Edit — Comfort and Credibility in One Step",
+          "subjectLine": "Shoes that keep up with your day.",
+          "previewText": "Heels, flats, and everything in between — built for real hours on your feet.",
+          "brief": "Curate top Shoes SKUs across heel heights and styles; use copy that acknowledges comfort as non-negotiable without sacrificing the polished look she needs. CTA: 'Find Your Work Shoe' with a style-type filter.",
+          "sendTiming": "Wednesday 12:00 PM — midweek accessory impulse window; footwear is a high-consideration category that benefits from a dedicated moment.",
+          "ctaButton": "Find Your Work Shoe"
+        },
+        {
+          "week": 4,
+          "dayOfWeek": "Friday",
+          "theme": "Watch & Jewelry Gifting — For the Woman Who Has a Lot On Her Plate",
+          "subjectLine": "A little something for her. Or you.",
+          "previewText": "Watches and jewelry she'll wear every day — at prices that feel like a treat, not a splurge.",
+          "brief": "Feature Anne Klein Watches and top Jewelry SKUs with dual messaging for self-purchase and gifting; lean into the GSC watch keyword strength with specific product names and price points. CTA: 'Shop Watches & Jewelry.'",
+          "sendTiming": "Friday 9:00–10:00 AM — end-of-week gifting mindset is highest on Friday mornings; watch queries are already strong traffic drivers.",
+          "ctaButton": "Shop Watches & Jewelry"
+        }
+      ],
+      "signupOfferRecommendation": {
+        "competitorBenchmark": "Donna Karan offers 10% off first order — a standard, transactional approach that converts but builds no loyalty or brand affinity.",
+        "recommendation": "DIFFERENTIATE — do not match on discount alone.",
+        "proposedOffer": "Join Anne Klein and get 15% off your first order — plus early access to new arrivals and sale events.",
+        "rationale": "Beating Donna Karan by 5 points on the initial discount is a low-cost acquisition lever at AK's average order value of $74.60 (incremental cost: ~$3.73 per signup). More importantly, layering in early access to new arrivals and sale events speaks directly to our customer's value-conscious mindset without positioning the brand as a discount destination. It also creates a two-tier incentive: she signs up for the discount and stays subscribed for the access — which is the real long-term win.",
+        "suggestedCopyForSignupModal": "Get 15% off your first order. Plus, be the first to know about new arrivals and sale events — straight to your inbox, no noise.",
+        "ctaButton": "Claim My 15% Off"
+      }
+    },
+    "heroHeadlines": {
+      "heroHeadlines": [
+        {
+          "headline": "Dressed. Done. Ready for Whatever.",
+          "subhead": "Anne Klein clothing, shoes, and bags built for the workweek — so getting ready in the morning stops being a decision.",
+          "cta": "Shop Work Looks",
+          "bestFor": "Evergreen homepage hero — works year-round as the primary brand statement; strongest for Q1 back-to-work and September re-entry moments"
+        },
+        {
+          "headline": "The Work Wardrobe That Works Back.",
+          "subhead": "From Monday meetings to Friday close-out — Anne Klein dresses, separates, and bags that hold up as long as you do.",
+          "cta": "Shop Wear to Work",
+          "bestFor": "Wear-to-Work nav launch campaign; pairs with a new 'Wear to Work' category rollout to reinforce the destination"
+        },
+        {
+          "headline": "Look Pulled-Together. Skip the Effort.",
+          "subhead": "Coordinated pieces, classic shoes, and bags that do the styling for you — starting at $50.",
+          "cta": "Find Your Outfit",
+          "bestFor": "Matching Sets / Suits & Separates category launch; speaks directly to decision fatigue and AOV-building outfit logic"
+        },
+        {
+          "headline": "Anne Klein Shoes, Bags, and Dresses — Here.",
+          "subhead": "If you've been searching for Anne Klein, you found the right place — shop the full collection, including new arrivals and sale.",
+          "cta": "Shop the Collection",
+          "bestFor": "SEO-driven hero targeting high-volume branded queries (anne klein shoes, anne klein bags, anne klein dresses) — use as an A/B test variant against the primary hero"
+        },
+        {
+          "headline": "Confidence Isn't a Trend. Neither Are We.",
+          "subhead": "Anne Klein has dressed working women since 1968 — the same reason it works now is the same reason it worked then: quality, fit, and clothes that mean business.",
+          "cta": "See What's New",
+          "bestFor": "Brand storytelling moment — best for Fall Campaign Collection launch or a heritage-forward editorial push; strong for email re-engagement traffic landing on homepage"
+        }
+      ]
+    },
+    "instagramCaptions": {
+      "instagramCaptions": [
+        {
+          "category": "Jewelry",
+          "caption": "The finishing touch that does more work than you'd think. A clean, classic watch pulls the whole look together — no second-guessing, no fussing. Just ready. Shop the collection via the link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#WatchStyle",
+            "#WorkKitWednesday",
+            "#WatchRing",
+            "#ClassicWatch",
+            "#PolishedAndReady",
+            "#WomenWhoWork",
+            "#AnneKleinWatch",
+            "#JewelryForWork",
+            "#EverydayStyle"
+          ],
+          "notes": "Targets high-volume GSC queries 'anne klein watch' and 'watch ring'. WorkKitWednesday borrowed from competitor hashtag intel. Strong Wednesday posting opportunity."
+        },
+        {
+          "category": "Jewelry",
+          "caption": "Stack it, wear it alone, make it yours. Our jewelry is designed to go from your 8am meeting to your 6pm dinner without skipping a beat. Because your accessories should keep up with you. Browse the full jewelry collection — link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#WorkJewelry",
+            "#RingStack",
+            "#WatchRing",
+            "#ClassicStyle",
+            "#WorkKitWednesday",
+            "#OfficeStyle",
+            "#AnneKleinJewelry",
+            "#WomenInBusiness",
+            "#PolishedProfessional"
+          ],
+          "notes": "Addresses the 'ring watch' and 'watch ring' GSC quick-win keywords naturally. Lifestyle framing without being aspirational-fantasy."
+        },
+        {
+          "category": "Shoes",
+          "caption": "Comfortable enough for a full day on your feet. Polished enough for the boardroom. That combination is harder to find than it should be — we worked on it. Shop Anne Klein shoes via link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#AnneKleinShoes",
+            "#WorkShoes",
+            "#OfficeStyle",
+            "#WomenWhoWork",
+            "#WorkKitWednesday",
+            "#ProfessionalStyle",
+            "#ComfortAndStyle",
+            "#WearToWork",
+            "#PolishedProfessional"
+          ],
+          "notes": "Directly addresses the real tension our customer feels — comfort vs. credibility. 'anne klein shoes' is a GSC quick-win keyword in position 4–15."
+        },
+        {
+          "category": "Shoes",
+          "caption": "The heel you can actually wear all day. Not a compromise — just well made. Grab your size before it goes. Link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#AnneKleinShoes",
+            "#HeelsForWork",
+            "#WorkStyle",
+            "#WearToWork",
+            "#OfficeOutfit",
+            "#ClassicHeels",
+            "#WomenWhoWork",
+            "#WorkKitWednesday",
+            "#PracticalStyle"
+          ],
+          "notes": "Short, punchy format. Soft urgency without being pushy. Speaks directly to the comfort-credibility insight — no hype language."
+        },
+        {
+          "category": "Clothing",
+          "caption": "Monday morning, 7am — you already know what you're wearing. That's the whole point. Classic pieces that take the guesswork out of getting dressed for work. Shop the collection, link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#WearToWork",
+            "#WorkWardrobe",
+            "#OfficeStyle",
+            "#ProfessionalWomen",
+            "#WorkKitWednesday",
+            "#ClassicStyle",
+            "#AnneKleinStyle",
+            "#WomenInBusiness",
+            "#PolishedProfessional"
+          ],
+          "notes": "Opens with a scene, not a product. Owns the 'practical confidence' positioning gap identified in competitor analysis. No buzzwords."
+        },
+        {
+          "category": "Clothing",
+          "caption": "A blazer that works as hard as you do. Wear it to the meeting, wear it to lunch, wear it on the commute home. Versatility isn't a trend — it's a requirement. Shop styles under $150 at the link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#WearToWork",
+            "#WorkBlazer",
+            "#OfficeOutfit",
+            "#ProfessionalStyle",
+            "#WomenWhoWork",
+            "#WorkKitWednesday",
+            "#AnneKleinStyle",
+            "#ClassicWorkwear",
+            "#WardrobeEssentials"
+          ],
+          "notes": "Price point mentioned ($150) to signal accessibility without screaming 'sale'. Speaks to versatility — a core decision driver for the 38–55 target."
+        },
+        {
+          "category": "Handbags",
+          "caption": "Laptop, lunch, notebook, phone — and it still looks put-together. A bag that carries everything shouldn't look like it's trying to. Shop Anne Klein handbags via the link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#AnneKleinBags",
+            "#WorkBag",
+            "#ToteForWork",
+            "#ProfessionalWomen",
+            "#WorkKitWednesday",
+            "#OfficeStyle",
+            "#WomenWhoWork",
+            "#AnneKleinHandbags",
+            "#CarryItAll"
+          ],
+          "notes": "Leads with the real use case — not an aesthetic pose. Targets GSC queries 'anne klein bags' and 'anne klein handbags'. Relatable and specific."
+        },
+        {
+          "category": "Handbags",
+          "caption": "The bag you reach for every single day. Classic enough to go with everything, structured enough to mean business. This one earns its spot. Shop the link in bio.",
+          "hashtags": [
+            "#AnneKlein",
+            "#AnneKleinBags",
+            "#WorkHandbag",
+            "#Satchel",
+            "#ClassicBag",
+            "#WearToWork",
+            "#WorkKitWednesday",
+            "#PolishedProfessional",
+            "#AnneKleinHandbags",
+            "#OfficeEssentials"
+          ],
+          "notes": "Short and confident. 'Earns its spot' language signals durability and value — key purchase drivers at the $55K–$95K income level. Satchel hashtag aligns with top product type in catalog."
+        }
+      ]
+    },
+    "collectionDescriptions": {
+      "collectionDescriptions": [
+        {
+          "collection": "Watches",
+          "primaryKeyword": "anne klein watches for women",
+          "description": "Anne Klein watches for women have been a workplace staple since 1968 — and for good reason. When you're running back-to-back meetings or managing a full day on your feet, a watch that looks polished without trying too hard just makes sense. Our collection includes classic bracelet watches, easy-read dial styles, and sleek minimalist designs that move from Monday morning to Friday happy hour without skipping a beat. Classic proportions, reliable movement, and prices that don't require a second thought. If you've been searching for a watch that simply works — this is it.",
+          "secondaryKeyword": "anne klein watch price"
+        },
+        {
+          "collection": "Shoes",
+          "primaryKeyword": "anne klein shoes",
+          "description": "Anne Klein shoes are built around a simple idea: you shouldn't have to choose between looking professional and making it through a full workday comfortably. Our collection includes block-heel pumps with enough stability for a long commute, classic loafers that pair with everything from trousers to ponte dresses, and versatile flats that don't read as an afterthought. Whether you're standing at a whiteboard all morning or heading straight from the office to dinner, there's a style here that earns its place in your regular rotation. Real shoes for real schedules.",
+          "secondaryKeyword": "anne klein heels"
+        },
+        {
+          "collection": "Handbags",
+          "primaryKeyword": "anne klein handbags",
+          "description": "Anne Klein handbags are designed for women who carry a lot — not just in their bag, but in their day. Our collection includes structured satchels that hold a laptop and still look sharp at a client meeting, roomy totes that make the commute feel organized, and compact crossbodies for days when you just need your essentials. Every style is sized and priced to be a genuine everyday workhorse, not a once-a-month occasion bag. Clean hardware, durable construction, and silhouettes that stay relevant season after season. A reliable anne klein bag is one of the easier decisions in your week.",
+          "secondaryKeyword": "anne klein bag"
+        },
+        {
+          "collection": "Dresses",
+          "primaryKeyword": "anne klein dresses",
+          "description": "Anne Klein dresses solve one of the most practical problems in a working woman's week: what to wear when you want to look put-together without assembling an outfit from scratch. One piece, fully done. Our collection includes sheath dresses in stretch fabrics that hold their shape all day, wrap styles that flatter a range of figures, and printed options that add personality without veering into weekend territory. Most styles take you from the office directly to wherever the evening takes you. Simple, credible, and worth every wear — exactly what a work dress should be.",
+          "secondaryKeyword": "work dresses for women"
+        },
+        {
+          "collection": "Jewelry",
+          "primaryKeyword": "anne klein jewelry",
+          "description": "Anne Klein jewelry is the kind you reach for without thinking — which is exactly the point. Our collection includes classic stud earrings and coordinating necklaces that add the right amount of polish to a blazer or a ponte sheath, delicate layering pieces for when you want a little more, and statement styles that still read as professional rather than weekend. Everything is priced to be worn regularly, not saved for special occasions. When you find pieces that work with most of what's already in your closet, getting dressed in the morning gets noticeably easier. Classic accessories, thoughtfully priced.",
+          "secondaryKeyword": "classic work jewelry"
+        }
+      ]
+    },
+    "editorialCalendar": {
+      "editorialCalendar": [
+        {
+          "week": 1,
+          "dates": "Jan 6–10",
+          "theme": "Back to the Office, Better",
+          "email": {
+            "subject": "Your January work wardrobe, sorted.",
+            "focus": "Fresh-start energy for the new year — spotlight Clothing and Shoes with a 'build your week' framing around coordinates and comfortable heels, anchored by a clear CTA to the Wear to Work collection."
+          },
+          "instagram": [
+            {
+              "format": "Carousel",
+              "idea": "5 outfits, 5 days: Show one complete Anne Klein work look per slide — blazer + trouser + bag — using real catalog pieces with prices. Caption: 'Monday handled. Tuesday too.' No styling guesswork required."
+            },
+            {
+              "format": "Reel",
+              "idea": "Quick-cut 'get dressed in 60 seconds' transition video: same woman, three different AK outfits for three different work environments (office, classroom, clinic). Ends on product name cards. Use trending audio that fits the brisk, confident pace."
+            },
+            {
+              "format": "Static",
+              "idea": "Flat lay of a classic AK tote, stud earrings, structured blazer, and pointed-toe flat — all under $200 combined. Copy overlay: 'The whole look. Zero overthinking.' Tag each product."
+            }
+          ],
+          "hero": {
+            "headline": "Your work week, figured out.",
+            "collection": "Wear to Work — Clothing + Shoes"
+          }
+        },
+        {
+          "week": 2,
+          "dates": "Jan 13–17",
+          "theme": "The Details That Do the Work",
+          "email": {
+            "subject": "The earrings your outfits have been waiting for.",
+            "focus": "Lead with Jewelry (308 SKUs, the catalog's largest category) — position a well-chosen earring or watch as the finishing move that makes a simple outfit look intentional, with a shop-by-occasion filter framing (desk to dinner, Monday meeting, Friday wrap-up)."
+          },
+          "instagram": [
+            {
+              "format": "Carousel",
+              "idea": "'Same blazer, different jewelry' — three slides showing one neutral blazer styled with three distinct AK jewelry combinations (classic studs, a statement necklace, a watch stacked with a bangle). Demonstrates catalog depth without overwhelming. Caption: 'One blazer. Three Mondays.'"
+            },
+            {
+              "format": "Static",
+              "idea": "Close-crop product shot of an AK watch on a wrist mid-typing at a desk — natural light, real office setting. Copy: 'Details people notice. Price they don't have to know.' Include watch name, price, and link in bio. Targets GSC quick-win keywords: anne klein watch, watch ring."
+            },
+            {
+              "format": "Reel",
+              "idea": "15-second 'jewelry check' Reel: woman glances at her AK watch, adjusts her earrings before walking into a meeting — confident, unhurried. No voiceover. End card: 'Anne Klein Jewelry. From $14.' Speaks directly to the value-conscious buyer."
+            }
+          ],
+          "hero": {
+            "headline": "The right earrings. The right watch. The rest takes care of itself.",
+            "collection": "Jewelry — Featured Styles Under $75"
+          }
+        },
+        {
+          "week": 3,
+          "dates": "Jan 20–24",
+          "theme": "Coordinated, Not Complicated",
+          "email": {
+            "subject": "Stop second-guessing. Start with a set.",
+            "focus": "Introduce the Matching Sets / Suits & Separates angle — surface blazer and trouser coordinates from the Clothing catalog, frame it as the decision-fatigue solution, and include a section for petite sizing with direct links to drive that underserved segment."
+          },
+          "instagram": [
+            {
+              "format": "Carousel",
+              "idea": "'How to build a capsule in 4 pieces' — AK blazer, coordinating trouser, neutral pump, structured satchel. Each slide is one piece with price. Final slide totals the look. Caption: 'Less deciding. More doing.' Targets the Polished Professional's real morning reality."
+            },
+            {
+              "format": "Reel",
+              "idea": "Petite-focused Reel: a woman under 5'4\" showing how AK petite pieces actually fit — honest, warm, practical. Not a 'petite fashion' gimmick, just proof the proportions work. Caption: 'Made for how you're actually built.' This is an underserved signal competitors like Jones New York are already owning."
+            },
+            {
+              "format": "Static",
+              "idea": "Editorial-style flat lay of a matching blazer and trouser set, opened to show lining, with a simple copy overlay: 'The set that gets you out the door.' Price the set clearly. Tag both pieces separately so followers can buy individually."
+            }
+          ],
+          "hero": {
+            "headline": "When the top and bottom already match, the hard part is done.",
+            "collection": "Suits & Separates — Clothing Coordinates"
+          }
+        },
+        {
+          "week": 4,
+          "dates": "Jan 27–31",
+          "theme": "The Weekend Doesn't Have to Look Like Monday",
+          "email": {
+            "subject": "Not every great outfit is for a meeting.",
+            "focus": "Soft-launch the Weekend Edit angle — pull handbags, casual shoes, and lighter jewelry from the catalog into a lifestyle-adjacent story that shows brand breadth beyond the office, reinforcing repeat visit behavior and protecting casual spend from competitors."
+          },
+          "instagram": [
+            {
+              "format": "Carousel",
+              "idea": "'5 ways to wear your AK bag off the clock' — same tote or crossbody styled across Saturday brunch, a farmers market, a school event, an afternoon errand run, and a casual dinner. Real-life settings, real-woman energy. Caption: 'It carries more than just work stuff.'"
+            },
+            {
+              "format": "Reel",
+              "idea": "Saturday morning Reel: coffee cup, a good bag, comfortable AK loafers, a soft blazer thrown over a weekend outfit. Warm lighting, unhurried pace. Text overlay: 'Still you. Just on a Saturday.' This builds the lifestyle identity without abandoning the core professional brand signal."
+            },
+            {
+              "format": "Static",
+              "idea": "UGC-style community post — repost or recreate a customer wearing AK outside the office. Add copy: 'Tag us in your weekend look. #AnneKlein' Starts building the UGC/community Instagram pillar the feed currently underuses, and opens the door to organic hashtag momentum."
+            }
+          ],
+          "hero": {
+            "headline": "Polished doesn't clock out on Friday.",
+            "collection": "Weekend Edit — Handbags + Shoes + Jewelry"
+          }
+        }
+      ]
+    },
+    "seoQuickWins": {
+      "seoQuickWins": [
+        {
+          "keyword": "anne klein watches for women",
+          "currentPage": "/collections/watches",
+          "titleTag": "Women's Watches | Anne Klein | Classic Styles from $50",
+          "metaDescription": "Shop Anne Klein watches for women. Timeless designs built for real life — from the office to the weekend. Free shipping available.",
+          "contentAdditions": [
+            "Add an H1 or intro paragraph that explicitly names the use case: 'Anne Klein watches for women who want to look polished at 9am and put-together at 6pm — without thinking twice.' This surfaces the phrase naturally and speaks directly to her.",
+            "Add a filterable 'Best Sellers' row near the top of the collection page with schema markup (Product + AggregateRating) to increase click-through rate in SERPs where star ratings render."
+          ]
+        },
+        {
+          "keyword": "anne klein shoes",
+          "currentPage": "/collections/shoes",
+          "titleTag": "Women's Shoes | Anne Klein | Work-Ready Heels, Flats & More",
+          "metaDescription": "Anne Klein shoes built for long days and real schedules. Heels, flats, and loafers from $50. Classic style that holds up.",
+          "contentAdditions": [
+            "Add a short editorial blurb above the product grid — 2–3 sentences — that naturally includes 'Anne Klein shoes,' 'women's work shoes,' and a use-case phrase like 'from boardroom to commute.' Thin copy on collection pages is a common reason positions 4–15 stall.",
+            "Create a 'Shop by Occasion' filter or visual subcategory strip (Work, Weekend, Event) directly on the shoes landing page to improve on-page engagement signals and give crawlers clearer topical structure."
+          ]
+        },
+        {
+          "keyword": "anne klein handbags",
+          "currentPage": "/collections/handbags",
+          "titleTag": "Women's Handbags & Totes | Anne Klein | Work Bags from $50",
+          "metaDescription": "Shop Anne Klein handbags — totes, satchels, and crossbodies built for the workweek. Quality that lasts, prices that make sense.",
+          "contentAdditions": [
+            "Add an H2 section midpage titled 'Work Bags Built for Real Days' that calls out specific bag types by name (tote, satchel, wallet) — these are already top product types in the catalog and naturally match high-intent search variants crawlers associate with the head term.",
+            "Add internal links from the handbags page to the top 3 individual best-selling bag PDPs using descriptive anchor text (e.g., 'our best-selling structured tote') rather than generic 'shop now' — this distributes page authority to the exact PDPs most likely to convert."
+          ]
+        },
+        {
+          "keyword": "anne klein dresses",
+          "currentPage": "/collections/dresses",
+          "titleTag": "Women's Dresses | Anne Klein | Work Dresses & Jumpsuits",
+          "metaDescription": "Anne Klein dresses for work and beyond. Classic cuts, easy care, and styles that travel from Monday meetings to Friday dinners.",
+          "contentAdditions": [
+            "The catalog shows only 8 Dresses & Jumpsuits — this is a content gap and a ranking ceiling. Add a buying guide editorial block on the page ('How to Choose a Work Dress That Actually Works') with 150–200 words. This adds topical depth without requiring more inventory, and gives Google something substantive to index beyond product tiles.",
+            "Cross-link the dresses page to relevant clothing separates and suiting pieces with anchor text like 'complete the look with matching blazers' — this builds topical relevance for 'workwear' as a cluster and keeps her on-site longer."
+          ]
+        },
+        {
+          "keyword": "reloj anne klein / anne klein reloj",
+          "currentPage": "/collections/watches",
+          "titleTag": "Relojes Anne Klein para Mujer | Anne Klein Watches",
+          "metaDescription": "Descubre los relojes Anne Klein — estilos clásicos para el trabajo y la vida diaria. Envío disponible a toda América Latina.",
+          "contentAdditions": [
+            "Add a dedicated Spanish-language metadata block and a brief bilingual description section on the watches collection page. Even 2–3 sentences in Spanish signals relevance to this query cluster, which appears in the GSC data as a meaningful traffic source — likely from the US Hispanic market and Latin America, including Canada.",
+            "Create a simple hreflang tag or a lightweight Spanish-language landing page at /es/relojes-anne-klein that mirrors the core watches collection. This isolates the Spanish-language SEO opportunity without diluting the primary English page and directly targets the 'reloj anne klein' and 'anne klein reloj' queries that are sitting in positions 4–15 and ready to move."
+          ]
+        }
+      ]
+    }
+  }
+}
