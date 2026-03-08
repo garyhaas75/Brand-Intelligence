@@ -93,6 +93,17 @@ app.get('/api/email-analysis',         (req, res) => res.json(loadData('email_an
 app.get('/api/agentic-search',         (req, res) => res.json(loadData('agentic_search.json') || {}));
 app.get('/api/price-intelligence',     (req, res) => res.json(loadData('price_intelligence.json') || {}));
 app.get('/api/brand-guidelines',       (req, res) => res.json(loadData('brand_guidelines.json') || {}));
+app.put('/api/brand-guidelines',       (req, res) => {
+  try {
+    const data = req.body;
+    if (!data || typeof data !== 'object') return res.status(400).json({ error: 'Invalid JSON body' });
+    data.updatedAt = new Date().toISOString().split('T')[0];
+    fs.writeFileSync(path.join(DATA_DIR, 'brand_guidelines.json'), JSON.stringify(data, null, 2));
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // History endpoint — returns last N snapshots for any module
 app.get('/api/history/:module', (req, res) => {

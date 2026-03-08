@@ -1396,41 +1396,185 @@ function PersonasTab({ personas }) {
 }
 
 function BrandGuidelinesTab({ guidelines }) {
-  if (!guidelines?.brandVoice) return (
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [saveMsg, setSaveMsg] = useState(null)
+  const [activeFormat, setActiveFormat] = useState('productDescription')
+  const [activeSample, setActiveSample] = useState('blazers')
+
+  const data = editing ? draft : guidelines
+
+  if (!data?.brandVoice) return (
     <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>No brand guidelines data found.</div>
   )
 
-  const { brandVoice, targetCustomer, writingRules, keywords, copyFormats, writingSamples } = guidelines
-  const [activeFormat, setActiveFormat] = useState('productDescription')
   const formatLabels = { productDescription: 'Product Description', emailSubjectLine: 'Email Subject', emailPreviewText: 'Email Preview Text', instagramCaption: 'Instagram Caption', heroHeadline: 'Hero Headline' }
-  const sampleCategories = Object.keys(writingSamples || {})
-  const [activeSample, setActiveSample] = useState(sampleCategories[0] || 'blazers')
+  const sampleCategories = Object.keys(data.writingSamples || {})
+
+  function startEdit() {
+    setDraft(JSON.parse(JSON.stringify(guidelines)))
+    setEditing(true)
+    setSaveMsg(null)
+  }
+
+  function cancelEdit() {
+    setDraft(null)
+    setEditing(false)
+    setSaveMsg(null)
+  }
+
+  async function saveEdit() {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/brand-guidelines', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft),
+      })
+      if (!res.ok) throw new Error('Save failed')
+      setSaveMsg('Saved!')
+      setEditing(false)
+      setDraft(null)
+    } catch (e) {
+      setSaveMsg('Error saving — try again')
+    }
+    setSaving(false)
+  }
+
+  // Helpers for editing nested state
+  function setIn(path, value) {
+    const keys = path.split('.')
+    setDraft(prev => {
+      const next = JSON.parse(JSON.stringify(prev))
+      let obj = next
+      for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]]
+      obj[keys[keys.length - 1]] = value
+      return next
+    })
+  }
+
+  function setListItem(path, index, value) {
+    const keys = path.split('.')
+    setDraft(prev => {
+      const next = JSON.parse(JSON.stringify(prev))
+      let obj = next
+      for (const k of keys) obj = obj[k]
+      obj[index] = value
+      return next
+    })
+  }
+
+  function addListItem(path, value = '') {
+    const keys = path.split('.')
+    setDraft(prev => {
+      const next = JSON.parse(JSON.stringify(prev))
+      let obj = next
+      for (const k of keys) obj = obj[k]
+      obj.push(value)
+      return next
+    })
+  }
+
+  function removeListItem(path, index) {
+    const keys = path.split('.')
+    setDraft(prev => {
+      const next = JSON.parse(JSON.stringify(prev))
+      let obj = next
+      for (const k of keys) obj = obj[k]
+      obj.splice(index, 1)
+      return next
+    })
+  }
+
+  const iStyle = { border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', boxSizing: 'border-box', background: '#fff' }
+  const taStyle = { ...iStyle, resize: 'vertical', minHeight: 60 }
+
+  function ET({ val, path, multiline }) {
+    if (!editing) return <span>{val}</span>
+    return multiline
+      ? <textarea style={taStyle} value={val} onChange={e => setIn(path, e.target.value)} />
+      : <input style={iStyle} value={val} onChange={e => setIn(path, e.target.value)} />
+  }
+
+  function EList({ items, path, color }) {
+    return (
+      <div>
+        {items.map((item, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 6 }}>
+            {editing
+              ? <input style={{ ...iStyle, flex: 1 }} value={item} onChange={e => setListItem(path, i, e.target.value)} />
+              : <span style={{ fontSize: 13, color: '#374151', flex: 1 }}>{item}</span>}
+            {editing && <button onClick={() => removeListItem(path, i)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 16, padding: '2px 4px' }}>×</button>}
+          </div>
+        ))}
+        {editing && <button onClick={() => addListItem(path)} style={{ fontSize: 12, color: '#6366f1', border: '1px dashed #6366f1', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', marginTop: 4 }}>+ Add</button>}
+      </div>
+    )
+  }
+
+  function EPills({ items, path, bg, color }) {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {items.map((k, i) => (
+          <span key={i} style={{ background: bg, color, padding: '3px 10px', borderRadius: 12, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+            {editing
+              ? <input value={k} onChange={e => setListItem(path, i, e.target.value)} style={{ border: 'none', background: 'transparent', color, fontSize: 12, width: Math.max(60, k.length * 8), padding: 0 }} />
+              : k}
+            {editing && <span onClick={() => removeListItem(path, i)} style={{ cursor: 'pointer', fontWeight: 700, opacity: 0.6 }}>×</span>}
+          </span>
+        ))}
+        {editing && <button onClick={() => addListItem(path)} style={{ background: bg, color, border: '1px dashed', borderRadius: 12, fontSize: 12, padding: '3px 10px', cursor: 'pointer' }}>+ Add</button>}
+      </div>
+    )
+  }
+
+  const { brandVoice, targetCustomer, writingRules, keywords, copyFormats, writingSamples } = data
 
   return (
     <div>
+      {/* Toolbar */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+        {saveMsg && <span style={{ fontSize: 13, color: saveMsg.includes('Error') ? '#ef4444' : '#10b981', fontWeight: 600 }}>{saveMsg}</span>}
+        {editing ? (
+          <>
+            <button onClick={cancelEdit} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+            <button onClick={saveEdit} disabled={saving} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>{saving ? 'Saving…' : 'Save Changes'}</button>
+          </>
+        ) : (
+          <button onClick={startEdit} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Edit Guidelines</button>
+        )}
+      </div>
+
       {/* Brand Voice */}
       <SectionHeader>Brand Voice</SectionHeader>
       <Card>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>"{brandVoice.summary}"</div>
-        <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>Tone: <strong>{brandVoice.tone}</strong></div>
+        <div style={{ fontSize: editing ? 13 : 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+          {editing ? <ET val={brandVoice.summary} path="brandVoice.summary" multiline /> : `"${brandVoice.summary}"`}
+        </div>
+        <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+          Tone: {editing ? <ET val={brandVoice.tone} path="brandVoice.tone" /> : <strong>{brandVoice.tone}</strong>}
+        </div>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>AK Is</div>
-            {brandVoice.personality.map((p, i) => (
+            {!editing && brandVoice.personality.map((p, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
                 <span style={{ color: '#10b981', fontWeight: 700 }}>✓</span>
                 <span style={{ fontSize: 13, color: '#374151' }}>{p}</span>
               </div>
             ))}
+            {editing && <EList items={brandVoice.personality} path="brandVoice.personality" />}
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Writing Style</div>
-            {brandVoice.writingStyle.map((s, i) => (
+            {!editing && brandVoice.writingStyle.map((s, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
                 <span style={{ color: '#6366f1', fontWeight: 700 }}>→</span>
                 <span style={{ fontSize: 13, color: '#374151' }}>{s}</span>
               </div>
             ))}
+            {editing && <EList items={brandVoice.writingStyle} path="brandVoice.writingStyle" />}
           </div>
         </div>
       </Card>
@@ -1440,18 +1584,19 @@ function BrandGuidelinesTab({ guidelines }) {
       <Card>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <div style={{ flex: 1, minWidth: 220 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 4 }}>{targetCustomer.name}</div>
-            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>Age {targetCustomer.age} · {targetCustomer.income} · {targetCustomer.priceRange}</div>
-            <div style={{ fontSize: 13, color: '#374151', marginBottom: 12 }}>{targetCustomer.description}</div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {targetCustomer.values.map((v, i) => (
-                <span key={i} style={{ background: '#ede9fe', color: '#6366f1', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>{v}</span>
-              ))}
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 4 }}><ET val={targetCustomer.name} path="targetCustomer.name" /></div>
+            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {editing ? (
+                <>Age <ET val={targetCustomer.age} path="targetCustomer.age" /> · <ET val={targetCustomer.income} path="targetCustomer.income" /> · <ET val={targetCustomer.priceRange} path="targetCustomer.priceRange" /></>
+              ) : `Age ${targetCustomer.age} · ${targetCustomer.income} · ${targetCustomer.priceRange}`}
             </div>
+            <div style={{ fontSize: 13, color: '#374151', marginBottom: 12 }}><ET val={targetCustomer.description} path="targetCustomer.description" multiline /></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Values</div>
+            <EPills items={targetCustomer.values} path="targetCustomer.values" bg="#ede9fe" color="#6366f1" />
           </div>
           <div style={{ flex: 1, minWidth: 220, background: '#f9fafb', borderRadius: 8, padding: 16, borderLeft: '3px solid #6366f1' }}>
             <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Her Voice</div>
-            <div style={{ fontSize: 14, color: '#374151', fontStyle: 'italic', lineHeight: 1.6 }}>"{targetCustomer.quote}"</div>
+            <ET val={targetCustomer.quote} path="targetCustomer.quote" multiline />
           </div>
         </div>
       </Card>
@@ -1460,20 +1605,22 @@ function BrandGuidelinesTab({ guidelines }) {
       <SectionHeader>Writing Rules</SectionHeader>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
         <Card title="Do">
-          {writingRules.dos.map((d, i) => (
+          {!editing && writingRules.dos.map((d, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
               <span style={{ color: '#10b981', fontWeight: 700, flexShrink: 0 }}>✓</span>
               <span style={{ fontSize: 13, color: '#374151' }}>{d}</span>
             </div>
           ))}
+          {editing && <EList items={writingRules.dos} path="writingRules.dos" />}
         </Card>
         <Card title="Don't">
-          {writingRules.donts.map((d, i) => (
+          {!editing && writingRules.donts.map((d, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.donts.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
               <span style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>✕</span>
               <span style={{ fontSize: 13, color: '#374151' }}>{d}</span>
             </div>
           ))}
+          {editing && <EList items={writingRules.donts} path="writingRules.donts" />}
         </Card>
       </div>
 
@@ -1481,25 +1628,13 @@ function BrandGuidelinesTab({ guidelines }) {
       <SectionHeader>Keywords</SectionHeader>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
         <Card title="Use These Words">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {keywords.positive.map((k, i) => (
-              <span key={i} style={{ background: '#d1fae5', color: '#065f46', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>{k}</span>
-            ))}
-          </div>
+          <EPills items={keywords.positive} path="keywords.positive" bg="#d1fae5" color="#065f46" />
         </Card>
         <Card title="Avoid These Words">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {keywords.negative.map((k, i) => (
-              <span key={i} style={{ background: '#fee2e2', color: '#991b1b', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>{k}</span>
-            ))}
-          </div>
+          <EPills items={keywords.negative} path="keywords.negative" bg="#fee2e2" color="#991b1b" />
         </Card>
         <Card title="SEO Keywords">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {keywords.seoKeywords.map((k, i) => (
-              <span key={i} style={{ background: '#ede9fe', color: '#5b21b6', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>{k}</span>
-            ))}
-          </div>
+          <EPills items={keywords.seoKeywords} path="keywords.seoKeywords" bg="#ede9fe" color="#5b21b6" />
         </Card>
       </div>
 
@@ -1513,41 +1648,34 @@ function BrandGuidelinesTab({ guidelines }) {
         </div>
         {copyFormats[activeFormat] && (() => {
           const fmt = copyFormats[activeFormat]
+          const fpath = `copyFormats.${activeFormat}`
           return (
             <div>
-              {fmt.structure && <div style={{ marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Structure: </span><span style={{ fontSize: 13, color: '#374151' }}>{fmt.structure}</span></div>}
-              {fmt.guidance && <div style={{ marginBottom: 12 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Guidance: </span><span style={{ fontSize: 13, color: '#374151' }}>{fmt.guidance}</span></div>}
-              {fmt.paragraphGuidance && <div style={{ marginBottom: 6, fontSize: 13, color: '#374151' }}><strong>Paragraph:</strong> {fmt.paragraphGuidance}</div>}
-              {fmt.bulletGuidance && <div style={{ marginBottom: 12, fontSize: 13, color: '#374151' }}><strong>Bullets:</strong> {fmt.bulletGuidance}</div>}
+              {fmt.structure !== undefined && <div style={{ marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Structure: </span><ET val={fmt.structure} path={`${fpath}.structure`} /></div>}
+              {fmt.guidance !== undefined && <div style={{ marginBottom: 12 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Guidance: </span><ET val={fmt.guidance} path={`${fpath}.guidance`} multiline /></div>}
+              {fmt.paragraphGuidance !== undefined && <div style={{ marginBottom: 6, fontSize: 13, color: '#374151' }}><strong>Paragraph: </strong><ET val={fmt.paragraphGuidance} path={`${fpath}.paragraphGuidance`} multiline /></div>}
+              {fmt.bulletGuidance !== undefined && <div style={{ marginBottom: 12, fontSize: 13, color: '#374151' }}><strong>Bullets: </strong><ET val={fmt.bulletGuidance} path={`${fpath}.bulletGuidance`} multiline /></div>}
               {fmt.example && (
                 <div style={{ background: '#f9fafb', borderRadius: 8, padding: 14, marginBottom: 12 }}>
                   <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 6 }}>EXAMPLE — {fmt.example.title}</div>
-                  <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, fontStyle: 'italic' }}>{fmt.example.paragraph}</div>
-                  <ul style={{ margin: 0, paddingLeft: 16 }}>
-                    {fmt.example.bullets?.map((b, i) => <li key={i} style={{ fontSize: 13, color: '#374151', marginBottom: 3 }}>{b}</li>)}
-                  </ul>
+                  <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, fontStyle: editing ? 'normal' : 'italic' }}><ET val={fmt.example.paragraph} path={`${fpath}.example.paragraph`} multiline /></div>
+                  <EList items={fmt.example.bullets || []} path={`${fpath}.example.bullets`} />
                 </div>
               )}
-              {fmt.examples && Array.isArray(fmt.examples) && (
-                <div>
-                  {fmt.examples.map((ex, i) => (
-                    <div key={i} style={{ background: '#f9fafb', borderRadius: 8, padding: 10, marginBottom: 8 }}>
-                      {typeof ex === 'string' ? (
-                        <div style={{ fontSize: 13, color: '#374151', fontStyle: 'italic' }}>{ex}</div>
-                      ) : (
-                        <div>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 4 }}>"{ex.headline}"</div>
-                          <div style={{ fontSize: 13, color: '#6b7280' }}>{ex.subhead}</div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+              {fmt.examples && Array.isArray(fmt.examples) && fmt.examples.map((ex, i) => (
+                <div key={i} style={{ background: '#f9fafb', borderRadius: 8, padding: 10, marginBottom: 8 }}>
+                  {typeof ex === 'string'
+                    ? <ET val={ex} path={`${fpath}.examples.${i}`} />
+                    : <div>
+                        <div style={{ marginBottom: 4 }}><strong style={{ fontSize: 12, color: '#9ca3af' }}>Headline: </strong><ET val={ex.headline} path={`${fpath}.examples.${i}.headline`} /></div>
+                        <div><strong style={{ fontSize: 12, color: '#9ca3af' }}>Subhead: </strong><ET val={ex.subhead} path={`${fpath}.examples.${i}.subhead`} /></div>
+                      </div>}
                 </div>
-              )}
+              ))}
               {fmt.donts && (
                 <div style={{ marginTop: 8 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', marginBottom: 6 }}>Avoid</div>
-                  {fmt.donts.map((d, i) => <div key={i} style={{ fontSize: 13, color: '#6b7280', marginBottom: 3 }}>✕ {d}</div>)}
+                  <EList items={fmt.donts} path={`${fpath}.donts`} />
                 </div>
               )}
             </div>
@@ -1565,11 +1693,9 @@ function BrandGuidelinesTab({ guidelines }) {
         </div>
         {(writingSamples[activeSample] || []).map((s, i) => (
           <div key={i} style={{ padding: '14px 0', borderBottom: i < writingSamples[activeSample].length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{s.title}</div>
-            <div style={{ fontSize: 13, color: '#374151', fontStyle: 'italic', marginBottom: 8 }}>{s.paragraph}</div>
-            <ul style={{ margin: 0, paddingLeft: 16 }}>
-              {s.bullets.map((b, j) => <li key={j} style={{ fontSize: 13, color: '#374151', marginBottom: 3 }}>{b}</li>)}
-            </ul>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6 }}><ET val={s.title} path={`writingSamples.${activeSample}.${i}.title`} /></div>
+            <div style={{ marginBottom: 8 }}><ET val={s.paragraph} path={`writingSamples.${activeSample}.${i}.paragraph`} multiline /></div>
+            <EList items={s.bullets} path={`writingSamples.${activeSample}.${i}.bullets`} />
           </div>
         ))}
       </Card>
