@@ -1,0 +1,32 @@
+# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Scraped data — lives on the server volume, not in git
+data/*.json
+
+# Logs
+logs/
+*.log
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Dashboard build output — Railway builds this on deploy
+dashboard/dist/
+dashboard/node_modules/
+
+# Credentials — never commit OAuth key files
+credentials/
+
+# Claude Code local config
+.claude/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

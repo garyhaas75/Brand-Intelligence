@@ -1,0 +1,16 @@
+[build]
+# Install deps and build the React dashboard
+builder = "NIXPACKS"
+buildCommand = "npm install && npm run build"
+
+[deploy]
+# Start server + scheduler together (same as npm run start:full minus the dashboard dev server)
+startCommand = "node server.js & node scheduler/index.js & wait"
+healthcheckPath = "/api/status"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[[volumes]]
+# Persistent disk — mounts at /data so scraped JSON survives deploys/restarts
+mountPath = "/app/data"
