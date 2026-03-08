@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './App.css'
 
 const API = '/api'
@@ -1298,10 +1298,10 @@ function PersonaCard({ p, index, color }) {
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [streamText, setStreamText] = useState('')
-  const chatEndRef = React.useRef(null)
+  const chatEndRef = useRef(null)
   const occupations = Array.isArray(p.occupation) ? p.occupation.join(' · ') : p.occupation
 
-  React.useEffect(() => {
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamText])
 

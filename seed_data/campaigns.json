@@ -1,0 +1,36 @@
+[
+  {
+    "id": "campaign_spring_work_2026",
+    "name": "Spring Into Work 2026",
+    "status": "active",
+    "startDate": "2026-03-16",
+    "endDate": "2026-04-05",
+    "persona": "The Polished Professional",
+    "styleGuide": {
+      "colorDirection": "Navy, blush, bone white",
+      "moodKeywords": ["effortless", "authoritative", "seasonal transition"],
+      "avoidWords": ["trendy", "fresh", "hot"],
+      "heroImageDirection": "Woman in her 40s at a standing desk or conference room, blazer over blouse, natural light, confident but approachable expression"
+    },
+    "brief": "Spring Into Work 2026 targets the Polished Professional as she refreshes her work wardrobe for Q2. The campaign leans into the transition from heavier winter layers to lighter suiting and knit blouses — pieces that carry credibility without effort. The strategic angle is capsule thinking: 3 new pieces that work with everything she already owns.\n\nCreative direction is clean and warm — navy and blush with bone white accents. No aspirational loft photography. Real offices, real women, real work days. Hero imagery should feel like a colleague she respects, not a magazine cover she can't relate to.\n\nAcross channels: email leads with a capsule framework (subject lines in the 'Formula' family), Instagram shows individual pieces in real work settings, and the site hero should carry a headline in the 'No-brainer workwear' register. CTA across all channels: Shop the Capsule.",
+    "calendarItemIds": ["cal_email_spring1", "cal_email_spring2", "cal_ig_spring1", "cal_ig_spring2", "cal_hero_spring1"],
+    "createdAt": "2026-03-08T10:00:00.000Z"
+  },
+  {
+    "id": "campaign_welcome_refresh_2026",
+    "name": "Welcome Email Refresh",
+    "status": "planning",
+    "startDate": "2026-03-20",
+    "endDate": "2026-03-20",
+    "persona": "The Polished Professional",
+    "styleGuide": {
+      "colorDirection": "Black, white, gold",
+      "moodKeywords": ["welcoming", "confident", "premium value"],
+      "avoidWords": ["excited", "amazing", "exclusive"],
+      "heroImageDirection": "Clean product flat-lay or model shot against white, jewelry or blazer as hero piece, minimal and editorial"
+    },
+    "brief": "",
+    "calendarItemIds": ["cal_email_welcome1"],
+    "createdAt": "2026-03-08T10:30:00.000Z"
+  }
+]
