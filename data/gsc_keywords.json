@@ -1,0 +1,5583 @@
+{
+  "generatedAt": "2026-03-07T15:05:03.354Z",
+  "siteUrl": "sc-domain:anneklein.com",
+  "dateRange": {
+    "startDate": "2025-12-04",
+    "endDate": "2026-03-04"
+  },
+  "daysAnalyzed": 90,
+  "queryAnalysis": {
+    "totalQueries": 500,
+    "totalClicks": 190003,
+    "totalImpressions": 1108337,
+    "avgCTR": 17.14,
+    "brandedClickShare": 89,
+    "queryTypeBreakdown": {
+      "branded": {
+        "count": 393,
+        "clicks": 169059,
+        "impressions": 954776
+      },
+      "unbranded-product": {
+        "count": 104,
+        "clicks": 20800,
+        "impressions": 143150
+      },
+      "category-generic": {
+        "count": 3,
+        "clicks": 144,
+        "impressions": 10411
+      }
+    },
+    "top50Queries": [
+      {
+        "query": "anne klein",
+        "clicks": 79392,
+        "impressions": 262553,
+        "ctr": 30.24,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch",
+        "clicks": 20852,
+        "impressions": 108963,
+        "ctr": 19.14,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches",
+        "clicks": 8332,
+        "impressions": 64213,
+        "ctr": 12.98,
+        "position": 8.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags",
+        "clicks": 5839,
+        "impressions": 26806,
+        "ctr": 21.78,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein",
+        "clicks": 5234,
+        "impressions": 19553,
+        "ctr": 26.77,
+        "position": 1.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein shoes",
+        "clicks": 3088,
+        "impressions": 23540,
+        "ctr": 13.12,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "anna klein",
+        "clicks": 2602,
+        "impressions": 10381,
+        "ctr": 25.07,
+        "position": 1.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein purse",
+        "clicks": 2541,
+        "impressions": 19681,
+        "ctr": 12.91,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch price",
+        "clicks": 2067,
+        "impressions": 12185,
+        "ctr": 16.96,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien",
+        "clicks": 2026,
+        "impressions": 6597,
+        "ctr": 30.71,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "annie klein",
+        "clicks": 2007,
+        "impressions": 7138,
+        "ctr": 28.12,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bag",
+        "clicks": 1843,
+        "impressions": 9124,
+        "ctr": 20.2,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein canada",
+        "clicks": 1355,
+        "impressions": 2383,
+        "ctr": 56.86,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein dresses",
+        "clicks": 1136,
+        "impressions": 8370,
+        "ctr": 13.57,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein handbags",
+        "clicks": 895,
+        "impressions": 9096,
+        "ctr": 9.84,
+        "position": 12,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wallet",
+        "clicks": 854,
+        "impressions": 4115,
+        "ctr": 20.75,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein outlet",
+        "clicks": 816,
+        "impressions": 2186,
+        "ctr": 37.33,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anneklein",
+        "clicks": 797,
+        "impressions": 2732,
+        "ctr": 29.17,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches for women",
+        "clicks": 755,
+        "impressions": 9255,
+        "ctr": 8.16,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bracelet",
+        "clicks": 744,
+        "impressions": 4359,
+        "ctr": 17.07,
+        "position": 12.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein usa",
+        "clicks": 659,
+        "impressions": 863,
+        "ctr": 76.36,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein clothing",
+        "clicks": 653,
+        "impressions": 4977,
+        "ctr": 13.12,
+        "position": 18.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein coat",
+        "clicks": 609,
+        "impressions": 5289,
+        "ctr": 11.51,
+        "position": 8.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jewelry",
+        "clicks": 584,
+        "impressions": 6047,
+        "ctr": 9.66,
+        "position": 26.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein reloj",
+        "clicks": 574,
+        "impressions": 9425,
+        "ctr": 6.09,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein brand",
+        "clicks": 563,
+        "impressions": 2787,
+        "ctr": 20.2,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein boots",
+        "clicks": 542,
+        "impressions": 6131,
+        "ctr": 8.84,
+        "position": 6.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne ak klein",
+        "clicks": 533,
+        "impressions": 1541,
+        "ctr": 34.59,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bolsas",
+        "clicks": 519,
+        "impressions": 6527,
+        "ctr": 7.95,
+        "position": 4.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags official website",
+        "clicks": 511,
+        "impressions": 1725,
+        "ctr": 29.62,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein relojes",
+        "clicks": 495,
+        "impressions": 3141,
+        "ctr": 15.76,
+        "position": 4.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch price original",
+        "clicks": 453,
+        "impressions": 3652,
+        "ctr": 12.4,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sunglasses",
+        "clicks": 449,
+        "impressions": 4806,
+        "ctr": 9.34,
+        "position": 27.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein blazer",
+        "clicks": 443,
+        "impressions": 2497,
+        "ctr": 17.74,
+        "position": 10.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein часы",
+        "clicks": 429,
+        "impressions": 2158,
+        "ctr": 19.88,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "ak anne klein",
+        "clicks": 411,
+        "impressions": 1641,
+        "ctr": 25.05,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein earrings",
+        "clicks": 372,
+        "impressions": 2603,
+        "ctr": 14.29,
+        "position": 14.8,
+        "type": "branded"
+      },
+      {
+        "query": "ann klien",
+        "clicks": 356,
+        "impressions": 1070,
+        "ctr": 33.27,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein watch women",
+        "clicks": 356,
+        "impressions": 5146,
+        "ctr": 6.92,
+        "position": 16,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tote bag",
+        "clicks": 335,
+        "impressions": 1643,
+        "ctr": 20.39,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein heels",
+        "clicks": 327,
+        "impressions": 2484,
+        "ctr": 13.16,
+        "position": 8.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein diamond watch",
+        "clicks": 324,
+        "impressions": 2804,
+        "ctr": 11.55,
+        "position": 13.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein carteras",
+        "clicks": 322,
+        "impressions": 2262,
+        "ctr": 14.24,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "ana klein",
+        "clicks": 313,
+        "impressions": 1632,
+        "ctr": 19.18,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein pants",
+        "clicks": 312,
+        "impressions": 4932,
+        "ctr": 6.33,
+        "position": 14.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches prices",
+        "clicks": 305,
+        "impressions": 2345,
+        "ctr": 13.01,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne clein",
+        "clicks": 301,
+        "impressions": 982,
+        "ctr": 30.65,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein dresses",
+        "clicks": 295,
+        "impressions": 1361,
+        "ctr": 21.68,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "is anne klein a luxury brand",
+        "clicks": 293,
+        "impressions": 5653,
+        "ctr": 5.18,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein uk",
+        "clicks": 291,
+        "impressions": 642,
+        "ctr": 45.33,
+        "position": 1.3,
+        "type": "branded"
+      }
+    ],
+    "ctrOpportunities": [
+      {
+        "query": "watch ring",
+        "clicks": 170,
+        "impressions": 20448,
+        "ctr": 0.83,
+        "position": 10.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ring watch",
+        "clicks": 84,
+        "impressions": 13157,
+        "ctr": 0.64,
+        "position": 12,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "clip on earrings",
+        "clicks": 40,
+        "impressions": 10078,
+        "ctr": 0.4,
+        "position": 18.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "reloj anne klein",
+        "clicks": 250,
+        "impressions": 10046,
+        "ctr": 2.49,
+        "position": 6.9,
+        "type": "branded"
+      },
+      {
+        "query": "watch ring women",
+        "clicks": 72,
+        "impressions": 4986,
+        "ctr": 1.44,
+        "position": 8,
+        "type": "category-generic"
+      },
+      {
+        "query": "is anne klein a good brand",
+        "clicks": 99,
+        "impressions": 4959,
+        "ctr": 2,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jackets",
+        "clicks": 64,
+        "impressions": 4376,
+        "ctr": 1.46,
+        "position": 14.8,
+        "type": "branded"
+      },
+      {
+        "query": "bolsa anne klein",
+        "clicks": 122,
+        "impressions": 4233,
+        "ctr": 2.88,
+        "position": 6.2,
+        "type": "branded"
+      },
+      {
+        "query": "watch rings",
+        "clicks": 39,
+        "impressions": 4217,
+        "ctr": 0.92,
+        "position": 10.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ring watches for women",
+        "clicks": 42,
+        "impressions": 4073,
+        "ctr": 1.03,
+        "position": 8.4,
+        "type": "category-generic"
+      },
+      {
+        "query": "anne klein pumps",
+        "clicks": 56,
+        "impressions": 3042,
+        "ctr": 1.84,
+        "position": 13.9,
+        "type": "branded"
+      },
+      {
+        "query": "bolsas anne klein",
+        "clicks": 71,
+        "impressions": 2904,
+        "ctr": 2.44,
+        "position": 10.9,
+        "type": "branded"
+      },
+      {
+        "query": "reloj anne klein mujer",
+        "clicks": 36,
+        "impressions": 2614,
+        "ctr": 1.38,
+        "position": 9.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein luggage",
+        "clicks": 43,
+        "impressions": 2118,
+        "ctr": 2.03,
+        "position": 17.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sport",
+        "clicks": 60,
+        "impressions": 2067,
+        "ctr": 2.9,
+        "position": 12,
+        "type": "branded"
+      },
+      {
+        "query": "ak shoes",
+        "clicks": 28,
+        "impressions": 1950,
+        "ctr": 1.44,
+        "position": 7.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein philippines",
+        "clicks": 40,
+        "impressions": 1550,
+        "ctr": 2.58,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "klein watches",
+        "clicks": 38,
+        "impressions": 1545,
+        "ctr": 2.46,
+        "position": 9.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ak watches",
+        "clicks": 39,
+        "impressions": 1509,
+        "ctr": 2.58,
+        "position": 18.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bolsa",
+        "clicks": 30,
+        "impressions": 1474,
+        "ctr": 2.04,
+        "position": 17,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wedges",
+        "clicks": 33,
+        "impressions": 1449,
+        "ctr": 2.28,
+        "position": 13.7,
+        "type": "branded"
+      },
+      {
+        "query": "women's anne klein watches",
+        "clicks": 37,
+        "impressions": 1395,
+        "ctr": 2.65,
+        "position": 5.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein glasses frames",
+        "clicks": 34,
+        "impressions": 1368,
+        "ctr": 2.49,
+        "position": 9.1,
+        "type": "branded"
+      },
+      {
+        "query": "watch rings for women",
+        "clicks": 30,
+        "impressions": 1352,
+        "ctr": 2.22,
+        "position": 6.2,
+        "type": "category-generic"
+      }
+    ],
+    "quickWins": [
+      {
+        "query": "anne klein watch",
+        "clicks": 20852,
+        "impressions": 108963,
+        "ctr": 19.14,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches",
+        "clicks": 8332,
+        "impressions": 64213,
+        "ctr": 12.98,
+        "position": 8.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoes",
+        "clicks": 3088,
+        "impressions": 23540,
+        "ctr": 13.12,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "watch ring",
+        "clicks": 170,
+        "impressions": 20448,
+        "ctr": 0.83,
+        "position": 10.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ring watch",
+        "clicks": 84,
+        "impressions": 13157,
+        "ctr": 0.64,
+        "position": 12,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "reloj anne klein",
+        "clicks": 250,
+        "impressions": 10046,
+        "ctr": 2.49,
+        "position": 6.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein reloj",
+        "clicks": 574,
+        "impressions": 9425,
+        "ctr": 6.09,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches for women",
+        "clicks": 755,
+        "impressions": 9255,
+        "ctr": 8.16,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein handbags",
+        "clicks": 895,
+        "impressions": 9096,
+        "ctr": 9.84,
+        "position": 12,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein dresses",
+        "clicks": 1136,
+        "impressions": 8370,
+        "ctr": 13.57,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bolsas",
+        "clicks": 519,
+        "impressions": 6527,
+        "ctr": 7.95,
+        "position": 4.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein boots",
+        "clicks": 542,
+        "impressions": 6131,
+        "ctr": 8.84,
+        "position": 6.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein coat",
+        "clicks": 609,
+        "impressions": 5289,
+        "ctr": 11.51,
+        "position": 8.7,
+        "type": "branded"
+      },
+      {
+        "query": "watch ring women",
+        "clicks": 72,
+        "impressions": 4986,
+        "ctr": 1.44,
+        "position": 8,
+        "type": "category-generic"
+      },
+      {
+        "query": "anne klein pants",
+        "clicks": 312,
+        "impressions": 4932,
+        "ctr": 6.33,
+        "position": 14.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jackets",
+        "clicks": 64,
+        "impressions": 4376,
+        "ctr": 1.46,
+        "position": 14.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bracelet",
+        "clicks": 744,
+        "impressions": 4359,
+        "ctr": 17.07,
+        "position": 12.6,
+        "type": "branded"
+      },
+      {
+        "query": "bolsa anne klein",
+        "clicks": 122,
+        "impressions": 4233,
+        "ctr": 2.88,
+        "position": 6.2,
+        "type": "branded"
+      },
+      {
+        "query": "watch rings",
+        "clicks": 39,
+        "impressions": 4217,
+        "ctr": 0.92,
+        "position": 10.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ring watches for women",
+        "clicks": 42,
+        "impressions": 4073,
+        "ctr": 1.03,
+        "position": 8.4,
+        "type": "category-generic"
+      },
+      {
+        "query": "anne klein glasses",
+        "clicks": 202,
+        "impressions": 4048,
+        "ctr": 4.99,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein dress",
+        "clicks": 289,
+        "impressions": 3417,
+        "ctr": 8.46,
+        "position": 10.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein relojes",
+        "clicks": 495,
+        "impressions": 3141,
+        "ctr": 15.76,
+        "position": 4.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pumps",
+        "clicks": 56,
+        "impressions": 3042,
+        "ctr": 1.84,
+        "position": 13.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women watches",
+        "clicks": 156,
+        "impressions": 3017,
+        "ctr": 5.17,
+        "position": 8.7,
+        "type": "branded"
+      },
+      {
+        "query": "bolsas anne klein",
+        "clicks": 71,
+        "impressions": 2904,
+        "ctr": 2.44,
+        "position": 10.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein diamond watch",
+        "clicks": 324,
+        "impressions": 2804,
+        "ctr": 11.55,
+        "position": 13.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sport shoes",
+        "clicks": 88,
+        "impressions": 2728,
+        "ctr": 3.23,
+        "position": 11.9,
+        "type": "branded"
+      },
+      {
+        "query": "reloj anne klein mujer",
+        "clicks": 36,
+        "impressions": 2614,
+        "ctr": 1.38,
+        "position": 9.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein earrings",
+        "clicks": 372,
+        "impressions": 2603,
+        "ctr": 14.29,
+        "position": 14.8,
+        "type": "branded"
+      }
+    ],
+    "allQueries": [
+      {
+        "query": "anne klein",
+        "clicks": 79392,
+        "impressions": 262553,
+        "ctr": 30.24,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch",
+        "clicks": 20852,
+        "impressions": 108963,
+        "ctr": 19.14,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches",
+        "clicks": 8332,
+        "impressions": 64213,
+        "ctr": 12.98,
+        "position": 8.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags",
+        "clicks": 5839,
+        "impressions": 26806,
+        "ctr": 21.78,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein",
+        "clicks": 5234,
+        "impressions": 19553,
+        "ctr": 26.77,
+        "position": 1.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein shoes",
+        "clicks": 3088,
+        "impressions": 23540,
+        "ctr": 13.12,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "anna klein",
+        "clicks": 2602,
+        "impressions": 10381,
+        "ctr": 25.07,
+        "position": 1.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein purse",
+        "clicks": 2541,
+        "impressions": 19681,
+        "ctr": 12.91,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch price",
+        "clicks": 2067,
+        "impressions": 12185,
+        "ctr": 16.96,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien",
+        "clicks": 2026,
+        "impressions": 6597,
+        "ctr": 30.71,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "annie klein",
+        "clicks": 2007,
+        "impressions": 7138,
+        "ctr": 28.12,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bag",
+        "clicks": 1843,
+        "impressions": 9124,
+        "ctr": 20.2,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein canada",
+        "clicks": 1355,
+        "impressions": 2383,
+        "ctr": 56.86,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein dresses",
+        "clicks": 1136,
+        "impressions": 8370,
+        "ctr": 13.57,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein handbags",
+        "clicks": 895,
+        "impressions": 9096,
+        "ctr": 9.84,
+        "position": 12,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wallet",
+        "clicks": 854,
+        "impressions": 4115,
+        "ctr": 20.75,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein outlet",
+        "clicks": 816,
+        "impressions": 2186,
+        "ctr": 37.33,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anneklein",
+        "clicks": 797,
+        "impressions": 2732,
+        "ctr": 29.17,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches for women",
+        "clicks": 755,
+        "impressions": 9255,
+        "ctr": 8.16,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bracelet",
+        "clicks": 744,
+        "impressions": 4359,
+        "ctr": 17.07,
+        "position": 12.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein usa",
+        "clicks": 659,
+        "impressions": 863,
+        "ctr": 76.36,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein clothing",
+        "clicks": 653,
+        "impressions": 4977,
+        "ctr": 13.12,
+        "position": 18.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein coat",
+        "clicks": 609,
+        "impressions": 5289,
+        "ctr": 11.51,
+        "position": 8.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jewelry",
+        "clicks": 584,
+        "impressions": 6047,
+        "ctr": 9.66,
+        "position": 26.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein reloj",
+        "clicks": 574,
+        "impressions": 9425,
+        "ctr": 6.09,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein brand",
+        "clicks": 563,
+        "impressions": 2787,
+        "ctr": 20.2,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein boots",
+        "clicks": 542,
+        "impressions": 6131,
+        "ctr": 8.84,
+        "position": 6.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne ak klein",
+        "clicks": 533,
+        "impressions": 1541,
+        "ctr": 34.59,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bolsas",
+        "clicks": 519,
+        "impressions": 6527,
+        "ctr": 7.95,
+        "position": 4.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags official website",
+        "clicks": 511,
+        "impressions": 1725,
+        "ctr": 29.62,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein relojes",
+        "clicks": 495,
+        "impressions": 3141,
+        "ctr": 15.76,
+        "position": 4.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch price original",
+        "clicks": 453,
+        "impressions": 3652,
+        "ctr": 12.4,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sunglasses",
+        "clicks": 449,
+        "impressions": 4806,
+        "ctr": 9.34,
+        "position": 27.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein blazer",
+        "clicks": 443,
+        "impressions": 2497,
+        "ctr": 17.74,
+        "position": 10.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein часы",
+        "clicks": 429,
+        "impressions": 2158,
+        "ctr": 19.88,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "ak anne klein",
+        "clicks": 411,
+        "impressions": 1641,
+        "ctr": 25.05,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein earrings",
+        "clicks": 372,
+        "impressions": 2603,
+        "ctr": 14.29,
+        "position": 14.8,
+        "type": "branded"
+      },
+      {
+        "query": "ann klien",
+        "clicks": 356,
+        "impressions": 1070,
+        "ctr": 33.27,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein watch women",
+        "clicks": 356,
+        "impressions": 5146,
+        "ctr": 6.92,
+        "position": 16,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tote bag",
+        "clicks": 335,
+        "impressions": 1643,
+        "ctr": 20.39,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein heels",
+        "clicks": 327,
+        "impressions": 2484,
+        "ctr": 13.16,
+        "position": 8.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein diamond watch",
+        "clicks": 324,
+        "impressions": 2804,
+        "ctr": 11.55,
+        "position": 13.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein carteras",
+        "clicks": 322,
+        "impressions": 2262,
+        "ctr": 14.24,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "ana klein",
+        "clicks": 313,
+        "impressions": 1632,
+        "ctr": 19.18,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein pants",
+        "clicks": 312,
+        "impressions": 4932,
+        "ctr": 6.33,
+        "position": 14.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches prices",
+        "clicks": 305,
+        "impressions": 2345,
+        "ctr": 13.01,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne clein",
+        "clicks": 301,
+        "impressions": 982,
+        "ctr": 30.65,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein dresses",
+        "clicks": 295,
+        "impressions": 1361,
+        "ctr": 21.68,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "is anne klein a luxury brand",
+        "clicks": 293,
+        "impressions": 5653,
+        "ctr": 5.18,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein uk",
+        "clicks": 291,
+        "impressions": 642,
+        "ctr": 45.33,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne kelin",
+        "clicks": 289,
+        "impressions": 734,
+        "ctr": 39.37,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein crossbody bag",
+        "clicks": 289,
+        "impressions": 1309,
+        "ctr": 22.08,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein dress",
+        "clicks": 289,
+        "impressions": 3417,
+        "ctr": 8.46,
+        "position": 10.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wool coat",
+        "clicks": 289,
+        "impressions": 1777,
+        "ctr": 16.26,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein часы официальный сайт",
+        "clicks": 284,
+        "impressions": 548,
+        "ctr": 51.82,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jacket",
+        "clicks": 282,
+        "impressions": 2511,
+        "ctr": 11.23,
+        "position": 14.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne kline",
+        "clicks": 269,
+        "impressions": 1197,
+        "ctr": 22.47,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein iflex shoes",
+        "clicks": 259,
+        "impressions": 2322,
+        "ctr": 11.15,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bag price",
+        "clicks": 257,
+        "impressions": 2271,
+        "ctr": 11.32,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein outlet store online",
+        "clicks": 254,
+        "impressions": 771,
+        "ctr": 32.94,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "reloj anne klein",
+        "clicks": 250,
+        "impressions": 10046,
+        "ctr": 2.49,
+        "position": 6.9,
+        "type": "branded"
+      },
+      {
+        "query": "ak bags",
+        "clicks": 247,
+        "impressions": 1556,
+        "ctr": 15.87,
+        "position": 1.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein necklace",
+        "clicks": 244,
+        "impressions": 5103,
+        "ctr": 4.78,
+        "position": 27.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein horloge",
+        "clicks": 243,
+        "impressions": 765,
+        "ctr": 31.76,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein.com",
+        "clicks": 241,
+        "impressions": 614,
+        "ctr": 39.25,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein apple watch band",
+        "clicks": 232,
+        "impressions": 1366,
+        "ctr": 16.98,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein çanta",
+        "clicks": 231,
+        "impressions": 970,
+        "ctr": 23.81,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags price",
+        "clicks": 229,
+        "impressions": 1861,
+        "ctr": 12.31,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein brooch",
+        "clicks": 227,
+        "impressions": 644,
+        "ctr": 35.25,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ropa",
+        "clicks": 226,
+        "impressions": 840,
+        "ctr": 26.9,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tops",
+        "clicks": 213,
+        "impressions": 5304,
+        "ctr": 4.02,
+        "position": 21.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klen",
+        "clicks": 213,
+        "impressions": 706,
+        "ctr": 30.17,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein loafers",
+        "clicks": 205,
+        "impressions": 4422,
+        "ctr": 4.64,
+        "position": 16.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein glasses",
+        "clicks": 202,
+        "impressions": 4048,
+        "ctr": 4.99,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches women",
+        "clicks": 200,
+        "impressions": 5211,
+        "ctr": 3.84,
+        "position": 22.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein purses",
+        "clicks": 194,
+        "impressions": 4795,
+        "ctr": 4.05,
+        "position": 15.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch original",
+        "clicks": 191,
+        "impressions": 928,
+        "ctr": 20.58,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein zapatos",
+        "clicks": 191,
+        "impressions": 1395,
+        "ctr": 13.69,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein watch",
+        "clicks": 190,
+        "impressions": 1643,
+        "ctr": 11.56,
+        "position": 9.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ane klein",
+        "clicks": 188,
+        "impressions": 685,
+        "ctr": 27.45,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "marca anne klein",
+        "clicks": 185,
+        "impressions": 1953,
+        "ctr": 9.47,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch diamond",
+        "clicks": 182,
+        "impressions": 967,
+        "ctr": 18.82,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein uhr",
+        "clicks": 180,
+        "impressions": 877,
+        "ctr": 20.52,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein size chart",
+        "clicks": 179,
+        "impressions": 555,
+        "ctr": 32.25,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's watch",
+        "clicks": 179,
+        "impressions": 2242,
+        "ctr": 7.98,
+        "position": 9.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jeans",
+        "clicks": 178,
+        "impressions": 2216,
+        "ctr": 8.03,
+        "position": 10.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoes for women",
+        "clicks": 175,
+        "impressions": 1550,
+        "ctr": 11.29,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein canada",
+        "clicks": 174,
+        "impressions": 313,
+        "ctr": 55.59,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein ii watch",
+        "clicks": 172,
+        "impressions": 1105,
+        "ctr": 15.57,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "watch ring",
+        "clicks": 170,
+        "impressions": 20448,
+        "ctr": 0.83,
+        "position": 10.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein uae",
+        "clicks": 167,
+        "impressions": 898,
+        "ctr": 18.6,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "annie klien",
+        "clicks": 165,
+        "impressions": 527,
+        "ctr": 31.31,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein gold watch",
+        "clicks": 159,
+        "impressions": 2307,
+        "ctr": 6.89,
+        "position": 22.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein coats",
+        "clicks": 158,
+        "impressions": 4056,
+        "ctr": 3.9,
+        "position": 18.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bezel watch",
+        "clicks": 157,
+        "impressions": 1723,
+        "ctr": 9.11,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women watches",
+        "clicks": 156,
+        "impressions": 3017,
+        "ctr": 5.17,
+        "position": 8.7,
+        "type": "branded"
+      },
+      {
+        "query": "ann kline",
+        "clicks": 155,
+        "impressions": 1024,
+        "ctr": 15.14,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein suits",
+        "clicks": 155,
+        "impressions": 3794,
+        "ctr": 4.09,
+        "position": 32.5,
+        "type": "branded"
+      },
+      {
+        "query": "royal anne klein",
+        "clicks": 152,
+        "impressions": 2195,
+        "ctr": 6.92,
+        "position": 3.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein relogio",
+        "clicks": 150,
+        "impressions": 1003,
+        "ctr": 14.96,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klain",
+        "clicks": 149,
+        "impressions": 445,
+        "ctr": 33.48,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein flats",
+        "clicks": 149,
+        "impressions": 3914,
+        "ctr": 3.81,
+        "position": 15.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein plus size",
+        "clicks": 148,
+        "impressions": 400,
+        "ctr": 37,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein shoes",
+        "clicks": 144,
+        "impressions": 1535,
+        "ctr": 9.38,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klien",
+        "clicks": 144,
+        "impressions": 439,
+        "ctr": 32.8,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "montre anne klein",
+        "clicks": 143,
+        "impressions": 944,
+        "ctr": 15.15,
+        "position": 5.8,
+        "type": "branded"
+      },
+      {
+        "query": "ak bag",
+        "clicks": 140,
+        "impressions": 1189,
+        "ctr": 11.77,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ان كلاين",
+        "clicks": 139,
+        "impressions": 2312,
+        "ctr": 6.01,
+        "position": 30.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein iflex",
+        "clicks": 138,
+        "impressions": 1081,
+        "ctr": 12.77,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein new york",
+        "clicks": 138,
+        "impressions": 470,
+        "ctr": 29.36,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tasche",
+        "clicks": 138,
+        "impressions": 607,
+        "ctr": 22.73,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein website",
+        "clicks": 138,
+        "impressions": 319,
+        "ctr": 43.26,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne.klein",
+        "clicks": 137,
+        "impressions": 381,
+        "ctr": 35.96,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein sac",
+        "clicks": 135,
+        "impressions": 424,
+        "ctr": 31.84,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien watch",
+        "clicks": 134,
+        "impressions": 924,
+        "ctr": 14.5,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "royal anne klein กระเป๋า",
+        "clicks": 134,
+        "impressions": 1437,
+        "ctr": 9.32,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bracelet watch",
+        "clicks": 133,
+        "impressions": 2251,
+        "ctr": 5.91,
+        "position": 20.4,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein bag",
+        "clicks": 132,
+        "impressions": 889,
+        "ctr": 14.85,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klein watch",
+        "clicks": 123,
+        "impressions": 547,
+        "ctr": 22.49,
+        "position": 2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bolsos",
+        "clicks": 122,
+        "impressions": 591,
+        "ctr": 20.64,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anneklein.com",
+        "clicks": 122,
+        "impressions": 391,
+        "ctr": 31.2,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "annklein",
+        "clicks": 122,
+        "impressions": 380,
+        "ctr": 32.11,
+        "position": 1.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "bolsa anne klein",
+        "clicks": 122,
+        "impressions": 4233,
+        "ctr": 2.88,
+        "position": 6.2,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein purses",
+        "clicks": 121,
+        "impressions": 1388,
+        "ctr": 8.72,
+        "position": 2.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein shoulder bag",
+        "clicks": 121,
+        "impressions": 601,
+        "ctr": 20.13,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein australia",
+        "clicks": 119,
+        "impressions": 415,
+        "ctr": 28.67,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein store",
+        "clicks": 119,
+        "impressions": 404,
+        "ctr": 29.46,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wallet price",
+        "clicks": 118,
+        "impressions": 820,
+        "ctr": 14.39,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein montre",
+        "clicks": 117,
+        "impressions": 586,
+        "ctr": 19.97,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sandals",
+        "clicks": 117,
+        "impressions": 4813,
+        "ctr": 2.43,
+        "position": 23.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ساعات",
+        "clicks": 116,
+        "impressions": 531,
+        "ctr": 21.85,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's bracelet watch",
+        "clicks": 115,
+        "impressions": 815,
+        "ctr": 14.11,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne kleim",
+        "clicks": 114,
+        "impressions": 379,
+        "ctr": 30.08,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein ladies watches",
+        "clicks": 113,
+        "impressions": 1497,
+        "ctr": 7.55,
+        "position": 4.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein شنط",
+        "clicks": 113,
+        "impressions": 433,
+        "ctr": 26.1,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein trench coat",
+        "clicks": 112,
+        "impressions": 692,
+        "ctr": 16.18,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein clip on earrings",
+        "clicks": 109,
+        "impressions": 502,
+        "ctr": 21.71,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ii",
+        "clicks": 108,
+        "impressions": 909,
+        "ctr": 11.88,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pajamas",
+        "clicks": 106,
+        "impressions": 455,
+        "ctr": 23.3,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein schuhe",
+        "clicks": 106,
+        "impressions": 329,
+        "ctr": 32.22,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein scarf",
+        "clicks": 104,
+        "impressions": 970,
+        "ctr": 10.72,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sweater",
+        "clicks": 104,
+        "impressions": 1092,
+        "ctr": 9.52,
+        "position": 14.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wristlet",
+        "clicks": 104,
+        "impressions": 382,
+        "ctr": 27.23,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "sac anne klein",
+        "clicks": 103,
+        "impressions": 357,
+        "ctr": 28.85,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sale",
+        "clicks": 101,
+        "impressions": 377,
+        "ctr": 26.79,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne kleine",
+        "clicks": 101,
+        "impressions": 375,
+        "ctr": 26.93,
+        "position": 1.2,
+        "type": "branded"
+      },
+      {
+        "query": "is anne klein a good brand",
+        "clicks": 99,
+        "impressions": 4959,
+        "ctr": 2,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein clothes",
+        "clicks": 98,
+        "impressions": 414,
+        "ctr": 23.67,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "women's anne klein watch",
+        "clicks": 98,
+        "impressions": 2459,
+        "ctr": 3.99,
+        "position": 4.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein saat",
+        "clicks": 97,
+        "impressions": 1230,
+        "ctr": 7.89,
+        "position": 7.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches canada",
+        "clicks": 96,
+        "impressions": 248,
+        "ctr": 38.71,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "relogio anne klein",
+        "clicks": 95,
+        "impressions": 1288,
+        "ctr": 7.38,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bracelet price",
+        "clicks": 94,
+        "impressions": 382,
+        "ctr": 24.61,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein perfume",
+        "clicks": 94,
+        "impressions": 1956,
+        "ctr": 4.81,
+        "position": 3.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tote",
+        "clicks": 94,
+        "impressions": 565,
+        "ctr": 16.64,
+        "position": 5.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein leather jacket",
+        "clicks": 92,
+        "impressions": 786,
+        "ctr": 11.7,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein blouses",
+        "clicks": 90,
+        "impressions": 1485,
+        "ctr": 6.06,
+        "position": 17.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein underwear",
+        "clicks": 90,
+        "impressions": 822,
+        "ctr": 10.95,
+        "position": 4.8,
+        "type": "branded"
+      },
+      {
+        "query": "relojes anne klein",
+        "clicks": 90,
+        "impressions": 1423,
+        "ctr": 6.32,
+        "position": 4.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch serial number check",
+        "clicks": 89,
+        "impressions": 595,
+        "ctr": 14.96,
+        "position": 1.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klei",
+        "clicks": 88,
+        "impressions": 283,
+        "ctr": 31.1,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein jewellery",
+        "clicks": 88,
+        "impressions": 252,
+        "ctr": 34.92,
+        "position": 6.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sport shoes",
+        "clicks": 88,
+        "impressions": 2728,
+        "ctr": 3.23,
+        "position": 11.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pants women",
+        "clicks": 87,
+        "impressions": 557,
+        "ctr": 15.62,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sweaters",
+        "clicks": 87,
+        "impressions": 2810,
+        "ctr": 3.1,
+        "position": 20.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne jlein",
+        "clicks": 86,
+        "impressions": 219,
+        "ctr": 39.27,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein backpack",
+        "clicks": 86,
+        "impressions": 1047,
+        "ctr": 8.21,
+        "position": 16.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bangle watch",
+        "clicks": 86,
+        "impressions": 647,
+        "ctr": 13.29,
+        "position": 4.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein logo",
+        "clicks": 86,
+        "impressions": 1577,
+        "ctr": 5.45,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein store near me",
+        "clicks": 86,
+        "impressions": 516,
+        "ctr": 16.67,
+        "position": 5.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein diamond watch price",
+        "clicks": 85,
+        "impressions": 1294,
+        "ctr": 6.57,
+        "position": 2.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sunglasses women",
+        "clicks": 85,
+        "impressions": 339,
+        "ctr": 25.07,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "cartera anne klein",
+        "clicks": 85,
+        "impressions": 1651,
+        "ctr": 5.15,
+        "position": 5.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein blazers",
+        "clicks": 84,
+        "impressions": 2853,
+        "ctr": 2.94,
+        "position": 24,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein cardigan",
+        "clicks": 84,
+        "impressions": 557,
+        "ctr": 15.08,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "ring watch",
+        "clicks": 84,
+        "impressions": 13157,
+        "ctr": 0.64,
+        "position": 12,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "zapatos anne klein",
+        "clicks": 84,
+        "impressions": 1198,
+        "ctr": 7.01,
+        "position": 4.8,
+        "type": "branded"
+      },
+      {
+        "query": "anee klein",
+        "clicks": 83,
+        "impressions": 230,
+        "ctr": 36.09,
+        "position": 2.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein us",
+        "clicks": 83,
+        "impressions": 114,
+        "ctr": 72.81,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein.",
+        "clicks": 83,
+        "impressions": 280,
+        "ctr": 29.64,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "watch anne klein",
+        "clicks": 83,
+        "impressions": 760,
+        "ctr": 10.92,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne kein",
+        "clicks": 82,
+        "impressions": 283,
+        "ctr": 28.98,
+        "position": 2.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein iflex heels",
+        "clicks": 82,
+        "impressions": 726,
+        "ctr": 11.29,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein official website",
+        "clicks": 82,
+        "impressions": 309,
+        "ctr": 26.54,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anklein",
+        "clicks": 81,
+        "impressions": 253,
+        "ctr": 32.02,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein boots",
+        "clicks": 81,
+        "impressions": 840,
+        "ctr": 9.64,
+        "position": 2.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein watches",
+        "clicks": 81,
+        "impressions": 459,
+        "ctr": 17.65,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein near me",
+        "clicks": 80,
+        "impressions": 457,
+        "ctr": 17.51,
+        "position": 6.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags canada",
+        "clicks": 79,
+        "impressions": 193,
+        "ctr": 40.93,
+        "position": 1.2,
+        "type": "branded"
+      },
+      {
+        "query": "original anne klein watch",
+        "clicks": 79,
+        "impressions": 400,
+        "ctr": 19.75,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein coat wool",
+        "clicks": 78,
+        "impressions": 498,
+        "ctr": 15.66,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches for ladies price",
+        "clicks": 78,
+        "impressions": 2087,
+        "ctr": 3.74,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein cartera",
+        "clicks": 77,
+        "impressions": 628,
+        "ctr": 12.26,
+        "position": 3.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein returns",
+        "clicks": 77,
+        "impressions": 112,
+        "ctr": 68.75,
+        "position": 9.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien watches",
+        "clicks": 77,
+        "impressions": 431,
+        "ctr": 17.87,
+        "position": 2.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "is anne klein expensive",
+        "clicks": 77,
+        "impressions": 601,
+        "ctr": 12.81,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein suit",
+        "clicks": 76,
+        "impressions": 461,
+        "ctr": 16.49,
+        "position": 9.4,
+        "type": "branded"
+      },
+      {
+        "query": "ann klein pants",
+        "clicks": 75,
+        "impressions": 765,
+        "ctr": 9.8,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein kitten heels",
+        "clicks": 75,
+        "impressions": 726,
+        "ctr": 10.33,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein blouse",
+        "clicks": 74,
+        "impressions": 366,
+        "ctr": 20.22,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "กระเป๋า royal anne klein",
+        "clicks": 73,
+        "impressions": 849,
+        "ctr": 8.6,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein handbag",
+        "clicks": 72,
+        "impressions": 611,
+        "ctr": 11.78,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jewelry set",
+        "clicks": 72,
+        "impressions": 339,
+        "ctr": 21.24,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ksa",
+        "clicks": 72,
+        "impressions": 242,
+        "ctr": 29.75,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein uhren",
+        "clicks": 72,
+        "impressions": 239,
+        "ctr": 30.13,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "watch ring women",
+        "clicks": 72,
+        "impressions": 4986,
+        "ctr": 1.44,
+        "position": 8,
+        "type": "category-generic"
+      },
+      {
+        "query": "anne cline watch",
+        "clicks": 71,
+        "impressions": 1061,
+        "ctr": 6.69,
+        "position": 2.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein blazer women",
+        "clicks": 71,
+        "impressions": 358,
+        "ctr": 19.83,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein peacoat",
+        "clicks": 71,
+        "impressions": 821,
+        "ctr": 8.65,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "bolsas anne klein",
+        "clicks": 71,
+        "impressions": 2904,
+        "ctr": 2.44,
+        "position": 10.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein smartwatch",
+        "clicks": 70,
+        "impressions": 296,
+        "ctr": 23.65,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "blazer anne klein",
+        "clicks": 70,
+        "impressions": 272,
+        "ctr": 25.74,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "ak watch",
+        "clicks": 69,
+        "impressions": 1250,
+        "ctr": 5.52,
+        "position": 2.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein lacey boot",
+        "clicks": 69,
+        "impressions": 966,
+        "ctr": 7.14,
+        "position": 4.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein rose gold watch",
+        "clicks": 69,
+        "impressions": 1843,
+        "ctr": 3.74,
+        "position": 25.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein schmuck",
+        "clicks": 69,
+        "impressions": 219,
+        "ctr": 31.51,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "royal anne klein กระเป๋าสตางค์",
+        "clicks": 69,
+        "impressions": 835,
+        "ctr": 8.26,
+        "position": 1.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein petite dresses",
+        "clicks": 68,
+        "impressions": 282,
+        "ctr": 24.11,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ring watch",
+        "clicks": 68,
+        "impressions": 310,
+        "ctr": 21.94,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "ak jeans",
+        "clicks": 67,
+        "impressions": 765,
+        "ctr": 8.76,
+        "position": 4.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein diamond",
+        "clicks": 67,
+        "impressions": 459,
+        "ctr": 14.6,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein flex shoes",
+        "clicks": 67,
+        "impressions": 600,
+        "ctr": 11.17,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jacket women",
+        "clicks": 67,
+        "impressions": 485,
+        "ctr": 13.81,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches price in pakistan",
+        "clicks": 67,
+        "impressions": 372,
+        "ctr": 18.01,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "ak brand bag",
+        "clicks": 66,
+        "impressions": 490,
+        "ctr": 13.47,
+        "position": 1.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein montre femme",
+        "clicks": 66,
+        "impressions": 280,
+        "ctr": 23.57,
+        "position": 4.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoes uk",
+        "clicks": 66,
+        "impressions": 249,
+        "ctr": 26.51,
+        "position": 3.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein petites",
+        "clicks": 65,
+        "impressions": 1103,
+        "ctr": 5.89,
+        "position": 29.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch for women",
+        "clicks": 65,
+        "impressions": 581,
+        "ctr": 11.19,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein winter coats",
+        "clicks": 65,
+        "impressions": 1128,
+        "ctr": 5.76,
+        "position": 17.6,
+        "type": "branded"
+      },
+      {
+        "query": "bolsos anne klein",
+        "clicks": 65,
+        "impressions": 593,
+        "ctr": 10.96,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "ak anne klein shoes",
+        "clicks": 64,
+        "impressions": 1267,
+        "ctr": 5.05,
+        "position": 15.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein brooches",
+        "clicks": 64,
+        "impressions": 249,
+        "ctr": 25.7,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein charm bracelet watch",
+        "clicks": 64,
+        "impressions": 1379,
+        "ctr": 4.64,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein gift set",
+        "clicks": 64,
+        "impressions": 302,
+        "ctr": 21.19,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jackets",
+        "clicks": 64,
+        "impressions": 4376,
+        "ctr": 1.46,
+        "position": 14.8,
+        "type": "branded"
+      },
+      {
+        "query": "annie klein watch",
+        "clicks": 64,
+        "impressions": 341,
+        "ctr": 18.77,
+        "position": 1.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne kl",
+        "clicks": 63,
+        "impressions": 292,
+        "ctr": 21.58,
+        "position": 1.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein apple watch bands",
+        "clicks": 63,
+        "impressions": 291,
+        "ctr": 21.65,
+        "position": 4.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein klocka",
+        "clicks": 62,
+        "impressions": 215,
+        "ctr": 28.84,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "ak purse",
+        "clicks": 61,
+        "impressions": 1068,
+        "ctr": 5.71,
+        "position": 2.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein tote bags",
+        "clicks": 61,
+        "impressions": 311,
+        "ctr": 19.61,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch set",
+        "clicks": 61,
+        "impressions": 2929,
+        "ctr": 2.08,
+        "position": 23.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein canada outlet",
+        "clicks": 60,
+        "impressions": 162,
+        "ctr": 37.04,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sport",
+        "clicks": 60,
+        "impressions": 2067,
+        "ctr": 2.9,
+        "position": 12,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein factory outlet",
+        "clicks": 59,
+        "impressions": 251,
+        "ctr": 23.51,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch bands",
+        "clicks": 59,
+        "impressions": 518,
+        "ctr": 11.39,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "royal anne klein กระเป๋า ตัง",
+        "clicks": 59,
+        "impressions": 598,
+        "ctr": 9.87,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne clien",
+        "clicks": 58,
+        "impressions": 205,
+        "ctr": 28.29,
+        "position": 1.6,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bracelets",
+        "clicks": 58,
+        "impressions": 279,
+        "ctr": 20.79,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein 2 watch",
+        "clicks": 57,
+        "impressions": 409,
+        "ctr": 13.94,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein dress pants",
+        "clicks": 57,
+        "impressions": 1242,
+        "ctr": 4.59,
+        "position": 21.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein klokke",
+        "clicks": 57,
+        "impressions": 140,
+        "ctr": 40.71,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein top",
+        "clicks": 57,
+        "impressions": 250,
+        "ctr": 22.8,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein petite",
+        "clicks": 56,
+        "impressions": 328,
+        "ctr": 17.07,
+        "position": 8.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pumps",
+        "clicks": 56,
+        "impressions": 3042,
+        "ctr": 1.84,
+        "position": 13.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shirts",
+        "clicks": 56,
+        "impressions": 333,
+        "ctr": 16.82,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien bags",
+        "clicks": 56,
+        "impressions": 194,
+        "ctr": 28.87,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "royal anne klein กระเป๋า สตางค์",
+        "clicks": 56,
+        "impressions": 505,
+        "ctr": 11.09,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "анна кляйн часы официальный сайт",
+        "clicks": 56,
+        "impressions": 130,
+        "ctr": 43.08,
+        "position": 1.6,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "an klein",
+        "clicks": 55,
+        "impressions": 202,
+        "ctr": 27.23,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein ballet flats",
+        "clicks": 55,
+        "impressions": 449,
+        "ctr": 12.25,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein orologi",
+        "clicks": 55,
+        "impressions": 324,
+        "ctr": 16.98,
+        "position": 3.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoes canada",
+        "clicks": 55,
+        "impressions": 184,
+        "ctr": 29.89,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne.klein watch",
+        "clicks": 55,
+        "impressions": 203,
+        "ctr": 27.09,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "carteras anne klein",
+        "clicks": 55,
+        "impressions": 913,
+        "ctr": 6.02,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "montre anne klein femme",
+        "clicks": 55,
+        "impressions": 426,
+        "ctr": 12.91,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein coats for women",
+        "clicks": 54,
+        "impressions": 428,
+        "ctr": 12.62,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein comforter set",
+        "clicks": 54,
+        "impressions": 293,
+        "ctr": 18.43,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein customer service",
+        "clicks": 54,
+        "impressions": 128,
+        "ctr": 42.19,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein india",
+        "clicks": 54,
+        "impressions": 507,
+        "ctr": 10.65,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's trench coat",
+        "clicks": 54,
+        "impressions": 258,
+        "ctr": 20.93,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bras",
+        "clicks": 53,
+        "impressions": 496,
+        "ctr": 10.69,
+        "position": 4.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein crossbody",
+        "clicks": 53,
+        "impressions": 334,
+        "ctr": 15.87,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein new york watch",
+        "clicks": 53,
+        "impressions": 405,
+        "ctr": 13.09,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoes clearance",
+        "clicks": 53,
+        "impressions": 760,
+        "ctr": 6.97,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein сумки",
+        "clicks": 53,
+        "impressions": 212,
+        "ctr": 25,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "ana klein watch",
+        "clicks": 52,
+        "impressions": 274,
+        "ctr": 18.98,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne ak klein bracelet",
+        "clicks": 52,
+        "impressions": 286,
+        "ctr": 18.18,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bag price philippines",
+        "clicks": 52,
+        "impressions": 426,
+        "ctr": 12.21,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein body mist",
+        "clicks": 52,
+        "impressions": 504,
+        "ctr": 10.32,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein femme",
+        "clicks": 52,
+        "impressions": 183,
+        "ctr": 28.42,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein jackets and blazers",
+        "clicks": 52,
+        "impressions": 366,
+        "ctr": 14.21,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wallets",
+        "clicks": 52,
+        "impressions": 1862,
+        "ctr": 2.79,
+        "position": 25.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch strap replacement",
+        "clicks": 52,
+        "impressions": 397,
+        "ctr": 13.1,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches official website",
+        "clicks": 52,
+        "impressions": 217,
+        "ctr": 23.96,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anni klein",
+        "clicks": 52,
+        "impressions": 322,
+        "ctr": 16.15,
+        "position": 1.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klein watches",
+        "clicks": 51,
+        "impressions": 192,
+        "ctr": 26.56,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anneklien",
+        "clicks": 51,
+        "impressions": 156,
+        "ctr": 32.69,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bangles",
+        "clicks": 50,
+        "impressions": 167,
+        "ctr": 29.94,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sling bag",
+        "clicks": 50,
+        "impressions": 288,
+        "ctr": 17.36,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags original",
+        "clicks": 49,
+        "impressions": 647,
+        "ctr": 7.57,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein hand cream",
+        "clicks": 49,
+        "impressions": 836,
+        "ctr": 5.86,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein booties",
+        "clicks": 48,
+        "impressions": 805,
+        "ctr": 5.96,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein comforter",
+        "clicks": 48,
+        "impressions": 308,
+        "ctr": 15.58,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoe size chart",
+        "clicks": 48,
+        "impressions": 229,
+        "ctr": 20.96,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne kleon",
+        "clicks": 48,
+        "impressions": 125,
+        "ctr": 38.4,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "часы anne klein",
+        "clicks": 48,
+        "impressions": 516,
+        "ctr": 9.3,
+        "position": 8.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shoes women",
+        "clicks": 47,
+        "impressions": 470,
+        "ctr": 10,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch uk",
+        "clicks": 47,
+        "impressions": 184,
+        "ctr": 25.54,
+        "position": 3.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein iflex boots",
+        "clicks": 46,
+        "impressions": 445,
+        "ctr": 10.34,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ropa mujer",
+        "clicks": 46,
+        "impressions": 278,
+        "ctr": 16.55,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch price in bd",
+        "clicks": 46,
+        "impressions": 286,
+        "ctr": 16.08,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wristlet wallet",
+        "clicks": 46,
+        "impressions": 191,
+        "ctr": 24.08,
+        "position": 2.8,
+        "type": "branded"
+      },
+      {
+        "query": "how much is anne klein watch",
+        "clicks": 46,
+        "impressions": 334,
+        "ctr": 13.77,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "アン クライン 公式",
+        "clicks": 46,
+        "impressions": 151,
+        "ctr": 30.46,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein charm bracelet",
+        "clicks": 45,
+        "impressions": 537,
+        "ctr": 8.38,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein iflex flats",
+        "clicks": 45,
+        "impressions": 481,
+        "ctr": 9.36,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne kle",
+        "clicks": 44,
+        "impressions": 185,
+        "ctr": 23.78,
+        "position": 1.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein blanket",
+        "clicks": 44,
+        "impressions": 157,
+        "ctr": 28.03,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein clearance",
+        "clicks": 44,
+        "impressions": 127,
+        "ctr": 34.65,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein leather watch",
+        "clicks": 44,
+        "impressions": 267,
+        "ctr": 16.48,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein shirt",
+        "clicks": 44,
+        "impressions": 361,
+        "ctr": 12.19,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein skirts",
+        "clicks": 44,
+        "impressions": 2205,
+        "ctr": 2,
+        "position": 25.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein store locations",
+        "clicks": 44,
+        "impressions": 244,
+        "ctr": 18.03,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein trousers",
+        "clicks": 44,
+        "impressions": 1361,
+        "ctr": 3.23,
+        "position": 12.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch and bracelet set",
+        "clicks": 44,
+        "impressions": 947,
+        "ctr": 4.65,
+        "position": 11.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch gold",
+        "clicks": 44,
+        "impressions": 424,
+        "ctr": 10.38,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches usa",
+        "clicks": 44,
+        "impressions": 107,
+        "ctr": 41.12,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "how to spot original anne klein bags",
+        "clicks": 44,
+        "impressions": 712,
+        "ctr": 6.18,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein accessories",
+        "clicks": 43,
+        "impressions": 2021,
+        "ctr": 2.13,
+        "position": 41.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein armband",
+        "clicks": 43,
+        "impressions": 123,
+        "ctr": 34.96,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein hand cream collection",
+        "clicks": 43,
+        "impressions": 1169,
+        "ctr": 3.68,
+        "position": 4.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein luggage",
+        "clicks": 43,
+        "impressions": 2118,
+        "ctr": 2.03,
+        "position": 17.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tas",
+        "clicks": 43,
+        "impressions": 133,
+        "ctr": 32.33,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein tops for women",
+        "clicks": 43,
+        "impressions": 326,
+        "ctr": 13.19,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch links",
+        "clicks": 43,
+        "impressions": 107,
+        "ctr": 40.19,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wrap dress",
+        "clicks": 43,
+        "impressions": 1058,
+        "ctr": 4.06,
+        "position": 23.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein black purse",
+        "clicks": 42,
+        "impressions": 513,
+        "ctr": 8.19,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein factory",
+        "clicks": 42,
+        "impressions": 123,
+        "ctr": 34.15,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pajamas set",
+        "clicks": 42,
+        "impressions": 221,
+        "ctr": 19,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein silver watch",
+        "clicks": 42,
+        "impressions": 494,
+        "ctr": 8.5,
+        "position": 4.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein solar watch",
+        "clicks": 42,
+        "impressions": 145,
+        "ctr": 28.97,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein two tone watch",
+        "clicks": 42,
+        "impressions": 510,
+        "ctr": 8.24,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch philippines",
+        "clicks": 42,
+        "impressions": 408,
+        "ctr": 10.29,
+        "position": 3.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch price philippines",
+        "clicks": 42,
+        "impressions": 1304,
+        "ctr": 3.22,
+        "position": 5.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien bag",
+        "clicks": 42,
+        "impressions": 218,
+        "ctr": 19.27,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klien shoes",
+        "clicks": 42,
+        "impressions": 238,
+        "ctr": 17.65,
+        "position": 2.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne watch",
+        "clicks": 42,
+        "impressions": 621,
+        "ctr": 6.76,
+        "position": 1.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ring watches for women",
+        "clicks": 42,
+        "impressions": 4073,
+        "ctr": 1.03,
+        "position": 8.4,
+        "type": "category-generic"
+      },
+      {
+        "query": "ak bag brand",
+        "clicks": 41,
+        "impressions": 397,
+        "ctr": 10.33,
+        "position": 1.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "allen klein watch",
+        "clicks": 41,
+        "impressions": 655,
+        "ctr": 6.26,
+        "position": 3.6,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna clein",
+        "clicks": 41,
+        "impressions": 148,
+        "ctr": 27.7,
+        "position": 1.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein crossbody purse",
+        "clicks": 41,
+        "impressions": 272,
+        "ctr": 15.07,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "ak handbags",
+        "clicks": 40,
+        "impressions": 328,
+        "ctr": 12.2,
+        "position": 2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein blazer",
+        "clicks": 40,
+        "impressions": 238,
+        "ctr": 16.81,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein tops",
+        "clicks": 40,
+        "impressions": 312,
+        "ctr": 12.82,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein apple watch",
+        "clicks": 40,
+        "impressions": 167,
+        "ctr": 23.95,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein card holder",
+        "clicks": 40,
+        "impressions": 207,
+        "ctr": 19.32,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein flats for women",
+        "clicks": 40,
+        "impressions": 464,
+        "ctr": 8.62,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein genuine diamond watch",
+        "clicks": 40,
+        "impressions": 236,
+        "ctr": 16.95,
+        "position": 4.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein philippines",
+        "clicks": 40,
+        "impressions": 1550,
+        "ctr": 2.58,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein underwear women",
+        "clicks": 40,
+        "impressions": 349,
+        "ctr": 11.46,
+        "position": 3.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's genuine diamond dial bangle watch",
+        "clicks": 40,
+        "impressions": 402,
+        "ctr": 9.95,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's leather strap watch",
+        "clicks": 40,
+        "impressions": 255,
+        "ctr": 15.69,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "clip on earrings",
+        "clicks": 40,
+        "impressions": 10078,
+        "ctr": 0.4,
+        "position": 18.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "tienda anne klein",
+        "clicks": 40,
+        "impressions": 76,
+        "ctr": 52.63,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "ak watches",
+        "clicks": 39,
+        "impressions": 1509,
+        "ctr": 2.58,
+        "position": 18.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein brosche",
+        "clicks": 39,
+        "impressions": 80,
+        "ctr": 48.75,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein interchangeable bezel watch set",
+        "clicks": 39,
+        "impressions": 456,
+        "ctr": 8.55,
+        "position": 4.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ph",
+        "clicks": 39,
+        "impressions": 558,
+        "ctr": 6.99,
+        "position": 4.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein price",
+        "clicks": 39,
+        "impressions": 509,
+        "ctr": 7.66,
+        "position": 2.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein stores",
+        "clicks": 39,
+        "impressions": 145,
+        "ctr": 26.9,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "watch rings",
+        "clicks": 39,
+        "impressions": 4217,
+        "ctr": 0.92,
+        "position": 10.7,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anie klein",
+        "clicks": 38,
+        "impressions": 106,
+        "ctr": 35.85,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein clothing",
+        "clicks": 38,
+        "impressions": 201,
+        "ctr": 18.91,
+        "position": 2.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bedding",
+        "clicks": 38,
+        "impressions": 168,
+        "ctr": 22.62,
+        "position": 3.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ladies watch",
+        "clicks": 38,
+        "impressions": 532,
+        "ctr": 7.14,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein makeup",
+        "clicks": 38,
+        "impressions": 380,
+        "ctr": 10,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein outlet store locations",
+        "clicks": 38,
+        "impressions": 209,
+        "ctr": 18.18,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch extender",
+        "clicks": 38,
+        "impressions": 117,
+        "ctr": 32.48,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches price",
+        "clicks": 38,
+        "impressions": 827,
+        "ctr": 4.59,
+        "position": 6.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein womens watch",
+        "clicks": 38,
+        "impressions": 1183,
+        "ctr": 3.21,
+        "position": 31.3,
+        "type": "branded"
+      },
+      {
+        "query": "egluck anne klein",
+        "clicks": 38,
+        "impressions": 111,
+        "ctr": 34.23,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "gold anne klein watch",
+        "clicks": 38,
+        "impressions": 705,
+        "ctr": 5.39,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "klein watches",
+        "clicks": 38,
+        "impressions": 1545,
+        "ctr": 2.46,
+        "position": 9.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann clein",
+        "clicks": 37,
+        "impressions": 111,
+        "ctr": 33.33,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein bags",
+        "clicks": 37,
+        "impressions": 192,
+        "ctr": 19.27,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein suits",
+        "clicks": 37,
+        "impressions": 198,
+        "ctr": 18.69,
+        "position": 2.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bags uae",
+        "clicks": 37,
+        "impressions": 201,
+        "ctr": 18.41,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein duffle bag",
+        "clicks": 37,
+        "impressions": 205,
+        "ctr": 18.05,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein russ bootie",
+        "clicks": 37,
+        "impressions": 441,
+        "ctr": 8.39,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches uk",
+        "clicks": 37,
+        "impressions": 201,
+        "ctr": 18.41,
+        "position": 6.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klien purse",
+        "clicks": 37,
+        "impressions": 250,
+        "ctr": 14.8,
+        "position": 1.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "relógio anne klein",
+        "clicks": 37,
+        "impressions": 415,
+        "ctr": 8.92,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "women's anne klein watches",
+        "clicks": 37,
+        "impressions": 1395,
+        "ctr": 2.65,
+        "position": 5.5,
+        "type": "branded"
+      },
+      {
+        "query": "ساعات anne klein",
+        "clicks": 37,
+        "impressions": 241,
+        "ctr": 15.35,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "ak bags brand",
+        "clicks": 36,
+        "impressions": 193,
+        "ctr": 18.65,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne clain",
+        "clicks": 36,
+        "impressions": 122,
+        "ctr": 29.51,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein ayakkabı",
+        "clicks": 36,
+        "impressions": 91,
+        "ctr": 39.56,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bags uk",
+        "clicks": 36,
+        "impressions": 114,
+        "ctr": 31.58,
+        "position": 5.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein cüzdan",
+        "clicks": 36,
+        "impressions": 125,
+        "ctr": 28.8,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein lip gloss",
+        "clicks": 36,
+        "impressions": 923,
+        "ctr": 3.9,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein mode",
+        "clicks": 36,
+        "impressions": 208,
+        "ctr": 17.31,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein purse black",
+        "clicks": 36,
+        "impressions": 408,
+        "ctr": 8.82,
+        "position": 2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sport flats",
+        "clicks": 36,
+        "impressions": 1164,
+        "ctr": 3.09,
+        "position": 13.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein suits women",
+        "clicks": 36,
+        "impressions": 248,
+        "ctr": 14.52,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch canada",
+        "clicks": 36,
+        "impressions": 109,
+        "ctr": 33.03,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches australia",
+        "clicks": 36,
+        "impressions": 298,
+        "ctr": 12.08,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "annie klein bags",
+        "clicks": 36,
+        "impressions": 158,
+        "ctr": 22.78,
+        "position": 1.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "reloj anne klein mujer",
+        "clicks": 36,
+        "impressions": 2614,
+        "ctr": 1.38,
+        "position": 9.4,
+        "type": "branded"
+      },
+      {
+        "query": "sac a main anne klein",
+        "clicks": 36,
+        "impressions": 125,
+        "ctr": 28.8,
+        "position": 1.2,
+        "type": "branded"
+      },
+      {
+        "query": "ak purse brand",
+        "clicks": 35,
+        "impressions": 468,
+        "ctr": 7.48,
+        "position": 2.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein coat price",
+        "clicks": 35,
+        "impressions": 343,
+        "ctr": 10.2,
+        "position": 3.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein gloves",
+        "clicks": 35,
+        "impressions": 199,
+        "ctr": 17.59,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein lip oil",
+        "clicks": 35,
+        "impressions": 619,
+        "ctr": 5.65,
+        "position": 4.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein outlet near me",
+        "clicks": 35,
+        "impressions": 154,
+        "ctr": 22.73,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein singapore",
+        "clicks": 35,
+        "impressions": 206,
+        "ctr": 16.99,
+        "position": 3.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wallets for women",
+        "clicks": 35,
+        "impressions": 246,
+        "ctr": 14.23,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch strap",
+        "clicks": 35,
+        "impressions": 204,
+        "ctr": 17.16,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches price in sri lanka",
+        "clicks": 35,
+        "impressions": 87,
+        "ctr": 40.23,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "annie clein",
+        "clicks": 35,
+        "impressions": 92,
+        "ctr": 38.04,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "bolso anne klein",
+        "clicks": 35,
+        "impressions": 778,
+        "ctr": 4.5,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "ak anne klein watch",
+        "clicks": 34,
+        "impressions": 1350,
+        "ctr": 2.52,
+        "position": 29.4,
+        "type": "branded"
+      },
+      {
+        "query": "ak sport shoes",
+        "clicks": 34,
+        "impressions": 744,
+        "ctr": 4.57,
+        "position": 3.8,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein.com",
+        "clicks": 34,
+        "impressions": 104,
+        "ctr": 32.69,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein belt",
+        "clicks": 34,
+        "impressions": 359,
+        "ctr": 9.47,
+        "position": 4.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein blouses for women",
+        "clicks": 34,
+        "impressions": 305,
+        "ctr": 11.15,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein glasses frames",
+        "clicks": 34,
+        "impressions": 1368,
+        "ctr": 2.49,
+        "position": 9.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein loafers for women",
+        "clicks": 34,
+        "impressions": 293,
+        "ctr": 11.6,
+        "position": 3.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein petite pants",
+        "clicks": 34,
+        "impressions": 341,
+        "ctr": 9.97,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein purse price",
+        "clicks": 34,
+        "impressions": 679,
+        "ctr": 5.01,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein south africa",
+        "clicks": 34,
+        "impressions": 140,
+        "ctr": 24.29,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein usa outlet",
+        "clicks": 34,
+        "impressions": 43,
+        "ctr": 79.07,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches uae",
+        "clicks": 34,
+        "impressions": 393,
+        "ctr": 8.65,
+        "position": 9.7,
+        "type": "branded"
+      },
+      {
+        "query": "annie klein watches",
+        "clicks": 34,
+        "impressions": 210,
+        "ctr": 16.19,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein fashion",
+        "clicks": 33,
+        "impressions": 1952,
+        "ctr": 1.69,
+        "position": 38.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein flex heels",
+        "clicks": 33,
+        "impressions": 260,
+        "ctr": 12.69,
+        "position": 2.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein malaysia",
+        "clicks": 33,
+        "impressions": 219,
+        "ctr": 15.07,
+        "position": 3.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein sac prix",
+        "clicks": 33,
+        "impressions": 173,
+        "ctr": 19.08,
+        "position": 1.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch bracelet",
+        "clicks": 33,
+        "impressions": 286,
+        "ctr": 11.54,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch nz",
+        "clicks": 33,
+        "impressions": 136,
+        "ctr": 24.26,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch original price",
+        "clicks": 33,
+        "impressions": 153,
+        "ctr": 21.57,
+        "position": 2.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein wedges",
+        "clicks": 33,
+        "impressions": 1449,
+        "ctr": 2.28,
+        "position": 13.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein zapatos mujer",
+        "clicks": 33,
+        "impressions": 199,
+        "ctr": 16.58,
+        "position": 4,
+        "type": "branded"
+      },
+      {
+        "query": "bolsas anne klein originales",
+        "clicks": 33,
+        "impressions": 724,
+        "ctr": 4.56,
+        "position": 6.4,
+        "type": "branded"
+      },
+      {
+        "query": "royal anne klein wallet",
+        "clicks": 33,
+        "impressions": 130,
+        "ctr": 25.38,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "watches anne klein",
+        "clicks": 33,
+        "impressions": 576,
+        "ctr": 5.73,
+        "position": 8.5,
+        "type": "branded"
+      },
+      {
+        "query": "www.anneklein.com",
+        "clicks": 33,
+        "impressions": 62,
+        "ctr": 53.23,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "กระเป๋า royal anne klein ราคา",
+        "clicks": 33,
+        "impressions": 870,
+        "ctr": 3.79,
+        "position": 2.9,
+        "type": "branded"
+      },
+      {
+        "query": "annaklein",
+        "clicks": 32,
+        "impressions": 111,
+        "ctr": 28.83,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne ak klein brooch",
+        "clicks": 32,
+        "impressions": 88,
+        "ctr": 36.36,
+        "position": 1.4,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne kkein",
+        "clicks": 32,
+        "impressions": 130,
+        "ctr": 24.62,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein christmas brooch",
+        "clicks": 32,
+        "impressions": 136,
+        "ctr": 23.53,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein flex",
+        "clicks": 32,
+        "impressions": 248,
+        "ctr": 12.9,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein hand cream set",
+        "clicks": 32,
+        "impressions": 472,
+        "ctr": 6.78,
+        "position": 4.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pull on pants",
+        "clicks": 32,
+        "impressions": 320,
+        "ctr": 10,
+        "position": 2.7,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein smart watch",
+        "clicks": 32,
+        "impressions": 121,
+        "ctr": 26.45,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein vestidos",
+        "clicks": 32,
+        "impressions": 143,
+        "ctr": 22.38,
+        "position": 2.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's premium crystal accented bangle watch and bracelet set",
+        "clicks": 32,
+        "impressions": 234,
+        "ctr": 13.68,
+        "position": 2.4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein официальный сайт",
+        "clicks": 32,
+        "impressions": 43,
+        "ctr": 74.42,
+        "position": 1,
+        "type": "branded"
+      },
+      {
+        "query": "آن كلاين",
+        "clicks": 32,
+        "impressions": 136,
+        "ctr": 23.53,
+        "position": 4.9,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein dress",
+        "clicks": 31,
+        "impressions": 346,
+        "ctr": 8.96,
+        "position": 17,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein purse",
+        "clicks": 31,
+        "impressions": 263,
+        "ctr": 11.79,
+        "position": 1.6,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klein bag",
+        "clicks": 31,
+        "impressions": 162,
+        "ctr": 19.14,
+        "position": 1.5,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klein bags",
+        "clicks": 31,
+        "impressions": 160,
+        "ctr": 19.38,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein dress size chart",
+        "clicks": 31,
+        "impressions": 106,
+        "ctr": 29.25,
+        "position": 3.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein ll",
+        "clicks": 31,
+        "impressions": 120,
+        "ctr": 25.83,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein oval watch",
+        "clicks": 31,
+        "impressions": 127,
+        "ctr": 24.41,
+        "position": 1.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein pink watch",
+        "clicks": 31,
+        "impressions": 386,
+        "ctr": 8.03,
+        "position": 3.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein plus size dresses",
+        "clicks": 31,
+        "impressions": 294,
+        "ctr": 10.54,
+        "position": 8.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein satovi",
+        "clicks": 31,
+        "impressions": 495,
+        "ctr": 6.26,
+        "position": 5.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein skirt",
+        "clicks": 31,
+        "impressions": 231,
+        "ctr": 13.42,
+        "position": 3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein women's single-breasted walker coat",
+        "clicks": 31,
+        "impressions": 127,
+        "ctr": 24.41,
+        "position": 2.3,
+        "type": "branded"
+      },
+      {
+        "query": "nne klein",
+        "clicks": 31,
+        "impressions": 99,
+        "ctr": 31.31,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "original anne klein watch price",
+        "clicks": 31,
+        "impressions": 253,
+        "ctr": 12.25,
+        "position": 1.8,
+        "type": "branded"
+      },
+      {
+        "query": "اني كلاين",
+        "clicks": 31,
+        "impressions": 733,
+        "ctr": 4.23,
+        "position": 2.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein outlet",
+        "clicks": 30,
+        "impressions": 116,
+        "ctr": 25.86,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klain",
+        "clicks": 30,
+        "impressions": 104,
+        "ctr": 28.85,
+        "position": 1.2,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anna klein shoes",
+        "clicks": 30,
+        "impressions": 121,
+        "ctr": 24.79,
+        "position": 1.3,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein bolsa",
+        "clicks": 30,
+        "impressions": 1474,
+        "ctr": 2.04,
+        "position": 17,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein bucket bag",
+        "clicks": 30,
+        "impressions": 358,
+        "ctr": 8.38,
+        "position": 5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein careers",
+        "clicks": 30,
+        "impressions": 96,
+        "ctr": 31.25,
+        "position": 6.2,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein egypt",
+        "clicks": 30,
+        "impressions": 80,
+        "ctr": 37.5,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein factory outlet online",
+        "clicks": 30,
+        "impressions": 88,
+        "ctr": 34.09,
+        "position": 4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein is a luxury brand",
+        "clicks": 30,
+        "impressions": 419,
+        "ctr": 7.16,
+        "position": 1.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein long wool coat",
+        "clicks": 30,
+        "impressions": 141,
+        "ctr": 21.28,
+        "position": 1.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein outlet store",
+        "clicks": 30,
+        "impressions": 167,
+        "ctr": 17.96,
+        "position": 2.5,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein swimwear",
+        "clicks": 30,
+        "impressions": 469,
+        "ctr": 6.4,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "anneklein watch",
+        "clicks": 30,
+        "impressions": 125,
+        "ctr": 24,
+        "position": 2.6,
+        "type": "branded"
+      },
+      {
+        "query": "bag anne klein",
+        "clicks": 30,
+        "impressions": 161,
+        "ctr": 18.63,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "relojes anne klein mujer",
+        "clicks": 30,
+        "impressions": 674,
+        "ctr": 4.45,
+        "position": 5.8,
+        "type": "branded"
+      },
+      {
+        "query": "watch rings for women",
+        "clicks": 30,
+        "impressions": 1352,
+        "ctr": 2.22,
+        "position": 6.2,
+        "type": "category-generic"
+      },
+      {
+        "query": "zapatos anne klein mujer",
+        "clicks": 30,
+        "impressions": 665,
+        "ctr": 4.51,
+        "position": 5.2,
+        "type": "branded"
+      },
+      {
+        "query": "ann kelin",
+        "clicks": 29,
+        "impressions": 79,
+        "ctr": 36.71,
+        "position": 1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "ann klein heels",
+        "clicks": 29,
+        "impressions": 191,
+        "ctr": 15.18,
+        "position": 1.1,
+        "type": "unbranded-product"
+      },
+      {
+        "query": "anne klein blusas",
+        "clicks": 29,
+        "impressions": 144,
+        "ctr": 20.14,
+        "position": 4.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein clothes for women",
+        "clicks": 29,
+        "impressions": 119,
+        "ctr": 24.37,
+        "position": 5.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein earrings price",
+        "clicks": 29,
+        "impressions": 93,
+        "ctr": 31.18,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein handbags price",
+        "clicks": 29,
+        "impressions": 278,
+        "ctr": 10.43,
+        "position": 4.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein loafers iflex",
+        "clicks": 29,
+        "impressions": 243,
+        "ctr": 11.93,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein marca",
+        "clicks": 29,
+        "impressions": 263,
+        "ctr": 11.03,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein satchel bag",
+        "clicks": 29,
+        "impressions": 155,
+        "ctr": 18.71,
+        "position": 1.9,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein square watch",
+        "clicks": 29,
+        "impressions": 241,
+        "ctr": 12.03,
+        "position": 4.8,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein swiss watch",
+        "clicks": 29,
+        "impressions": 182,
+        "ctr": 15.93,
+        "position": 5.6,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watch diamond real",
+        "clicks": 29,
+        "impressions": 267,
+        "ctr": 10.86,
+        "position": 1.1,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein watches south africa",
+        "clicks": 29,
+        "impressions": 204,
+        "ctr": 14.22,
+        "position": 4,
+        "type": "branded"
+      },
+      {
+        "query": "anne klein กระเป๋า สตางค์",
+        "clicks": 29,
+        "impressions": 153,
+        "ctr": 18.95,
+        "position": 1.3,
+        "type": "branded"
+      },
+      {
+        "query": "jam tangan anne klein",
+        "clicks": 29,
+        "impressions": 233,
+        "ctr": 12.45,
+        "position": 1.7,
+        "type": "branded"
+      },
+      {
+        "query": "ak shoes",
+        "clicks": 28,
+        "impressions": 1950,
+        "ctr": 1.44,
+        "position": 7.4,
+        "type": "unbranded-product"
+      }
+    ]
+  },
+  "topPages": [
+    {
+      "page": "https://anneklein.com/",
+      "clicks": 90453,
+      "impressions": 1239612,
+      "ctr": 7.3,
+      "position": 8.8
+    },
+    {
+      "page": "https://anneklein.com/collections/watches",
+      "clicks": 51007,
+      "impressions": 995178,
+      "ctr": 5.13,
+      "position": 7.1
+    },
+    {
+      "page": "https://anneklein.com/collections/handbags-1",
+      "clicks": 28325,
+      "impressions": 764335,
+      "ctr": 3.71,
+      "position": 5.4
+    },
+    {
+      "page": "https://anneklein.com/collections/clothing",
+      "clicks": 8145,
+      "impressions": 577359,
+      "ctr": 1.41,
+      "position": 4.3
+    },
+    {
+      "page": "https://anneklein.com/collections/shoes",
+      "clicks": 7423,
+      "impressions": 546990,
+      "ctr": 1.36,
+      "position": 3.6
+    },
+    {
+      "page": "https://anneklein.com/collections/watches-jewelry",
+      "clicks": 3609,
+      "impressions": 388810,
+      "ctr": 0.93,
+      "position": 3.5
+    },
+    {
+      "page": "https://anneklein.com/collections/watch-collection/watches",
+      "clicks": 3485,
+      "impressions": 190491,
+      "ctr": 1.83,
+      "position": 2.5
+    },
+    {
+      "page": "https://anneklein.com/collections/wallets-wristlets",
+      "clicks": 3043,
+      "impressions": 55222,
+      "ctr": 5.51,
+      "position": 14.4
+    },
+    {
+      "page": "https://anneklein.com/collections/dresses",
+      "clicks": 2877,
+      "impressions": 132383,
+      "ctr": 2.17,
+      "position": 7.8
+    },
+    {
+      "page": "https://anneklein.com/collections/blazers-jackets",
+      "clicks": 2597,
+      "impressions": 76461,
+      "ctr": 3.4,
+      "position": 14.4
+    },
+    {
+      "page": "https://anneklein.com/collections/clearance",
+      "clicks": 2454,
+      "impressions": 236731,
+      "ctr": 1.04,
+      "position": 2.9
+    },
+    {
+      "page": "https://anneklein.com/pages/watch-inquiries",
+      "clicks": 2137,
+      "impressions": 84953,
+      "ctr": 2.52,
+      "position": 9.4
+    },
+    {
+      "page": "https://anneklein.com/collections/boots",
+      "clicks": 1868,
+      "impressions": 45494,
+      "ctr": 4.11,
+      "position": 9.6
+    },
+    {
+      "page": "https://anneklein.com/collections/watches/gold",
+      "clicks": 1837,
+      "impressions": 148627,
+      "ctr": 1.24,
+      "position": 2.5
+    },
+    {
+      "page": "https://anneklein.com/collections/tote-bags",
+      "clicks": 1562,
+      "impressions": 92276,
+      "ctr": 1.69,
+      "position": 16.4
+    },
+    {
+      "page": "https://anneklein.com/pages/size-guide",
+      "clicks": 1440,
+      "impressions": 24477,
+      "ctr": 5.88,
+      "position": 10.6
+    },
+    {
+      "page": "https://anneklein.com/collections/best-seller-watches",
+      "clicks": 1398,
+      "impressions": 194594,
+      "ctr": 0.72,
+      "position": 3.4
+    },
+    {
+      "page": "https://anneklein.com/pages/store-locator",
+      "clicks": 1325,
+      "impressions": 22749,
+      "ctr": 5.82,
+      "position": 7.6
+    },
+    {
+      "page": "https://anneklein.com/collections/sunglasses",
+      "clicks": 1313,
+      "impressions": 26739,
+      "ctr": 4.91,
+      "position": 9.8
+    },
+    {
+      "page": "https://anneklein.com/collections/bottoms",
+      "clicks": 1298,
+      "impressions": 43871,
+      "ctr": 2.96,
+      "position": 14.1
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-wool-coats",
+      "clicks": 1289,
+      "impressions": 40050,
+      "ctr": 3.22,
+      "position": 39.4
+    },
+    {
+      "page": "https://anneklein.com/collections/bracelets",
+      "clicks": 1282,
+      "impressions": 19681,
+      "ctr": 6.51,
+      "position": 11
+    },
+    {
+      "page": "https://anneklein.com/collections/jewelry",
+      "clicks": 1243,
+      "impressions": 31017,
+      "ctr": 4.01,
+      "position": 7.9
+    },
+    {
+      "page": "https://anneklein.com/collections/outerwear",
+      "clicks": 1226,
+      "impressions": 57988,
+      "ctr": 2.11,
+      "position": 8.5
+    },
+    {
+      "page": "https://anneklein.com/collections/crossbody-bags",
+      "clicks": 1183,
+      "impressions": 76335,
+      "ctr": 1.55,
+      "position": 16.2
+    },
+    {
+      "page": "https://anneklein.com/collections/shoes-handbags",
+      "clicks": 1159,
+      "impressions": 87400,
+      "ctr": 1.33,
+      "position": 9.7
+    },
+    {
+      "page": "https://anneklein.com/collections/tops",
+      "clicks": 1157,
+      "impressions": 47118,
+      "ctr": 2.46,
+      "position": 9.9
+    },
+    {
+      "page": "https://anneklein.com/collections/shoes/iflex",
+      "clicks": 1115,
+      "impressions": 28312,
+      "ctr": 3.94,
+      "position": 17.6
+    },
+    {
+      "page": "https://anneklein.com/collections/apple-watch-accessories",
+      "clicks": 1110,
+      "impressions": 76948,
+      "ctr": 1.44,
+      "position": 25.2
+    },
+    {
+      "page": "https://anneklein.com/collections/diamonds",
+      "clicks": 1072,
+      "impressions": 28013,
+      "ctr": 3.83,
+      "position": 13.1
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-winter-coats",
+      "clicks": 1058,
+      "impressions": 23829,
+      "ctr": 4.44,
+      "position": 12.2
+    },
+    {
+      "page": "https://anneklein.com/collections/watches/rose-gold",
+      "clicks": 1045,
+      "impressions": 135961,
+      "ctr": 0.77,
+      "position": 4
+    },
+    {
+      "page": "https://anneklein.com/collections/flats",
+      "clicks": 872,
+      "impressions": 61482,
+      "ctr": 1.42,
+      "position": 18.4
+    },
+    {
+      "page": "https://anneklein.com/collections/watches/silver",
+      "clicks": 817,
+      "impressions": 130965,
+      "ctr": 0.62,
+      "position": 3.6
+    },
+    {
+      "page": "https://anneklein.com/collections/ring-watches",
+      "clicks": 758,
+      "impressions": 75444,
+      "ctr": 1,
+      "position": 12.3
+    },
+    {
+      "page": "https://anneklein.com/collections/sweaters",
+      "clicks": 749,
+      "impressions": 18245,
+      "ctr": 4.11,
+      "position": 10.9
+    },
+    {
+      "page": "https://anneklein.com/collections/watches/diamond",
+      "clicks": 748,
+      "impressions": 109461,
+      "ctr": 0.68,
+      "position": 2.3
+    },
+    {
+      "page": "https://anneklein.com/collections/heels",
+      "clicks": 730,
+      "impressions": 35829,
+      "ctr": 2.04,
+      "position": 21.3
+    },
+    {
+      "page": "https://anneklein.com/collections/brooches",
+      "clicks": 716,
+      "impressions": 15719,
+      "ctr": 4.55,
+      "position": 18.3
+    },
+    {
+      "page": "https://anneklein.com/collections/watch-collection",
+      "clicks": 686,
+      "impressions": 215018,
+      "ctr": 0.32,
+      "position": 7.1
+    },
+    {
+      "page": "https://anneklein.com/collections/shoes/heels",
+      "clicks": 667,
+      "impressions": 40182,
+      "ctr": 1.66,
+      "position": 10.2
+    },
+    {
+      "page": "https://anneklein.com/collections/wear-to-work",
+      "clicks": 659,
+      "impressions": 30187,
+      "ctr": 2.18,
+      "position": 29.7
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-flat-shoes",
+      "clicks": 567,
+      "impressions": 48359,
+      "ctr": 1.17,
+      "position": 9.9
+    },
+    {
+      "page": "https://anneklein.com/collections/sleepwear",
+      "clicks": 559,
+      "impressions": 13689,
+      "ctr": 4.08,
+      "position": 16.1
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-flats-loafers",
+      "clicks": 558,
+      "impressions": 24414,
+      "ctr": 2.29,
+      "position": 20.7
+    },
+    {
+      "page": "https://anneklein.com/collections/blouses",
+      "clicks": 556,
+      "impressions": 19807,
+      "ctr": 2.81,
+      "position": 14.9
+    },
+    {
+      "page": "https://anneklein.com/collections/bedding",
+      "clicks": 523,
+      "impressions": 7941,
+      "ctr": 6.59,
+      "position": 28
+    },
+    {
+      "page": "https://anneklein.com/collections/earring",
+      "clicks": 519,
+      "impressions": 7110,
+      "ctr": 7.3,
+      "position": 10.4
+    },
+    {
+      "page": "https://anneklein.com/collections/necklaces",
+      "clicks": 507,
+      "impressions": 14646,
+      "ctr": 3.46,
+      "position": 14.7
+    },
+    {
+      "page": "https://anneklein.com/collections/clip-earrings",
+      "clicks": 498,
+      "impressions": 80603,
+      "ctr": 0.62,
+      "position": 17.5
+    },
+    {
+      "page": "https://anneklein.com/collections/sets",
+      "clicks": 491,
+      "impressions": 18040,
+      "ctr": 2.72,
+      "position": 12.6
+    },
+    {
+      "page": "https://anneklein.com/collections/handbags-1?page=2",
+      "clicks": 488,
+      "impressions": 85444,
+      "ctr": 0.57,
+      "position": 6.5
+    },
+    {
+      "page": "https://anneklein.com/collections/leathers",
+      "clicks": 487,
+      "impressions": 53578,
+      "ctr": 0.91,
+      "position": 18.1
+    },
+    {
+      "page": "https://anneklein.com/collections/rectangular",
+      "clicks": 486,
+      "impressions": 57685,
+      "ctr": 0.84,
+      "position": 17.9
+    },
+    {
+      "page": "https://anneklein.com/pages/ak-history",
+      "clicks": 459,
+      "impressions": 324798,
+      "ctr": 0.14,
+      "position": 7.6
+    },
+    {
+      "page": "https://anneklein.com/collections/sandals-slides",
+      "clicks": 437,
+      "impressions": 21915,
+      "ctr": 1.99,
+      "position": 17.1
+    },
+    {
+      "page": "https://anneklein.com/collections/plus-sizes",
+      "clicks": 430,
+      "impressions": 20656,
+      "ctr": 2.08,
+      "position": 33.8
+    },
+    {
+      "page": "https://anneklein.com/collections/shoulder-bags",
+      "clicks": 429,
+      "impressions": 37730,
+      "ctr": 1.14,
+      "position": 20.1
+    },
+    {
+      "page": "https://anneklein.com/collections/fragrance",
+      "clicks": 417,
+      "impressions": 12777,
+      "ctr": 3.26,
+      "position": 5.1
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-cardigan-sweaters",
+      "clicks": 391,
+      "impressions": 14121,
+      "ctr": 2.77,
+      "position": 28.2
+    },
+    {
+      "page": "https://anneklein.com/collections/bracelets/bracelet",
+      "clicks": 377,
+      "impressions": 7005,
+      "ctr": 5.38,
+      "position": 5.1
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-wool-blend-peacoats",
+      "clicks": 375,
+      "impressions": 19993,
+      "ctr": 1.88,
+      "position": 36.9
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-trench-coats",
+      "clicks": 360,
+      "impressions": 8662,
+      "ctr": 4.16,
+      "position": 28.3
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-heels-pumps",
+      "clicks": 357,
+      "impressions": 29365,
+      "ctr": 1.22,
+      "position": 16.8
+    },
+    {
+      "page": "https://anneklein.com/collections/petite",
+      "clicks": 351,
+      "impressions": 21603,
+      "ctr": 1.62,
+      "position": 29.8
+    },
+    {
+      "page": "https://anneklein.com/collections/wedges",
+      "clicks": 346,
+      "impressions": 22392,
+      "ctr": 1.55,
+      "position": 23.9
+    },
+    {
+      "page": "https://anneklein.com/collections/gift-sets",
+      "clicks": 343,
+      "impressions": 21240,
+      "ctr": 1.61,
+      "position": 24.6
+    },
+    {
+      "page": "https://anneklein.com/collections/best-seller-handbags",
+      "clicks": 342,
+      "impressions": 81038,
+      "ctr": 0.42,
+      "position": 11.3
+    },
+    {
+      "page": "https://anneklein.com/collections/pants",
+      "clicks": 331,
+      "impressions": 20063,
+      "ctr": 1.65,
+      "position": 11
+    },
+    {
+      "page": "https://anneklein.com/collections/ak-jeans",
+      "clicks": 329,
+      "impressions": 10950,
+      "ctr": 3,
+      "position": 5.3
+    },
+    {
+      "page": "https://anneklein.com/blogs/fashion-tips-and-trends/apple-watch-styling-how-to-make-your-apple-watch-look-classy",
+      "clicks": 319,
+      "impressions": 24922,
+      "ctr": 1.28,
+      "position": 7.7
+    },
+    {
+      "page": "https://anneklein.com/collections/satchels-top-handles",
+      "clicks": 310,
+      "impressions": 24505,
+      "ctr": 1.27,
+      "position": 19.9
+    },
+    {
+      "page": "https://anneklein.com/collections/oval-watches",
+      "clicks": 303,
+      "impressions": 23069,
+      "ctr": 1.31,
+      "position": 12.8
+    },
+    {
+      "page": "https://anneklein.com/pages/faq-customer-service",
+      "clicks": 287,
+      "impressions": 8528,
+      "ctr": 3.37,
+      "position": 10
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-kitten-heels",
+      "clicks": 286,
+      "impressions": 20747,
+      "ctr": 1.38,
+      "position": 28.7
+    },
+    {
+      "page": "https://anneklein.com/collections/heels/shoes",
+      "clicks": 282,
+      "impressions": 28356,
+      "ctr": 0.99,
+      "position": 11
+    },
+    {
+      "page": "https://anneklein.com/collections/sale-blazers-jackets",
+      "clicks": 266,
+      "impressions": 17131,
+      "ctr": 1.55,
+      "position": 13
+    },
+    {
+      "page": "https://anneklein.com/collections/flats/iflex",
+      "clicks": 265,
+      "impressions": 15925,
+      "ctr": 1.66,
+      "position": 17.7
+    },
+    {
+      "page": "https://anneklein.com/collections/handbags",
+      "clicks": 264,
+      "impressions": 15071,
+      "ctr": 1.75,
+      "position": 8.7
+    },
+    {
+      "page": "https://anneklein.com/blogs/fashion-tips-and-trends/solar-powered-watches-for-women-a-guide-by-anne-klein",
+      "clicks": 259,
+      "impressions": 14086,
+      "ctr": 1.84,
+      "position": 13.4
+    },
+    {
+      "page": "https://anneklein.com/collections/handbags/black",
+      "clicks": 259,
+      "impressions": 10763,
+      "ctr": 2.41,
+      "position": 19.2
+    },
+    {
+      "page": "https://anneklein.com/collections/womens-slingback-heels",
+      "clicks": 244,
+      "impressions": 16065,
+      "ctr": 1.52,
+      "position": 27
+    },
+    {
+      "page": "https://anneklein.com/collections/watches/two-tone",
+      "clicks": 241,
+      "impressions": 13297,
+      "ctr": 1.81,
+      "position": 11.9
+    },
+    {
+      "page": "https://anneklein.com/products/premium-crystal-accented-bangle-watch-set-gold-tone",
+      "clicks": 240,
+      "impressions": 18902,
+      "ctr": 1.27,
+      "position": 7.4
+    },
+    {
+      "page": "https://anneklein.com/collections/ceramics",
+      "clicks": 238,
+      "impressions": 21883,
+      "ctr": 1.09,
+      "position": 23.5
+    },
+    {
+      "page": "https://anneklein.com/collections/bottoms/dress-pants",
+      "clicks": 231,
+      "impressions": 10711,
+      "ctr": 2.16,
+      "position": 16.1
+    },
+    {
+      "page": "https://anneklein.com/collections/crossbody-bags/accessories",
+      "clicks": 223,
+      "impressions": 9970,
+      "ctr": 2.24,
+      "position": 19.2
+    },
+    {
+      "page": "https://anneklein.com/collections/gateaway-bags",
+      "clicks": 216,
+      "impressions": 10135,
+      "ctr": 2.13,
+      "position": 10.1
+    },
+    {
+      "page": "https://anneklein.com/collections/mini-bags",
+      "clicks": 216,
+      "impressions": 36547,
+      "ctr": 0.59,
+      "position": 22.1
+    },
+    {
+      "page": "https://anneklein.com/collections/clearance/clearance",
+      "clicks": 203,
+      "impressions": 5011,
+      "ctr": 4.05,
+      "position": 11.2
+    },
+    {
+      "page": "https://anneklein.com/collections/sunglasses/sunglasses",
+      "clicks": 203,
+      "impressions": 4955,
+      "ctr": 4.1,
+      "position": 4
+    },
+    {
+      "page": "https://anneklein.com/products/crystal-accented-charm-bracelet-watch-gold",
+      "clicks": 200,
+      "impressions": 17881,
+      "ctr": 1.12,
+      "position": 8.6
+    },
+    {
+      "page": "https://anneklein.com/collections/necklaces/jewelry",
+      "clicks": 192,
+      "impressions": 8963,
+      "ctr": 2.14,
+      "position": 8.8
+    },
+    {
+      "page": "https://anneklein.com/collections/handbags/brown",
+      "clicks": 180,
+      "impressions": 8416,
+      "ctr": 2.14,
+      "position": 23.7
+    },
+    {
+      "page": "https://anneklein.com/collections/end-of-summer-sale-included-collection/handbags",
+      "clicks": 179,
+      "impressions": 10139,
+      "ctr": 1.77,
+      "position": 14.9
+    },
+    {
+      "page": "https://anneklein.com/collections/diamonds/watches",
+      "clicks": 178,
+      "impressions": 6348,
+      "ctr": 2.8,
+      "position": 5
+    },
+    {
+      "page": "https://anneklein.com/products/medium-perfect-tote-black",
+      "clicks": 175,
+      "impressions": 90834,
+      "ctr": 0.19,
+      "position": 7.1
+    },
+    {
+      "page": "https://anneklein.com/collections/comfortable-work-pants-for-women",
+      "clicks": 170,
+      "impressions": 19286,
+      "ctr": 0.88,
+      "position": 13.7
+    },
+    {
+      "page": "https://anneklein.com/products/pull-on-wide-leg",
+      "clicks": 168,
+      "impressions": 11794,
+      "ctr": 1.42,
+      "position": 11.4
+    },
+    {
+      "page": "https://anneklein.com/collections/bottoms/skirts",
+      "clicks": 163,
+      "impressions": 6043,
+      "ctr": 2.7,
+      "position": 8.5
+    }
+  ],
+  "keyInsights": {
+    "totalClicks": 190003,
+    "totalImpressions": 1108337,
+    "avgCTR": 17.14,
+    "brandedClickShare": 89,
+    "ctrOpportunityCount": 24,
+    "quickWinCount": 30
+  }
+}
