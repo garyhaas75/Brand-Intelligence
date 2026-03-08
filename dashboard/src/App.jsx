@@ -1395,6 +1395,188 @@ function PersonasTab({ personas }) {
   )
 }
 
+function BrandGuidelinesTab({ guidelines }) {
+  if (!guidelines?.brandVoice) return (
+    <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>No brand guidelines data found.</div>
+  )
+
+  const { brandVoice, targetCustomer, writingRules, keywords, copyFormats, writingSamples } = guidelines
+  const [activeFormat, setActiveFormat] = useState('productDescription')
+  const formatLabels = { productDescription: 'Product Description', emailSubjectLine: 'Email Subject', emailPreviewText: 'Email Preview Text', instagramCaption: 'Instagram Caption', heroHeadline: 'Hero Headline' }
+  const sampleCategories = Object.keys(writingSamples || {})
+  const [activeSample, setActiveSample] = useState(sampleCategories[0] || 'blazers')
+
+  return (
+    <div>
+      {/* Brand Voice */}
+      <SectionHeader>Brand Voice</SectionHeader>
+      <Card>
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>"{brandVoice.summary}"</div>
+        <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>Tone: <strong>{brandVoice.tone}</strong></div>
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>AK Is</div>
+            {brandVoice.personality.map((p, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
+                <span style={{ color: '#10b981', fontWeight: 700 }}>✓</span>
+                <span style={{ fontSize: 13, color: '#374151' }}>{p}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Writing Style</div>
+            {brandVoice.writingStyle.map((s, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
+                <span style={{ color: '#6366f1', fontWeight: 700 }}>→</span>
+                <span style={{ fontSize: 13, color: '#374151' }}>{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Target Customer */}
+      <SectionHeader>Target Customer</SectionHeader>
+      <Card>
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 4 }}>{targetCustomer.name}</div>
+            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>Age {targetCustomer.age} · {targetCustomer.income} · {targetCustomer.priceRange}</div>
+            <div style={{ fontSize: 13, color: '#374151', marginBottom: 12 }}>{targetCustomer.description}</div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {targetCustomer.values.map((v, i) => (
+                <span key={i} style={{ background: '#ede9fe', color: '#6366f1', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>{v}</span>
+              ))}
+            </div>
+          </div>
+          <div style={{ flex: 1, minWidth: 220, background: '#f9fafb', borderRadius: 8, padding: 16, borderLeft: '3px solid #6366f1' }}>
+            <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Her Voice</div>
+            <div style={{ fontSize: 14, color: '#374151', fontStyle: 'italic', lineHeight: 1.6 }}>"{targetCustomer.quote}"</div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Writing Rules */}
+      <SectionHeader>Writing Rules</SectionHeader>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+        <Card title="Do">
+          {writingRules.dos.map((d, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+              <span style={{ color: '#10b981', fontWeight: 700, flexShrink: 0 }}>✓</span>
+              <span style={{ fontSize: 13, color: '#374151' }}>{d}</span>
+            </div>
+          ))}
+        </Card>
+        <Card title="Don't">
+          {writingRules.donts.map((d, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.donts.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+              <span style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>✕</span>
+              <span style={{ fontSize: 13, color: '#374151' }}>{d}</span>
+            </div>
+          ))}
+        </Card>
+      </div>
+
+      {/* Keywords */}
+      <SectionHeader>Keywords</SectionHeader>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
+        <Card title="Use These Words">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {keywords.positive.map((k, i) => (
+              <span key={i} style={{ background: '#d1fae5', color: '#065f46', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>{k}</span>
+            ))}
+          </div>
+        </Card>
+        <Card title="Avoid These Words">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {keywords.negative.map((k, i) => (
+              <span key={i} style={{ background: '#fee2e2', color: '#991b1b', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>{k}</span>
+            ))}
+          </div>
+        </Card>
+        <Card title="SEO Keywords">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {keywords.seoKeywords.map((k, i) => (
+              <span key={i} style={{ background: '#ede9fe', color: '#5b21b6', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>{k}</span>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Copy Formats */}
+      <SectionHeader>Copy Formats</SectionHeader>
+      <Card>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+          {Object.keys(formatLabels).map(f => (
+            <button key={f} onClick={() => setActiveFormat(f)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeFormat === f ? '#6366f1' : '#f3f4f6', color: activeFormat === f ? '#fff' : '#374151' }}>{formatLabels[f]}</button>
+          ))}
+        </div>
+        {copyFormats[activeFormat] && (() => {
+          const fmt = copyFormats[activeFormat]
+          return (
+            <div>
+              {fmt.structure && <div style={{ marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Structure: </span><span style={{ fontSize: 13, color: '#374151' }}>{fmt.structure}</span></div>}
+              {fmt.guidance && <div style={{ marginBottom: 12 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Guidance: </span><span style={{ fontSize: 13, color: '#374151' }}>{fmt.guidance}</span></div>}
+              {fmt.paragraphGuidance && <div style={{ marginBottom: 6, fontSize: 13, color: '#374151' }}><strong>Paragraph:</strong> {fmt.paragraphGuidance}</div>}
+              {fmt.bulletGuidance && <div style={{ marginBottom: 12, fontSize: 13, color: '#374151' }}><strong>Bullets:</strong> {fmt.bulletGuidance}</div>}
+              {fmt.example && (
+                <div style={{ background: '#f9fafb', borderRadius: 8, padding: 14, marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 6 }}>EXAMPLE — {fmt.example.title}</div>
+                  <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, fontStyle: 'italic' }}>{fmt.example.paragraph}</div>
+                  <ul style={{ margin: 0, paddingLeft: 16 }}>
+                    {fmt.example.bullets?.map((b, i) => <li key={i} style={{ fontSize: 13, color: '#374151', marginBottom: 3 }}>{b}</li>)}
+                  </ul>
+                </div>
+              )}
+              {fmt.examples && Array.isArray(fmt.examples) && (
+                <div>
+                  {fmt.examples.map((ex, i) => (
+                    <div key={i} style={{ background: '#f9fafb', borderRadius: 8, padding: 10, marginBottom: 8 }}>
+                      {typeof ex === 'string' ? (
+                        <div style={{ fontSize: 13, color: '#374151', fontStyle: 'italic' }}>{ex}</div>
+                      ) : (
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 4 }}>"{ex.headline}"</div>
+                          <div style={{ fontSize: 13, color: '#6b7280' }}>{ex.subhead}</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {fmt.donts && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', marginBottom: 6 }}>Avoid</div>
+                  {fmt.donts.map((d, i) => <div key={i} style={{ fontSize: 13, color: '#6b7280', marginBottom: 3 }}>✕ {d}</div>)}
+                </div>
+              )}
+            </div>
+          )
+        })()}
+      </Card>
+
+      {/* Writing Samples */}
+      <SectionHeader>Writing Samples</SectionHeader>
+      <Card>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          {sampleCategories.map(cat => (
+            <button key={cat} onClick={() => setActiveSample(cat)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeSample === cat ? '#6366f1' : '#f3f4f6', color: activeSample === cat ? '#fff' : '#374151', textTransform: 'capitalize' }}>{cat}</button>
+          ))}
+        </div>
+        {(writingSamples[activeSample] || []).map((s, i) => (
+          <div key={i} style={{ padding: '14px 0', borderBottom: i < writingSamples[activeSample].length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6 }}>{s.title}</div>
+            <div style={{ fontSize: 13, color: '#374151', fontStyle: 'italic', marginBottom: 8 }}>{s.paragraph}</div>
+            <ul style={{ margin: 0, paddingLeft: 16 }}>
+              {s.bullets.map((b, j) => <li key={j} style={{ fontSize: 13, color: '#374151', marginBottom: 3 }}>{b}</li>)}
+            </ul>
+          </div>
+        ))}
+      </Card>
+    </div>
+  )
+}
+
 const TABS = [
   { id: 'overview',  label: '🏠 Overview' },
   { id: 'catalog',   label: '👗 Catalog' },
@@ -1406,6 +1588,7 @@ const TABS = [
   { id: 'price',     label: '💰 Pricing' },
   { id: 'ai',        label: '🤖 AI Search' },
   { id: 'personas',  label: '👥 Personas' },
+  { id: 'brand',     label: '📘 Brand Guidelines' },
 ]
 
 export default function App() {
@@ -1417,7 +1600,7 @@ export default function App() {
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const [siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage] = await Promise.all([
+      const [siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines] = await Promise.all([
         fetchEndpoint('/site-intelligence'),
         fetchEndpoint('/product-catalog'),
         fetchEndpoint('/site-analysis'),
@@ -1431,8 +1614,9 @@ export default function App() {
         fetchEndpoint('/price-intelligence'),
         fetchEndpoint('/personas'),
         fetchEndpoint('/apify-usage'),
+        fetchEndpoint('/brand-guidelines'),
       ])
-      setData({ siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage })
+      setData({ siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines })
       setLastUpdated(new Date().toLocaleTimeString())
       setLoading(false)
     }
@@ -1481,6 +1665,7 @@ export default function App() {
             {tab === 'price'    && <PriceTab priceIntel={data.priceIntel} />}
             {tab === 'ai'       && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
             {tab === 'personas' && <PersonasTab personas={data.personas} />}
+            {tab === 'brand'    && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
           </>
         )}
       </div>

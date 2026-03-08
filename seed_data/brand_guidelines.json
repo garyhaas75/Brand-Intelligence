@@ -1,0 +1,167 @@
+{
+  "updatedAt": "2026-03-08",
+  "brandVoice": {
+    "summary": "Approachable authority. Warm, practical, classic. Never stiff, never trendy, never corporate jargon.",
+    "tone": "Refined, elevated, concise",
+    "personality": [
+      "Authoritative without being stiff",
+      "Warm without being casual",
+      "Timeless without being dated",
+      "Practical without being plain",
+      "Aspirational without being unreachable"
+    ],
+    "writingStyle": [
+      "Short, punchy sentences for headlines and social",
+      "Longer, confident prose for product descriptions",
+      "Lead with the customer's reality — not the product name",
+      "Use real scenarios: meetings, commutes, events",
+      "Soft CTAs — 'shop the look', not 'buy now'"
+    ]
+  },
+  "targetCustomer": {
+    "name": "The Polished Professional",
+    "age": "38–55",
+    "income": "$55K–$95K",
+    "priceRange": "$50–$300",
+    "description": "She wants to look polished and credible at work without overthinking it. She values versatility, quality, and fair price.",
+    "quote": "I don't want to think about what I'm wearing — I want to think about the meeting I'm walking into.",
+    "values": ["Versatility", "Quality that lasts", "Effortless polish", "Value for money", "Understated confidence"]
+  },
+  "writingRules": {
+    "dos": [
+      "Use refined, elegant, and practical language",
+      "Write 1 paragraph + 4–6 bullet points for product descriptions",
+      "Start bullet points with an active verb (Features, Crafted, Designed, Finished)",
+      "Reference fabric, fit, key details, and versatility in bullets",
+      "Keep copy SEO-optimized — include occasion, silhouette, fabric keywords",
+      "Reference real-life occasions: boardroom, weekend brunch, client dinner",
+      "Write as a peer talking to an accomplished woman — not a salesperson"
+    ],
+    "donts": [
+      "Do NOT refer to the woman wearing the product ('she', 'her', 'the wearer')",
+      "Do NOT repeat the style name in the opening paragraph",
+      "Do NOT use 'empower' or 'embody'",
+      "Do NOT use 'girlboss', 'slay', 'boss babe' or similar slang",
+      "Do NOT use corporate jargon or overly formal language",
+      "Do NOT describe as 'cheap', 'affordable', 'budget' — use 'accessible' or 'exceptional value'",
+      "Do NOT use aspirational fantasy — keep it real and grounded"
+    ]
+  },
+  "keywords": {
+    "positive": [
+      "Timeless", "Refined", "Polished", "Versatile", "Elevated",
+      "Effortless", "Classic", "Tailored", "Sophisticated", "Credible",
+      "Practical", "Quality", "Confident", "Enduring", "Seamless",
+      "Crafted", "Clean lines", "Investment piece", "Wardrobe essential",
+      "Day-to-night", "Work-ready", "Understated"
+    ],
+    "negative": [
+      "cheap", "knockoff", "fast fashion", "replica", "low quality",
+      "empower", "embody", "girlboss", "slay", "boss babe",
+      "trendy", "on-trend", "viral", "drop", "hype",
+      "innovative", "disrupting", "game-changing", "curated",
+      "affordable", "budget-friendly"
+    ],
+    "seoKeywords": [
+      "women's workwear", "professional women's clothing", "women's blazer",
+      "women's dress pants", "women's office wear", "classic women's fashion",
+      "women's career clothing", "women's suits", "women's work dresses",
+      "Anne Klein clothing", "women's professional separates"
+    ]
+  },
+  "copyFormats": {
+    "productDescription": {
+      "structure": "1 opening paragraph + 4–6 bullet points",
+      "paragraphGuidance": "Describe the piece using refined, practical language. Highlight the occasion, the feeling, and the versatility. Do NOT start with the product name. ~2–3 sentences.",
+      "bulletGuidance": "Each bullet = one key feature. Start with an active verb. Cover: fabric/material, silhouette/fit, key design detail, versatility/occasion.",
+      "example": {
+        "title": "Bedford Stretch Blazer",
+        "paragraph": "A refined take on the tailored blazer, cut from stretch fabric that moves with you through a full day. Clean lines and a polished silhouette make it equally at home in the boardroom or at dinner.",
+        "bullets": [
+          "Crafted from stretch fabric for all-day comfort",
+          "Tailored fit with notched lapels",
+          "Single-button closure for a clean front",
+          "Front welt pockets for a structured finish",
+          "Pairs effortlessly with trousers or dress pants"
+        ]
+      }
+    },
+    "emailSubjectLine": {
+      "structure": "Under 45 characters for mobile preview",
+      "guidance": "Lead with the offer or the occasion — not the brand name. Use tension or specificity. Avoid clickbait.",
+      "examples": [
+        "Offer-forward: '15% Off Your First Order — Inside'",
+        "Occasion-led: 'Dress for the Boardroom (and After)'",
+        "Urgency: 'Your Welcome Offer Expires Sunday'",
+        "Editorial: 'The Spring Work Wardrobe Edit Is Here'"
+      ]
+    },
+    "emailPreviewText": {
+      "guidance": "Treat preview text as a second subject line — add information, don't repeat the subject.",
+      "donts": ["'We're so glad you're here!'", "Repeating the subject line word-for-word"],
+      "examples": [
+        "Shop our Spring workwear edit — offer expires in 48 hours.",
+        "Timeless workwear for the woman who's earned her confidence.",
+        "New arrivals: blazers, trousers, and dresses built for the workweek."
+      ]
+    },
+    "instagramCaption": {
+      "structure": "1–2 punchy opening lines + context sentence + hashtags",
+      "guidance": "Open with a real scenario or sharp observation. Grounded, not aspirational fantasy. Soft CTA. End with 5–8 hashtags.",
+      "example": "The meeting ran long. The blazer didn't flinch.\n\nShop the Bedford Stretch Blazer — link in bio.\n\n#AnneKlein #WorkwearStyle #WomenWhoWork #ProfessionalWomen #TailoredStyle"
+    },
+    "heroHeadline": {
+      "structure": "Headline (3–7 words) + subhead (1 sentence)",
+      "guidance": "Headline speaks to the customer's reality. Subhead adds context and grounds it in product/benefit.",
+      "examples": [
+        {
+          "headline": "Dressed. Done. Ready for Whatever.",
+          "subhead": "Anne Klein clothing, shoes, and bags built for the workweek — so getting ready stops being a decision."
+        },
+        {
+          "headline": "The Work Wardrobe That Works.",
+          "subhead": "Versatile, polished, and built to last — because you have better things to think about."
+        }
+      ]
+    }
+  },
+  "writingSamples": {
+    "dresses": [
+      {
+        "title": "V-Neck Midi Dress",
+        "paragraph": "A sleeveless midi silhouette with soft draping that carries through a full workday without losing its shape. Refined enough for a client presentation; versatile enough for an evening out.",
+        "bullets": [
+          "Sleeveless A-line silhouette with flattering V-neckline",
+          "Midi length with soft draping fabric",
+          "Zipper closure at back for a clean finish",
+          "Transitions seamlessly from office to evening"
+        ]
+      }
+    ],
+    "blazers": [
+      {
+        "title": "Bedford Stretch Blazer",
+        "paragraph": "Cut from stretch fabric for a tailored fit that moves with you. Clean notched lapels and a single-button closure keep the silhouette sharp without being stiff.",
+        "bullets": [
+          "Crafted from stretch fabric for all-day comfort",
+          "Tailored fit with notched lapels",
+          "Single-button closure for a clean front",
+          "Front welt pockets with structured finish",
+          "Pairs with trousers, dresses, or denim"
+        ]
+      }
+    ],
+    "tops": [
+      {
+        "title": "Sleeveless Shell",
+        "paragraph": "A clean, lightweight knit with an uncluttered neckline — the kind of piece that goes under a blazer on Monday and stands alone on Friday.",
+        "bullets": [
+          "Lightweight knit construction",
+          "Clean neckline — no fuss",
+          "Tucks cleanly into trousers or skirts",
+          "Versatile base layer for workwear dressing"
+        ]
+      }
+    ]
+  }
+}

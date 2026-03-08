@@ -92,6 +92,7 @@ app.get('/api/email-inbox',            (req, res) => res.json(loadData('email_in
 app.get('/api/email-analysis',         (req, res) => res.json(loadData('email_analysis.json') || {}));
 app.get('/api/agentic-search',         (req, res) => res.json(loadData('agentic_search.json') || {}));
 app.get('/api/price-intelligence',     (req, res) => res.json(loadData('price_intelligence.json') || {}));
+app.get('/api/brand-guidelines',       (req, res) => res.json(loadData('brand_guidelines.json') || {}));
 
 // History endpoint — returns last N snapshots for any module
 app.get('/api/history/:module', (req, res) => {
