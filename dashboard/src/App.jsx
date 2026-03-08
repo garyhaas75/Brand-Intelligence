@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-const API = 'http://localhost:3001/api'
+const API = '/api'
 
 async function fetchEndpoint(path) {
   try {
@@ -760,7 +760,7 @@ function ContentGeneratorPanel() {
     setError(null)
     setResult(null)
     try {
-      const res = await fetch('http://localhost:3001/api/generate', {
+      const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contentType, prompt }),
