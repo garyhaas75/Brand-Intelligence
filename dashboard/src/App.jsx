@@ -2046,9 +2046,18 @@ function SeoProductTab() {
   const [statusFilter, setStatusFilter] = useState('pending')
   const [runFilter, setRunFilter] = useState('new_arrivals')
   const [runLimit, setRunLimit] = useState(50)
+  const [forceReanalyze, setForceReanalyze] = useState(false)
   const [selected, setSelected] = useState(new Set())
   const [bulkApproving, setBulkApproving] = useState(false)
   const [expandedHref, setExpandedHref] = useState(null)
+  const pollRef = useRef(null)
+  const [shopifyConfig, setShopifyConfig] = useState(null)
+  const [pushing, setPushing] = useState(false)
+  const [pushLog, setPushLog] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/shopify/status').then(r => r.json()).then(setShopifyConfig).catch(() => {})
+  }, [])
 
   async function loadData() {
     setLoading(true)
@@ -2065,11 +2074,21 @@ function SeoProductTab() {
   async function runAnalysis() {
     setRunning(true)
     setRunLog(null)
+    // Poll every 3s to update progress bar while the child process runs
+    pollRef.current = setInterval(async () => {
+      try {
+        const r = await fetch('/api/seo-suggestions')
+        const d = await r.json()
+        setData(prev => prev ? { ...prev, totalAnalyzed: d.totalAnalyzed, totalProducts: d.totalProducts } : d)
+      } catch {}
+    }, 3000)
     const res = await fetch('/api/seo-suggestions/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filter: runFilter, limit: runLimit }),
+      body: JSON.stringify({ filter: runFilter, limit: runLimit, force: forceReanalyze }),
     })
+    clearInterval(pollRef.current)
+    pollRef.current = null
     const result = await res.json()
     setRunLog(result)
     setRunning(false)
@@ -2094,6 +2113,20 @@ function SeoProductTab() {
       body: JSON.stringify({ hrefs: [...selected] }),
     })
     setBulkApproving(false)
+    loadData()
+  }
+
+  async function pushToShopify(hrefs, dryRun = false) {
+    setPushing(true)
+    setPushLog(null)
+    const res = await fetch('/api/seo-suggestions/push-shopify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hrefs, dryRun }),
+    })
+    const result = await res.json()
+    setPushLog(result)
+    setPushing(false)
     loadData()
   }
 
@@ -2140,9 +2173,14 @@ function SeoProductTab() {
               {[25, 50, 100].map(n => <option key={n} value={n}>{n} products</option>)}
             </select>
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#374151', cursor: 'pointer', userSelect: 'none', paddingBottom: 2 }}>
+            <input type="checkbox" checked={forceReanalyze} onChange={e => setForceReanalyze(e.target.checked)}
+              style={{ width: 14, height: 14, accentColor: '#f59e0b', cursor: 'pointer' }} />
+            <span>Re-analyze existing</span>
+          </label>
           <button onClick={runAnalysis} disabled={running}
-            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: running ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13, opacity: running ? 0.7 : 1 }}>
-            {running ? '⚙️ Analyzing…' : '✨ Analyze Next Batch'}
+            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: forceReanalyze ? '#f59e0b' : '#6366f1', color: '#fff', cursor: running ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13, opacity: running ? 0.7 : 1 }}>
+            {running ? '⚙️ Analyzing…' : forceReanalyze ? '🔄 Re-analyze Batch' : '✨ Analyze Next Batch'}
           </button>
           <a href="/api/seo-suggestions/export-csv" download
             style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
@@ -2151,6 +2189,20 @@ function SeoProductTab() {
         </div>
       </div>
 
+      {/* Shopify connection status banner */}
+      {shopifyConfig && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderRadius: 8, marginBottom: 14,
+          background: shopifyConfig.configured ? '#f0fdf4' : '#fefce8',
+          border: `1px solid ${shopifyConfig.configured ? '#bbf7d0' : '#fde68a'}` }}>
+          <span style={{ fontSize: 16 }}>{shopifyConfig.configured ? '🟢' : '🔑'}</span>
+          <div style={{ flex: 1, fontSize: 12 }}>
+            {shopifyConfig.configured
+              ? <><strong>Shopify connected</strong> — {shopifyConfig.domain} · API {shopifyConfig.apiVersion}</>
+              : <><strong>Shopify not connected</strong> — Add <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3 }}>SHOPIFY_STORE_DOMAIN</code> and <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3 }}>SHOPIFY_ADMIN_API_TOKEN</code> to your .env to enable pushing</>}
+          </div>
+        </div>
+      )}
+
       {/* Run log */}
       {runLog && (
         <div style={{ background: runLog.ok ? '#f0fdf4' : '#fef2f2', border: `1px solid ${runLog.ok ? '#bbf7d0' : '#fecaca'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
@@ -2158,6 +2210,18 @@ function SeoProductTab() {
             {runLog.ok ? `✓ Batch complete — ${runLog.totalAnalyzed} of ${runLog.totalProducts} products analyzed` : '✗ Analysis encountered errors'}
           </div>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: '#6b7280' }}>{runLog.output}</pre>
+        </div>
+      )}
+
+      {/* Push log */}
+      {pushLog && (
+        <div style={{ background: pushLog.ok ? '#f0fdf4' : '#fef2f2', border: `1px solid ${pushLog.ok ? '#bbf7d0' : '#fecaca'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
+          <div style={{ fontWeight: 700, marginBottom: 4, color: pushLog.ok ? '#059669' : '#dc2626' }}>
+            {pushLog.ok
+              ? `✓ Push complete — ${pushLog.pushed} pushed to Shopify${pushLog.errors ? `, ${pushLog.errors} errors` : ''}`
+              : `✗ Push failed — ${pushLog.errors} errors`}
+          </div>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: '#6b7280' }}>{pushLog.output}</pre>
         </div>
       )}
 
@@ -2184,7 +2248,7 @@ function SeoProductTab() {
         </div>
       </div>
 
-      {/* Bulk action bar */}
+      {/* Bulk action bar — pending */}
       {statusFilter === 'pending' && products.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
           <input type="checkbox" checked={selected.size === products.length && products.length > 0}
@@ -2196,6 +2260,32 @@ function SeoProductTab() {
             <button onClick={bulkApprove} disabled={bulkApproving}
               style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
               {bulkApproving ? 'Approving…' : `✓ Approve ${selected.size}`}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Bulk action bar — approved */}
+      {statusFilter === 'approved' && products.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+          <input type="checkbox" checked={selected.size === products.length && products.length > 0}
+            onChange={toggleSelectAll} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+          <span style={{ fontSize: 13, color: '#6b7280' }}>
+            {selected.size > 0 ? `${selected.size} selected` : `Select all ${products.length}`}
+          </span>
+          {selected.size > 0 && shopifyConfig?.configured && (
+            <button onClick={() => pushToShopify([...selected])} disabled={pushing}
+              style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#0284c7', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, opacity: pushing ? 0.7 : 1 }}>
+              {pushing ? '⏳ Pushing…' : `↑ Push ${selected.size} to Shopify`}
+            </button>
+          )}
+          {selected.size > 0 && !shopifyConfig?.configured && (
+            <span style={{ fontSize: 12, color: '#d97706', fontWeight: 600 }}>🔑 Add Shopify credentials to push</span>
+          )}
+          {selected.size > 0 && shopifyConfig?.configured && (
+            <button onClick={() => pushToShopify([...selected], true)} disabled={pushing}
+              style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 12 }}>
+              Dry run
             </button>
           )}
         </div>
@@ -2219,12 +2309,14 @@ function SeoProductTab() {
       {!loading && products.map(p => {
         const isExpanded = expandedHref === p.href
         const isSelected = selected.has(p.href)
+        const isPushed = p.pushStatus === 'pushed'
+        const isPushError = p.pushStatus === 'error'
         return (
           <div key={p.href} style={{ background: '#fff', border: `1px solid ${isSelected ? '#6366f1' : '#e5e7eb'}`, borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
             {/* Collapsed row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: 'pointer' }}
               onClick={() => setExpandedHref(isExpanded ? null : p.href)}>
-              {statusFilter === 'pending' && (
+              {(statusFilter === 'pending' || statusFilter === 'approved') && (
                 <input type="checkbox" checked={isSelected} onChange={e => { e.stopPropagation(); toggleSelect(p.href) }}
                   onClick={e => e.stopPropagation()} style={{ width: 16, height: 16, flexShrink: 0, cursor: 'pointer' }} />
               )}
@@ -2259,6 +2351,16 @@ function SeoProductTab() {
                 {p.status !== 'pending' && (
                   <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'pending') }}
                     style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Undo</button>
+                )}
+                {p.status === 'approved' && shopifyConfig?.configured && !isPushed && (
+                  <button onClick={e => { e.stopPropagation(); pushToShopify([p.href]) }} disabled={pushing}
+                    style={{ padding: '3px 10px', borderRadius: 6, border: 'none', background: '#0284c7', color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>↑ Push</button>
+                )}
+                {isPushed && (
+                  <span style={{ fontSize: 11, color: '#0284c7', fontWeight: 700 }}>✓ Live</span>
+                )}
+                {isPushError && (
+                  <span style={{ fontSize: 11, color: '#dc2626', fontWeight: 700 }} title={p.pushError}>⚠ Error</span>
                 )}
                 <span style={{ fontSize: 14, color: '#9ca3af', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', display: 'inline-block' }}>▾</span>
               </div>
@@ -2301,6 +2403,58 @@ function SeoProductTab() {
                     <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
                   </div>
                 </div>
+                {p.suggested?.alt_text && (
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Image Alt Text <span style={{ fontWeight: 400, textTransform: 'none', color: '#9ca3af' }}>(Shopify productUpdateMedia)</span></div>
+                    <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
+                      {p.suggested.alt_text}
+                      <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{p.suggested.alt_text.length}/125</span>
+                    </div>
+                  </div>
+                )}
+                {p.suggested?.geo_description && (
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>GEO Description <span style={{ fontWeight: 400, textTransform: 'none', color: '#9ca3af' }}>(AI assistant discoverability)</span></div>
+                    <div style={{ fontSize: 13, color: '#1d4ed8', background: '#eff6ff', borderRadius: 6, padding: '8px 12px', lineHeight: 1.6 }}>
+                      {p.suggested.geo_description}
+                    </div>
+                  </div>
+                )}
+                {/* Category-specific Shopify metafields */}
+                {p.categoryGroup && p.categoryGroup !== 'other' && (() => {
+                  const s = p.suggested || {}
+                  const catFields = {
+                    clothing:  [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
+                    shoes:     [['material','Material'],['heel_style','Heel Style'],['closure_type','Closure Type']],
+                    jewelry:   [['material','Material'],['closure_type','Closure Type']],
+                    handbags:  [['material','Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+                  }[p.categoryGroup] || []
+                  const visibleFields = catFields.filter(([k]) => s[k])
+                  if (!visibleFields.length && !s.shopify_taxonomy_gid && !s.shopify_category) return null
+                  return (
+                    <div style={{ marginTop: 14, padding: '10px 12px', background: '#fdf4ff', border: '1px solid #e9d5ff', borderRadius: 8 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 8 }}>
+                        Shopify Taxonomy — {p.categoryGroup} metafields
+                      </div>
+                      {(s.shopify_taxonomy_gid || s.shopify_category) && (
+                        <div style={{ fontSize: 12, marginBottom: 6 }}>
+                          <span style={{ color: '#6b7280', fontWeight: 600 }}>category GID: </span>
+                          {s.shopify_taxonomy_gid
+                            ? <span style={{ color: '#7c3aed', fontFamily: 'monospace', fontSize: 11 }}>{s.shopify_taxonomy_gid}</span>
+                            : <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>{s.shopify_category} — re-analyze to get GID</span>}
+                        </div>
+                      )}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 6 }}>
+                        {visibleFields.map(([key, label]) => (
+                          <div key={key} style={{ background: '#fff', borderRadius: 6, padding: '6px 10px', border: '1px solid #e9d5ff' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
+                            <div style={{ fontSize: 12, color: '#374151' }}>{s[key]}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
                 <div style={{ marginTop: 12 }}>
                   <a href={p.href} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: '#6366f1' }}>View on anneklein.com ↗</a>
                 </div>

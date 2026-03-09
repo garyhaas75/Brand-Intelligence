@@ -590,9 +590,10 @@ app.get('/api/seo-suggestions', (req, res) => {
 
 // Run a new batch (triggers the analyzer script in-process)
 app.post('/api/seo-suggestions/run', async (req, res) => {
-  const { filter = 'all', limit = 50 } = req.body || {};
+  const { filter = 'all', limit = 50, force = false } = req.body || {};
   const { spawn } = require('child_process');
   const args = [`--filter=${filter}`, `--limit=${limit}`];
+  if (force) args.push('--force');
   const child = spawn('node', [path.join(__dirname, 'analysis/seo_product_analyzer.js'), ...args], {
     env: { ...process.env },
     cwd: __dirname,
@@ -635,11 +636,52 @@ app.post('/api/seo-suggestions/bulk-approve', (req, res) => {
   res.json({ ok: true, approved: count });
 });
 
+// Push approved products to Shopify via GraphQL Admin API
+app.post('/api/seo-suggestions/push-shopify', async (req, res) => {
+  const { hrefs, dryRun = false } = req.body || {};
+  const { spawn } = require('child_process');
+  const args = [];
+  if (dryRun) args.push('--dry-run');
+  if (hrefs?.length === 1) args.push(`--href=${hrefs[0]}`);
+  else if (hrefs?.length > 1) {
+    // Write hrefs to a temp file and pass as arg (avoids shell escaping issues)
+    const tmpFile = path.join(__dirname, 'data', '.push_hrefs_tmp.json');
+    fs.writeFileSync(tmpFile, JSON.stringify(hrefs));
+    args.push(`--hrefs-file=${tmpFile}`);
+  }
+  const child = spawn('node', [path.join(__dirname, 'shopify/push_seo.js'), ...args], {
+    env: { ...process.env },
+    cwd: __dirname,
+  });
+  let output = '';
+  child.stdout.on('data', d => { output += d.toString(); });
+  child.stderr.on('data', d => { output += d.toString(); });
+  child.on('close', code => {
+    // Clean up temp file if created
+    const tmpFile = path.join(__dirname, 'data', '.push_hrefs_tmp.json');
+    if (fs.existsSync(tmpFile)) try { fs.unlinkSync(tmpFile); } catch {}
+    const data = loadSeoSuggestions();
+    const pushed = data.products.filter(p => p.pushStatus === 'pushed').length;
+    const errors = data.products.filter(p => p.pushStatus === 'error').length;
+    res.json({ ok: code === 0, output: output.slice(-3000), pushed, errors, dryRun });
+  });
+});
+
+// Shopify connection status check
+app.get('/api/shopify/status', (_req, res) => {
+  const configured = !!(process.env.SHOPIFY_STORE_DOMAIN && process.env.SHOPIFY_ADMIN_API_TOKEN);
+  res.json({
+    configured,
+    domain: process.env.SHOPIFY_STORE_DOMAIN || null,
+    apiVersion: process.env.SHOPIFY_API_VERSION || '2025-07',
+  });
+});
+
 // Export approved as CSV
 app.get('/api/seo-suggestions/export-csv', (req, res) => {
   const data = loadSeoSuggestions();
   const approved = data.products.filter(p => p.status === 'approved');
-  const rows = [['Product Name', 'Category', 'Price', 'URL', 'Meta Title', 'Meta Description', 'Tags', 'Image Insights', 'Approved At']];
+  const rows = [['Product Name', 'Category', 'Price', 'URL', 'Meta Title', 'Meta Description', 'Tags', 'Alt Text', 'GEO Description', 'Image Insights', 'Approved At']];
   for (const p of approved) {
     rows.push([
       `"${(p.name || '').replace(/"/g, '""')}"`,
@@ -649,6 +691,8 @@ app.get('/api/seo-suggestions/export-csv', (req, res) => {
       `"${(p.suggested?.meta_title || '').replace(/"/g, '""')}"`,
       `"${(p.suggested?.meta_description || '').replace(/"/g, '""')}"`,
       `"${(p.suggested?.tags || []).join(', ')}"`,
+      `"${(p.suggested?.alt_text || '').replace(/"/g, '""')}"`,
+      `"${(p.suggested?.geo_description || '').replace(/"/g, '""')}"`,
       `"${(p.suggested?.image_insights || '').replace(/"/g, '""')}"`,
       `"${p.approvedAt || ''}"`,
     ]);

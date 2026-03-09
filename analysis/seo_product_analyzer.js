@@ -1,19 +1,30 @@
 /**
- * SEO Product Analyzer — Phase 2
+ * SEO Product Analyzer — Phase 2 (updated)
  * Analyzes Anne Klein products in batches and suggests:
  *   - Optimized meta title (under 60 chars)
  *   - Optimized meta description (under 160 chars)
  *   - Improved tags (search-friendly, persona-aware)
  *   - Image insights (derived from product image via Claude Vision)
+ *   - Alt text for Shopify productUpdateMedia
+ *   - GEO description for AI assistant discoverability
+ *   - Category-specific Shopify taxonomy metafields:
+ *       clothing  → material, care_instructions, fit_type
+ *       shoes     → material, heel_style, closure_type
+ *       jewelry   → material, closure_type
+ *       handbags  → material, closure_type
+ *   - shopify_category → suggested Shopify taxonomy string for productType
  *
  * Tracks analyzed products so re-runs skip already-processed items.
+ * Use --force to re-analyze and update products already in the file.
+ *
  * Supports --filter=new_arrivals|clothing|jewelry|shoes|handbags
  * Supports --limit=N (default 50)
+ * Supports --force (re-analyze products already processed, updates in place)
  *
  * Usage:
  *   node analysis/seo_product_analyzer.js
  *   node analysis/seo_product_analyzer.js --filter=new_arrivals --limit=25
- *   node analysis/seo_product_analyzer.js --filter=clothing --limit=50
+ *   node analysis/seo_product_analyzer.js --filter=clothing --force
  */
 
 require('dotenv').config();
@@ -23,14 +34,16 @@ const path = require('path');
 const https = require('https');
 const { getBrandContext } = require('../utils/brand_context');
 
-const LOG_FILE     = path.join(__dirname, '../logs/seo_product_analyzer.log');
-const CATALOG_FILE = path.join(__dirname, '../data/product_catalog.json');
-const OUTPUT_FILE  = path.join(__dirname, '../data/seo_suggestions.json');
+const LOG_FILE       = path.join(__dirname, '../logs/seo_product_analyzer.log');
+const CATALOG_FILE   = path.join(__dirname, '../data/product_catalog.json');
+const OUTPUT_FILE    = path.join(__dirname, '../data/seo_suggestions.json');
+const TAXONOMY_FILE  = path.join(__dirname, '../data/shopify_taxonomy.json');
 
 // ─── CLI args ────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const filterArg = (args.find(a => a.startsWith('--filter=')) || '').replace('--filter=', '') || 'all';
 const limitArg  = parseInt((args.find(a => a.startsWith('--limit='))  || '').replace('--limit=', '')) || 50;
+const FORCE     = args.includes('--force');
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function log(msg) {
@@ -42,6 +55,18 @@ function log(msg) {
 function loadJSON(fp) {
   if (!fs.existsSync(fp)) return null;
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return null; }
+}
+
+// Load taxonomy and build a focused category option list for a given group.
+// Passes only level-3+ (specific) categories to Claude to keep the prompt tight.
+function getTaxonomyOptions(categoryGroup) {
+  const taxonomy = loadJSON(TAXONOMY_FILE);
+  if (!taxonomy?.byGroup) return null;
+  const cats = (taxonomy.byGroup[categoryGroup] || [])
+    .filter(c => c.level >= 3)        // only specific subcategories
+    .slice(0, 30);                    // cap at 30 to stay within prompt budget
+  if (!cats.length) return null;
+  return cats.map(c => `${c.gid} | ${c.fullName}`).join('\n');
 }
 
 function loadSuggestions() {
@@ -87,14 +112,90 @@ function filterProducts(products, filter) {
   }
 }
 
+// ─── Detect Shopify category group from product category string ───────────────
+function detectCategoryGroup(category) {
+  const c = (category || '').toLowerCase();
+  if (/shoe|heel|boot|flat|sandal|loafer|pump|wedge|mule/i.test(c)) return 'shoes';
+  if (/jewelry|earring|necklace|bracelet|ring|watch|pendant|bangle/i.test(c)) return 'jewelry';
+  if (/handbag|bag|purse|satchel|tote|crossbody|wallet|clutch/i.test(c)) return 'handbags';
+  if (/clothing|blazer|jacket|pant|dress|top|shirt|skirt|suit|cardigan|sweater|coat|blouse/i.test(c)) return 'clothing';
+  return 'other';
+}
+
+// Returns extra field instructions + JSON schema additions per category.
+// Injects real taxonomy GIDs from the synced taxonomy file so Claude picks
+// an exact valid GID instead of guessing a free-text string.
+function getCategoryPromptSection(categoryGroup, hasImage) {
+  const imageNote = hasImage ? ' (infer from the image if visible)' : ' (infer from the product name/description)';
+  const taxonomyOptions = getTaxonomyOptions(categoryGroup);
+
+  const taxonomyInstruction = taxonomyOptions
+    ? `shopify_taxonomy_gid: Pick the single most specific matching GID from this list (return only the GID string, e.g. "gid://shopify/TaxonomyCategory/aa-1-4-3"):
+${taxonomyOptions}`
+    : `shopify_taxonomy_gid: The Shopify taxonomy GID for this product type (format: "gid://shopify/TaxonomyCategory/aa-X-X").`;
+
+  switch (categoryGroup) {
+    case 'clothing':
+      return {
+        fields: `7. material: The primary fabric or material composition${imageNote}. Be specific: "Ponte knit blend", "Stretch crepe", "Woven polyester". Not just "fabric".
+8. care_instructions: One line, practical${imageNote}. E.g., "Machine wash cold, tumble dry low" or "Hand wash or dry clean recommended".
+9. fit_type: How it fits the body${imageNote}. One of: Slim, Regular, Relaxed, Tailored, Fitted, Straight. One word or short phrase.
+10. ${taxonomyInstruction}`,
+        schema: `  "material": "",
+  "care_instructions": "",
+  "fit_type": "",
+  "shopify_taxonomy_gid": ""`,
+      };
+
+    case 'shoes':
+      return {
+        fields: `7. material: Upper material${imageNote}. E.g., "Faux leather upper, synthetic sole" or "Suede upper, leather lining".
+8. heel_style: Heel type and height if visible${imageNote}. E.g., "Block heel, 2.5 inch", "Kitten heel, 1.5 inch", "Flat", "Wedge, 3 inch".
+9. closure_type: How the shoe is put on/secured${imageNote}. E.g., "Slip-on", "Ankle strap with buckle", "Side zip", "Lace-up".
+10. ${taxonomyInstruction}`,
+        schema: `  "material": "",
+  "heel_style": "",
+  "closure_type": "",
+  "shopify_taxonomy_gid": ""`,
+      };
+
+    case 'jewelry':
+      return {
+        fields: `7. material: Metal finish and base material${imageNote}. E.g., "Gold-tone base metal", "Silver-tone stainless steel", "Rose gold-plated brass".
+8. closure_type: How the piece fastens${imageNote}. For earrings: "Push back", "Lever back", "Clip-on". For necklaces: "Lobster clasp". For bracelets: "Toggle clasp", "Magnetic clasp".
+9. ${taxonomyInstruction}`,
+        schema: `  "material": "",
+  "closure_type": "",
+  "shopify_taxonomy_gid": ""`,
+      };
+
+    case 'handbags':
+      return {
+        fields: `7. material: Exterior material${imageNote}. E.g., "Faux leather with fabric lining", "Quilted nylon", "Smooth vegan leather".
+8. closure_type: How the bag closes${imageNote}. E.g., "Magnetic snap flap", "Zip-top", "Open top with inner zip pocket", "Flap with turn-lock".
+9. strap_drop: Strap length or carry style${imageNote}. E.g., "10-inch top handle drop", "22-inch adjustable strap", "Detachable chain strap".
+10. ${taxonomyInstruction}`,
+        schema: `  "material": "",
+  "closure_type": "",
+  "strap_drop": "",
+  "shopify_taxonomy_gid": ""`,
+      };
+
+    default:
+      return {
+        fields: `7. ${taxonomyInstruction}`,
+        schema: `  "shopify_taxonomy_gid": ""`,
+      };
+  }
+}
+
 // ─── Main analysis function ───────────────────────────────────────────────────
 async function analyzeProduct(client, product, brandContext) {
   const imageData = product.image ? await fetchImageBase64(product.image) : null;
+  const categoryGroup = detectCategoryGroup(product.category);
+  const catSection = getCategoryPromptSection(categoryGroup, !!imageData);
 
-  // Build the message content
   const content = [];
-
-  // If we have an image, include it for vision analysis
   if (imageData) {
     content.push({
       type: 'image',
@@ -109,39 +210,46 @@ async function analyzeProduct(client, product, brandContext) {
 
   content.push({
     type: 'text',
-    text: `You are an SEO specialist for Anne Klein, a women's workwear brand.
+    text: `You are an SEO and merchandising specialist for Anne Klein, a women's workwear brand.
 
 BRAND CONTEXT:
 ${brandContext}
 
 PRODUCT:
 Name: ${product.name}
-Category: ${product.category || 'Unknown'}
+Category: ${product.category || 'Unknown'} (type: ${categoryGroup})
 Price: ${product.price || 'Unknown'}
 Current description: ${(product.description || '').substring(0, 400)}
 Current tags: ${existingTags || 'none'}
 ${imageData ? 'Product image included above.' : 'No image available.'}
 
-${imageData ? `First, analyze the product image and note: material appearance, silhouette/cut, occasion suitability, who it is clearly for.` : ''}
+${imageData ? 'First, analyze the product image: material appearance, silhouette/cut, construction details, occasion suitability.' : ''}
 
-Then generate:
-1. meta_title: Under 60 characters. Include product type + key attribute + brand name. Natural, not keyword-stuffed. Example: "Ponte Blazer with Welt Pockets | Anne Klein"
-2. meta_description: Under 160 characters. Lead with what makes this piece worth buying for a professional woman. Include 1-2 search-natural phrases. End with a soft CTA.
-3. tags: 6-10 clean, search-friendly tags. Mix of: product type, occasion (work, office, professional), style descriptor, material if obvious from image. No internal codes, dates, or operational tags.
-4. image_insights: ${imageData ? '1-2 sentences on what the image reveals about material, silhouette, and occasion — facts the current description may be missing.' : 'null (no image)'}
+Generate ALL of the following fields:
 
-Return ONLY valid JSON:
+1. meta_title: Under 60 characters. Product type + key attribute + brand name. Natural, not keyword-stuffed. Example: "Ponte Blazer with Welt Pockets | Anne Klein"
+2. meta_description: Under 160 characters. Lead with the purchase reason for a professional woman. Include 1-2 natural search phrases. Soft CTA at end.
+3. tags: 6-10 clean search-friendly tags. Mix: product type, occasion (work, office, professional), style descriptor, material. No internal codes or operational tags.
+4. image_insights: ${imageData ? '1-2 sentences on what the image reveals about material, silhouette, and occasion that the current description misses.' : 'null'}
+5. alt_text: Under 125 characters. Descriptive image alt text. Describe what is literally shown: product type, color, key style details. Do NOT start with "Image of" or "Photo of".
+6. geo_description: 2-3 sentences for AI assistant discoverability. Answer a query like "best blazers for work" or "professional outfit ideas". Name product type and brand naturally. Include one specific functional feature. No superlatives.
+${catSection.fields}
+
+Return ONLY valid JSON (no markdown, no explanation):
 {
   "meta_title": "",
   "meta_description": "",
   "tags": [],
-  "image_insights": ""
+  "image_insights": "",
+  "alt_text": "",
+  "geo_description": "",
+  ${catSection.schema}
 }`,
   });
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 500,
+    max_tokens: 800,
     messages: [{ role: 'user', content }],
   });
 
@@ -162,7 +270,7 @@ async function run() {
   const logsDir = path.join(__dirname, '../logs');
   if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-  log(`=== SEO Product Analyzer Started — filter: ${filterArg}, limit: ${limitArg} ===`);
+  log(`=== SEO Product Analyzer Started — filter: ${filterArg}, limit: ${limitArg}${FORCE ? ', FORCE re-analyze' : ''} ===`);
 
   const catalog = loadJSON(CATALOG_FILE);
   if (!catalog?.products?.length) {
@@ -173,17 +281,17 @@ async function run() {
   const suggestions = loadSuggestions();
   const analyzedHrefs = new Set(suggestions.products.map(p => p.href));
 
-  // Filter + exclude already analyzed
+  // Filter products — with --force, include already-analyzed ones too
   const pool = filterProducts(catalog.products, filterArg)
-    .filter(p => !analyzedHrefs.has(p.href));
+    .filter(p => FORCE ? true : !analyzedHrefs.has(p.href));
 
   if (pool.length === 0) {
-    log(`No unanalyzed products found for filter "${filterArg}". All done or try a different filter.`);
+    log(`No products found for filter "${filterArg}"${FORCE ? '' : ' (all already analyzed — use --force to re-analyze)'}. Done.`);
     process.exit(0);
   }
 
   const batch = pool.slice(0, limitArg);
-  log(`${pool.length} unanalyzed products in pool. Analyzing ${batch.length} now.`);
+  log(`${pool.length} products in pool. Analyzing ${batch.length} now.`);
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext();
@@ -193,16 +301,18 @@ async function run() {
 
   for (let i = 0; i < batch.length; i++) {
     const product = batch[i];
-    log(`  [${i + 1}/${batch.length}] ${product.name.substring(0, 60)}`);
+    const categoryGroup = detectCategoryGroup(product.category);
+    log(`  [${i + 1}/${batch.length}] [${categoryGroup}] ${product.name.substring(0, 55)}`);
 
     try {
       const suggested = await analyzeProduct(client, product, brandContext);
 
-      suggestions.products.push({
+      const entry = {
         href: product.href,
         id: product.id,
         name: product.name,
         category: product.category,
+        categoryGroup,
         image: product.image || null,
         price: product.price,
         isNewArrival: product.isNewArrival || false,
@@ -214,7 +324,24 @@ async function run() {
         status: 'pending',
         analyzedAt: new Date().toISOString(),
         approvedAt: null,
-      });
+      };
+
+      if (FORCE && analyzedHrefs.has(product.href)) {
+        // Update in place — preserve approval status and push state
+        const idx = suggestions.products.findIndex(p => p.href === product.href);
+        const existing = suggestions.products[idx];
+        suggestions.products[idx] = {
+          ...entry,
+          status: existing.status,
+          approvedAt: existing.approvedAt,
+          pushStatus: existing.pushStatus,
+          pushedAt: existing.pushedAt,
+          shopifyGid: existing.shopifyGid,
+        };
+        log(`    → Updated (was ${existing.status})`);
+      } else {
+        suggestions.products.push(entry);
+      }
 
       successCount++;
     } catch (err) {
@@ -222,7 +349,6 @@ async function run() {
       errorCount++;
     }
 
-    // Small delay to respect rate limits
     if (i < batch.length - 1) await new Promise(r => setTimeout(r, 300));
   }
 
