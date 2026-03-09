@@ -58,43 +58,90 @@ function loadJSON(fp) {
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return null; }
 }
 
-// Anne Klein-relevant level-2 GID prefixes for clothing.
-// Excludes activewear, baby/children, lingerie, maternity, men's, sleepwear, socks, swimwear, uniforms.
-const AK_CLOTHING_PREFIXES = [
-  'aa-1-4',   // Dresses
-  'aa-1-10',  // Outerwear (coats, jackets, sport jackets)
-  'aa-1-11',  // Outfit Sets
-  'aa-1-12',  // Pants
-  'aa-1-13',  // Clothing Tops (blouses, shirts, tunics)
-  'aa-1-14',  // Shorts
-  'aa-1-15',  // Skirts
-  'aa-1-16',  // Skorts
-  'aa-1-19',  // Suits (pant suits, skirt suits, tuxedos)
-  'aa-1-3',   // Cardigans & Knitwear (if present)
-  'aa-1-5',   // Jackets & Vests (if present)
-  'aa-1-21',  // Sweaters (if present)
-];
+// Inline taxonomy — embedded so Railway volume mount can't shadow the file.
+// Sourced from Shopify product taxonomy 2026-05. Update quarterly via sync_taxonomy.js.
+// Only AK-relevant categories included (women's workwear, shoes, jewelry, handbags).
+const INLINE_TAXONOMY = {
+  clothing: [
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-1 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Bolero Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-2 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Bomber Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-3 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Capes',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-5 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Overcoats',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-6 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Parkas',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-7 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Pea Coats',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-8 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Ponchos',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-9 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Puffer Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-10 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Rain Coats',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-11 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Sport Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-12 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Track Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-13 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Trench Coats',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-14 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Trucker Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-15 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Varsity Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-16 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Windbreakers',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2-17 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets > Wrap Coats',
+    'gid://shopify/TaxonomyCategory/aa-1-13-1 | Apparel & Accessories > Clothing > Clothing Tops > Blouses',
+    'gid://shopify/TaxonomyCategory/aa-1-13-2 | Apparel & Accessories > Clothing > Clothing Tops > Bodysuits',
+    'gid://shopify/TaxonomyCategory/aa-1-13-3 | Apparel & Accessories > Clothing > Clothing Tops > Cardigans',
+    'gid://shopify/TaxonomyCategory/aa-1-13-5 | Apparel & Accessories > Clothing > Clothing Tops > Overshirts',
+    'gid://shopify/TaxonomyCategory/aa-1-13-7 | Apparel & Accessories > Clothing > Clothing Tops > Shirts',
+    'gid://shopify/TaxonomyCategory/aa-1-13-12 | Apparel & Accessories > Clothing > Clothing Tops > Sweaters',
+    'gid://shopify/TaxonomyCategory/aa-1-13-9 | Apparel & Accessories > Clothing > Clothing Tops > Tank Tops',
+    'gid://shopify/TaxonomyCategory/aa-1-13-11 | Apparel & Accessories > Clothing > Clothing Tops > Tunics',
+    'gid://shopify/TaxonomyCategory/aa-1-10-2 | Apparel & Accessories > Clothing > Outerwear > Coats & Jackets',
+    'gid://shopify/TaxonomyCategory/aa-1-10-6 | Apparel & Accessories > Clothing > Outerwear > Vests',
+    'gid://shopify/TaxonomyCategory/aa-1-12-3 | Apparel & Accessories > Clothing > Pants > Chinos',
+    'gid://shopify/TaxonomyCategory/aa-1-12-4 | Apparel & Accessories > Clothing > Pants > Jeans',
+    'gid://shopify/TaxonomyCategory/aa-1-12-8 | Apparel & Accessories > Clothing > Pants > Leggings',
+    'gid://shopify/TaxonomyCategory/aa-1-12-11 | Apparel & Accessories > Clothing > Pants > Trousers',
+    'gid://shopify/TaxonomyCategory/aa-1-19-1 | Apparel & Accessories > Clothing > Suits > Pant Suits',
+    'gid://shopify/TaxonomyCategory/aa-1-19-2 | Apparel & Accessories > Clothing > Suits > Skirt Suits',
+    'gid://shopify/TaxonomyCategory/aa-1-13 | Apparel & Accessories > Clothing > Clothing Tops',
+    'gid://shopify/TaxonomyCategory/aa-1-4 | Apparel & Accessories > Clothing > Dresses',
+    'gid://shopify/TaxonomyCategory/aa-1-10 | Apparel & Accessories > Clothing > Outerwear',
+    'gid://shopify/TaxonomyCategory/aa-1-11 | Apparel & Accessories > Clothing > Outfit Sets',
+    'gid://shopify/TaxonomyCategory/aa-1-12 | Apparel & Accessories > Clothing > Pants',
+    'gid://shopify/TaxonomyCategory/aa-1-15 | Apparel & Accessories > Clothing > Skirts',
+    'gid://shopify/TaxonomyCategory/aa-1-19 | Apparel & Accessories > Clothing > Suits',
+  ].join('\n'),
+  shoes: [
+    'gid://shopify/TaxonomyCategory/aa-8-1 | Apparel & Accessories > Shoes > Athletic Shoes',
+    'gid://shopify/TaxonomyCategory/aa-8-3 | Apparel & Accessories > Shoes > Boots',
+    'gid://shopify/TaxonomyCategory/aa-8-9 | Apparel & Accessories > Shoes > Flats',
+    'gid://shopify/TaxonomyCategory/aa-8-10 | Apparel & Accessories > Shoes > Heels',
+    'gid://shopify/TaxonomyCategory/aa-8-6 | Apparel & Accessories > Shoes > Sandals',
+    'gid://shopify/TaxonomyCategory/aa-8-7 | Apparel & Accessories > Shoes > Slippers',
+    'gid://shopify/TaxonomyCategory/aa-8-8 | Apparel & Accessories > Shoes > Sneakers',
+  ].join('\n'),
+  jewelry: [
+    'gid://shopify/TaxonomyCategory/aa-6-3 | Apparel & Accessories > Jewelry > Bracelets',
+    'gid://shopify/TaxonomyCategory/aa-6-4 | Apparel & Accessories > Jewelry > Brooches & Lapel Pins',
+    'gid://shopify/TaxonomyCategory/aa-6-5 | Apparel & Accessories > Jewelry > Charms & Pendants',
+    'gid://shopify/TaxonomyCategory/aa-6-6 | Apparel & Accessories > Jewelry > Earrings',
+    'gid://shopify/TaxonomyCategory/aa-6-7 | Apparel & Accessories > Jewelry > Jewelry Sets',
+    'gid://shopify/TaxonomyCategory/aa-6-8 | Apparel & Accessories > Jewelry > Necklaces',
+    'gid://shopify/TaxonomyCategory/aa-6-9 | Apparel & Accessories > Jewelry > Rings',
+    'gid://shopify/TaxonomyCategory/aa-6-12 | Apparel & Accessories > Jewelry > Smart Watches',
+    'gid://shopify/TaxonomyCategory/aa-6-11 | Apparel & Accessories > Jewelry > Watches',
+  ].join('\n'),
+  handbags: [
+    'gid://shopify/TaxonomyCategory/aa-5-4-5 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Clutch Bags',
+    'gid://shopify/TaxonomyCategory/aa-5-4-7 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Cross Body Bags',
+    'gid://shopify/TaxonomyCategory/aa-5-4-9 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Envelope Clutches',
+    'gid://shopify/TaxonomyCategory/aa-5-4-12 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Hobo Bags',
+    'gid://shopify/TaxonomyCategory/aa-5-4-16 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Satchel Bags',
+    'gid://shopify/TaxonomyCategory/aa-5-4-18 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Shopper Bags',
+    'gid://shopify/TaxonomyCategory/aa-5-4-19 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags > Shoulder Bags',
+    'gid://shopify/TaxonomyCategory/aa-5-5-2 | Apparel & Accessories > Handbags, Wallets & Cases > Wallets & Money Clips > Card Cases',
+    'gid://shopify/TaxonomyCategory/aa-5-5-3 | Apparel & Accessories > Handbags, Wallets & Cases > Wallets & Money Clips > Coin Purses',
+    'gid://shopify/TaxonomyCategory/aa-5-5-7 | Apparel & Accessories > Handbags, Wallets & Cases > Wallets & Money Clips > Wallets',
+    'gid://shopify/TaxonomyCategory/aa-5-4 | Apparel & Accessories > Handbags, Wallets & Cases > Handbags',
+    'gid://shopify/TaxonomyCategory/aa-5-5 | Apparel & Accessories > Handbags, Wallets & Cases > Wallets & Money Clips',
+  ].join('\n'),
+};
 
-// Load taxonomy and build a focused category option list for a given group.
-// For clothing: filters to Anne Klein-relevant subcategories, sorts deepest-first.
-// Passes only level-3+ (specific) categories to Claude to keep the prompt tight.
+// Return the inline taxonomy options string for the given category group.
 function getTaxonomyOptions(categoryGroup) {
-  const taxonomy = loadJSON(TAXONOMY_FILE);
-  if (!taxonomy?.byGroup) return null;
-  let cats = (taxonomy.byGroup[categoryGroup] || []).filter(c => c.level >= 2);
-
-  if (categoryGroup === 'clothing') {
-    // Restrict to women's workwear-relevant subcategory trees
-    cats = cats.filter(c => AK_CLOTHING_PREFIXES.some(pfx => {
-      const id = c.gid.replace('gid://shopify/TaxonomyCategory/', '');
-      return id === pfx || id.startsWith(pfx + '-');
-    }));
-  }
-
-  // Sort deepest (most specific) first so Claude always sees leaf-level options
-  cats = cats.sort((a, b) => b.level - a.level).slice(0, 60);
-  if (!cats.length) return null;
-  return cats.map(c => `${c.gid} | ${c.fullName}`).join('\n');
+  return INLINE_TAXONOMY[categoryGroup] || null;
 }
 
 function loadSuggestions() {
