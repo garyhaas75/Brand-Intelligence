@@ -1205,7 +1205,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 
       {/* Sub-tab toggle */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: `1px solid ${T.border}`, paddingBottom: 0 }}>
-        {[{ id: 'planner', label: '📅 Weekly Planner' }, { id: 'library', label: '📚 Content Library' }].map(t => (
+        {[{ id: 'planner', label: '📅 Weekly Planner' }, { id: 'library', label: '⚡ Quick Create' }].map(t => (
           <button key={t.id} onClick={() => setSubTab(t.id)}
             style={{ padding: '10px 20px', border: 'none', borderBottom: subTab === t.id ? '2px solid #6366f1' : '2px solid transparent', background: 'none', color: subTab === t.id ? '#6366f1' : T.textSub, fontWeight: 700, fontSize: 14, cursor: 'pointer', marginBottom: -1 }}>
             {t.label}
@@ -1260,7 +1260,12 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 
             {/* Volume controls */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Content Volumes</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Content Volumes</div>
+                <div style={{ fontSize: 11, color: T.textFaint }}>
+                  {activeCampaigns.length > 0 ? `· from "${activeCampaigns[0].name}" — adjust to override` : '· no active campaign'}
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {[{ label: '📧 Emails', key: 'email' }, { label: '📱 Instagram', key: 'instagram' }, { label: '🏠 Hero', key: 'hero' }].map(f => (
                   <div key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 8, background: T.stripeBg, borderRadius: 8, padding: '6px 12px' }}>
@@ -1454,16 +1459,19 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         </div>
       )}
 
-      {/* ══════════ CONTENT LIBRARY ══════════ */}
+      {/* ══════════ QUICK CREATE ══════════ */}
       {subTab === 'library' && (
         <div>
+          <div style={{ background: T.stripeBg, borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: T.textMuted, lineHeight: 1.6 }}>
+            Use <strong style={{ color: T.textSub }}>Quick Create</strong> for one-off pieces outside your campaign plan — a flash sale email, an urgent IG post, or content for a week with no active campaign.
+          </div>
           <ContentGeneratorPanel />
           {!c ? (
-            <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No content library data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
+            <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No bulk content data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
           ) : (
           <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-            <SectionHeader style={{ marginBottom: 0 }}>Content Library</SectionHeader>
+            <SectionHeader style={{ marginBottom: 0, color: T.textMuted, fontSize: 14 }}>Legacy Bulk Content</SectionHeader>
             <button onClick={regenerateContent} disabled={regenerating}
               style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: regenerating ? 'not-allowed' : 'pointer', opacity: regenerating ? 0.7 : 1 }}>
               {regenerating ? 'Regenerating… (~4 min)' : 'Regenerate All'}
