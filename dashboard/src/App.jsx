@@ -1007,46 +1007,171 @@ function ContentGeneratorPanel() {
   )
 }
 
+function getMonday(dateStr) {
+  const d = new Date(dateStr)
+  const day = d.getDay() // 0=Sun, 1=Mon
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return d.toISOString().split('T')[0]
+}
+
+function formatWeekRange(weekStart) {
+  const start = new Date(weekStart)
+  const end = new Date(weekStart)
+  end.setDate(end.getDate() + 6)
+  const opts = { month: 'short', day: 'numeric' }
+  const startStr = start.toLocaleDateString('en-US', opts)
+  const endStr = end.getDate()
+  const year = end.getFullYear()
+  return `${startStr}–${endStr}, ${year}`
+}
+
 function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   const T = useT()
+  const today = new Date().toISOString().split('T')[0]
+  const [subTab, setSubTab] = useState('planner')
+
+  // Planner state
+  const [weekStart, setWeekStart] = useState(() => getMonday(today))
+  const [planItems, setPlanItems] = useState([])
+  const [ownableEvents, setOwnableEvents] = useState([])
+  const [generating, setGenerating] = useState(false)
+  const [channelFilter, setChannelFilter] = useState('all')
+  const [itemDates, setItemDates] = useState({})
+  const [addingToCalendar, setAddingToCalendar] = useState(false)
+  const [plannerToast, setPlannerToast] = useState(null)
+  const [volumes, setVolumes] = useState({ email: 2, instagram: 3, hero: 1 })
+  const [loadingPlan, setLoadingPlan] = useState(false)
+
+  // Library state (existing)
   const [activeSection, setActiveSection] = useState('email')
-  const [personaFilter, setPersonaFilter] = useState(null)
-  const [linkingAsset, setLinkingAsset] = useState(null)
-  const [linkedToast, setLinkedToast] = useState(null)
   const [regenerating, setRegenerating] = useState(false)
-  const [schedulingAsset, setSchedulingAsset] = useState(null) // { key, channel, fields }
-  const [scheduleDate, setScheduleDate] = useState('')
-  const [scheduleCampaignId, setScheduleCampaignId] = useState('')
-  const [scheduleToast, setScheduleToast] = useState(null)
   const c = content?.content
 
-  async function scheduleToCalendar() {
-    if (!scheduleDate) return
-    const { channel, fields } = schedulingAsset
-    const camp = activeCampaigns.find(c => c.id === scheduleCampaignId)
-    const res = await fetch('/api/calendar/item', {
+  // Compute active campaigns for this week
+  const activeCampaigns = (campaigns || []).filter(camp => {
+    if (camp.status === 'archived') return false
+    const s = new Date(camp.startDate), e = new Date(camp.endDate), w = new Date(weekStart)
+    return s <= w && e >= w
+  }).map(camp => {
+    const s = new Date(camp.startDate), w = new Date(weekStart)
+    const weekNum = Math.floor((w - s) / (7 * 24 * 60 * 60 * 1000)) + 1
+    const totalWeeks = Math.ceil((new Date(camp.endDate) - s) / (7 * 24 * 60 * 60 * 1000))
+    const arcWeek = (camp.storyArc || []).find(aw => aw.weekNum === weekNum) || null
+    return { ...camp, weekNum, totalWeeks, arcWeek }
+  })
+
+  // Sync volumes from first active campaign's contentVolumes
+  useEffect(() => {
+    const camp = activeCampaigns[0]
+    if (camp?.contentVolumes) setVolumes(camp.contentVolumes)
+  }, [weekStart, campaigns.length])
+
+  // Fetch plan + events when week changes
+  useEffect(() => {
+    setLoadingPlan(true)
+    const year = new Date(weekStart).getFullYear()
+    Promise.all([
+      fetch(`/api/weekly-plan?week=${weekStart}`).then(r => r.json()).catch(() => []),
+      fetch(`/api/ownable-events?year=${year}`).then(r => r.json()).catch(() => []),
+    ]).then(([plan, events]) => {
+      setPlanItems(Array.isArray(plan) ? plan : [])
+      setOwnableEvents(Array.isArray(events) ? events : [])
+      setLoadingPlan(false)
+    })
+  }, [weekStart])
+
+  function navigateWeek(dir) {
+    const d = new Date(weekStart)
+    d.setDate(d.getDate() + dir * 7)
+    setWeekStart(d.toISOString().split('T')[0])
+    setChannelFilter('all')
+    setItemDates({})
+  }
+
+  // Events happening in next 14 days from weekStart
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekEnd.getDate() + 14)
+  const upcomingEvents = ownableEvents.filter(e => {
+    if (!e.date) return false
+    const d = new Date(e.date)
+    return d >= new Date(weekStart) && d <= weekEnd
+  })
+
+  async function generateContent() {
+    setGenerating(true)
+    setPlannerToast(null)
+    try {
+      const res = await fetch('/api/weekly-plan/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weekStart,
+          campaignIds: activeCampaigns.map(c => c.id),
+          volumes,
+          ownableEventIds: upcomingEvents.map(e => e.id),
+        }),
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setPlanItems(data.items || [])
+        setChannelFilter('all')
+        setPlannerToast(`Generated ${data.count} content pieces`)
+        setTimeout(() => setPlannerToast(null), 3000)
+      } else {
+        setPlannerToast(`Error: ${data.error}`)
+        setTimeout(() => setPlannerToast(null), 5000)
+      }
+    } catch (err) {
+      setPlannerToast(`Error: ${err.message}`)
+      setTimeout(() => setPlannerToast(null), 5000)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  function toggleApprove(itemId) {
+    setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, approved: !i.approved } : i))
+    fetch('/api/weekly-plan/approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        date: scheduleDate,
-        channel,
-        status: 'brief',
-        campaignId: scheduleCampaignId || null,
-        personaTarget: fields.targetPersona || '',
-        theme: fields.theme || fields.category || '',
-        subjectLine: fields.subjectLine || '',
-        previewText: fields.previewText || '',
-        brief: fields.brief || fields.caption || '',
-        notes: fields.imageryNotes || '',
-      }),
+      body: JSON.stringify({ weekStart, itemIds: [itemId] }),
     })
-    const item = await res.json()
-    if (setCalItems) setCalItems(prev => [...prev, item])
-    setSchedulingAsset(null)
-    setScheduleDate('')
-    setScheduleCampaignId('')
-    setScheduleToast(camp ? `Scheduled to ${camp.name}` : `Scheduled for ${scheduleDate}`)
-    setTimeout(() => setScheduleToast(null), 2500)
+  }
+
+  async function skipItem(itemId) {
+    setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, skipped: true } : i))
+    await fetch('/api/weekly-plan/skip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekStart, itemId }),
+    })
+  }
+
+  async function addApprovedToCalendar() {
+    const approved = planItems.filter(i => i.approved && !i.addedToCalendar)
+    if (!approved.length) return
+    setAddingToCalendar(true)
+    try {
+      const res = await fetch('/api/weekly-plan/add-to-calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weekStart,
+          itemIds: approved.map(i => i.id),
+          dates: itemDates,
+        }),
+      })
+      const data = await res.json()
+      if (data.ok) {
+        if (setCalItems) setCalItems(prev => [...prev, ...data.items])
+        setPlanItems(prev => prev.map(i => approved.find(a => a.id === i.id) ? { ...i, addedToCalendar: true } : i))
+        setPlannerToast(`Added ${data.created} items to calendar`)
+        setTimeout(() => setPlannerToast(null), 3000)
+      }
+    } finally {
+      setAddingToCalendar(false)
+    }
   }
 
   async function regenerateContent() {
@@ -1058,303 +1183,395 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       setRegenerating(false)
     }
   }
-  const activeCampaigns = (campaigns || []).filter(c => c.status !== 'archived')
 
-  async function linkToCampaign(campaignId, asset) {
-    await fetch(`/api/campaigns/${campaignId}/link-content`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(asset),
-    })
-    const camp = activeCampaigns.find(c => c.id === campaignId)
-    setLinkingAsset(null)
-    setLinkedToast(camp?.name || 'Campaign')
-    setTimeout(() => setLinkedToast(null), 2500)
-  }
+  const visibleItems = planItems.filter(i => {
+    if (i.skipped) return false
+    if (channelFilter === 'all') return true
+    return i.channel === channelFilter
+  })
 
-  const PERSONAS = ['The Polished Professional', 'The Emerging Leader', 'The Refined Rewinder', 'The Practical Multitasker']
-  const PERSONA_COLORS = {
-    'The Polished Professional': '#6366f1',
-    'The Emerging Leader': '#10b981',
-    'The Refined Rewinder': '#f59e0b',
-    'The Practical Multitasker': '#ec4899',
-  }
+  const CHANNEL_COLORS = { email: '#6366f1', instagram: '#ec4899', hero: '#8b5cf6' }
+  const CHANNEL_ICONS = { email: '📧', instagram: '📱', hero: '🏠' }
 
-  const sections = [
-    { id: 'email',    label: '📧 Email Campaigns',    count: c?.emailCampaigns?.emailCampaigns?.length },
-    { id: 'hero',     label: '🏠 Hero Headlines',     count: c?.heroHeadlines?.heroHeadlines?.length },
-    { id: 'ig',       label: '📱 Instagram',          count: c?.instagramCaptions?.instagramCaptions?.length },
-    { id: 'seo',      label: '🔍 SEO Descriptions',   count: c?.collectionDescriptions?.collectionDescriptions?.length },
-    { id: 'calendar', label: '📅 Editorial Calendar', count: c?.editorialCalendar?.editorialCalendar?.length },
-  ]
+  const approvedCount = planItems.filter(i => i.approved && !i.addedToCalendar).length
 
   return (
     <div>
-      <ContentGeneratorPanel />
-
-      {!c ? (
-        <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No scheduled content data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
-      ) : (
-      <>
-      {linkedToast && (
+      {plannerToast && (
         <div className="ak-toast" style={{ position: 'fixed', bottom: 24, right: 24, background: '#111827', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-          Added to "{linkedToast}"
+          {plannerToast}
         </div>
       )}
-      {scheduleToast && (
-        <div className="ak-toast" style={{ position: 'fixed', bottom: 72, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-          📅 {scheduleToast}
-        </div>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0, flexWrap: 'wrap', gap: 8 }}>
-        <SectionHeader style={{ marginBottom: 0 }}>Generated Content Assets</SectionHeader>
-        <button onClick={regenerateContent} disabled={regenerating}
-          style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: regenerating ? 'not-allowed' : 'pointer', opacity: regenerating ? 0.7 : 1 }}>
-          {regenerating ? 'Regenerating… (~4 min)' : 'Regenerate Content'}
-        </button>
-      </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-        {sections.map(s => (
-          <button key={s.id} onClick={() => setActiveSection(s.id)}
-            style={{ padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-              background: activeSection === s.id ? '#6366f1' : T.surfaceAlt,
-              color: activeSection === s.id ? '#fff' : T.textSub }}>
-            {s.label} {s.count ? `(${s.count})` : ''}
+
+      {/* Sub-tab toggle */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: `1px solid ${T.border}`, paddingBottom: 0 }}>
+        {[{ id: 'planner', label: '📅 Weekly Planner' }, { id: 'library', label: '📚 Content Library' }].map(t => (
+          <button key={t.id} onClick={() => setSubTab(t.id)}
+            style={{ padding: '10px 20px', border: 'none', borderBottom: subTab === t.id ? '2px solid #6366f1' : '2px solid transparent', background: 'none', color: subTab === t.id ? '#6366f1' : T.textSub, fontWeight: 700, fontSize: 14, cursor: 'pointer', marginBottom: -1 }}>
+            {t.label}
           </button>
         ))}
       </div>
 
-      {(activeSection === 'email' || activeSection === 'ig') && (
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20, alignItems: 'center' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: T.textFaint, marginRight: 2 }}>PERSONA:</span>
-          <button onClick={() => setPersonaFilter(null)}
-            style={{ padding: '4px 12px', borderRadius: 20, border: `1px solid ${T.border}`, cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              background: personaFilter === null ? T.text : T.surface,
-              color: personaFilter === null ? T.surface : T.textSub }}>
-            All
-          </button>
-          {PERSONAS.map(p => (
-            <button key={p} onClick={() => setPersonaFilter(personaFilter === p ? null : p)}
-              style={{ padding: '4px 12px', borderRadius: 20, border: `1px solid ${PERSONA_COLORS[p]}`, cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                background: personaFilter === p ? PERSONA_COLORS[p] : T.surface,
-                color: personaFilter === p ? '#fff' : PERSONA_COLORS[p] }}>
-              {p}
+      {/* ══════════ WEEKLY PLANNER ══════════ */}
+      {subTab === 'planner' && (
+        <div>
+          {/* Week navigator */}
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
+              <button onClick={() => navigateWeek(-1)}
+                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 16 }}>←</button>
+              <div style={{ flex: 1, textAlign: 'center' }}>
+                <div style={{ fontWeight: 800, fontSize: 18, color: T.text }}>{formatWeekRange(weekStart)}</div>
+                <div style={{ fontSize: 12, color: T.textMuted, marginTop: 2 }}>Week of {weekStart}</div>
+              </div>
+              <button onClick={() => navigateWeek(1)}
+                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 16 }}>→</button>
+            </div>
+
+            {/* Active campaigns */}
+            {activeCampaigns.length > 0 && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Campaigns</div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {activeCampaigns.map(camp => (
+                    <div key={camp.id} style={{ background: '#6366f110', border: '1px solid #6366f140', borderRadius: 8, padding: '5px 12px', fontSize: 12, color: '#4f46e5', fontWeight: 600 }}>
+                      {camp.name}
+                      {camp.arcWeek && <span style={{ fontWeight: 400, color: T.textSub, marginLeft: 6 }}>· Week {camp.weekNum}: {camp.arcWeek.theme}</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Upcoming ownable events */}
+            {upcomingEvents.length > 0 && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ownable Events (next 14 days)</div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {upcomingEvents.map(e => (
+                    <div key={e.id} style={{ background: e.relevance === 'high' ? '#fef3c710' : T.stripeBg, border: `1px solid ${e.relevance === 'high' ? '#f59e0b60' : T.border}`, borderRadius: 8, padding: '5px 12px', fontSize: 12, color: e.relevance === 'high' ? '#92400e' : T.textSub, fontWeight: 600 }}>
+                      {e.relevance === 'high' ? '⭐' : '📌'} {e.name} · {e.date}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Volume controls */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Content Volumes</div>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {[{ label: '📧 Emails', key: 'email' }, { label: '📱 Instagram', key: 'instagram' }, { label: '🏠 Hero', key: 'hero' }].map(f => (
+                  <div key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 8, background: T.stripeBg, borderRadius: 8, padding: '6px 12px' }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: T.textSub }}>{f.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <button onClick={() => setVolumes(v => ({ ...v, [f.key]: Math.max(0, v[f.key] - 1) }))}
+                        style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: T.text, minWidth: 24, textAlign: 'center' }}>{volumes[f.key] || 0}</span>
+                      <button onClick={() => setVolumes(v => ({ ...v, [f.key]: (v[f.key] || 0) + 1 }))}
+                        style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={generateContent} disabled={generating}
+              style={{ background: generating ? '#9ca3af' : '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: generating ? 'not-allowed' : 'pointer', width: '100%', transition: 'background 0.2s' }}>
+              {generating ? '⏳ Generating content… (30–60 sec)' : `✨ Generate Content for ${formatWeekRange(weekStart)}`}
             </button>
-          ))}
+          </Card>
+
+          {/* Generated items */}
+          {loadingPlan && (
+            <div style={{ textAlign: 'center', padding: 40, color: T.textMuted }}>Loading plan…</div>
+          )}
+
+          {!loadingPlan && planItems.length > 0 && (
+            <>
+              {/* Filter tabs + bulk action */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['all', 'email', 'instagram', 'hero'].map(ch => {
+                    const count = ch === 'all' ? planItems.filter(i => !i.skipped).length : planItems.filter(i => i.channel === ch && !i.skipped).length
+                    return (
+                      <button key={ch} onClick={() => setChannelFilter(ch)}
+                        style={{ padding: '7px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
+                          background: channelFilter === ch ? (CHANNEL_COLORS[ch] || '#6366f1') : T.surfaceAlt,
+                          color: channelFilter === ch ? '#fff' : T.textSub }}>
+                        {CHANNEL_ICONS[ch] || '🗂'} {ch === 'all' ? 'All' : ch.charAt(0).toUpperCase() + ch.slice(1)} ({count})
+                      </button>
+                    )
+                  })}
+                </div>
+                {approvedCount > 0 && (
+                  <button onClick={addApprovedToCalendar} disabled={addingToCalendar}
+                    style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 700, cursor: addingToCalendar ? 'not-allowed' : 'pointer' }}>
+                    {addingToCalendar ? 'Adding…' : `📅 Add ${approvedCount} Approved to Calendar`}
+                  </button>
+                )}
+              </div>
+
+              {/* Suggestion cards */}
+              {visibleItems.map(item => {
+                const channelColor = CHANNEL_COLORS[item.channel] || '#6366f1'
+                const campaign = (campaigns || []).find(c => c.id === item.campaignId)
+                const event = ownableEvents.find(e => e.id === item.ownableEventId)
+                return (
+                  <div key={item.id} style={{ border: `1px solid ${item.approved ? '#059669' : T.border}`, borderRadius: 12, padding: '16px 18px', marginBottom: 14, background: item.approved ? (T.surface + '08') : T.surface, transition: 'border 0.2s, background 0.2s', position: 'relative' }}>
+                    {item.addedToCalendar && (
+                      <div style={{ position: 'absolute', top: 10, right: 14, fontSize: 12, fontWeight: 700, color: '#059669', background: '#f0fdf4', borderRadius: 20, padding: '2px 10px' }}>✓ On Calendar</div>
+                    )}
+                    {/* Header row */}
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
+                      <span style={{ background: channelColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>
+                        {CHANNEL_ICONS[item.channel]} {item.channel?.toUpperCase()}
+                      </span>
+                      {campaign && (
+                        <span style={{ background: '#6366f110', border: '1px solid #6366f130', borderRadius: 20, fontSize: 11, fontWeight: 600, padding: '3px 10px', color: '#4f46e5' }}>
+                          {campaign.name}{campaign.arcWeek ? ` · Week ${campaign.weekNum}: ${campaign.arcWeek.theme}` : ''}
+                        </span>
+                      )}
+                      {event && (
+                        <span style={{ background: '#fef3c7', border: '1px solid #f59e0b50', borderRadius: 20, fontSize: 11, fontWeight: 600, padding: '3px 10px', color: '#92400e' }}>
+                          ⭐ {event.name}
+                        </span>
+                      )}
+                      {item.targetPersona && (
+                        <span style={{ fontSize: 11, color: T.textMuted, marginLeft: 'auto' }}>{item.targetPersona}</span>
+                      )}
+                    </div>
+
+                    {/* Theme */}
+                    {item.theme && <div style={{ fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 10 }}>{item.theme}</div>}
+
+                    {/* Channel-specific content */}
+                    {item.channel === 'email' && item.email && (
+                      <div style={{ display: 'grid', gap: 8 }}>
+                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>SUBJECT LINE</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>"{item.email.subjectLine}"</div>
+                        </div>
+                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>PREVIEW TEXT</div>
+                          <div style={{ fontSize: 13, color: T.textSub }}>{item.email.previewText}</div>
+                        </div>
+                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>BODY OUTLINE</div>
+                          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{item.email.bodyOutline}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textSub, flexWrap: 'wrap' }}>
+                          <span>🎯 <strong>{item.email.cta}</strong></span>
+                          {item.email.sendDay && <span>📅 Send: <strong>{item.email.sendDay}</strong></span>}
+                        </div>
+                      </div>
+                    )}
+
+                    {item.channel === 'instagram' && item.instagram && (
+                      <div style={{ display: 'grid', gap: 8 }}>
+                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>CAPTION</div>
+                          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.7 }}>{item.instagram.caption}</div>
+                        </div>
+                        {item.instagram.imageryDirection && (
+                          <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
+                            📸 {item.instagram.imageryDirection}
+                          </div>
+                        )}
+                        {item.instagram.productFeature && (
+                          <div style={{ fontSize: 13, color: T.textSub }}>🏷 Feature: <strong>{item.instagram.productFeature}</strong></div>
+                        )}
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {(item.instagram.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
+                        </div>
+                      </div>
+                    )}
+
+                    {item.channel === 'hero' && item.hero && (
+                      <div style={{ display: 'grid', gap: 8 }}>
+                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>HEADLINE</div>
+                          <div style={{ fontSize: 20, fontWeight: 800, color: T.text }}>"{item.hero.headline}"</div>
+                        </div>
+                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>SUBHEAD</div>
+                          <div style={{ fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{item.hero.subhead}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textSub, flexWrap: 'wrap' }}>
+                          <span>🎯 <strong>{item.hero.cta}</strong></span>
+                        </div>
+                        {item.hero.imageDirection && (
+                          <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#6d28d9', fontStyle: 'italic' }}>
+                            🖼 {item.hero.imageDirection}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Actions row */}
+                    {!item.addedToCalendar && (
+                      <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+                        <button onClick={() => toggleApprove(item.id)}
+                          style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${item.approved ? '#059669' : T.border}`, background: item.approved ? '#059669' : T.surface, color: item.approved ? '#fff' : T.textSub, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}>
+                          {item.approved ? '✓ Approved' : '✓ Approve'}
+                        </button>
+                        {!item.approved && (
+                          <button onClick={() => skipItem(item.id)}
+                            style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.textMuted, fontSize: 13, cursor: 'pointer' }}>
+                            ✕ Skip
+                          </button>
+                        )}
+                        {item.approved && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: 12, color: T.textMuted }}>Send date:</span>
+                            <input type="date" value={itemDates[item.id] || ''} placeholder={weekStart}
+                              onChange={e => setItemDates(prev => ({ ...prev, [item.id]: e.target.value }))}
+                              style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 12, background: T.inputBg, color: T.text }} />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+
+              {visibleItems.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '30px 20px', color: T.textFaint }}>
+                  No {channelFilter === 'all' ? '' : channelFilter + ' '}items to show
+                </div>
+              )}
+            </>
+          )}
+
+          {!loadingPlan && planItems.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: T.textFaint }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>✨</div>
+              <div style={{ fontWeight: 600, fontSize: 16, color: T.textMuted, marginBottom: 6 }}>No content generated yet for this week</div>
+              <div style={{ fontSize: 13 }}>Set your volumes and click Generate to create AI-powered content suggestions.</div>
+            </div>
+          )}
         </div>
       )}
 
-      {activeSection === 'email' && (c?.emailCampaigns?.emailCampaigns || []).filter(e => !personaFilter || e.targetPersona === personaFilter).map((e, i) => {
-        const products = getProductsForCampaign(e.theme, e.brief, catalog)
-        const pColor = PERSONA_COLORS[e.targetPersona] || '#9ca3af'
-        return (
-          <Card key={i} title={`Week ${e.week}${e.dayOfWeek ? ' · ' + e.dayOfWeek : ''}: ${e.theme}`} accent="#6366f1">
-            {e.targetPersona && (
-              <div style={{ marginBottom: 10 }}>
-                <span style={{ background: pColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>{e.targetPersona}</span>
+      {/* ══════════ CONTENT LIBRARY ══════════ */}
+      {subTab === 'library' && (
+        <div>
+          <ContentGeneratorPanel />
+          {!c ? (
+            <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No content library data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
+          ) : (
+          <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+            <SectionHeader style={{ marginBottom: 0 }}>Content Library</SectionHeader>
+            <button onClick={regenerateContent} disabled={regenerating}
+              style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: regenerating ? 'not-allowed' : 'pointer', opacity: regenerating ? 0.7 : 1 }}>
+              {regenerating ? 'Regenerating… (~4 min)' : 'Regenerate All'}
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {[
+              { id: 'email',    label: '📧 Email Campaigns',    count: c?.emailCampaigns?.emailCampaigns?.length },
+              { id: 'hero',     label: '🏠 Hero Headlines',     count: c?.heroHeadlines?.heroHeadlines?.length },
+              { id: 'ig',       label: '📱 Instagram',          count: c?.instagramCaptions?.instagramCaptions?.length },
+              { id: 'seo',      label: '🔍 SEO Descriptions',   count: c?.collectionDescriptions?.collectionDescriptions?.length },
+              { id: 'calendar', label: '📅 Editorial Calendar', count: c?.editorialCalendar?.editorialCalendar?.length },
+            ].map(s => (
+              <button key={s.id} onClick={() => setActiveSection(s.id)}
+                style={{ padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
+                  background: activeSection === s.id ? '#6366f1' : T.surfaceAlt,
+                  color: activeSection === s.id ? '#fff' : T.textSub }}>
+                {s.label} {s.count ? `(${s.count})` : ''}
+              </button>
+            ))}
+          </div>
+
+          {activeSection === 'email' && (c?.emailCampaigns?.emailCampaigns || []).map((e, i) => (
+            <Card key={i} title={`Week ${e.week}${e.dayOfWeek ? ' · ' + e.dayOfWeek : ''}: ${e.theme}`} accent="#6366f1">
+              <div className="ak-content-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
+                <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>SUBJECT LINE</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>"{e.subjectLine}"</div>
+                </div>
+                <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>PREVIEW TEXT</div>
+                  <div style={{ fontSize: 13, color: T.textSub }}>{e.previewText}</div>
+                </div>
               </div>
-            )}
-            <div className="ak-content-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
-              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>SUBJECT LINE</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>"{e.subjectLine}"</div>
+              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>BRIEF</div>
+                <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{e.brief}</div>
               </div>
-              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>PREVIEW TEXT</div>
-                <div style={{ fontSize: 13, color: T.textSub }}>{e.previewText}</div>
+              <div style={{ fontSize: 13, color: T.textSub }}>🎯 CTA: <strong>{e.ctaButton}</strong> · 📅 {e.sendTiming}</div>
+            </Card>
+          ))}
+
+          {activeSection === 'hero' && (c?.heroHeadlines?.heroHeadlines || []).map((h, i) => (
+            <Card key={i} accent="#8b5cf6">
+              <div style={{ fontSize: 22, fontWeight: 800, color: T.text, marginBottom: 10, lineHeight: 1.3 }}>"{h.headline}"</div>
+              <div style={{ fontSize: 14, color: T.textSub, marginBottom: 10, lineHeight: 1.6 }}>{h.subhead}</div>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 13 }}>
+                <Badge color="purple">CTA: {h.cta}</Badge>
+                <span style={{ color: T.textMuted }}>{h.bestFor}</span>
               </div>
-            </div>
-            <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>BRIEF</div>
-              <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{e.brief}</div>
-            </div>
-            <div style={{ display: 'flex', gap: 12, fontSize: 13, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-              <span>🎯 CTA: <strong>{e.ctaButton}</strong></span>
-              <span>📅 {e.sendTiming}</span>
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                {/* Schedule to Calendar */}
-                {schedulingAsset?.key === `email-${i}` ? (
-                  <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#f0fdf4', border: '1px solid #6ee7b7', borderRadius: 8, padding: '4px 8px' }}>
-                    <input type="date" value={scheduleDate} onChange={ev => setScheduleDate(ev.target.value)}
-                      style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }} />
-                    {activeCampaigns.length > 0 && (
-                      <select value={scheduleCampaignId} onChange={ev => setScheduleCampaignId(ev.target.value)}
-                        style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }}>
-                        <option value="">No campaign</option>
-                        {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                      </select>
-                    )}
-                    <button onClick={scheduleToCalendar} disabled={!scheduleDate}
-                      style={{ padding: '2px 8px', borderRadius: 5, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Add</button>
-                    <button onClick={() => setSchedulingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.textMuted, fontSize: 12 }}>✕</button>
+            </Card>
+          ))}
+
+          {activeSection === 'ig' && (c?.instagramCaptions?.instagramCaptions || []).map((g, i) => (
+            <Card key={i} title={g.category} accent="#ec4899">
+              <div style={{ fontSize: 14, color: T.textSub, lineHeight: 1.7, marginBottom: 10 }}>{g.caption}</div>
+              {g.imageryNotes && (
+                <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', marginBottom: 10, fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
+                  📸 {g.imageryNotes}
+                </div>
+              )}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {(g.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
+              </div>
+            </Card>
+          ))}
+
+          {activeSection === 'seo' && (c?.collectionDescriptions?.collectionDescriptions || []).map((d, i) => (
+            <Card key={i} title={d.collection} accent="#10b981">
+              <div style={{ marginBottom: 10, display: 'flex', gap: 8 }}>
+                <Badge color="green">KW: {d.primaryKeyword}</Badge>
+                {d.secondaryKeyword && <Badge color="blue">Secondary: {d.secondaryKeyword}</Badge>}
+              </div>
+              <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.7 }}>{d.description}</p>
+            </Card>
+          ))}
+
+          {activeSection === 'calendar' && (c?.editorialCalendar?.editorialCalendar || []).map((w, i) => (
+            <Card key={i} title={`Week ${w.week}${w.dates ? ': ' + w.dates : ''}`} subtitle={w.theme} accent="#f59e0b">
+              {w.email && (
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📧 EMAIL</div>
+                  <div style={{ fontSize: 13, color: T.textSub }}>
+                    <strong>{typeof w.email === 'object' ? w.email.subjectLine || w.email.subject : w.email}</strong>
                   </div>
-                ) : (
-                  <button onClick={() => { setSchedulingAsset({ key: `email-${i}`, channel: 'email', fields: e }); setScheduleDate(''); setScheduleCampaignId('') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: T.surface, color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                    📅 Schedule
-                  </button>
-                )}
-                {/* Add to Campaign */}
-                {activeCampaigns.length > 0 && (
-                  linkingAsset?.key === `email-${i}` ? (
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                      <select onChange={ev => { if (ev.target.value) linkToCampaign(ev.target.value, { type: 'email', subjectLine: e.subjectLine, theme: e.theme, targetPersona: e.targetPersona, brief: e.brief }) }}
-                        style={{ border: '1px solid #6366f1', borderRadius: 6, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
-                        defaultValue="">
-                        <option value="">— pick campaign —</option>
-                        {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                      </select>
-                      <button onClick={() => setLinkingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.textMuted, fontSize: 12 }}>✕</button>
+                </div>
+              )}
+              {w.instagram?.length > 0 && (
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📱 INSTAGRAM</div>
+                  {(Array.isArray(w.instagram) ? w.instagram : [w.instagram]).map((post, j) => (
+                    <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
+                      {typeof post === 'object' ? `[${post.format || 'Post'}] ${post.idea || post.description || ''}` : post}
                     </div>
-                  ) : (
-                    <button onClick={() => setLinkingAsset({ key: `email-${i}` })}
-                      style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                      + Campaign
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
-            {products.length > 0 && (
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8 }}>
-                  {products.map(p => <ProductCard key={p.id} product={p} />)}
+                  ))}
                 </div>
-              </div>
-            )}
-          </Card>
-        )
-      })}
-
-      {activeSection === 'hero' && (c?.heroHeadlines?.heroHeadlines || []).map((h, i) => (
-        <Card key={i} accent="#8b5cf6">
-          <div style={{ fontSize: 22, fontWeight: 800, color: T.text, marginBottom: 10, lineHeight: 1.3 }}>"{h.headline}"</div>
-          <div style={{ fontSize: 14, color: T.textSub, marginBottom: 10, lineHeight: 1.6 }}>{h.subhead}</div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 13 }}>
-            <Badge color="purple">CTA: {h.cta}</Badge>
-            <span style={{ color: T.textMuted }}>{h.bestFor}</span>
-          </div>
-        </Card>
-      ))}
-
-      {activeSection === 'ig' && (c?.instagramCaptions?.instagramCaptions || []).filter(g => !personaFilter || g.targetPersona === personaFilter).map((g, i) => {
-        const products = getProductsForCampaign(g.category, g.caption, catalog)
-        const pColor = PERSONA_COLORS[g.targetPersona] || '#9ca3af'
-        return (
-          <Card key={i} title={g.category} accent="#ec4899">
-            {g.targetPersona && (
-              <div style={{ marginBottom: 10 }}>
-                <span style={{ background: pColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>{g.targetPersona}</span>
-              </div>
-            )}
-            <div style={{ fontSize: 14, color: T.textSub, lineHeight: 1.7, marginBottom: 10 }}>{g.caption}</div>
-            {g.imageryNotes && (
-              <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', marginBottom: 10, fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
-                📸 {g.imageryNotes}
-              </div>
-            )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: products.length ? 14 : 0 }}>
-              {(g.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
-            </div>
-            {g.notes && <div style={{ fontSize: 12, color: T.textMuted, fontStyle: 'italic', marginBottom: 10 }}>{g.notes}</div>}
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: products.length ? 14 : 0 }}>
-              {/* Schedule to Calendar */}
-              {schedulingAsset?.key === `ig-${i}` ? (
-                <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#f0fdf4', border: '1px solid #6ee7b7', borderRadius: 8, padding: '4px 8px' }}>
-                  <input type="date" value={scheduleDate} onChange={ev => setScheduleDate(ev.target.value)}
-                    style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }} />
-                  {activeCampaigns.length > 0 && (
-                    <select value={scheduleCampaignId} onChange={ev => setScheduleCampaignId(ev.target.value)}
-                      style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }}>
-                      <option value="">No campaign</option>
-                      {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                  )}
-                  <button onClick={scheduleToCalendar} disabled={!scheduleDate}
-                    style={{ padding: '2px 8px', borderRadius: 5, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Add</button>
-                  <button onClick={() => setSchedulingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
-                </div>
-              ) : (
-                <button onClick={() => { setSchedulingAsset({ key: `ig-${i}`, channel: 'instagram', fields: g }); setScheduleDate(''); setScheduleCampaignId('') }}
-                  style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: T.surface, color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                  📅 Schedule
-                </button>
               )}
-              {/* Add to Campaign */}
-              {activeCampaigns.length > 0 && (
-                linkingAsset?.key === `ig-${i}` ? (
-                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                    <select onChange={ev => { if (ev.target.value) linkToCampaign(ev.target.value, { type: 'ig', caption: g.caption, category: g.category, targetPersona: g.targetPersona }) }}
-                      style={{ border: '1px solid #ec4899', borderRadius: 6, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
-                      defaultValue="">
-                      <option value="">— pick campaign —</option>
-                      {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                    <button onClick={() => setLinkingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
-                  </div>
-                ) : (
-                  <button onClick={() => setLinkingAsset({ key: `ig-${i}` })}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #ec4899', background: T.surface, color: '#ec4899', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                    + Campaign
-                  </button>
-                )
+              {w.hero && (
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>🏠 WEBSITE HERO</div>
+                  <div style={{ fontSize: 13, color: T.textSub }}>{typeof w.hero === 'object' ? (w.hero.headline || w.hero.collection || '') : w.hero}</div>
+                </div>
               )}
-            </div>
-            {products.length > 0 && (
-              <div style={{ marginTop: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8 }}>
-                  {products.map(p => <ProductCard key={p.id} product={p} />)}
-                </div>
-              </div>
-            )}
-          </Card>
-        )
-      })}
-
-      {activeSection === 'seo' && (c?.collectionDescriptions?.collectionDescriptions || []).map((d, i) => (
-        <Card key={i} title={d.collection} accent="#10b981">
-          <div style={{ marginBottom: 10, display: 'flex', gap: 8 }}>
-            <Badge color="green">KW: {d.primaryKeyword}</Badge>
-            {d.secondaryKeyword && <Badge color="blue">Secondary: {d.secondaryKeyword}</Badge>}
-          </div>
-          <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.7 }}>{d.description}</p>
-        </Card>
-      ))}
-
-      {activeSection === 'calendar' && (c?.editorialCalendar?.editorialCalendar || []).map((w, i) => (
-        <Card key={i} title={`Week ${w.week}${w.dates ? ': ' + w.dates : ''}`} subtitle={w.theme} accent="#f59e0b">
-          {w.email && (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📧 EMAIL</div>
-              <div style={{ fontSize: 13, color: T.textSub }}>
-                <strong>{typeof w.email === 'object' ? w.email.subjectLine || w.email.subject : w.email}</strong>
-                {typeof w.email === 'object' && w.email.focus && <span style={{ color: T.textMuted }}> — {w.email.focus}</span>}
-              </div>
-            </div>
+            </Card>
+          ))}
+          </>
           )}
-          {w.instagram?.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📱 INSTAGRAM</div>
-              {(Array.isArray(w.instagram) ? w.instagram : [w.instagram]).map((post, j) => (
-                <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
-                  {typeof post === 'object' ? `[${post.format || post.type || 'Post'}] ${post.idea || post.description || ''}` : post}
-                </div>
-              ))}
-            </div>
-          )}
-          {w.hero && (
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>🏠 WEBSITE HERO</div>
-              <div style={{ fontSize: 13, color: T.textSub }}>
-                {typeof w.hero === 'object' ? (w.hero.headline || w.hero.collection || '') : w.hero}
-              </div>
-            </div>
-          )}
-        </Card>
-      ))}
-      </>
+        </div>
       )}
     </div>
   )
@@ -1996,7 +2213,7 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
   const PCOLS = { 'The Polished Professional': '#6366f1', 'The Emerging Leader': '#10b981', 'The Refined Rewinder': '#f59e0b', 'The Practical Multitasker': '#ec4899' }
 
   function openNew() {
-    setForm({ name: '', status: 'planning', startDate: '', endDate: '', persona: personaNames[0] || '', styleGuide: { colorDirection: '', moodKeywords: [], avoidWords: [], heroImageDirection: '' } })
+    setForm({ name: '', status: 'planning', startDate: '', endDate: '', persona: personaNames[0] || '', contentVolumes: { email: 2, instagram: 3, hero: 1 }, storyArc: [], styleGuide: { colorDirection: '', moodKeywords: [], avoidWords: [], heroImageDirection: '' } })
     setEditId(null)
     setShowForm(true)
   }
@@ -2153,7 +2370,53 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
                 onChange={e => setFormIn('styleGuide.avoidWords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                 style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
             </div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+
+            {/* Content Volumes */}
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.textSub, marginBottom: 10, marginTop: 4 }}>Weekly Content Volumes</div>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+              {[{ label: 'Emails / week', key: 'email' }, { label: 'Instagram / week', key: 'instagram' }, { label: 'Hero banners / week', key: 'hero' }].map(f => (
+                <div key={f.key} style={{ flex: '1 1 100px' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>{f.label}</div>
+                  <input type="number" min={0} max={10} value={(form.contentVolumes || {})[f.key] ?? 0}
+                    onChange={e => setForm(p => ({ ...p, contentVolumes: { ...(p.contentVolumes || {}), [f.key]: parseInt(e.target.value) || 0 } }))}
+                    style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 14, fontWeight: 700, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
+                </div>
+              ))}
+            </div>
+
+            {/* Story Arc Editor */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textSub }}>Campaign Story Arc</div>
+              <button onClick={() => setForm(p => ({ ...p, storyArc: [...(p.storyArc || []), { weekNum: (p.storyArc || []).length + 1, theme: '', angle: '', keyMessage: '' }] }))}
+                style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+                + Add Week
+              </button>
+            </div>
+            {(form.storyArc || []).length === 0 && (
+              <div style={{ fontSize: 12, color: T.textFaint, marginBottom: 16, padding: '10px 12px', background: T.stripeBg, borderRadius: 8 }}>
+                No arc weeks yet. Add weeks to define how this campaign's story unfolds over time — the AI will use this to plan content.
+              </div>
+            )}
+            {(form.storyArc || []).map((week, wi) => (
+              <div key={wi} style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: 14, marginBottom: 12, background: T.stripeBg }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Week {week.weekNum}</div>
+                  <button onClick={() => setForm(p => ({ ...p, storyArc: p.storyArc.filter((_, i) => i !== wi).map((w, i) => ({ ...w, weekNum: i + 1 })) }))}
+                    style={{ fontSize: 11, padding: '2px 8px', borderRadius: 5, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.textMuted, cursor: 'pointer' }}>
+                    Remove
+                  </button>
+                </div>
+                {[{ label: 'Theme (e.g. "Awareness")', key: 'theme' }, { label: 'Angle (1 sentence)', key: 'angle' }, { label: 'Key Message (what the customer should feel)', key: 'keyMessage' }].map(f => (
+                  <div key={f.key} style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>{f.label}</div>
+                    <input value={week[f.key] || ''} onChange={e => setForm(p => ({ ...p, storyArc: p.storyArc.map((w, i) => i === wi ? { ...w, [f.key]: e.target.value } : w) }))}
+                      style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', fontSize: 12, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
               <button onClick={() => setShowForm(false)} style={{ padding: '8px 18px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               <button onClick={save} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>Save</button>
             </div>

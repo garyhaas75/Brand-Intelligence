@@ -29,6 +29,7 @@ const SEED_VALIDATORS = {
   'product_catalog.json':         (d) => Array.isArray(d?.products) && d.products.length > 0,
   'content_recommendations.json': (d) => !!d?.content,
   'agentic_search.json':          (d) => Array.isArray(d?.queries) && d.queries.length > 0,
+  'ownable_events.json':          (d) => Array.isArray(d) && d.length > 0,
 };
 
 // On startup: copy seed file if live file is missing or fails validation.
@@ -851,6 +852,334 @@ app.get('/api/apify-usage', async (req, res) => {
 
 // Personas
 app.get('/api/personas', (req, res) => res.json(loadData('personas.json') || {}));
+
+// ─── Ownable Events ───────────────────────────────────────────────────────────
+const OWNABLE_EVENTS_FILE = path.join(DATA_DIR, 'ownable_events.json');
+
+function loadOwnableEvents() {
+  if (!fs.existsSync(OWNABLE_EVENTS_FILE)) return [];
+  try { return JSON.parse(fs.readFileSync(OWNABLE_EVENTS_FILE, 'utf8')); } catch { return []; }
+}
+function saveOwnableEvents(data) {
+  fs.writeFileSync(OWNABLE_EVENTS_FILE, JSON.stringify(data, null, 2));
+}
+
+// Resolve recurring events' YYYY placeholder to an actual year
+function resolveEvents(events, year) {
+  return events.map(e => ({
+    ...e,
+    date: e.date ? e.date.replace('YYYY', String(year)) : e.date,
+  }));
+}
+
+app.get('/api/ownable-events', (req, res) => {
+  const year = parseInt(req.query.year) || new Date().getFullYear();
+  const events = resolveEvents(loadOwnableEvents(), year);
+  res.json(events);
+});
+
+app.post('/api/ownable-events', (req, res) => {
+  const events = loadOwnableEvents();
+  const event = {
+    id: `event_custom_${Date.now()}`,
+    recurring: false,
+    category: 'custom',
+    relevance: 'medium',
+    ...req.body,
+  };
+  events.push(event);
+  saveOwnableEvents(events);
+  res.json(event);
+});
+
+app.delete('/api/ownable-events/:id', (req, res) => {
+  const events = loadOwnableEvents();
+  saveOwnableEvents(events.filter(e => e.id !== req.params.id));
+  res.json({ ok: true });
+});
+
+// ─── Weekly Content Plans ─────────────────────────────────────────────────────
+const WEEKLY_PLANS_FILE = path.join(DATA_DIR, 'weekly_plans.json');
+
+function loadWeeklyPlans() {
+  if (!fs.existsSync(WEEKLY_PLANS_FILE)) return {};
+  try { return JSON.parse(fs.readFileSync(WEEKLY_PLANS_FILE, 'utf8')); } catch { return {}; }
+}
+function saveWeeklyPlans(data) {
+  fs.writeFileSync(WEEKLY_PLANS_FILE, JSON.stringify(data, null, 2));
+}
+
+app.get('/api/weekly-plan', (req, res) => {
+  const { week } = req.query;
+  if (!week) return res.status(400).json({ error: 'week param required (YYYY-MM-DD)' });
+  const plans = loadWeeklyPlans();
+  res.json(plans[week] || []);
+});
+
+app.post('/api/weekly-plan/generate', async (req, res) => {
+  const { weekStart, campaignIds = [], volumes = { email: 2, instagram: 3, hero: 1 }, ownableEventIds = [] } = req.body || {};
+  if (!weekStart) return res.status(400).json({ error: 'weekStart required' });
+
+  const campaigns = loadCampaigns();
+  const allEvents = resolveEvents(loadOwnableEvents(), new Date(weekStart).getFullYear());
+  const personas = loadData('personas.json');
+  const brandGuidelines = loadData('brand_guidelines.json');
+  const plans = loadWeeklyPlans();
+
+  // Compute active campaigns with arc week position
+  const weekStartDate = new Date(weekStart);
+  const activeCampaigns = campaigns
+    .filter(c => campaignIds.length === 0 || campaignIds.includes(c.id))
+    .filter(c => {
+      const s = new Date(c.startDate), e = new Date(c.endDate);
+      return s <= weekStartDate && e >= weekStartDate;
+    })
+    .map(c => {
+      const s = new Date(c.startDate);
+      const weekNum = Math.floor((weekStartDate - s) / (7 * 24 * 60 * 60 * 1000)) + 1;
+      const totalWeeks = Math.ceil((new Date(c.endDate) - s) / (7 * 24 * 60 * 60 * 1000));
+      const arcWeek = (c.storyArc || []).find(w => w.weekNum === weekNum) || null;
+      return { ...c, weekNum, totalWeeks, arcWeek };
+    });
+
+  // Events in next 14 days (lookahead for lead time)
+  const lookAheadEnd = new Date(weekStartDate);
+  lookAheadEnd.setDate(lookAheadEnd.getDate() + 14);
+  const upcomingEvents = allEvents.filter(e => {
+    if (!e.date) return false;
+    const d = new Date(e.date);
+    return d >= weekStartDate && d <= lookAheadEnd;
+  }).filter(e => ownableEventIds.length === 0 || ownableEventIds.includes(e.id));
+
+  // Sent history — last 8 weeks
+  const calendar = loadCalendar();
+  const eightWeeksAgo = new Date(weekStartDate);
+  eightWeeksAgo.setDate(eightWeeksAgo.getDate() - 56);
+  const sentHistory = calendar
+    .filter(i => i.status === 'sent' && new Date(i.date) >= eightWeeksAgo)
+    .map(i => ({ channel: i.channel, theme: i.theme, subjectLine: i.subjectLine, date: i.date }));
+
+  // Build Claude prompt
+  const brandContext = getBrandContext();
+  const campaignContext = activeCampaigns.length > 0
+    ? activeCampaigns.map(c => `
+CAMPAIGN: "${c.name}" (Week ${c.weekNum} of ${c.totalWeeks}, ${c.startDate}–${c.endDate})
+Target persona: ${c.persona || 'The Polished Professional'}
+Style: ${JSON.stringify(c.styleGuide || {})}
+${c.arcWeek ? `THIS WEEK'S ARC: Theme="${c.arcWeek.theme}" | Angle="${c.arcWeek.angle}" | Key message="${c.arcWeek.keyMessage}"` : 'No arc defined for this week.'}
+Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w => `Week ${w.weekNum}: ${w.theme} — ${w.angle}`).join(' | ') || 'none yet'}
+`).join('\n---\n')
+    : 'No active campaigns for this week. Generate standalone brand-building content.';
+
+  const eventsContext = upcomingEvents.length > 0
+    ? upcomingEvents.map(e => `- ${e.name} (${e.date}): ${e.suggestedAngle}`).join('\n')
+    : 'No major ownable events in the next 14 days.';
+
+  const sentContext = sentHistory.length > 0
+    ? sentHistory.map(i => `[${i.date}] ${i.channel} — Theme: "${i.theme}"${i.subjectLine ? ` | Subject: "${i.subjectLine}"` : ''}`).join('\n')
+    : 'No sent history yet.';
+
+  const personasContext = (personas?.personas || []).slice(0, 3)
+    .map(p => `${p.name}: ${p.ageRange}, ${p.income} — Motivators: ${(p.motivators || []).slice(0, 2).join(', ')}`)
+    .join('\n');
+
+  const prompt = `You are a marketing strategist and copywriter for Anne Klein. Generate a weekly content plan for the week of ${weekStart}.
+
+${brandContext}
+
+PLANNING WEEK: ${weekStart}
+
+${campaignContext}
+
+UPCOMING OWNABLE EVENTS (next 14 days, plan content to land BEFORE the event):
+${eventsContext}
+
+RECENT SENT CONTENT (last 8 weeks — avoid repeating these themes/angles):
+${sentContext}
+
+CUSTOMER PERSONAS:
+${personasContext}
+
+YOUR TASK:
+Generate EXACTLY ${volumes.email || 0} email pieces, ${volumes.instagram || 0} Instagram posts, and ${volumes.hero || 0} hero/site banner pieces for this week.
+
+Return a JSON array (no markdown, no commentary) with EXACTLY ${(volumes.email || 0) + (volumes.instagram || 0) + (volumes.hero || 0)} items total. Each item must match this schema exactly:
+
+For EMAIL:
+{
+  "channel": "email",
+  "campaignId": "<campaign id or null>",
+  "ownableEventId": "<event id or null>",
+  "theme": "<short theme label>",
+  "targetPersona": "<persona name>",
+  "email": {
+    "subjectLine": "<compelling subject, 40-60 chars>",
+    "previewText": "<preview text, 80-100 chars>",
+    "bodyOutline": "<3-4 bullet points describing body sections>",
+    "cta": "<CTA button text>",
+    "sendDay": "<recommended day, e.g. Tuesday>"
+  }
+}
+
+For INSTAGRAM:
+{
+  "channel": "instagram",
+  "campaignId": "<campaign id or null>",
+  "ownableEventId": "<event id or null>",
+  "theme": "<short theme label>",
+  "targetPersona": "<persona name>",
+  "instagram": {
+    "caption": "<full caption, 150-220 chars>",
+    "hashtags": ["<5-8 hashtags>"],
+    "imageryDirection": "<brief art direction for the image>",
+    "productFeature": "<product category or specific piece to feature>"
+  }
+}
+
+For HERO:
+{
+  "channel": "hero",
+  "campaignId": "<campaign id or null>",
+  "ownableEventId": "<event id or null>",
+  "theme": "<short theme label>",
+  "targetPersona": "<persona name>",
+  "hero": {
+    "headline": "<punchy headline, 4-8 words>",
+    "subhead": "<supporting subhead, 10-16 words>",
+    "cta": "<CTA button text>",
+    "imageDirection": "<brief description of hero image>"
+  }
+}
+
+Rules:
+- Each piece must feel DIFFERENT from the others — vary tone, product focus, and angle
+- If a campaign arc week is defined, ALL pieces should reinforce that arc's theme and key message
+- If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
+- Do NOT repeat themes from recent sent history listed above
+- Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
+- Return ONLY the JSON array, starting with [ and ending with ]`;
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await anthropic.messages.create({
+      model: 'claude-opus-4-6',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const raw = msg.content[0].text.trim();
+    const start = raw.indexOf('[');
+    const end = raw.lastIndexOf(']');
+    if (start === -1 || end === -1) throw new Error('Claude did not return a valid JSON array');
+
+    const generated = JSON.parse(raw.slice(start, end + 1));
+    const now = Date.now();
+    const items = generated.map((item, i) => ({
+      id: `gen_${now}_${i}`,
+      weekOf: weekStart,
+      approved: false,
+      skipped: false,
+      generatedAt: new Date().toISOString(),
+      ...item,
+    }));
+
+    plans[weekStart] = items;
+    saveWeeklyPlans(plans);
+    res.json({ ok: true, items, count: items.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/weekly-plan/approve', (req, res) => {
+  const { weekStart, itemIds } = req.body || {};
+  if (!weekStart || !Array.isArray(itemIds)) return res.status(400).json({ error: 'weekStart and itemIds required' });
+  const plans = loadWeeklyPlans();
+  const items = plans[weekStart] || [];
+  for (const item of items) {
+    if (itemIds.includes(item.id)) item.approved = true;
+  }
+  plans[weekStart] = items;
+  saveWeeklyPlans(plans);
+  res.json({ ok: true });
+});
+
+app.post('/api/weekly-plan/skip', (req, res) => {
+  const { weekStart, itemId } = req.body || {};
+  if (!weekStart || !itemId) return res.status(400).json({ error: 'weekStart and itemId required' });
+  const plans = loadWeeklyPlans();
+  const items = plans[weekStart] || [];
+  const item = items.find(i => i.id === itemId);
+  if (item) item.skipped = true;
+  plans[weekStart] = items;
+  saveWeeklyPlans(plans);
+  res.json({ ok: true });
+});
+
+app.post('/api/weekly-plan/add-to-calendar', (req, res) => {
+  const { weekStart, itemIds, dates = {} } = req.body || {};
+  if (!weekStart || !Array.isArray(itemIds)) return res.status(400).json({ error: 'weekStart and itemIds required' });
+  const plans = loadWeeklyPlans();
+  const items = (plans[weekStart] || []).filter(i => itemIds.includes(i.id));
+  const calItems = loadCalendar();
+  const created = [];
+
+  for (const item of items) {
+    // Resolve send date: explicitly provided, or computed from sendDay
+    let date = dates[item.id] || weekStart;
+    if (!dates[item.id] && item.email?.sendDay) {
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const targetDay = days.indexOf(item.email.sendDay);
+      if (targetDay !== -1) {
+        const d = new Date(weekStart);
+        while (d.getDay() !== targetDay) d.setDate(d.getDate() + 1);
+        date = d.toISOString().split('T')[0];
+      }
+    }
+
+    const calItem = {
+      id: `cal_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      date,
+      channel: item.channel,
+      status: 'brief',
+      campaignId: item.campaignId || null,
+      personaTarget: item.targetPersona || '',
+      theme: item.theme || '',
+      weeklyPlanId: item.id,
+      weekOf: weekStart,
+      ownableEventId: item.ownableEventId || null,
+      // Pre-populate channel-specific fields
+      subjectLine: item.email?.subjectLine || '',
+      previewText: item.email?.previewText || '',
+      brief: item.email?.bodyOutline
+        ? `Body outline:\n${item.email.bodyOutline}\n\nCTA: ${item.email.cta}`
+        : item.instagram?.caption
+        ? `Caption: ${item.instagram.caption}\n\nHashtags: ${(item.instagram.hashtags || []).join(' ')}\nImagery: ${item.instagram.imageryDirection}\nProduct: ${item.instagram.productFeature}`
+        : item.hero
+        ? `Headline: ${item.hero.headline}\nSubhead: ${item.hero.subhead}\nCTA: ${item.hero.cta}\nImage direction: ${item.hero.imageDirection}`
+        : '',
+      heroImageBrief: null,
+      selectedProducts: [],
+      assignedTo: '',
+      notes: '',
+      createdAt: new Date().toISOString(),
+    };
+    calItems.push(calItem);
+    created.push(calItem);
+  }
+
+  saveCalendar(calItems);
+
+  // Mark items as added to calendar in the weekly plan
+  const planItems = plans[weekStart] || [];
+  for (const item of planItems) {
+    if (itemIds.includes(item.id)) item.addedToCalendar = true;
+  }
+  plans[weekStart] = planItems;
+  saveWeeklyPlans(plans);
+
+  res.json({ ok: true, created: created.length, items: created });
+});
 
 // Serve built dashboard in production
 const dashboardDist = path.join(__dirname, 'dashboard', 'dist');
