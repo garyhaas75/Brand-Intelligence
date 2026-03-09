@@ -5,6 +5,8 @@
 
 # Scraped data — lives on the server volume, not in git
 data/*.json
+# Taxonomy is static reference data (updated quarterly) — commit it so Railway has it
+!data/shopify_taxonomy.json
 
 
 # Logs
