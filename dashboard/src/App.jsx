@@ -933,13 +933,46 @@ function ContentGeneratorPanel() {
   )
 }
 
-function ContentTab({ content, catalog, campaigns, loadData }) {
+function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   const [activeSection, setActiveSection] = useState('email')
   const [personaFilter, setPersonaFilter] = useState(null)
   const [linkingAsset, setLinkingAsset] = useState(null)
   const [linkedToast, setLinkedToast] = useState(null)
   const [regenerating, setRegenerating] = useState(false)
+  const [schedulingAsset, setSchedulingAsset] = useState(null) // { key, channel, fields }
+  const [scheduleDate, setScheduleDate] = useState('')
+  const [scheduleCampaignId, setScheduleCampaignId] = useState('')
+  const [scheduleToast, setScheduleToast] = useState(null)
   const c = content?.content
+
+  async function scheduleToCalendar() {
+    if (!scheduleDate) return
+    const { channel, fields } = schedulingAsset
+    const camp = activeCampaigns.find(c => c.id === scheduleCampaignId)
+    const res = await fetch('/api/calendar/item', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date: scheduleDate,
+        channel,
+        status: 'brief',
+        campaignId: scheduleCampaignId || null,
+        personaTarget: fields.targetPersona || '',
+        theme: fields.theme || fields.category || '',
+        subjectLine: fields.subjectLine || '',
+        previewText: fields.previewText || '',
+        brief: fields.brief || fields.caption || '',
+        notes: fields.imageryNotes || '',
+      }),
+    })
+    const item = await res.json()
+    if (setCalItems) setCalItems(prev => [...prev, item])
+    setSchedulingAsset(null)
+    setScheduleDate('')
+    setScheduleCampaignId('')
+    setScheduleToast(camp ? `Scheduled to ${camp.name}` : `Scheduled for ${scheduleDate}`)
+    setTimeout(() => setScheduleToast(null), 2500)
+  }
 
   async function regenerateContent() {
     setRegenerating(true)
@@ -991,6 +1024,11 @@ function ContentTab({ content, catalog, campaigns, loadData }) {
       {linkedToast && (
         <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#111827', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
           Added to "{linkedToast}"
+        </div>
+      )}
+      {scheduleToast && (
+        <div style={{ position: 'fixed', bottom: 24, right: 280, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+          📅 {scheduleToast}
         </div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
@@ -1058,9 +1096,32 @@ function ContentTab({ content, catalog, campaigns, loadData }) {
             <div style={{ display: 'flex', gap: 12, fontSize: 13, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               <span>🎯 CTA: <strong>{e.ctaButton}</strong></span>
               <span>📅 {e.sendTiming}</span>
-              {activeCampaigns.length > 0 && (
-                <div style={{ marginLeft: 'auto', position: 'relative' }}>
-                  {linkingAsset?.key === `email-${i}` ? (
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                {/* Schedule to Calendar */}
+                {schedulingAsset?.key === `email-${i}` ? (
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#f0fdf4', border: '1px solid #6ee7b7', borderRadius: 8, padding: '4px 8px' }}>
+                    <input type="date" value={scheduleDate} onChange={ev => setScheduleDate(ev.target.value)}
+                      style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }} />
+                    {activeCampaigns.length > 0 && (
+                      <select value={scheduleCampaignId} onChange={ev => setScheduleCampaignId(ev.target.value)}
+                        style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }}>
+                        <option value="">No campaign</option>
+                        {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    )}
+                    <button onClick={scheduleToCalendar} disabled={!scheduleDate}
+                      style={{ padding: '2px 8px', borderRadius: 5, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Add</button>
+                    <button onClick={() => setSchedulingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
+                  </div>
+                ) : (
+                  <button onClick={() => { setSchedulingAsset({ key: `email-${i}`, channel: 'email', fields: e }); setScheduleDate(''); setScheduleCampaignId('') }}
+                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: '#fff', color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                    📅 Schedule
+                  </button>
+                )}
+                {/* Add to Campaign */}
+                {activeCampaigns.length > 0 && (
+                  linkingAsset?.key === `email-${i}` ? (
                     <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                       <select onChange={ev => { if (ev.target.value) linkToCampaign(ev.target.value, { type: 'email', subjectLine: e.subjectLine, theme: e.theme, targetPersona: e.targetPersona, brief: e.brief }) }}
                         style={{ border: '1px solid #6366f1', borderRadius: 6, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
@@ -1073,11 +1134,11 @@ function ContentTab({ content, catalog, campaigns, loadData }) {
                   ) : (
                     <button onClick={() => setLinkingAsset({ key: `email-${i}` })}
                       style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                      + Add to Campaign
+                      + Campaign
                     </button>
-                  )}
-                </div>
-              )}
+                  )
+                )}
+              </div>
             </div>
             {products.length > 0 && (
               <div>
@@ -1122,9 +1183,32 @@ function ContentTab({ content, catalog, campaigns, loadData }) {
               {(g.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
             </div>
             {g.notes && <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic', marginBottom: 10 }}>{g.notes}</div>}
-            {activeCampaigns.length > 0 && (
-              <div style={{ marginBottom: products.length ? 14 : 0 }}>
-                {linkingAsset?.key === `ig-${i}` ? (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: products.length ? 14 : 0 }}>
+              {/* Schedule to Calendar */}
+              {schedulingAsset?.key === `ig-${i}` ? (
+                <div style={{ display: 'flex', gap: 4, alignItems: 'center', background: '#f0fdf4', border: '1px solid #6ee7b7', borderRadius: 8, padding: '4px 8px' }}>
+                  <input type="date" value={scheduleDate} onChange={ev => setScheduleDate(ev.target.value)}
+                    style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }} />
+                  {activeCampaigns.length > 0 && (
+                    <select value={scheduleCampaignId} onChange={ev => setScheduleCampaignId(ev.target.value)}
+                      style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 6px', fontSize: 12 }}>
+                      <option value="">No campaign</option>
+                      {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  )}
+                  <button onClick={scheduleToCalendar} disabled={!scheduleDate}
+                    style={{ padding: '2px 8px', borderRadius: 5, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Add</button>
+                  <button onClick={() => setSchedulingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
+                </div>
+              ) : (
+                <button onClick={() => { setSchedulingAsset({ key: `ig-${i}`, channel: 'instagram', fields: g }); setScheduleDate(''); setScheduleCampaignId('') }}
+                  style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: '#fff', color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                  📅 Schedule
+                </button>
+              )}
+              {/* Add to Campaign */}
+              {activeCampaigns.length > 0 && (
+                linkingAsset?.key === `ig-${i}` ? (
                   <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                     <select onChange={ev => { if (ev.target.value) linkToCampaign(ev.target.value, { type: 'ig', caption: g.caption, category: g.category, targetPersona: g.targetPersona }) }}
                       style={{ border: '1px solid #ec4899', borderRadius: 6, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
@@ -1137,11 +1221,11 @@ function ContentTab({ content, catalog, campaigns, loadData }) {
                 ) : (
                   <button onClick={() => setLinkingAsset({ key: `ig-${i}` })}
                     style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #ec4899', background: '#fff', color: '#ec4899', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                    + Add to Campaign
+                    + Campaign
                   </button>
-                )}
-              </div>
-            )}
+                )
+              )}
+            </div>
             {products.length > 0 && (
               <div style={{ marginTop: 4 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
@@ -1813,7 +1897,7 @@ const CAMPAIGN_STATUSES = ['planning', 'active', 'complete', 'paused']
 const STATUS_COLORS = { planning: '#6366f1', active: '#10b981', complete: '#6b7280', paused: '#f59e0b' }
 const CHANNELS = ['email', 'instagram', 'site', 'hero', 'sms', 'other']
 
-function CampaignsTab({ campaigns, setCampaigns, personas, content }) {
+function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems }) {
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({})
@@ -1843,6 +1927,24 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content }) {
     const saved = await res.json()
     setCampaigns(prev => editId ? prev.map(c => c.id === editId ? saved : c) : [...prev, saved])
     setShowForm(false)
+
+    // Auto-create a calendar placeholder on the campaign start date
+    if (isNew && saved.startDate && setCalItems) {
+      const calRes = await fetch('/api/calendar/item', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: saved.startDate,
+          channel: 'email',
+          status: 'brief',
+          campaignId: saved.id,
+          personaTarget: saved.persona || '',
+          theme: `${saved.name} — Launch`,
+        }),
+      })
+      const calItem = await calRes.json()
+      setCalItems(prev => [...prev, calItem])
+    }
 
     // After creating a new campaign, surface matching content assets
     if (isNew && content?.content) {
@@ -3358,14 +3460,14 @@ export default function App() {
           <>
             {tab === 'overview'  && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
             {tab === 'calendar'  && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
-            {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} />}
+            {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} setCalItems={setCalItems} />}
             {tab === 'catalog'   && <CatalogTab catalog={data.catalog} />}
             {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
             {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={reloadEmailAnalysis} />}
             {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
             {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
             {tab === 'seo-products' && <SeoProductTab />}
-            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} loadData={reloadContent} />}
+            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} loadData={reloadContent} setCalItems={setCalItems} />}
             {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
             {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
             {tab === 'personas'  && <PersonasTab personas={data.personas} content={data.content} />}
