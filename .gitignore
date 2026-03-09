@@ -17,8 +17,7 @@ logs/
 node_modules/
 npm-debug.log*
 
-# Dashboard build output — committed to git so Railway skips the npm build step
-# dashboard/dist/  ← intentionally tracked
+# dashboard/dist is intentionally tracked (committed locally, Railway skips build step)
 dashboard/node_modules/
 
 # Credentials — never commit OAuth key files
