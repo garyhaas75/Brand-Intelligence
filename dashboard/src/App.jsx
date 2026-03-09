@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './App.css'
+import './responsive.css'
 
 const API = '/api'
 
@@ -176,7 +177,7 @@ function Badge({ color, children }) {
 function Card({ title, subtitle, children, accent }) {
   const T = useT()
   return (
-    <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, borderLeft: accent ? `4px solid ${accent}` : undefined }}>
+    <div className="ak-card" style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, borderLeft: accent ? `4px solid ${accent}` : undefined }}>
       {title && <div style={{ fontWeight: 700, fontSize: 16, marginBottom: subtitle ? 2 : 12, color: T.text }}>{title}</div>}
       {subtitle && <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 12 }}>{subtitle}</div>}
       {children}
@@ -187,8 +188,8 @@ function Card({ title, subtitle, children, accent }) {
 function Stat({ label, value, sub, color }) {
   const T = useT()
   return (
-    <div style={{ textAlign: 'center', padding: '16px 20px', background: T.surfaceAlt, borderRadius: 10, flex: 1, minWidth: 100 }}>
-      <div style={{ fontSize: 28, fontWeight: 800, color: color || T.text, lineHeight: 1 }}>{value ?? '—'}</div>
+    <div className="ak-stat-box" style={{ textAlign: 'center', padding: '16px 20px', background: T.surfaceAlt, borderRadius: 10, flex: 1, minWidth: 100 }}>
+      <div className="ak-stat-value" style={{ fontSize: 28, fontWeight: 800, color: color || T.text, lineHeight: 1 }}>{value ?? '—'}</div>
       <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub, marginTop: 4 }}>{label}</div>
       {sub && <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{sub}</div>}
     </div>
@@ -197,7 +198,7 @@ function Stat({ label, value, sub, color }) {
 
 function SectionHeader({ children }) {
   const T = useT()
-  return <h2 style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: '32px 0 16px', borderBottom: `2px solid ${T.borderAlt}`, paddingBottom: 10 }}>{children}</h2>
+  return <h2 className="ak-section-header" style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: '32px 0 16px', borderBottom: `2px solid ${T.borderAlt}`, paddingBottom: 10 }}>{children}</h2>
 }
 
 function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel, content, apifyUsage }) {
@@ -216,7 +217,7 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
   return (
     <div>
       <SectionHeader>Platform Status</SectionHeader>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div className="ak-competitor-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         <Stat label="Products Scraped" value={catalog?.totalProducts?.toLocaleString()} sub="AK catalog" color="#6366f1" />
         <Stat label="Category Gaps" value={siteIntel?.categoryGapAnalysis?.gaps?.length} sub="vs competitors" color="#f59e0b" />
         <Stat label="Email Signups" value={`${emailSubmitted}/5`} sub="competitors" color="#10b981" />
@@ -354,7 +355,7 @@ function CatalogTab({ catalog }) {
 
       <div style={{ fontSize: 12, color: T.textFaint, marginBottom: 12 }}>Showing {filtered.length} of {catalog.products.filter(p => filterCat === 'All' || p.category === filterCat).length} products</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+      <div className="ak-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
         {filtered.map(p => (
           <div key={p.id} style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, padding: 14 }}>
             <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 4, lineHeight: 1.4, color: T.text }}>{p.name}</div>
@@ -681,7 +682,7 @@ function SocialTab({ socialIntel }) {
   return (
     <div>
       <SectionHeader>Instagram Intelligence</SectionHeader>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div className="ak-social-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         <Stat label="AK Avg Engagement" value={intel.akAvgEngagement || 0} color={intel.akAvgEngagement ? '#10b981' : '#ef4444'} />
         <Stat label="Competitor Avg" value={intel.competitorAvgEngagement?.toLocaleString()} color="#6366f1" />
         <Stat label="Engagement Gap" value={intel.engagementGap?.toLocaleString()} color="#f59e0b" sub="competitors ahead" />
@@ -786,8 +787,8 @@ function SEOTab({ seoIntel, content }) {
         <>
           <SectionHeader>Top Queries</SectionHeader>
           <Card>
-            <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 500 }}>
+            <div className="ak-table-scroll" style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${T.border}` }}>
                   {['Query', 'Clicks', 'Impressions', 'CTR', 'Position', 'Type'].map(h => (
@@ -1082,12 +1083,12 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       ) : (
       <>
       {linkedToast && (
-        <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#111827', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+        <div className="ak-toast" style={{ position: 'fixed', bottom: 24, right: 24, background: '#111827', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
           Added to "{linkedToast}"
         </div>
       )}
       {scheduleToast && (
-        <div style={{ position: 'fixed', bottom: 72, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+        <div className="ak-toast" style={{ position: 'fixed', bottom: 72, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
           📅 {scheduleToast}
         </div>
       )}
@@ -1139,7 +1140,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                 <span style={{ background: pColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>{e.targetPersona}</span>
               </div>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
+            <div className="ak-content-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
               <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>SUBJECT LINE</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>"{e.subjectLine}"</div>
@@ -1364,7 +1365,7 @@ function PriceTab({ priceIntel }) {
   return (
     <div>
       <SectionHeader>AK Sale Activity</SectionHeader>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div className="ak-pricing-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         <Stat label="Products on Sale" value={`${akSaleRate}%`} sub={`${akOnSaleCount} of ${akProductsTracked}`} color={saleColor} />
         <Stat label="Avg Discount" value={`${akAvgSaleDepth}%`} sub="when on sale" color="#f59e0b" />
         <Stat label="New Sales Today" value={changes?.newSaleItems?.length ?? '—'} sub="just went on sale" color="#ef4444" />
@@ -1504,7 +1505,7 @@ function AgenticSearchTab({ agenticSearch }) {
   return (
     <div>
       <SectionHeader>AI Search Visibility Scores</SectionHeader>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div className="ak-ai-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         <Stat label="Visibility Rate" value={`${scores.visibilityRate}%`} sub={`${scores.queriesMentioned}/${scores.queriesTested} queries`} color={visColor} />
         <Stat label="Top of Mind" value={`${scores.topOfMindRate}%`} sub="mentioned first" color="#6366f1" />
         <Stat label="Positive Sentiment" value={`${scores.positiveRateWhenMentioned}%`} sub="when mentioned" color="#10b981" />
@@ -1764,7 +1765,7 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
           <div style={{ background: color, color: '#fff', padding: '8px 14px', fontSize: 12, fontWeight: 700 }}>
             Chatting with {p.name} · Responses reset on refresh
           </div>
-          <div style={{ height: 260, overflowY: 'auto', padding: 14, background: T.stripeBg, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="ak-chat-panel" style={{ height: 260, overflowY: 'auto', padding: 14, background: T.stripeBg, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {messages.length === 0 && !streaming && (
               <div style={{ color: T.textFaint, fontSize: 13, textAlign: 'center', marginTop: 60 }}>
                 Ask {p.name} anything — about shopping, style, what she wants from a brand…
@@ -1772,8 +1773,8 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
             )}
             {messages.map((m, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                <div style={{
-                  maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
+                <div className="ak-chat-bubble" style={{
+                  maxWidth: 'min(80%, calc(100vw - 60px))', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
                   background: m.role === 'user' ? color : T.surface,
                   color: m.role === 'user' ? '#fff' : T.textSub,
                   border: m.role === 'assistant' ? `1px solid ${T.border}` : 'none',
@@ -1784,7 +1785,7 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
             ))}
             {(streaming || streamText) && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: T.surface, color: T.textSub, border: `1px solid ${T.border}` }}>
+                <div className="ak-chat-bubble" style={{ maxWidth: 'min(80%, calc(100vw - 60px))', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: T.surface, color: T.textSub, border: `1px solid ${T.border}` }}>
                   {streamText || <span style={{ color: T.textFaint }}>…</span>}
                 </div>
               </div>
@@ -2079,7 +2080,7 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
       {/* Campaign Form */}
       {showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: T.surface, borderRadius: 12, padding: 'clamp(16px, 4vw, 28px)', width: 'min(560px, 95vw)', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+          <div className="ak-modal" style={{ background: T.surface, borderRadius: 12, padding: 'clamp(16px, 4vw, 28px)', width: 'min(560px, 95vw)', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 20, color: T.text }}>{editId ? 'Edit Campaign' : 'New Campaign'}</div>
             {[
               { label: 'Campaign Name', key: 'name', type: 'text' },
@@ -2309,7 +2310,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
       <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)' }} onClick={onClose} />
-      <div style={{ width: 'min(520px, 100vw)', background: T.surface, overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
+      <div className="ak-cal-drawer" style={{ width: 'min(520px, 100vw)', background: T.surface, overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
         {/* Drawer header */}
         <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.bg }}>
           <div style={{ fontWeight: 800, fontSize: 16, color: T.text }}>
@@ -2498,8 +2499,8 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
       )}
 
       {/* Week grid */}
-      <div style={{ overflowX: 'auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))', gap: 8, minWidth: 560 }}>
+      <div className="ak-cal-week-scroll" style={{ overflowX: 'auto' }}>
+        <div className="ak-cal-week-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))', gap: 8 }}>
           {weekDates.map((date, di) => {
             const dk = dateKey(date)
             const dayItems = calItems.filter(i => i.date === dk)
@@ -2932,7 +2933,7 @@ function SeoProductTab() {
                     <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
                   </div>
                 )}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 14 }}>
+                <div className="ak-seo-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 14 }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
                     <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
@@ -3319,7 +3320,7 @@ function BrandGuidelinesTab({ guidelines }) {
           <Card>
             {Object.entries(toneByChannel).map(([channel, guidance], i, arr) => (
               <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                <div style={{ minWidth: 140, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
+                <div className="ak-brand-tone-label" style={{ minWidth: 140, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
                 <div style={{ flex: 1, fontSize: 13, color: T.textSub }}>
                   {editing
                     ? <textarea style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', resize: 'vertical', minHeight: 40, background: T.inputBg, color: T.text }} value={guidance} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.toneByChannel[channel] = e.target.value; setDraft(next); }} />
@@ -3333,7 +3334,7 @@ function BrandGuidelinesTab({ guidelines }) {
 
       {/* Writing Rules */}
       <SectionHeader>Writing Rules</SectionHeader>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+      <div className="ak-brand-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
         <Card title="Do">
           {!editing && writingRules.dos.map((d, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? `1px solid ${T.border}` : 'none' }}>
@@ -3356,7 +3357,7 @@ function BrandGuidelinesTab({ guidelines }) {
 
       {/* Keywords */}
       <SectionHeader>Keywords</SectionHeader>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+      <div className="ak-brand-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
         <Card title="Use These Words">
           <EPills items={keywords.positive} path="keywords.positive" bg="#d1fae5" color="#065f46" />
         </Card>
@@ -3513,7 +3514,7 @@ export default function App() {
     <ThemeContext.Provider value={T}>
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: T.bg, minHeight: '100vh', color: T.text, transition: 'background 0.2s, color 0.2s' }}>
       {/* Top nav */}
-      <div style={{ background: T.navBg, color: T.navText, padding: 'clamp(10px, 2vw, 14px) clamp(12px, 3vw, 32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+      <div className="ak-nav" style={{ background: T.navBg, color: T.navText, padding: 'clamp(10px, 2vw, 14px) clamp(12px, 3vw, 32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <div>
           <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.5px', color: T.navText }}>ANNE KLEIN</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>Brand Intelligence Platform</div>
@@ -3529,13 +3530,13 @@ export default function App() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: `0 clamp(8px, 3vw, 32px)`, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+      <div className="ak-tabs" style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: `0 clamp(8px, 3vw, 32px)`, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         {TABS.map(t => (
           <React.Fragment key={t.id}>
             {t.dividerBefore && (
               <div style={{ width: 1, background: T.border, margin: '10px 6px', alignSelf: 'stretch' }} />
             )}
-            <button onClick={() => setTab(t.id)}
+            <button className="ak-tab-btn" onClick={() => setTab(t.id)}
               style={{ padding: '13px 14px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 12,
                 color: tab === t.id ? T.accent : T.textMuted,
                 borderBottom: tab === t.id ? `2px solid ${T.accent}` : '2px solid transparent',
@@ -3547,7 +3548,7 @@ export default function App() {
       </div>
 
       {/* Content */}
-      <div style={{ width: '100%', padding: `clamp(12px, 3vw, 24px) clamp(12px, 4vw, 40px)`, boxSizing: 'border-box' }}>
+      <div className="ak-content" style={{ width: '100%', padding: `clamp(12px, 3vw, 24px) clamp(12px, 4vw, 40px)`, boxSizing: 'border-box' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80, color: T.textMuted }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
