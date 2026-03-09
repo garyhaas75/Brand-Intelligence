@@ -6,7 +6,9 @@
  *   - meta_title   → global.title_tag metafield (single_line_text_field)
  *   - meta_description → global.description_tag metafield (single_line_text_field)
  *   - tags         → product.tags (productUpdate mutation)
- *   - alt_text     → first product image alt (productUpdateMedia mutation)
+ *   - alt_text     → first product image alt (fileUpdate mutation)
+ *   - category     → Shopify taxonomy GID (productUpdate mutation)
+ *   - custom fields → category-specific metafields (metafieldsSet)
  *
  * Tracks push status in seo_suggestions.json: pushStatus = 'pushed' | 'error', pushedAt
  *
@@ -20,6 +22,13 @@
  *   SHOPIFY_STORE_DOMAIN=anneklein.myshopify.com
  *   SHOPIFY_ADMIN_API_TOKEN=shpat_xxxxxx
  *   SHOPIFY_API_VERSION=2025-07   (optional, defaults to 2025-07)
+ *
+ * API notes (verified against Shopify docs):
+ *   - productByHandle deprecated → productByIdentifier (2025-01+)
+ *   - productUpdate argument renamed: input: ProductInput! → product: ProductUpdateInput! (2024-10+)
+ *   - ProductInput.category is a bare ID scalar, NOT { id: "gid://..." }
+ *   - productUpdateMedia deprecated → fileUpdate (2025-07+)
+ *   - global.title_tag / global.description_tag with single_line_text_field are correct
  */
 
 require('dotenv').config();
@@ -65,7 +74,6 @@ function saveSeo(data) {
 }
 
 function extractHandle(href) {
-  // https://www.anneklein.com/products/ponte-blazer-with-pockets -> ponte-blazer-with-pockets
   const match = (href || '').match(/\/products\/([^/?#]+)/);
   return match ? match[1] : null;
 }
@@ -103,14 +111,16 @@ function shopifyGraphQL(query, variables = {}) {
 
 // ─── GraphQL operations ───────────────────────────────────────────────────────
 
-// Get product GID + first media ID by handle
+// Look up product GID + first IMAGE file GID by handle.
+// Uses productByIdentifier (replaces deprecated productByHandle).
+// Media node IDs from product.media are also valid File GIDs for fileUpdate.
 async function getProductByHandle(handle) {
   const data = await shopifyGraphQL(`
     query getProduct($handle: String!) {
-      productByHandle(handle: $handle) {
+      productByIdentifier(identifier: { handle: $handle }) {
         id
         title
-        media(first: 1) {
+        media(first: 5) {
           edges {
             node {
               id
@@ -123,25 +133,27 @@ async function getProductByHandle(handle) {
     }
   `, { handle });
 
-  const product = data?.productByHandle;
+  const product = data?.productByIdentifier;
   if (!product) return null;
-  const mediaEdge = product.media?.edges?.[0]?.node;
+  // Only update alt text on IMAGE type media
+  const imageEdge = product.media?.edges?.find(e => e.node.mediaContentType === 'IMAGE')?.node || null;
   return {
     id: product.id,
     title: product.title,
-    mediaId: mediaEdge?.id || null,
-    currentAlt: mediaEdge?.alt || null,
+    mediaId: imageEdge?.id || null,
+    currentAlt: imageEdge?.alt || null,
   };
 }
 
-// Push title_tag and description_tag metafields
+// Push global.title_tag and global.description_tag SEO metafields.
+// Verified: namespace='global', type='single_line_text_field' is correct per Shopify docs.
 async function pushMetafields(productGid, metaTitle, metaDescription) {
   const metafields = [];
   if (metaTitle) {
-    metafields.push({ ownerId: productGid, namespace: 'global', key: 'title_tag', type: 'single_line_text_field', value: metaTitle });
+    metafields.push({ ownerId: productGid, namespace: 'global', key: 'title_tag', type: 'single_line_text_field', value: metaTitle.slice(0, 255) });
   }
   if (metaDescription) {
-    metafields.push({ ownerId: productGid, namespace: 'global', key: 'description_tag', type: 'single_line_text_field', value: metaDescription });
+    metafields.push({ ownerId: productGid, namespace: 'global', key: 'description_tag', type: 'single_line_text_field', value: metaDescription.slice(0, 320) });
   }
   if (!metafields.length) return { ok: true };
 
@@ -159,84 +171,84 @@ async function pushMetafields(productGid, metaTitle, metaDescription) {
   return { ok: true };
 }
 
-// Update product tags and/or taxonomy category
-// category = { id: "gid://shopify/TaxonomyCategory/aa-1-4-3" }
-async function pushTags(productGid, tags, _unused, category) {
-  const input = { id: productGid };
-  if (tags?.length) input.tags = tags;
-  if (category?.id) input.category = category; // sets Shopify taxonomy category (unlocks metafield definitions)
-  if (Object.keys(input).length === 1) return { ok: true }; // nothing to set
+// Push product tags and taxonomy category.
+// API 2024-10+ breaking change: argument renamed from `input: ProductInput!`
+// to `product: ProductUpdateInput!`.
+// ProductUpdateInput.category is a bare ID scalar (not an object wrapper).
+async function pushTagsAndCategory(productGid, tags, categoryGid) {
+  const product = { id: productGid };
+  // Shopify enforces max 255 chars per tag
+  if (tags?.length) product.tags = tags.map(t => String(t).slice(0, 255));
+  // category is a bare ID scalar — do NOT wrap in { id: ... }
+  if (categoryGid) product.category = categoryGid;
+  if (Object.keys(product).length === 1) return { ok: true }; // nothing beyond id
 
   const data = await shopifyGraphQL(`
-    mutation productUpdate($input: ProductInput!) {
-      productUpdate(input: $input) {
+    mutation productUpdate($product: ProductUpdateInput!) {
+      productUpdate(product: $product) {
         product { id tags category { id name fullName } }
         userErrors { field message }
       }
     }
-  `, { input });
+  `, { product });
 
   const errors = data?.productUpdate?.userErrors || [];
   if (errors.length) throw new Error(errors.map(e => `${e.field}: ${e.message}`).join('; '));
   return { ok: true };
 }
 
-// Update image alt text
-async function pushAltText(productGid, mediaId, altText) {
+// Update image alt text via fileUpdate (replaces deprecated productUpdateMedia).
+// The media node ID from product.media is a valid File GID for fileUpdate.
+async function pushAltText(mediaId, altText) {
   if (!mediaId || !altText) return { ok: true };
 
   const data = await shopifyGraphQL(`
-    mutation productUpdateMedia($productId: ID!, $media: [UpdateMediaInput!]!) {
-      productUpdateMedia(productId: $productId, media: $media) {
-        media { id alt }
+    mutation fileUpdate($files: [FileUpdateInput!]!) {
+      fileUpdate(files: $files) {
+        files { id alt }
         userErrors { field message }
       }
     }
-  `, { productId: productGid, media: [{ id: mediaId, alt: altText }] });
+  `, { files: [{ id: mediaId, alt: altText.slice(0, 512) }] });
 
-  const errors = data?.productUpdateMedia?.userErrors || [];
+  const errors = data?.fileUpdate?.userErrors || [];
   if (errors.length) throw new Error(errors.map(e => `${e.field}: ${e.message}`).join('; '));
   return { ok: true };
 }
 
-// Build category-specific metafield entries (namespace: custom)
-// These map to the fields the analyzer generates per category group
-function buildCategoryMetafields(productGid, categoryGroup, suggested) {
-  const fields = [];
-  const add = (key, value) => {
-    if (value) fields.push({ ownerId: productGid, namespace: 'custom', key, type: 'single_line_text_field', value: String(value) });
-  };
+// Fields handled by dedicated push steps — excluded from custom metafields
+const SEO_FIELDS = new Set([
+  'meta_title', 'meta_description', 'tags', 'alt_text',
+  'image_insights', 'geo_description',
+  'shopify_taxonomy_gid', 'shopify_category',
+]);
 
-  switch (categoryGroup) {
-    case 'clothing':
-      add('material', suggested.material);
-      add('care_instructions', suggested.care_instructions);
-      add('fit_type', suggested.fit_type);
-      break;
-    case 'shoes':
-      add('material', suggested.material);
-      add('heel_style', suggested.heel_style);
-      add('closure_type', suggested.closure_type);
-      break;
-    case 'jewelry':
-      add('material', suggested.material);
-      add('closure_type', suggested.closure_type);
-      break;
-    case 'handbags':
-      add('material', suggested.material);
-      add('closure_type', suggested.closure_type);
-      add('strap_drop', suggested.strap_drop);
-      break;
+// Build category-specific metafield entries (namespace: custom).
+// Dynamically pushes all attribute fields the analyzer generated,
+// using the exact key names (metal_finish, heel_height, fit_type, etc.).
+// Skips SEO fields handled by dedicated steps above.
+function buildCategoryMetafields(productGid, suggested) {
+  const fields = [];
+  for (const [key, value] of Object.entries(suggested)) {
+    if (SEO_FIELDS.has(key)) continue;
+    if (value === null || value === undefined || value === '') continue;
+    if (Array.isArray(value) || typeof value === 'object') continue;
+    fields.push({
+      ownerId: productGid,
+      namespace: 'custom',
+      key,
+      type: 'single_line_text_field',
+      value: String(value).slice(0, 255),
+    });
   }
   return fields;
 }
 
-// Push category-specific metafields (bundled into a single metafieldsSet call)
-async function pushCategoryMetafields(productGid, categoryGroup, suggested) {
-  const metafields = buildCategoryMetafields(productGid, categoryGroup, suggested);
+// Push all category-specific metafields in one metafieldsSet call.
+async function pushCategoryMetafields(productGid, suggested) {
+  const metafields = buildCategoryMetafields(productGid, suggested);
   if (!metafields.length) return { ok: true };
 
-  // metafieldsSet accepts up to 25 per call — well within limit
   const data = await shopifyGraphQL(`
     mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
       metafieldsSet(metafields: $metafields) {
@@ -257,8 +269,11 @@ async function pushProduct(product) {
   if (!handle) throw new Error(`Could not extract handle from href: ${product.href}`);
 
   const suggested = product.suggested || {};
-
   const categoryGroup = product.categoryGroup || 'other';
+
+  // Unwrap GID if stored as object { id: "gid://..." } instead of plain string
+  const rawGid = suggested.shopify_taxonomy_gid;
+  const gidStr = rawGid && typeof rawGid === 'object' ? rawGid.id : (rawGid || null);
 
   if (DRY_RUN) {
     log(`  [DRY RUN] Would push: handle=${handle} (${categoryGroup})`);
@@ -266,18 +281,17 @@ async function pushProduct(product) {
     log(`    meta_description: ${suggested.meta_description}`);
     log(`    tags:             ${(suggested.tags || []).join(', ')}`);
     log(`    alt_text:         ${suggested.alt_text || '(none)'}`);
-    log(`    taxonomy_gid:     ${suggested.shopify_taxonomy_gid || suggested.shopify_category || '(none)'}`);
-    const catFields = buildCategoryMetafields('(gid)', categoryGroup, suggested);
+    log(`    taxonomy_gid:     ${gidStr || '(none)'}`);
+    const catFields = buildCategoryMetafields('(gid)', suggested);
     if (catFields.length) {
       log(`    category metafields: ${catFields.map(f => `${f.key}="${f.value}"`).join(', ')}`);
     }
     return { ok: true, dryRun: true };
   }
 
-  // 1. Look up product GID
+  // 1. Look up product GID + image media ID
   const shopifyProduct = await getProductByHandle(handle);
   if (!shopifyProduct) throw new Error(`Product not found in Shopify: ${handle}`);
-
   const { id: productGid, mediaId } = shopifyProduct;
 
   // 2. Push SEO metafields (global.title_tag + global.description_tag)
@@ -285,24 +299,18 @@ async function pushProduct(product) {
     await pushMetafields(productGid, suggested.meta_title, suggested.meta_description);
   }
 
-  // 3. Push tags + taxonomy category GID (drives Shopify's metafield definitions)
-  const updateInput = { id: productGid };
-  if (suggested.tags?.length) updateInput.tags = suggested.tags;
-  // shopify_taxonomy_gid is the real Shopify taxonomy category GID (from sync_taxonomy.js)
-  // Falls back to shopify_category string (legacy free-text) if GID not yet generated
-  if (suggested.shopify_taxonomy_gid) {
-    updateInput.category = { id: suggested.shopify_taxonomy_gid };
-  }
-  if (Object.keys(updateInput).length > 1) {
-    await pushTags(productGid, updateInput.tags, null, updateInput.category);
+  // 3. Push tags + taxonomy category GID via productUpdate
+  // category is passed as a bare ID string per Shopify's ProductUpdateInput schema
+  if (suggested.tags?.length || gidStr) {
+    await pushTagsAndCategory(productGid, suggested.tags, gidStr);
   }
 
-  // 4. Push category-specific metafields (material, fit, heel_style, etc.)
-  await pushCategoryMetafields(productGid, categoryGroup, suggested);
+  // 4. Push category-specific custom metafields (material, fit_type, metal_finish, etc.)
+  await pushCategoryMetafields(productGid, suggested);
 
-  // 5. Push image alt text
+  // 5. Push image alt text via fileUpdate
   if (suggested.alt_text && mediaId) {
-    await pushAltText(productGid, mediaId, suggested.alt_text);
+    await pushAltText(mediaId, suggested.alt_text);
   }
 
   return { ok: true, productGid, mediaId };
@@ -311,6 +319,7 @@ async function pushProduct(product) {
 // ─── Run ──────────────────────────────────────────────────────────────────────
 async function run() {
   log(`=== Shopify SEO Push Started${DRY_RUN ? ' [DRY RUN]' : ''} ===`);
+  log(`    API version: ${API_VERSION}`);
 
   if (!DRY_RUN && (!STORE_DOMAIN || !ADMIN_TOKEN)) {
     log('FATAL: SHOPIFY_STORE_DOMAIN and SHOPIFY_ADMIN_API_TOKEN must be set in .env');
@@ -323,7 +332,6 @@ async function run() {
     process.exit(1);
   }
 
-  // Select products to push
   let targets = seoData.products.filter(p => p.status === 'approved');
 
   if (hrefsFromFile) {
@@ -336,7 +344,7 @@ async function run() {
   }
 
   if (!targets.length) {
-    log('No products to push. All approved products have already been pushed. Use --all to re-push.');
+    log('No products to push. All approved products already pushed. Use --all to re-push.');
     process.exit(0);
   }
 
@@ -351,8 +359,6 @@ async function run() {
 
     try {
       const result = await pushProduct(product);
-
-      // Update push status in the file
       const idx = seoData.products.findIndex(p => p.href === product.href);
       if (idx !== -1) {
         seoData.products[idx].pushStatus = 'pushed';
@@ -370,7 +376,7 @@ async function run() {
       errorCount++;
     }
 
-    // Save after each product so partial progress is preserved
+    // Save after each product so partial progress is preserved on failure
     saveSeo(seoData);
 
     if (i < targets.length - 1) await new Promise(r => setTimeout(r, 500));
