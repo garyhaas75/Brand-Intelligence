@@ -1042,10 +1042,10 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   const [plannerToast, setPlannerToast] = useState(null)
   const [volumes, setVolumes] = useState({ email: 2, instagram: 3, hero: 1 })
   const [loadingPlan, setLoadingPlan] = useState(false)
+  const [extraVolumes, setExtraVolumes] = useState({ email: 0, instagram: 0, hero: 0 })
+  const [generatingMore, setGeneratingMore] = useState(false)
+  const [showGenerateMore, setShowGenerateMore] = useState(false)
 
-  // Library state (existing)
-  const [activeSection, setActiveSection] = useState('email')
-  const [regenerating, setRegenerating] = useState(false)
   const c = content?.content
 
   // Compute active campaigns for this week
@@ -1065,7 +1065,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   useEffect(() => {
     const camp = activeCampaigns[0]
     if (camp?.contentVolumes) setVolumes(camp.contentVolumes)
-  }, [weekStart, campaigns.length])
+  }, [activeCampaigns[0]?.id, weekStart])
 
   // Fetch plan + events when week changes
   useEffect(() => {
@@ -1130,6 +1130,42 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
     }
   }
 
+  async function generateMore() {
+    const total = extraVolumes.email + extraVolumes.instagram + extraVolumes.hero
+    if (total === 0) return
+    setGeneratingMore(true)
+    setPlannerToast(null)
+    try {
+      const res = await fetch('/api/weekly-plan/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weekStart,
+          campaignIds: activeCampaigns.map(c => c.id),
+          volumes: extraVolumes,
+          ownableEventIds: upcomingEvents.map(e => e.id),
+          mode: 'append',
+        }),
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setPlanItems(prev => [...prev, ...(data.items || [])])
+        setExtraVolumes({ email: 0, instagram: 0, hero: 0 })
+        setShowGenerateMore(false)
+        setPlannerToast(`Added ${data.count} more content pieces`)
+        setTimeout(() => setPlannerToast(null), 3000)
+      } else {
+        setPlannerToast(`Error: ${data.error}`)
+        setTimeout(() => setPlannerToast(null), 5000)
+      }
+    } catch (err) {
+      setPlannerToast(`Error: ${err.message}`)
+      setTimeout(() => setPlannerToast(null), 5000)
+    } finally {
+      setGeneratingMore(false)
+    }
+  }
+
   function toggleApprove(itemId) {
     setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, approved: !i.approved } : i))
     fetch('/api/weekly-plan/approve', {
@@ -1171,16 +1207,6 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       }
     } finally {
       setAddingToCalendar(false)
-    }
-  }
-
-  async function regenerateContent() {
-    setRegenerating(true)
-    try {
-      await fetch('/api/content-recommendations/regenerate', { method: 'POST' })
-      if (loadData) await loadData()
-    } finally {
-      setRegenerating(false)
     }
   }
 
@@ -1282,10 +1308,38 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
               </div>
             </div>
 
-            <button onClick={generateContent} disabled={generating}
-              style={{ background: generating ? '#9ca3af' : '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: generating ? 'not-allowed' : 'pointer', width: '100%', transition: 'background 0.2s' }}>
-              {generating ? '⏳ Generating content… (30–60 sec)' : `✨ Generate Content for ${formatWeekRange(weekStart)}`}
-            </button>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
+              <button onClick={generateContent} disabled={generating}
+                style={{ flex: 1, background: generating ? '#9ca3af' : '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 15, fontWeight: 700, cursor: generating ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}>
+                {generating ? '⏳ Generating… (30–60 sec)' : `✨ Generate for ${formatWeekRange(weekStart)}`}
+              </button>
+              {planItems.length > 0 && (
+                <button onClick={() => setShowGenerateMore(v => !v)} disabled={generating || generatingMore}
+                  style={{ background: showGenerateMore ? T.surfaceAlt : T.surface, color: '#6366f1', border: `1px solid #6366f1`, borderRadius: 10, padding: '12px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  + More
+                </button>
+              )}
+            </div>
+
+            {showGenerateMore && (
+              <div style={{ marginTop: 10, background: T.stripeBg, borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.textSub }}>Add pieces:</span>
+                {[['email', '📧'], ['instagram', '📱'], ['hero', '🏠']].map(([ch, icon]) => (
+                  <div key={ch} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 13, color: T.textSub }}>{icon}</span>
+                    <button onClick={() => setExtraVolumes(v => ({ ...v, [ch]: Math.max(0, v[ch] - 1) }))}
+                      style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14 }}>−</button>
+                    <span style={{ width: 20, textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.text }}>{extraVolumes[ch]}</span>
+                    <button onClick={() => setExtraVolumes(v => ({ ...v, [ch]: v[ch] + 1 }))}
+                      style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14 }}>+</button>
+                  </div>
+                ))}
+                <button onClick={generateMore} disabled={generatingMore || (extraVolumes.email + extraVolumes.instagram + extraVolumes.hero === 0)}
+                  style={{ marginLeft: 'auto', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: generatingMore || (extraVolumes.email + extraVolumes.instagram + extraVolumes.hero === 0) ? 0.5 : 1 }}>
+                  {generatingMore ? '⏳ Adding…' : 'Add'}
+                </button>
+              </div>
+            )}
           </Card>
 
           {/* Generated items */}
@@ -1466,119 +1520,6 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
             Use <strong style={{ color: T.textSub }}>Quick Create</strong> for one-off pieces outside your campaign plan — a flash sale email, an urgent IG post, or content for a week with no active campaign.
           </div>
           <ContentGeneratorPanel />
-          {!c ? (
-            <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No bulk content data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
-          ) : (
-          <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-            <SectionHeader style={{ marginBottom: 0, color: T.textMuted, fontSize: 14 }}>Legacy Bulk Content</SectionHeader>
-            <button onClick={regenerateContent} disabled={regenerating}
-              style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: regenerating ? 'not-allowed' : 'pointer', opacity: regenerating ? 0.7 : 1 }}>
-              {regenerating ? 'Regenerating… (~4 min)' : 'Regenerate All'}
-            </button>
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-            {[
-              { id: 'email',    label: '📧 Email Campaigns',    count: c?.emailCampaigns?.emailCampaigns?.length },
-              { id: 'hero',     label: '🏠 Hero Headlines',     count: c?.heroHeadlines?.heroHeadlines?.length },
-              { id: 'ig',       label: '📱 Instagram',          count: c?.instagramCaptions?.instagramCaptions?.length },
-              { id: 'seo',      label: '🔍 SEO Descriptions',   count: c?.collectionDescriptions?.collectionDescriptions?.length },
-              { id: 'calendar', label: '📅 Editorial Calendar', count: c?.editorialCalendar?.editorialCalendar?.length },
-            ].map(s => (
-              <button key={s.id} onClick={() => setActiveSection(s.id)}
-                style={{ padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-                  background: activeSection === s.id ? '#6366f1' : T.surfaceAlt,
-                  color: activeSection === s.id ? '#fff' : T.textSub }}>
-                {s.label} {s.count ? `(${s.count})` : ''}
-              </button>
-            ))}
-          </div>
-
-          {activeSection === 'email' && (c?.emailCampaigns?.emailCampaigns || []).map((e, i) => (
-            <Card key={i} title={`Week ${e.week}${e.dayOfWeek ? ' · ' + e.dayOfWeek : ''}: ${e.theme}`} accent="#6366f1">
-              <div className="ak-content-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
-                <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>SUBJECT LINE</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>"{e.subjectLine}"</div>
-                </div>
-                <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>PREVIEW TEXT</div>
-                  <div style={{ fontSize: 13, color: T.textSub }}>{e.previewText}</div>
-                </div>
-              </div>
-              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>BRIEF</div>
-                <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{e.brief}</div>
-              </div>
-              <div style={{ fontSize: 13, color: T.textSub }}>🎯 CTA: <strong>{e.ctaButton}</strong> · 📅 {e.sendTiming}</div>
-            </Card>
-          ))}
-
-          {activeSection === 'hero' && (c?.heroHeadlines?.heroHeadlines || []).map((h, i) => (
-            <Card key={i} accent="#8b5cf6">
-              <div style={{ fontSize: 22, fontWeight: 800, color: T.text, marginBottom: 10, lineHeight: 1.3 }}>"{h.headline}"</div>
-              <div style={{ fontSize: 14, color: T.textSub, marginBottom: 10, lineHeight: 1.6 }}>{h.subhead}</div>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 13 }}>
-                <Badge color="purple">CTA: {h.cta}</Badge>
-                <span style={{ color: T.textMuted }}>{h.bestFor}</span>
-              </div>
-            </Card>
-          ))}
-
-          {activeSection === 'ig' && (c?.instagramCaptions?.instagramCaptions || []).map((g, i) => (
-            <Card key={i} title={g.category} accent="#ec4899">
-              <div style={{ fontSize: 14, color: T.textSub, lineHeight: 1.7, marginBottom: 10 }}>{g.caption}</div>
-              {g.imageryNotes && (
-                <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', marginBottom: 10, fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
-                  📸 {g.imageryNotes}
-                </div>
-              )}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {(g.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
-              </div>
-            </Card>
-          ))}
-
-          {activeSection === 'seo' && (c?.collectionDescriptions?.collectionDescriptions || []).map((d, i) => (
-            <Card key={i} title={d.collection} accent="#10b981">
-              <div style={{ marginBottom: 10, display: 'flex', gap: 8 }}>
-                <Badge color="green">KW: {d.primaryKeyword}</Badge>
-                {d.secondaryKeyword && <Badge color="blue">Secondary: {d.secondaryKeyword}</Badge>}
-              </div>
-              <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.7 }}>{d.description}</p>
-            </Card>
-          ))}
-
-          {activeSection === 'calendar' && (c?.editorialCalendar?.editorialCalendar || []).map((w, i) => (
-            <Card key={i} title={`Week ${w.week}${w.dates ? ': ' + w.dates : ''}`} subtitle={w.theme} accent="#f59e0b">
-              {w.email && (
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📧 EMAIL</div>
-                  <div style={{ fontSize: 13, color: T.textSub }}>
-                    <strong>{typeof w.email === 'object' ? w.email.subjectLine || w.email.subject : w.email}</strong>
-                  </div>
-                </div>
-              )}
-              {w.instagram?.length > 0 && (
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📱 INSTAGRAM</div>
-                  {(Array.isArray(w.instagram) ? w.instagram : [w.instagram]).map((post, j) => (
-                    <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
-                      {typeof post === 'object' ? `[${post.format || 'Post'}] ${post.idea || post.description || ''}` : post}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {w.hero && (
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>🏠 WEBSITE HERO</div>
-                  <div style={{ fontSize: 13, color: T.textSub }}>{typeof w.hero === 'object' ? (w.hero.headline || w.hero.collection || '') : w.hero}</div>
-                </div>
-              )}
-            </Card>
-          ))}
-          </>
-          )}
         </div>
       )}
     </div>

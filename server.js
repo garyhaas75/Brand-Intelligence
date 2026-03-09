@@ -30,6 +30,7 @@ const SEED_VALIDATORS = {
   'content_recommendations.json': (d) => !!d?.content,
   'agentic_search.json':          (d) => Array.isArray(d?.queries) && d.queries.length > 0,
   'ownable_events.json':          (d) => Array.isArray(d) && d.length > 0,
+  'campaigns.json':               (d) => Array.isArray(d) && d.some(c => Array.isArray(c.storyArc) && c.storyArc.length > 0),
 };
 
 // On startup: copy seed file if live file is missing or fails validation.
@@ -917,7 +918,7 @@ app.get('/api/weekly-plan', (req, res) => {
 });
 
 app.post('/api/weekly-plan/generate', async (req, res) => {
-  const { weekStart, campaignIds = [], volumes = { email: 2, instagram: 3, hero: 1 }, ownableEventIds = [] } = req.body || {};
+  const { weekStart, campaignIds = [], volumes = { email: 2, instagram: 3, hero: 1 }, ownableEventIds = [], mode = 'replace' } = req.body || {};
   if (!weekStart) return res.status(400).json({ error: 'weekStart required' });
 
   const campaigns = loadCampaigns();
@@ -1083,7 +1084,11 @@ Rules:
       ...item,
     }));
 
-    plans[weekStart] = items;
+    if (mode === 'append') {
+      plans[weekStart] = [...(plans[weekStart] || []), ...items];
+    } else {
+      plans[weekStart] = items;
+    }
     saveWeeklyPlans(plans);
     res.json({ ok: true, items, count: items.length });
   } catch (err) {
