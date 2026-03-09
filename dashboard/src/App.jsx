@@ -3545,7 +3545,7 @@ export default function App() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 32px' }}>
+      <div style={{ width: '100%', padding: '24px 40px', boxSizing: 'border-box' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80, color: T.textMuted }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
