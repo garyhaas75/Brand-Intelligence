@@ -50,7 +50,7 @@ async function getInStockProducts({ limit = 30, productType } = {}) {
           price,
           availableQty: qty,
           image: p.images?.[0]?.src || null,
-          href: `https://${process.env.SHOPIFY_STORE_DOMAIN || 'anneklein.com'}/products/${p.handle}`,
+          href: `https://anneklein.com/products/${p.handle}`,
         };
       })
       .filter(p => p.availableQty > 0)
