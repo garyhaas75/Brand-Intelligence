@@ -1508,7 +1508,7 @@ function PersonaSection({ label, items, borderColor, bullet }) {
 }
 
 // ─── Persona Card with Chat ───────────────────────────────────────────────────
-function PersonaCard({ p, index, color }) {
+function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
   const [chatOpen, setChatOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -1672,18 +1672,47 @@ function PersonaCard({ p, index, color }) {
       )}
 
       {p.preferredChannels?.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: (contentEmails.length || contentIg.length) ? 16 : 0 }}>
           <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>Preferred channels:</span>
           {p.preferredChannels.map((ch, j) => (
             <span key={j} style={{ fontSize: 12, background: '#f3f4f6', color: '#374151', borderRadius: 6, padding: '2px 10px' }}>{j + 1}. {ch}</span>
           ))}
         </div>
       )}
+
+      {(contentEmails.length > 0 || contentIg.length > 0) && (
+        <div style={{ borderTop: `1px solid ${color}30`, paddingTop: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 10 }}>CONTENT ASSETS TARGETING THIS PERSONA</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {contentEmails.map((e, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#f5f3ff', borderRadius: 6, padding: '6px 10px' }}>
+                <span style={{ fontSize: 12, color: '#6366f1' }}>📧</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>"{e.subjectLine}"</div>
+                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{e.theme} · {e.sendTiming}</div>
+                </div>
+              </div>
+            ))}
+            {contentIg.map((g, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#fdf2f8', borderRadius: 6, padding: '6px 10px' }}>
+                <span style={{ fontSize: 12, color: '#ec4899' }}>📸</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{g.category}</div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{g.caption?.slice(0, 90)}…</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {!contentEmails.length && !contentIg.length && (
+            <div style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>No tagged content yet — re-run Module 5 to generate persona-targeted assets.</div>
+          )}
+        </div>
+      )}
     </Card>
   )
 }
 
-function PersonasTab({ personas }) {
+function PersonasTab({ personas, content }) {
   const [suggestions, setSuggestions] = useState(null)
   const [suggesting, setSuggesting] = useState(false)
 
@@ -1753,9 +1782,11 @@ function PersonasTab({ personas }) {
         </div>
       )}
 
-      {personas.personas.map((p, i) => (
-        <PersonaCard key={i} p={p} index={i} color={PERSONA_COLORS[i % PERSONA_COLORS.length]} />
-      ))}
+      {personas.personas.map((p, i) => {
+        const emails = (content?.content?.emailCampaigns?.emailCampaigns || []).filter(e => e.targetPersona === p.name)
+        const ig = (content?.content?.instagramCaptions?.instagramCaptions || []).filter(g => g.targetPersona === p.name)
+        return <PersonaCard key={i} p={p} index={i} color={PERSONA_COLORS[i % PERSONA_COLORS.length]} contentEmails={emails} contentIg={ig} />
+      })}
     </div>
   )
 }
@@ -1765,12 +1796,15 @@ const CAMPAIGN_STATUSES = ['planning', 'active', 'complete', 'paused']
 const STATUS_COLORS = { planning: '#6366f1', active: '#10b981', complete: '#6b7280', paused: '#f59e0b' }
 const CHANNELS = ['email', 'instagram', 'site', 'hero', 'sms', 'other']
 
-function CampaignsTab({ campaigns, setCampaigns, personas }) {
+function CampaignsTab({ campaigns, setCampaigns, personas, content }) {
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({})
   const [generatingBrief, setGeneratingBrief] = useState(null)
+  const [contentSuggestions, setContentSuggestions] = useState({}) // campaignId → { emails, ig }
   const personaNames = personas?.personas?.map(p => p.name) || []
+
+  const PCOLS = { 'The Polished Professional': '#6366f1', 'The Emerging Leader': '#10b981', 'The Refined Rewinder': '#f59e0b', 'The Practical Multitasker': '#ec4899' }
 
   function openNew() {
     setForm({ name: '', status: 'planning', startDate: '', endDate: '', persona: personaNames[0] || '', styleGuide: { colorDirection: '', moodKeywords: [], avoidWords: [], heroImageDirection: '' } })
@@ -1785,12 +1819,42 @@ function CampaignsTab({ campaigns, setCampaigns, personas }) {
   }
 
   async function save() {
+    const isNew = !editId
     const method = editId ? 'PUT' : 'POST'
     const url = editId ? `/api/campaigns/${editId}` : '/api/campaigns'
     const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
     const saved = await res.json()
     setCampaigns(prev => editId ? prev.map(c => c.id === editId ? saved : c) : [...prev, saved])
     setShowForm(false)
+
+    // After creating a new campaign, surface matching content assets
+    if (isNew && content?.content) {
+      const persona = saved.persona
+      const emails = (content.content.emailCampaigns?.emailCampaigns || [])
+        .filter(e => !persona || !e.targetPersona || e.targetPersona === persona)
+        .slice(0, 4)
+      const ig = (content.content.instagramCaptions?.instagramCaptions || [])
+        .filter(g => !persona || !g.targetPersona || g.targetPersona === persona)
+        .slice(0, 3)
+      if (emails.length || ig.length) {
+        setContentSuggestions(prev => ({ ...prev, [saved.id]: { emails, ig } }))
+      }
+    }
+  }
+
+  async function pinContent(campaignId, asset) {
+    await fetch(`/api/campaigns/${campaignId}/link-content`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(asset),
+    })
+    setCampaigns(prev => prev.map(c => {
+      if (c.id !== campaignId) return c
+      const linked = c.linkedContent || []
+      const key = asset.type === 'email' ? asset.subjectLine : asset.caption?.slice(0, 80)
+      if (linked.some(a => (a.type === 'email' ? a.subjectLine : a.caption?.slice(0, 80)) === key)) return c
+      return { ...c, linkedContent: [...linked, asset] }
+    }))
   }
 
   async function deleteCampaign(id) {
@@ -1930,6 +1994,51 @@ function CampaignsTab({ campaigns, setCampaigns, personas }) {
               style={{ padding: '7px 16px', borderRadius: 8, border: '1px dashed #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, opacity: generatingBrief === c.id ? 0.6 : 1 }}>
               {generatingBrief === c.id ? '✨ Generating brief…' : '✨ Generate Campaign Brief'}
             </button>
+          )}
+
+          {/* Pinned content assets */}
+          {(c.linkedContent || []).length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 6 }}>PINNED CONTENT</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {c.linkedContent.map((a, ai) => (
+                  <div key={ai} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f9fafb', borderRadius: 6, padding: '5px 10px', fontSize: 12 }}>
+                    <span style={{ color: a.type === 'email' ? '#6366f1' : '#ec4899', fontWeight: 700 }}>{a.type === 'email' ? '📧' : '📸'}</span>
+                    <span style={{ color: '#374151', flex: 1 }}>{a.type === 'email' ? `"${a.subjectLine}"` : a.caption?.slice(0, 80) + '…'}</span>
+                    {a.targetPersona && <span style={{ color: PCOLS[a.targetPersona] || '#9ca3af', fontSize: 11, fontWeight: 600 }}>{a.targetPersona}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Auto-suggested content (shown after new campaign creation) */}
+          {contentSuggestions[c.id] && (
+            <div style={{ marginTop: 14, border: '1px dashed #6366f1', borderRadius: 8, padding: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#6366f1' }}>SUGGESTED CONTENT FOR THIS CAMPAIGN</div>
+                <button onClick={() => setContentSuggestions(prev => { const n = { ...prev }; delete n[c.id]; return n })}
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 12 }}>dismiss</button>
+              </div>
+              {contentSuggestions[c.id].emails.map((e, ei) => (
+                <div key={ei} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: '#f9fafb', borderRadius: 6, padding: '5px 10px' }}>
+                  <span style={{ fontSize: 12, color: '#6366f1' }}>📧</span>
+                  <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>"{e.subjectLine}" <span style={{ color: '#9ca3af' }}>· {e.theme}</span></span>
+                  {e.targetPersona && <span style={{ fontSize: 11, color: PCOLS[e.targetPersona] || '#9ca3af', fontWeight: 600 }}>{e.targetPersona}</span>}
+                  <button onClick={() => pinContent(c.id, { type: 'email', subjectLine: e.subjectLine, theme: e.theme, targetPersona: e.targetPersona, brief: e.brief })}
+                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
+                </div>
+              ))}
+              {contentSuggestions[c.id].ig.map((g, gi) => (
+                <div key={gi} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: '#f9fafb', borderRadius: 6, padding: '5px 10px' }}>
+                  <span style={{ fontSize: 12, color: '#ec4899' }}>📸</span>
+                  <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>{g.category} <span style={{ color: '#9ca3af' }}>· {g.caption?.slice(0, 60)}…</span></span>
+                  {g.targetPersona && <span style={{ fontSize: 11, color: PCOLS[g.targetPersona] || '#9ca3af', fontWeight: 600 }}>{g.targetPersona}</span>}
+                  <button onClick={() => pinContent(c.id, { type: 'ig', caption: g.caption, category: g.category, targetPersona: g.targetPersona })}
+                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #ec4899', background: '#fff', color: '#ec4899', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
+                </div>
+              ))}
+            </div>
           )}
         </Card>
       ))}
@@ -2191,14 +2300,33 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
         </div>
       </div>
 
+      {/* Campaign legend */}
+      {campaigns?.filter(c => c.startDate && c.endDate).length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af' }}>CAMPAIGNS:</span>
+          {campaigns.filter(c => c.startDate && c.endDate).map((c, ci) => (
+            <span key={c.id} style={{ fontSize: 11, background: Object.values(STATUS_COLORS)[ci % 4] + '20', color: Object.values(STATUS_COLORS)[ci % 4], borderRadius: 6, padding: '2px 8px', fontWeight: 600 }}>{c.name}</span>
+          ))}
+        </div>
+      )}
+
       {/* Week grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8 }}>
         {weekDates.map((date, di) => {
           const dk = dateKey(date)
           const dayItems = calItems.filter(i => i.date === dk)
           const isToday = dk === today
+          const activeCamps = (campaigns || []).filter(c => {
+            if (!c.startDate || !c.endDate) return false
+            return dk >= c.startDate && dk <= c.endDate
+          })
           return (
             <div key={dk} style={{ minHeight: 120, background: '#fff', borderRadius: 10, border: `1px solid ${isToday ? '#6366f1' : '#e5e7eb'}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
+              {/* Campaign bands */}
+              {activeCamps.map((c, ci) => (
+                <div key={c.id} title={c.name}
+                  style={{ height: 4, borderRadius: 2, marginBottom: 3, background: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4] }} />
+              ))}
               {/* Day header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <div>
@@ -3203,7 +3331,7 @@ export default function App() {
           <>
             {tab === 'overview'  && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
             {tab === 'calendar'  && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
-            {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} />}
+            {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} />}
             {tab === 'catalog'   && <CatalogTab catalog={data.catalog} />}
             {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
             {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={loadData} />}
@@ -3213,7 +3341,7 @@ export default function App() {
             {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} />}
             {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
             {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
-            {tab === 'personas'  && <PersonasTab personas={data.personas} />}
+            {tab === 'personas'  && <PersonasTab personas={data.personas} content={data.content} />}
             {tab === 'brand'     && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
           </>
         )}
