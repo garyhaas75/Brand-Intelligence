@@ -933,10 +933,25 @@ function ContentGeneratorPanel() {
   )
 }
 
-function ContentTab({ content, catalog }) {
+function ContentTab({ content, catalog, campaigns }) {
   const [activeSection, setActiveSection] = useState('email')
   const [personaFilter, setPersonaFilter] = useState(null)
+  const [linkingAsset, setLinkingAsset] = useState(null) // { type, key, asset } — which asset is showing campaign picker
+  const [linkedToast, setLinkedToast] = useState(null) // campaign name to show in toast
   const c = content?.content
+  const activeCampaigns = (campaigns || []).filter(c => c.status !== 'archived')
+
+  async function linkToCampaign(campaignId, asset) {
+    await fetch(`/api/campaigns/${campaignId}/link-content`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(asset),
+    })
+    const camp = activeCampaigns.find(c => c.id === campaignId)
+    setLinkingAsset(null)
+    setLinkedToast(camp?.name || 'Campaign')
+    setTimeout(() => setLinkedToast(null), 2500)
+  }
 
   const PERSONAS = ['The Polished Professional', 'The Emerging Leader', 'The Refined Rewinder', 'The Practical Multitasker']
   const PERSONA_COLORS = {
@@ -962,6 +977,11 @@ function ContentTab({ content, catalog }) {
         <div style={{ padding: 40, color: '#6b7280', textAlign: 'center' }}>No scheduled content data. Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
       ) : (
       <>
+      {linkedToast && (
+        <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#111827', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+          Added to "{linkedToast}"
+        </div>
+      )}
       <SectionHeader>Generated Content Assets</SectionHeader>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         {sections.map(s => (
@@ -1018,9 +1038,29 @@ function ContentTab({ content, catalog }) {
               <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>BRIEF</div>
               <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{e.brief}</div>
             </div>
-            <div style={{ display: 'flex', gap: 12, fontSize: 13, marginBottom: products.length ? 14 : 0 }}>
+            <div style={{ display: 'flex', gap: 12, fontSize: 13, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               <span>🎯 CTA: <strong>{e.ctaButton}</strong></span>
               <span>📅 {e.sendTiming}</span>
+              {activeCampaigns.length > 0 && (
+                <div style={{ marginLeft: 'auto', position: 'relative' }}>
+                  {linkingAsset?.key === `email-${i}` ? (
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <select onChange={ev => { if (ev.target.value) linkToCampaign(ev.target.value, { type: 'email', subjectLine: e.subjectLine, theme: e.theme, targetPersona: e.targetPersona, brief: e.brief }) }}
+                        style={{ border: '1px solid #6366f1', borderRadius: 6, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
+                        defaultValue="">
+                        <option value="">— pick campaign —</option>
+                        {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                      <button onClick={() => setLinkingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setLinkingAsset({ key: `email-${i}` })}
+                      style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                      + Add to Campaign
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
             {products.length > 0 && (
               <div>
@@ -1064,7 +1104,27 @@ function ContentTab({ content, catalog }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: products.length ? 14 : 0 }}>
               {(g.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
             </div>
-            {g.notes && <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic', marginBottom: products.length ? 12 : 0 }}>{g.notes}</div>}
+            {g.notes && <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic', marginBottom: 10 }}>{g.notes}</div>}
+            {activeCampaigns.length > 0 && (
+              <div style={{ marginBottom: products.length ? 14 : 0 }}>
+                {linkingAsset?.key === `ig-${i}` ? (
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <select onChange={ev => { if (ev.target.value) linkToCampaign(ev.target.value, { type: 'ig', caption: g.caption, category: g.category, targetPersona: g.targetPersona }) }}
+                      style={{ border: '1px solid #ec4899', borderRadius: 6, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
+                      defaultValue="">
+                      <option value="">— pick campaign —</option>
+                      {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                    <button onClick={() => setLinkingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
+                  </div>
+                ) : (
+                  <button onClick={() => setLinkingAsset({ key: `ig-${i}` })}
+                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #ec4899', background: '#fff', color: '#ec4899', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                    + Add to Campaign
+                  </button>
+                )}
+              </div>
+            )}
             {products.length > 0 && (
               <div style={{ marginTop: 4 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
@@ -3150,7 +3210,7 @@ export default function App() {
             {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
             {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
             {tab === 'seo-products' && <SeoProductTab />}
-            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} />}
+            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} />}
             {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
             {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
             {tab === 'personas'  && <PersonasTab personas={data.personas} />}

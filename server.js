@@ -373,6 +373,35 @@ app.post('/api/campaigns/:id/generate-brief', async (req, res) => {
   const campaign = campaigns.find(c => c.id === req.params.id);
   if (!campaign) return res.status(404).json({ error: 'Not found' });
 
+  // Pull matching content assets from content_recommendations.json
+  let contentAssetContext = '';
+  try {
+    const contentFile = path.join(DATA_DIR, 'content_recommendations.json');
+    if (fs.existsSync(contentFile)) {
+      const contentData = JSON.parse(fs.readFileSync(contentFile, 'utf8'));
+      const persona = campaign.persona || 'The Polished Professional';
+      const emailAssets = (contentData.content?.emailCampaigns?.emailCampaigns || [])
+        .filter(e => !e.targetPersona || e.targetPersona === persona)
+        .slice(0, 3)
+        .map(e => `  - Email: "${e.subjectLine}" | ${e.theme} | CTA: ${e.ctaButton}`)
+        .join('\n');
+      const igAssets = (contentData.content?.instagramCaptions?.instagramCaptions || [])
+        .filter(g => !g.targetPersona || g.targetPersona === persona)
+        .slice(0, 2)
+        .map(g => `  - IG (${g.category}): ${g.caption.slice(0, 100)}…`)
+        .join('\n');
+      const linkedAssets = (campaign.linkedContent || [])
+        .map(a => `  - [Pinned] ${a.type === 'email' ? 'Email' : 'IG'}: "${a.subjectLine || a.caption?.slice(0, 80)}"`)
+        .join('\n');
+      if (emailAssets || igAssets || linkedAssets) {
+        contentAssetContext = `\nEXISTING CONTENT ASSETS (persona-matched from content library):
+${linkedAssets ? 'PINNED TO THIS CAMPAIGN:\n' + linkedAssets + '\n' : ''}${emailAssets ? 'EMAIL OPTIONS:\n' + emailAssets + '\n' : ''}${igAssets ? 'INSTAGRAM OPTIONS:\n' + igAssets : ''}
+
+Use these as starting points for channel execution notes — reference specific subject lines and IG angles where relevant.`;
+      }
+    }
+  } catch (_) {}
+
   const brandContext = getBrandContext();
   const prompt = `Write a campaign brief for this Anne Klein marketing campaign.
 
@@ -387,14 +416,14 @@ Color direction: ${campaign.styleGuide?.colorDirection || 'not specified'}
 Mood: ${(campaign.styleGuide?.moodKeywords || []).join(', ') || 'not specified'}
 Avoid: ${(campaign.styleGuide?.avoidWords || []).join(', ') || 'none specified'}
 Hero image direction: ${campaign.styleGuide?.heroImageDirection || 'not specified'}
-
+${contentAssetContext}
 BRAND CONTEXT:
 ${brandContext}
 
 Write a 3-paragraph campaign brief covering:
 1. Campaign objective and strategic rationale
 2. Creative direction (tone, visual language, key message)
-3. Channel execution notes (email, Instagram, site)
+3. Channel execution notes (email, Instagram, site) — reference specific content assets above where relevant
 
 Be specific and actionable. No generic marketing language.`;
 
@@ -413,6 +442,35 @@ Be specific and actionable. No generic marketing language.`;
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// Link a content asset to a campaign (stored in campaign.linkedContent[])
+app.post('/api/campaigns/:id/link-content', (req, res) => {
+  const campaigns = loadCampaigns();
+  const idx = campaigns.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const asset = req.body; // { type, subjectLine, theme, caption, targetPersona, category }
+  const linked = campaigns[idx].linkedContent || [];
+  const key = asset.type === 'email' ? asset.subjectLine : asset.caption?.slice(0, 80);
+  if (!linked.some(a => (a.type === 'email' ? a.subjectLine : a.caption?.slice(0, 80)) === key)) {
+    linked.push(asset);
+  }
+  campaigns[idx].linkedContent = linked;
+  saveCampaigns(campaigns);
+  res.json(campaigns[idx]);
+});
+
+app.delete('/api/campaigns/:id/link-content', (req, res) => {
+  const campaigns = loadCampaigns();
+  const idx = campaigns.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const { key } = req.body;
+  campaigns[idx].linkedContent = (campaigns[idx].linkedContent || []).filter(a => {
+    const k = a.type === 'email' ? a.subjectLine : a.caption?.slice(0, 80);
+    return k !== key;
+  });
+  saveCampaigns(campaigns);
+  res.json(campaigns[idx]);
 });
 
 // ─── Calendar CRUD ────────────────────────────────────────────────────────────
