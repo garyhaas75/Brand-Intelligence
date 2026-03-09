@@ -3297,6 +3297,11 @@ export default function App() {
     load()
   }, [])
 
+  async function reloadEmailAnalysis() {
+    const emailAnalysis = await fetchEndpoint('/email-analysis')
+    setData(prev => ({ ...prev, emailAnalysis }))
+  }
+
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: '#f9fafb', minHeight: '100vh' }}>
       <div style={{ background: '#111827', color: '#fff', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -3334,7 +3339,7 @@ export default function App() {
             {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} />}
             {tab === 'catalog'   && <CatalogTab catalog={data.catalog} />}
             {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
-            {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={loadData} />}
+            {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={reloadEmailAnalysis} />}
             {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
             {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
             {tab === 'seo-products' && <SeoProductTab />}
