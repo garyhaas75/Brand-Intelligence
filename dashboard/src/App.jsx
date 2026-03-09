@@ -217,7 +217,7 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
   return (
     <div>
       <SectionHeader>Platform Status</SectionHeader>
-      <div className="ak-competitor-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div className="ak-competitor-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 24 }}>
         <Stat label="Products Scraped" value={catalog?.totalProducts?.toLocaleString()} sub="AK catalog" color="#6366f1" />
         <Stat label="Category Gaps" value={siteIntel?.categoryGapAnalysis?.gaps?.length} sub="vs competitors" color="#f59e0b" />
         <Stat label="Email Signups" value={`${emailSubmitted}/5`} sub="competitors" color="#10b981" />
@@ -387,6 +387,7 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
   return (
     <div>
       <SectionHeader>Competitor Navigation</SectionHeader>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 0 }}>
       {(siteIntel.brands || []).map(brand => (
         <Card key={brand.id} title={brand.name} subtitle={brand.url}
           accent={brand.id === 'anne_klein' ? '#6366f1' : brand.botBlocked ? '#ef4444' : '#10b981'}>
@@ -414,6 +415,7 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
           )}
         </Card>
       ))}
+      </div>
 
       <SectionHeader>Category Gaps ({realGaps.length} found)</SectionHeader>
       <Card subtitle="Categories on competitor sites not present on anneklein.com">
@@ -537,6 +539,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
       {welcomeBenchmark.length > 0 && (
         <>
           <SectionHeader>Welcome Email Benchmark</SectionHeader>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 0 }}>
           {welcomeBenchmark.map((b, i) => (
             <Card key={i} accent={gradeColor(b.grade)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -555,6 +558,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
               {b.tactic && <div style={{ fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>{b.tactic}</div>}
             </Card>
           ))}
+          </div>
           {analysis.emailTypeAnalysis?.welcome?.akRecommendation && (
             <Card accent="#10b981">
               <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>AK WELCOME RECOMMENDATION</div>
@@ -688,6 +692,7 @@ function SocialTab({ socialIntel }) {
         <Stat label="Engagement Gap" value={intel.engagementGap?.toLocaleString()} color="#f59e0b" sub="competitors ahead" />
       </div>
 
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 0 }}>
       {(socialIntel.brands || []).map(b => (
         <Card key={b.id} title={`${b.name} (@${b.handle})`}
           accent={b.id === 'anne_klein' ? '#6366f1' : '#e5e7eb'}>
@@ -734,6 +739,7 @@ function SocialTab({ socialIntel }) {
           )}
         </Card>
       ))}
+      </div>
 
       {intel.competitorHashtagsNotUsedByAK?.length > 0 && (
         <>
@@ -783,84 +789,92 @@ function SEOTab({ seoIntel, content }) {
         <Stat label="CTR Opps" value={qa.ctrOpportunities?.length} sub="low CTR" color="#f59e0b" />
       </div>
 
-      {qa.top50Queries?.length > 0 && (
-        <>
-          <SectionHeader>Top Queries</SectionHeader>
-          <Card>
-            <div className="ak-table-scroll" style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: `2px solid ${T.border}` }}>
-                  {['Query', 'Clicks', 'Impressions', 'CTR', 'Position', 'Type'].map(h => (
-                    <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: T.textMuted, fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {qa.top50Queries.slice(0, 25).map((q, i) => (
-                  <tr key={i} style={{ borderBottom: `1px solid ${T.borderAlt}` }}>
-                    <td style={{ padding: '7px 8px', fontWeight: 500, color: T.text }}>{q.query}</td>
-                    <td style={{ padding: '7px 8px', color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>{q.clicks}</td>
-                    <td style={{ padding: '7px 8px', color: T.textMuted, whiteSpace: 'nowrap' }}>{q.impressions?.toLocaleString()}</td>
-                    <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.ctr}%</td>
-                    <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.position}</td>
-                    <td style={{ padding: '7px 8px' }}><Badge color={q.type === 'branded' ? 'purple' : q.type === 'transactional' ? 'green' : 'gray'}>{q.type}</Badge></td>
-                  </tr>
+      <div className="ak-seo-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24 }}>
+        {/* LEFT: Top Queries table */}
+        <div>
+          {qa.top50Queries?.length > 0 && (
+            <>
+              <SectionHeader>Top Queries</SectionHeader>
+              <Card>
+                <div className="ak-table-scroll" style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${T.border}` }}>
+                      {['Query', 'Clicks', 'Impressions', 'CTR', 'Position', 'Type'].map(h => (
+                        <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: T.textMuted, fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {qa.top50Queries.slice(0, 25).map((q, i) => (
+                      <tr key={i} style={{ borderBottom: `1px solid ${T.borderAlt}` }}>
+                        <td style={{ padding: '7px 8px', fontWeight: 500, color: T.text }}>{q.query}</td>
+                        <td style={{ padding: '7px 8px', color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>{q.clicks}</td>
+                        <td style={{ padding: '7px 8px', color: T.textMuted, whiteSpace: 'nowrap' }}>{q.impressions?.toLocaleString()}</td>
+                        <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.ctr}%</td>
+                        <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.position}</td>
+                        <td style={{ padding: '7px 8px' }}><Badge color={q.type === 'branded' ? 'purple' : q.type === 'transactional' ? 'green' : 'gray'}>{q.type}</Badge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </div>
+              </Card>
+            </>
+          )}
+        </div>
+
+        {/* RIGHT: Quick Wins + CTR Opps + Claude's SEO Action Plan */}
+        <div>
+          {qa.quickWins?.length > 0 && (
+            <>
+              <SectionHeader>Quick Wins (Position 4–15)</SectionHeader>
+              <Card subtitle="High impressions, achievable ranking — small content changes could move these to page 1">
+                {qa.quickWins.slice(0, 15).map((q, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.borderAlt}`, gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 500, fontSize: 14, color: T.text, flex: '1 1 140px' }}>{q.query}</span>
+                    <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textMuted, flexShrink: 0 }}>
+                      <span>pos <strong>{q.position}</strong></span>
+                      <span>{q.impressions?.toLocaleString()} impr</span>
+                      <span>{q.ctr}% CTR</span>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-            </div>
-          </Card>
-        </>
-      )}
+              </Card>
+            </>
+          )}
 
-      {qa.quickWins?.length > 0 && (
-        <>
-          <SectionHeader>Quick Wins (Position 4–15)</SectionHeader>
-          <Card subtitle="High impressions, achievable ranking — small content changes could move these to page 1">
-            {qa.quickWins.slice(0, 15).map((q, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.borderAlt}`, gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 500, fontSize: 14, color: T.text, flex: '1 1 140px' }}>{q.query}</span>
-                <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textMuted, flexShrink: 0 }}>
-                  <span>pos <strong>{q.position}</strong></span>
-                  <span>{q.impressions?.toLocaleString()} impr</span>
-                  <span>{q.ctr}% CTR</span>
-                </div>
-              </div>
-            ))}
-          </Card>
-        </>
-      )}
-
-      {content?.content?.seoQuickWins?.seoQuickWins?.length > 0 && (
-        <>
-          <SectionHeader>Claude's SEO Action Plan</SectionHeader>
-          {content.content.seoQuickWins.seoQuickWins.map((w, i) => (
-            <Card key={i} title={w.keyword} accent="#10b981">
-              <div style={{ marginBottom: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>PAGE TO OPTIMIZE: </span>
-                <span style={{ fontSize: 13 }}>{w.currentPage}</span>
-              </div>
-              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>TITLE TAG</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{w.titleTag}</div>
-              </div>
-              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>META DESCRIPTION</div>
-                <div style={{ fontSize: 13, color: T.textSub }}>{w.metaDescription}</div>
-              </div>
-              {w.contentAdditions?.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6 }}>ON-PAGE ADDITIONS</div>
-                  {w.contentAdditions.map((a, j) => (
-                    <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0 3px 12px', borderLeft: '3px solid #10b981', marginBottom: 4 }}>{a}</div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          ))}
-        </>
-      )}
+          {content?.content?.seoQuickWins?.seoQuickWins?.length > 0 && (
+            <>
+              <SectionHeader>Claude's SEO Action Plan</SectionHeader>
+              {content.content.seoQuickWins.seoQuickWins.map((w, i) => (
+                <Card key={i} title={w.keyword} accent="#10b981">
+                  <div style={{ marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>PAGE TO OPTIMIZE: </span>
+                    <span style={{ fontSize: 13 }}>{w.currentPage}</span>
+                  </div>
+                  <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>TITLE TAG</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{w.titleTag}</div>
+                  </div>
+                  <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>META DESCRIPTION</div>
+                    <div style={{ fontSize: 13, color: T.textSub }}>{w.metaDescription}</div>
+                  </div>
+                  {w.contentAdditions?.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6 }}>ON-PAGE ADDITIONS</div>
+                      {w.contentAdditions.map((a, j) => (
+                        <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0 3px 12px', borderLeft: '3px solid #10b981', marginBottom: 4 }}>{a}</div>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -1512,143 +1526,150 @@ function AgenticSearchTab({ agenticSearch }) {
         <Stat label="Visibility Gaps" value={scores.gaps?.length} sub="queries AK missed" color="#ef4444" />
       </div>
 
-      {/* Competitor comparison bar chart */}
-      <SectionHeader>AI Visibility vs Competitors</SectionHeader>
-      <Card subtitle={`Tested across ${scores.queriesTested} shopping queries · Model: Claude Sonnet`}>
-        {[{ brand: 'Anne Klein', rate: scores.visibilityRate, mentions: scores.queriesMentioned }, ...(scores.competitorVisibility || [])].map((c, i) => (
-          <div key={i} style={{ marginBottom: 10 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 13, fontWeight: c.brand === 'Anne Klein' ? 700 : 500, color: c.brand === 'Anne Klein' ? T.accent : T.textSub }}>{c.brand}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: c.rate >= 60 ? '#10b981' : c.rate >= 30 ? '#f59e0b' : '#9ca3af' }}>{c.rate}%</span>
-            </div>
-            <div style={{ background: T.surfaceAlt, borderRadius: 4, height: 8, overflow: 'hidden' }}>
-              <div style={{ background: c.brand === 'Anne Klein' ? '#6366f1' : T.border, height: '100%', width: `${c.rate}%`, borderRadius: 4, transition: 'width 0.3s' }} />
-            </div>
-          </div>
-        ))}
-      </Card>
-
-      {/* Competitor drivers — what's making them rank */}
-      <SectionHeader>What's Driving Competitor Rankings</SectionHeader>
-      <Card subtitle="Why AI assistants recommend each competitor — inferred from query responses">
-        {(scores.competitorVisibility || []).filter(c => c.rate > 0).map((c, i) => {
-          const appearances = (queryResults || []).filter(r => r.visibility?.[c.brand]?.mentioned)
-          const catCounts = {}
-          appearances.forEach(r => { catCounts[r.category] = (catCounts[r.category] || 0) + 1 })
-          const topCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 3)
-          const positiveContexts = appearances
-            .filter(r => r.visibility?.[c.brand]?.sentiment === 'positive' && r.visibility?.[c.brand]?.context)
-            .slice(0, 1)
-          const sentimentPos = appearances.filter(r => r.visibility?.[c.brand]?.sentiment === 'positive').length
-          const sentimentPct = appearances.length ? Math.round(sentimentPos / appearances.length * 100) : 0
-          return (
-            <div key={c.brand} style={{ padding: '14px 0', borderBottom: i < (scores.competitorVisibility.filter(x => x.rate > 0).length - 1) ? `1px solid ${T.borderAlt}` : 'none' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: T.text }}>{c.brand}</span>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <Badge color={c.rate >= 60 ? 'green' : c.rate >= 30 ? 'yellow' : 'gray'}>{c.rate}% visible</Badge>
-                  <Badge color={sentimentPct >= 60 ? 'green' : sentimentPct >= 30 ? 'yellow' : 'gray'}>{sentimentPct}% positive</Badge>
+      <div className="ak-ai-main-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
+        {/* LEFT: Visibility stats + brand comparison bars */}
+        <div>
+          {/* Competitor comparison bar chart */}
+          <SectionHeader>AI Visibility vs Competitors</SectionHeader>
+          <Card subtitle={`Tested across ${scores.queriesTested} shopping queries · Model: Claude Sonnet`}>
+            {[{ brand: 'Anne Klein', rate: scores.visibilityRate, mentions: scores.queriesMentioned }, ...(scores.competitorVisibility || [])].map((c, i) => (
+              <div key={i} style={{ marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, fontWeight: c.brand === 'Anne Klein' ? 700 : 500, color: c.brand === 'Anne Klein' ? T.accent : T.textSub }}>{c.brand}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: c.rate >= 60 ? '#10b981' : c.rate >= 30 ? '#f59e0b' : '#9ca3af' }}>{c.rate}%</span>
                 </div>
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: positiveContexts.length ? 8 : 0 }}>
-                {topCats.map(([cat, count]) => (
-                  <span key={cat} style={{ background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
-                    {cat} <strong>({count}/{appearances.length})</strong>
-                  </span>
-                ))}
-              </div>
-              {positiveContexts.map((p, j) => (
-                <div key={j} style={{ fontSize: 12, color: T.textMuted, background: T.bg, borderRadius: 6, padding: '6px 10px', lineHeight: 1.5, fontStyle: 'italic' }}>
-                  "…{p.visibility?.[c.brand]?.context?.substring(0, 200)}…"
-                  <span style={{ display: 'block', fontSize: 11, color: T.textFaint, marginTop: 2 }}>from query: "{p.query}"</span>
-                </div>
-              ))}
-            </div>
-          )
-        })}
-      </Card>
-
-      {/* Per-category breakdown */}
-      <SectionHeader>Visibility by Query Type</SectionHeader>
-      <Card>
-        {(scores.categoryBreakdown || []).map((c, i) => (
-          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-            <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{c.category}</span>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: T.textFaint }}>{c.mentioned}/{c.total} queries</span>
-              <Badge color={c.visibilityRate >= 60 ? 'green' : c.visibilityRate >= 30 ? 'yellow' : 'red'}>{c.visibilityRate}%</Badge>
-            </div>
-          </div>
-        ))}
-      </Card>
-
-      {/* Visibility gaps */}
-      {scores.gaps?.length > 0 && (
-        <>
-          <SectionHeader>Visibility Gaps — AK Missing, Competitors Present</SectionHeader>
-          <Card subtitle="These are queries where AI assistants recommend competitors but not Anne Klein">
-            {scores.gaps.map((g, i) => (
-              <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: T.text, marginBottom: 4 }}>"{g.query}"</div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, color: T.textFaint }}>{g.category} ·</span>
-                  {g.competitorsPresent.map(b => <Badge key={b} color="blue">{b}</Badge>)}
-                  <span style={{ fontSize: 12, color: T.textFaint }}>mentioned instead</span>
+                <div style={{ background: T.surfaceAlt, borderRadius: 4, height: 8, overflow: 'hidden' }}>
+                  <div style={{ background: c.brand === 'Anne Klein' ? '#6366f1' : T.border, height: '100%', width: `${c.rate}%`, borderRadius: 4, transition: 'width 0.3s' }} />
                 </div>
               </div>
             ))}
           </Card>
-        </>
-      )}
 
-      {/* GEO recommendations */}
-      {geoRecommendations?.length > 0 && (
-        <>
-          <SectionHeader>GEO Recommendations (Generative Engine Optimization)</SectionHeader>
-          {geoRecommendations.map((r, i) => (
-            <Card key={i} title={r.title} accent={r.priority === 'high' ? '#ef4444' : '#f59e0b'}>
-              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                <Badge color={r.priority === 'high' ? 'red' : 'yellow'}>{r.priority} priority</Badge>
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>ACTION</div>
-                <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{r.action}</p>
-              </div>
-              <div style={{ background: T.bg, borderRadius: 8, padding: '8px 12px', fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>
-                <strong>Why:</strong> {r.rationale}
-              </div>
-            </Card>
-          ))}
-        </>
-      )}
+          {/* Competitor drivers — what's making them rank */}
+          <SectionHeader>What's Driving Competitor Rankings</SectionHeader>
+          <Card subtitle="Why AI assistants recommend each competitor — inferred from query responses">
+            {(scores.competitorVisibility || []).filter(c => c.rate > 0).map((c, i) => {
+              const appearances = (queryResults || []).filter(r => r.visibility?.[c.brand]?.mentioned)
+              const catCounts = {}
+              appearances.forEach(r => { catCounts[r.category] = (catCounts[r.category] || 0) + 1 })
+              const topCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 3)
+              const positiveContexts = appearances
+                .filter(r => r.visibility?.[c.brand]?.sentiment === 'positive' && r.visibility?.[c.brand]?.context)
+                .slice(0, 1)
+              const sentimentPos = appearances.filter(r => r.visibility?.[c.brand]?.sentiment === 'positive').length
+              const sentimentPct = appearances.length ? Math.round(sentimentPos / appearances.length * 100) : 0
+              return (
+                <div key={c.brand} style={{ padding: '14px 0', borderBottom: i < (scores.competitorVisibility.filter(x => x.rate > 0).length - 1) ? `1px solid ${T.borderAlt}` : 'none' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: T.text }}>{c.brand}</span>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <Badge color={c.rate >= 60 ? 'green' : c.rate >= 30 ? 'yellow' : 'gray'}>{c.rate}% visible</Badge>
+                      <Badge color={sentimentPct >= 60 ? 'green' : sentimentPct >= 30 ? 'yellow' : 'gray'}>{sentimentPct}% positive</Badge>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: positiveContexts.length ? 8 : 0 }}>
+                    {topCats.map(([cat, count]) => (
+                      <span key={cat} style={{ background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
+                        {cat} <strong>({count}/{appearances.length})</strong>
+                      </span>
+                    ))}
+                  </div>
+                  {positiveContexts.map((p, j) => (
+                    <div key={j} style={{ fontSize: 12, color: T.textMuted, background: T.bg, borderRadius: 6, padding: '6px 10px', lineHeight: 1.5, fontStyle: 'italic' }}>
+                      "…{p.visibility?.[c.brand]?.context?.substring(0, 200)}…"
+                      <span style={{ display: 'block', fontSize: 11, color: T.textFaint, marginTop: 2 }}>from query: "{p.query}"</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+          </Card>
 
-      {/* Query-level detail */}
-      <SectionHeader>All Query Results</SectionHeader>
-      <Card subtitle="Full breakdown of how AK and competitors appeared in each AI search query">
-        {(queryResults || []).filter(r => !r.error).map((r, i) => (
-          <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-              <div style={{ flex: 1, marginRight: 12 }}>
-                <span style={{ fontSize: 12, color: T.textFaint, marginRight: 6 }}>[{r.category}]</span>
-                <span style={{ fontSize: 13, fontWeight: 500, color: T.textSub }}>{r.query}</span>
+          {/* Per-category breakdown */}
+          <SectionHeader>Visibility by Query Type</SectionHeader>
+          <Card>
+            {(scores.categoryBreakdown || []).map((c, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{c.category}</span>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, color: T.textFaint }}>{c.mentioned}/{c.total} queries</span>
+                  <Badge color={c.visibilityRate >= 60 ? 'green' : c.visibilityRate >= 30 ? 'yellow' : 'red'}>{c.visibilityRate}%</Badge>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                <Badge color={r.akMentioned ? (r.akTopOfMind ? 'green' : 'blue') : 'red'}>
-                  {r.akMentioned ? (r.akTopOfMind ? 'AK #1' : `AK #${r.akPosition}`) : 'AK absent'}
-                </Badge>
+            ))}
+          </Card>
+
+          {/* Visibility gaps */}
+          {scores.gaps?.length > 0 && (
+            <>
+              <SectionHeader>Visibility Gaps — AK Missing, Competitors Present</SectionHeader>
+              <Card subtitle="These are queries where AI assistants recommend competitors but not Anne Klein">
+                {scores.gaps.map((g, i) => (
+                  <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: T.text, marginBottom: 4 }}>"{g.query}"</div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 12, color: T.textFaint }}>{g.category} ·</span>
+                      {g.competitorsPresent.map(b => <Badge key={b} color="blue">{b}</Badge>)}
+                      <span style={{ fontSize: 12, color: T.textFaint }}>mentioned instead</span>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            </>
+          )}
+
+          {/* Query-level detail */}
+          <SectionHeader>All Query Results</SectionHeader>
+          <Card subtitle="Full breakdown of how AK and competitors appeared in each AI search query">
+            {(queryResults || []).filter(r => !r.error).map((r, i) => (
+              <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div style={{ flex: 1, marginRight: 12 }}>
+                    <span style={{ fontSize: 12, color: T.textFaint, marginRight: 6 }}>[{r.category}]</span>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: T.textSub }}>{r.query}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <Badge color={r.akMentioned ? (r.akTopOfMind ? 'green' : 'blue') : 'red'}>
+                      {r.akMentioned ? (r.akTopOfMind ? 'AK #1' : `AK #${r.akPosition}`) : 'AK absent'}
+                    </Badge>
+                  </div>
+                </div>
+                {r.akMentioned && r.visibility?.['Anne Klein']?.context && (
+                  <div style={{ fontSize: 12, color: T.textMuted, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px', marginBottom: 4, lineHeight: 1.5 }}>
+                    "…{r.visibility['Anne Klein'].context.substring(0, 150)}…"
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {r.competitorsMentioned?.map(b => <Badge key={b} color="gray">{b}</Badge>)}
+                </div>
               </div>
-            </div>
-            {r.akMentioned && r.visibility?.['Anne Klein']?.context && (
-              <div style={{ fontSize: 12, color: T.textMuted, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px', marginBottom: 4, lineHeight: 1.5 }}>
-                "…{r.visibility['Anne Klein'].context.substring(0, 150)}…"
-              </div>
-            )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-              {r.competitorsMentioned?.map(b => <Badge key={b} color="gray">{b}</Badge>)}
-            </div>
-          </div>
-        ))}
-      </Card>
+            ))}
+          </Card>
+        </div>
+
+        {/* RIGHT: GEO recommendations sidebar */}
+        <div>
+          {geoRecommendations?.length > 0 && (
+            <>
+              <SectionHeader>GEO Recommendations (Generative Engine Optimization)</SectionHeader>
+              {geoRecommendations.map((r, i) => (
+                <Card key={i} title={r.title} accent={r.priority === 'high' ? '#ef4444' : '#f59e0b'}>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                    <Badge color={r.priority === 'high' ? 'red' : 'yellow'}>{r.priority} priority</Badge>
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>ACTION</div>
+                    <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{r.action}</p>
+                  </div>
+                  <div style={{ background: T.bg, borderRadius: 8, padding: '8px 12px', fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>
+                    <strong>Why:</strong> {r.rationale}
+                  </div>
+                </Card>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -1809,7 +1830,7 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
       )}
 
       {/* 2-column grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20, marginBottom: 16 }}>
         <PersonaSection label="CORE VALUES"         items={p.values}            borderColor={color}     bullet />
         <PersonaSection label="FASHION GOALS"       items={p.fashionGoals}      borderColor={T.border} />
         <PersonaSection label="PURCHASE MOTIVATORS" items={p.motivators}        borderColor={color} />
@@ -1933,7 +1954,7 @@ function PersonasTab({ personas, content }) {
       {suggestions && (
         <div style={{ marginBottom: 24 }}>
           <SectionHeader>Adjacent Persona Opportunities</SectionHeader>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             {suggestions.map((s, i) => (
               <div key={i} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, borderTop: '3px solid #8b5cf6' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 4 }}>{s.name}</div>
@@ -2933,7 +2954,7 @@ function SeoProductTab() {
                     <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
                   </div>
                 )}
-                <div className="ak-seo-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 14 }}>
+                <div className="ak-seo-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 14 }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
                     <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
@@ -3251,7 +3272,7 @@ function BrandGuidelinesTab({ guidelines }) {
         <>
           <SectionHeader>Brand Heritage</SectionHeader>
           <Card>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
               <div>
                 <div style={{ marginBottom: 12 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Founded</div>
@@ -3292,7 +3313,7 @@ function BrandGuidelinesTab({ guidelines }) {
       {brandPillars?.length > 0 && (
         <>
           <SectionHeader>Brand Pillars</SectionHeader>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
             {brandPillars.map((p, i) => (
               <div key={i} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, borderTop: '3px solid #6366f1' }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>
@@ -3334,7 +3355,7 @@ function BrandGuidelinesTab({ guidelines }) {
 
       {/* Writing Rules */}
       <SectionHeader>Writing Rules</SectionHeader>
-      <div className="ak-brand-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+      <div className="ak-brand-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
         <Card title="Do">
           {!editing && writingRules.dos.map((d, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? `1px solid ${T.border}` : 'none' }}>

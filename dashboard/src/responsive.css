@@ -104,6 +104,16 @@
   .ak-ai-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ── SEO tab main 2-column grid ── */
+@media (max-width: 768px) {
+  .ak-seo-main-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── AI Search tab main 2-column grid ── */
+@media (max-width: 768px) {
+  .ak-ai-main-grid { grid-template-columns: 1fr !important; }
+}
+
 /* ── SEO Products — expanded detail grid ── */
 @media (max-width: 600px) {
   .ak-seo-detail-grid { grid-template-columns: 1fr !important; }
