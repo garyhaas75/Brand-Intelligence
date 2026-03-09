@@ -118,6 +118,20 @@ app.get('/api/seo-intelligence',       (req, res) => res.json(loadData('gsc_keyw
 app.get('/api/content-recommendations',(req, res) => res.json(loadData('content_recommendations.json') || {}));
 app.get('/api/email-inbox',            (req, res) => res.json(loadData('email_inbox.json') || {}));
 app.get('/api/email-analysis',         (req, res) => res.json(loadData('email_analysis.json') || {}));
+app.post('/api/email-analysis/refresh', (req, res) => {
+  const { spawn } = require('child_process');
+  const child = spawn('node', [path.join(__dirname, 'email/analyze_inbox.js')], {
+    env: { ...process.env },
+    cwd: __dirname,
+  });
+  let output = '';
+  child.stdout.on('data', d => { output += d.toString(); });
+  child.stderr.on('data', d => { output += d.toString(); });
+  child.on('close', code => {
+    const data = loadData('email_analysis.json') || {};
+    res.json({ ok: code === 0, output: output.slice(-2000), generatedAt: data.generatedAt });
+  });
+});
 app.get('/api/agentic-search',         (req, res) => res.json(loadData('agentic_search.json') || {}));
 app.get('/api/price-intelligence',     (req, res) => res.json(loadData('price_intelligence.json') || {}));
 app.get('/api/brand-guidelines',       (req, res) => res.json(loadData('brand_guidelines.json') || {}));

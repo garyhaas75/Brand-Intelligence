@@ -392,11 +392,22 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
   )
 }
 
-function EmailTab({ inboxData, emailAnalysis }) {
+function EmailTab({ inboxData, emailAnalysis, loadData }) {
+  const [refreshing, setRefreshing] = useState(false)
   const inboxBrands = inboxData?.brands || []
   const analysis = emailAnalysis?.analysis || {}
   const totalReceived = inboxBrands.reduce((s, b) => s + (b.summary?.count || 0), 0)
   const brandsActive = inboxBrands.filter(b => b.emails?.length > 0).length
+
+  async function refreshAnalysis() {
+    setRefreshing(true)
+    try {
+      await fetch('/api/email-analysis/refresh', { method: 'POST' })
+      if (loadData) await loadData()
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const gradeColor = g => g === 'A' ? '#10b981' : g === 'B' ? '#f59e0b' : g === 'C' ? '#ef4444' : '#9ca3af'
   const categoryColor = c => {
@@ -420,9 +431,19 @@ function EmailTab({ inboxData, emailAnalysis }) {
   return (
     <div>
       {/* AK Strategy — top of page */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+        <SectionHeader style={{ marginBottom: 0 }}>AK Email Strategy</SectionHeader>
+        <button
+          onClick={refreshAnalysis}
+          disabled={refreshing}
+          style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: refreshing ? 'not-allowed' : 'pointer', opacity: refreshing ? 0.7 : 1 }}
+        >
+          {refreshing ? 'Refreshing...' : 'Refresh Analysis'}
+        </button>
+      </div>
       {analysis.akEmailStrategy && (
         <>
-          <SectionHeader>AK Email Strategy</SectionHeader>
+          <div style={{ height: 0 }} />
           <Card accent="#6366f1">
             {analysis.akEmailStrategy.programGaps?.length > 0 && (
               <div style={{ marginBottom: 14 }}>
@@ -3084,7 +3105,7 @@ export default function App() {
             {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} />}
             {tab === 'catalog'   && <CatalogTab catalog={data.catalog} />}
             {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
-            {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} />}
+            {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={loadData} />}
             {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
             {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
             {tab === 'seo-products' && <SeoProductTab />}

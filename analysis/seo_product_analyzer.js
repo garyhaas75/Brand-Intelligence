@@ -606,7 +606,7 @@ Return ONLY valid JSON (no markdown, no explanation):
   }
   // Merge AI-generated SEO tags with existing navigational/merchandising tags.
   // Keep all original tags that aren't internal junk; append new AI tags (no duplicates).
-  const keepTags = (product.tags || []).filter(t => !/enrich:|gorgias|discount|do.not/i.test(t));
+  const keepTags = product.tags || [];  // keep ALL original tags — they drive Shopify systems
   const aiTags = (parsed.tags || []).map(t => String(t).trim());
   const existingLower = new Set(keepTags.map(t => t.toLowerCase()));
   const newOnly = aiTags.filter(t => !existingLower.has(t.toLowerCase()));
