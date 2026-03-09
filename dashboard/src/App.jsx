@@ -1050,8 +1050,6 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   // Stock status state: handle → { name, qty, status }
   const [stockStatus, setStockStatus] = useState({})
   const [checkingStock, setCheckingStock] = useState({})
-  // Browse products popover: itemId or null
-  const [browseOpen, setBrowseOpen] = useState(null)
   const [browseProducts, setBrowseProducts] = useState([])
   const [browseFilter, setBrowseFilter] = useState('')
 
@@ -1197,14 +1195,6 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       })
       return { ...prev, [itemId]: updated }
     })
-  }
-
-  async function openBrowse(itemId) {
-    setBrowseOpen(itemId)
-    if (browseProducts.length === 0) {
-      const data = await fetch('/api/shopify/products?limit=100').then(r => r.json()).catch(() => ({ products: [] }))
-      setBrowseProducts(data.products || [])
-    }
   }
 
   async function refreshStock(handles) {
@@ -1548,35 +1538,38 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                               )
                             })}
                           </div>
-                          <button onClick={() => openBrowse(browseOpen === item.id ? null : item.id)}
-                            style={{ fontSize: 12, color: '#6366f1', background: 'none', border: '1px dashed #6366f1', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
-                            + Browse products
-                          </button>
-                          {browseOpen === item.id && (
-                            <div style={{ marginTop: 8, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: 10, maxHeight: 220, overflowY: 'auto' }}>
-                              <input value={browseFilter} onChange={e => setBrowseFilter(e.target.value)}
-                                placeholder="Filter by name or type…"
-                                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '6px 10px', fontSize: 12, marginBottom: 8, background: T.inputBg, color: T.text, boxSizing: 'border-box' }} />
-                              {browseProducts
-                                .filter(p => !browseFilter || p.name.toLowerCase().includes(browseFilter.toLowerCase()) || p.productType?.toLowerCase().includes(browseFilter.toLowerCase()))
-                                .slice(0, 40)
-                                .map(p => {
-                                  const isSel = (itemProducts[item.id] || item.products || []).find(s => s.handle === p.handle)
-                                  return (
-                                    <div key={p.handle} onClick={() => toggleProduct(item.id, { handle: p.handle, name: p.name, price: p.price })}
-                                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 6px', borderRadius: 6, cursor: 'pointer', background: isSel ? '#6366f110' : 'none', marginBottom: 2 }}>
-                                      <span style={{ fontSize: 12, color: T.text }}>{isSel ? '✓ ' : ''}{p.name}</span>
-                                      <span style={{ fontSize: 11, color: T.textMuted }}>${p.price} · {p.availableQty} in stock</span>
-                                    </div>
-                                  )
-                                })}
-                              {browseProducts.length === 0 && (
-                                <div style={{ fontSize: 12, color: T.textMuted, textAlign: 'center', padding: 12 }}>
-                                  No products loaded — add SHOPIFY_ADMIN_API_TOKEN to .env
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          {/* Inline search to swap/add a product */}
+                          <div style={{ marginTop: 6 }}>
+                            <input value={browseFilter} onChange={async e => {
+                              setBrowseFilter(e.target.value)
+                              if (browseProducts.length === 0 && e.target.value.length > 0) {
+                                const d = await fetch('/api/shopify/products?limit=200').then(r => r.json()).catch(() => ({ products: [] }))
+                                setBrowseProducts(d.products || [])
+                              }
+                            }}
+                              placeholder="+ Swap or add a product…"
+                              style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', fontSize: 12, background: T.inputBg, color: T.text, boxSizing: 'border-box' }} />
+                            {browseFilter.length > 1 && (
+                              <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, marginTop: 4, maxHeight: 160, overflowY: 'auto' }}>
+                                {browseProducts
+                                  .filter(p => p.name.toLowerCase().includes(browseFilter.toLowerCase()) || p.productType?.toLowerCase().includes(browseFilter.toLowerCase()) || p.tags?.some(t => t.toLowerCase().includes(browseFilter.toLowerCase())))
+                                  .slice(0, 8)
+                                  .map(p => {
+                                    const isSel = (itemProducts[item.id] || item.products || []).find(s => s.handle === p.handle)
+                                    return (
+                                      <div key={p.handle} onClick={() => { toggleProduct(item.id, { handle: p.handle, name: p.name, price: p.price }); setBrowseFilter('') }}
+                                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', cursor: 'pointer', borderBottom: `1px solid ${T.border}`, background: isSel ? '#6366f108' : 'none' }}>
+                                        <span style={{ fontSize: 12, color: T.text }}>{isSel ? '✓ ' : ''}{p.name}</span>
+                                        <span style={{ fontSize: 11, color: T.textMuted }}>${p.price} · {p.availableQty} in stock</span>
+                                      </div>
+                                    )
+                                  })}
+                                {browseProducts.filter(p => p.name.toLowerCase().includes(browseFilter.toLowerCase()) || p.productType?.toLowerCase().includes(browseFilter.toLowerCase())).length === 0 && (
+                                  <div style={{ fontSize: 12, color: T.textMuted, padding: '8px 10px' }}>No matches</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )
                     })()}

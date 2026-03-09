@@ -13,7 +13,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 const basicAuth = require('express-basic-auth');
 const { getBrandContext } = require('./utils/brand_context');
-const { getInStockProducts, checkHandles, isConfigured: shopifyConfigured } = require('./shopify/inventory');
+const { getInStockProducts, getProductCatalogForPrompt, checkHandles, isConfigured: shopifyConfigured } = require('./shopify/inventory');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -961,8 +961,8 @@ app.post('/api/weekly-plan/generate', async (req, res) => {
     .filter(i => i.status === 'sent' && new Date(i.date) >= eightWeeksAgo)
     .map(i => ({ channel: i.channel, theme: i.theme, subjectLine: i.subjectLine, date: i.date }));
 
-  // Fetch in-stock products for product injection (gracefully returns [] if not configured)
-  const inStockProducts = await getInStockProducts({ limit: 25 }).catch(() => []);
+  // Fetch rich product catalog for Claude (grouped by category, with descriptions + tags)
+  const productCatalog = await getProductCatalogForPrompt({ perCategory: 6 }).catch(() => '');
 
   // Build Claude prompt
   const brandContext = getBrandContext();
@@ -988,10 +988,7 @@ Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w =
     .map(p => `${p.name}: ${p.ageRange}, ${p.income} — Motivators: ${(p.motivators || []).slice(0, 2).join(', ')}`)
     .join('\n');
 
-  const productContext = inStockProducts.length > 0
-    ? `FEATURED IN-STOCK PRODUCTS (reference these specifically — all confirmed available):\n` +
-      inStockProducts.map(p => `- ${p.name} ($${p.price}) — ${p.href} [${p.availableQty} in stock]`).join('\n')
-    : '';
+  const productContext = productCatalog || '';
 
   const prompt = `You are a marketing strategist and copywriter for Anne Klein. Generate a weekly content plan for the week of ${weekStart}.
 
@@ -1068,7 +1065,7 @@ Rules:
 - If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
 - Do NOT repeat themes from recent sent history listed above
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
-- For EMAIL items: populate "products" with 2-4 specific products from the FEATURED IN-STOCK PRODUCTS list that fit the email's theme. If no in-stock products were provided, use an empty array.
+- For EMAIL items: populate "products" with 2-4 specific products chosen from the IN-STOCK PRODUCTS catalog above. Match products to the email's specific theme, arc week, and persona — pick items whose category, tags, and description align with the email angle. Use the handle exactly as shown. If no catalog was provided, use an empty array.
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
   try {

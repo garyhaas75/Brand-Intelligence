@@ -10,7 +10,7 @@ function shopifyHeaders() {
 }
 
 function shopifyUrl(path) {
-  const domain = process.env.SHOPIFY_STORE_DOMAIN || 'anneklein.com';
+  const domain = process.env.SHOPIFY_STORE_DOMAIN || 'anneklein.myshopify.com';
   const version = process.env.SHOPIFY_API_VERSION || '2024-01';
   return `https://${domain}/admin/api/${version}${path}`;
 }
@@ -19,10 +19,14 @@ function isConfigured() {
   return !!process.env.SHOPIFY_ADMIN_API_TOKEN;
 }
 
+function stripHtml(html) {
+  return (html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+}
+
 /**
- * Returns top in-stock products sorted by available quantity.
- * Results are cached for 30 minutes to avoid hammering the API.
- * Returns [] if SHOPIFY_ADMIN_API_TOKEN is not set.
+ * Fetches in-stock products with rich metadata (description, tags, category).
+ * Returns products grouped by type for smarter Claude matching.
+ * Cache: 30 minutes.
  */
 async function getInStockProducts({ limit = 30, productType } = {}) {
   if (!isConfigured()) return [];
@@ -36,19 +40,26 @@ async function getInStockProducts({ limit = 30, productType } = {}) {
   try {
     const { data } = await axios.get(shopifyUrl('/products.json'), {
       headers: shopifyHeaders(),
-      params: { fields: 'id,title,handle,product_type,variants,images', limit: 250 },
+      params: { fields: 'id,title,handle,product_type,body_html,tags,variants,images', limit: 250 },
     });
 
     const all = (data.products || [])
       .map(p => {
         const qty = (p.variants || []).reduce((sum, v) => sum + (parseInt(v.inventory_quantity) || 0), 0);
         const price = parseFloat(p.variants?.[0]?.price || 0);
+        // Extract clean tags (remove internal ops tags)
+        const tags = (p.tags || '').split(',')
+          .map(t => t.trim())
+          .filter(t => t && !['bis-show', 'discount-eligible', 'gorgias_do_not_recommend'].includes(t))
+          .slice(0, 6);
         return {
           handle: p.handle,
           name: p.title,
           productType: p.product_type || '',
           price,
           availableQty: qty,
+          description: stripHtml(p.body_html),
+          tags,
           image: p.images?.[0]?.src || null,
           href: `https://anneklein.com/products/${p.handle}`,
         };
@@ -70,9 +81,37 @@ async function getInStockProducts({ limit = 30, productType } = {}) {
 }
 
 /**
+ * Returns the product catalog formatted for Claude — grouped by type,
+ * top N per category, with enough context for intelligent theme matching.
+ * This is what gets injected into the generate prompt.
+ */
+async function getProductCatalogForPrompt({ perCategory = 6 } = {}) {
+  if (!isConfigured()) return '';
+  const all = await getInStockProducts({ limit: 250 });
+  if (!all.length) return '';
+
+  // Group by productType
+  const byType = {};
+  for (const p of all) {
+    const t = p.productType || 'Other';
+    if (!byType[t]) byType[t] = [];
+    if (byType[t].length < perCategory) byType[t].push(p);
+  }
+
+  const lines = ['IN-STOCK PRODUCTS BY CATEGORY (pick the best match for each email\'s theme — do not use out-of-stock products):'];
+  for (const [type, products] of Object.entries(byType)) {
+    lines.push(`\n${type.toUpperCase()}:`);
+    for (const p of products) {
+      const tagStr = p.tags.length ? ` [${p.tags.join(', ')}]` : '';
+      lines.push(`  • ${p.name} ($${p.price})${tagStr} — ${p.description || 'No description'} | handle: ${p.handle}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Checks current availability for a list of product handles.
- * Returns { handle: { name, qty, status: 'inStock'|'lowStock'|'outOfStock'|'notFound' } }
- * Returns {} if SHOPIFY_ADMIN_API_TOKEN is not set.
  */
 async function checkHandles(handles) {
   if (!isConfigured() || !handles?.length) return {};
@@ -99,10 +138,9 @@ async function checkHandles(handles) {
   return out;
 }
 
-/** Invalidates the in-memory product cache (call after a manual rescrape) */
 function invalidateCache() {
   _cache = null;
   _cacheTime = 0;
 }
 
-module.exports = { getInStockProducts, checkHandles, invalidateCache, isConfigured };
+module.exports = { getInStockProducts, getProductCatalogForPrompt, checkHandles, invalidateCache, isConfigured };
