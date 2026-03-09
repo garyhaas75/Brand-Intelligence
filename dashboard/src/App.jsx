@@ -3,6 +3,53 @@ import './App.css'
 
 const API = '/api'
 
+const LIGHT_T = {
+  bg:          '#f9fafb',
+  surface:     '#ffffff',
+  surfaceAlt:  '#f3f4f6',
+  border:      '#e5e7eb',
+  borderAlt:   '#f3f4f6',
+  text:        '#111827',
+  textSub:     '#374151',
+  textMuted:   '#6b7280',
+  textFaint:   '#9ca3af',
+  accent:      '#6366f1',
+  accentText:  '#ffffff',
+  navBg:       '#111827',
+  navText:     '#ffffff',
+  tabBg:       '#ffffff',
+  tabBorder:   '#e5e7eb',
+  inputBg:     '#ffffff',
+  inputBorder: '#d1d5db',
+  codeBg:      '#f3f4f6',
+  stripeBg:    '#fafafa',
+}
+
+const DARK_T = {
+  bg:          '#0f172a',
+  surface:     '#1e293b',
+  surfaceAlt:  '#0f172a',
+  border:      '#334155',
+  borderAlt:   '#1e293b',
+  text:        '#f1f5f9',
+  textSub:     '#cbd5e1',
+  textMuted:   '#94a3b8',
+  textFaint:   '#64748b',
+  accent:      '#818cf8',
+  accentText:  '#ffffff',
+  navBg:       '#020617',
+  navText:     '#f1f5f9',
+  tabBg:       '#1e293b',
+  tabBorder:   '#334155',
+  inputBg:     '#1e293b',
+  inputBorder: '#475569',
+  codeBg:      '#111827',
+  stripeBg:    '#0f172a',
+}
+
+const ThemeContext = React.createContext(LIGHT_T)
+const useT = () => React.useContext(ThemeContext)
+
 // Human-readable labels for Shopify taxonomy GIDs used by Anne Klein products.
 const TAXONOMY_LABELS = {
   'gid://shopify/TaxonomyCategory/aa-1-10-2-1': 'Bolero Jackets',
@@ -109,13 +156,14 @@ async function fetchEndpoint(path) {
 }
 
 function Badge({ color, children }) {
+  const T = useT()
   const colors = {
     green:  { bg: '#d1fae5', text: '#065f46' },
     red:    { bg: '#fee2e2', text: '#991b1b' },
     yellow: { bg: '#fef3c7', text: '#92400e' },
     blue:   { bg: '#dbeafe', text: '#1e40af' },
     purple: { bg: '#ede9fe', text: '#5b21b6' },
-    gray:   { bg: '#f3f4f6', text: '#374151' },
+    gray:   { bg: T.surfaceAlt, text: T.textSub },
   }
   const c = colors[color] || colors.gray
   return (
@@ -126,30 +174,34 @@ function Badge({ color, children }) {
 }
 
 function Card({ title, subtitle, children, accent }) {
+  const T = useT()
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '20px 24px', marginBottom: 20, borderLeft: accent ? `4px solid ${accent}` : undefined }}>
-      {title && <div style={{ fontWeight: 700, fontSize: 16, marginBottom: subtitle ? 2 : 12, color: '#111827' }}>{title}</div>}
-      {subtitle && <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>{subtitle}</div>}
+    <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, borderLeft: accent ? `4px solid ${accent}` : undefined }}>
+      {title && <div style={{ fontWeight: 700, fontSize: 16, marginBottom: subtitle ? 2 : 12, color: T.text }}>{title}</div>}
+      {subtitle && <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 12 }}>{subtitle}</div>}
       {children}
     </div>
   )
 }
 
 function Stat({ label, value, sub, color }) {
+  const T = useT()
   return (
-    <div style={{ textAlign: 'center', padding: '16px 20px', background: '#f9fafb', borderRadius: 10, flex: 1, minWidth: 100 }}>
-      <div style={{ fontSize: 28, fontWeight: 800, color: color || '#111827', lineHeight: 1 }}>{value ?? '—'}</div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginTop: 4 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{sub}</div>}
+    <div style={{ textAlign: 'center', padding: '16px 20px', background: T.surfaceAlt, borderRadius: 10, flex: 1, minWidth: 100 }}>
+      <div style={{ fontSize: 28, fontWeight: 800, color: color || T.text, lineHeight: 1 }}>{value ?? '—'}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub, marginTop: 4 }}>{label}</div>
+      {sub && <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{sub}</div>}
     </div>
   )
 }
 
 function SectionHeader({ children }) {
-  return <h2 style={{ fontSize: 20, fontWeight: 800, color: '#111827', margin: '32px 0 16px', borderBottom: '2px solid #f3f4f6', paddingBottom: 10 }}>{children}</h2>
+  const T = useT()
+  return <h2 style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: '32px 0 16px', borderBottom: `2px solid ${T.borderAlt}`, paddingBottom: 10 }}>{children}</h2>
 }
 
 function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel, content, apifyUsage }) {
+  const T = useT()
   const brandStatus = (siteIntel?.brands || []).map(b => ({
     name: b.name,
     navCount: b.navigation?.length || 0,
@@ -180,10 +232,10 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
       <SectionHeader>Competitor Scrape Status</SectionHeader>
       <Card>
         {brandStatus.map(b => (
-          <div key={b.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+          <div key={b.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
             <span style={{ fontWeight: 600, fontSize: 14 }}>{b.name}</span>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: 13, color: '#6b7280' }}>{b.navCount} nav items</span>
+              <span style={{ fontSize: 13, color: T.textMuted }}>{b.navCount} nav items</span>
               {b.botBlocked && <Badge color="red">Bot-blocked</Badge>}
               {b.error && !b.botBlocked && <Badge color="yellow">Error</Badge>}
               {!b.botBlocked && !b.error && b.navCount > 0 && <Badge color="green">✓ Scraped</Badge>}
@@ -212,11 +264,11 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
             </div>
             {apifyUsage.monthlyUsageCreditsCents != null && apifyUsage.monthlyBasePriceCents != null && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: T.textMuted, marginBottom: 4 }}>
                   <span>Monthly usage</span>
                   <span>{Math.round(apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents * 100)}%</span>
                 </div>
-                <div style={{ background: '#f3f4f6', borderRadius: 6, height: 10, overflow: 'hidden' }}>
+                <div style={{ background: T.surfaceAlt, borderRadius: 6, height: 10, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', borderRadius: 6,
                     width: `${Math.min(100, apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents * 100)}%`,
@@ -235,7 +287,7 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
       <SectionHeader>Top Positioning Opportunity</SectionHeader>
       {siteAnalysis?.messagingAnalysis?.positioningOpportunity && (
         <Card accent="#6366f1">
-          <p style={{ fontSize: 14, lineHeight: 1.7, color: '#374151', margin: 0 }}>
+          <p style={{ fontSize: 14, lineHeight: 1.7, color: T.textSub, margin: 0 }}>
             {siteAnalysis.messagingAnalysis.positioningOpportunity}
           </p>
         </Card>
@@ -244,7 +296,7 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
       <SectionHeader>Catalog Health Warning</SectionHeader>
       {siteAnalysis?.catalogAnalysis?.catalogHealth && (
         <Card accent="#f59e0b">
-          <p style={{ fontSize: 14, lineHeight: 1.7, color: '#374151', margin: 0 }}>
+          <p style={{ fontSize: 14, lineHeight: 1.7, color: T.textSub, margin: 0 }}>
             {siteAnalysis.catalogAnalysis.catalogHealth}
           </p>
         </Card>
@@ -254,10 +306,11 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
 }
 
 function CatalogTab({ catalog }) {
+  const T = useT()
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('All')
 
-  if (!catalog?.products) return <div style={{ padding: 40, color: '#6b7280', textAlign: 'center' }}>No catalog data. Run npm run scrape:products</div>
+  if (!catalog?.products) return <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No catalog data. Run npm run scrape:products</div>
 
   const newArrivalCount = catalog.products.filter(p => p.isNewArrival).length
   const categories = ['All', `New Arrivals (${newArrivalCount})`, ...Object.keys(catalog.categoryCounts || {}).sort((a, b) => catalog.categoryCounts[b] - catalog.categoryCounts[a])]
@@ -283,7 +336,7 @@ function CatalogTab({ catalog }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {Object.entries(catalog.categoryCounts || {}).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
             <div key={cat} onClick={() => setFilterCat(cat === filterCat ? 'All' : cat)}
-              style={{ background: filterCat === cat ? '#6366f1' : '#f3f4f6', color: filterCat === cat ? '#fff' : '#374151', padding: '4px 12px', borderRadius: 20, fontSize: 13, cursor: 'pointer', userSelect: 'none' }}>
+              style={{ background: filterCat === cat ? '#6366f1' : T.surfaceAlt, color: filterCat === cat ? '#fff' : T.textSub, padding: '4px 12px', borderRadius: 20, fontSize: 13, cursor: 'pointer', userSelect: 'none' }}>
               {cat} <strong>({count})</strong>
             </div>
           ))}
@@ -292,29 +345,29 @@ function CatalogTab({ catalog }) {
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search products..." style={{ flex: 1, padding: '8px 14px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14 }} />
+          placeholder="Search products..." style={{ flex: 1, padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }} />
         <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-          style={{ padding: '8px 14px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14 }}>
+          style={{ padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }}>
           {categories.map(c => <option key={c}>{c}</option>)}
         </select>
       </div>
 
-      <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 12 }}>Showing {filtered.length} of {catalog.products.filter(p => filterCat === 'All' || p.category === filterCat).length} products</div>
+      <div style={{ fontSize: 12, color: T.textFaint, marginBottom: 12 }}>Showing {filtered.length} of {catalog.products.filter(p => filterCat === 'All' || p.category === filterCat).length} products</div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
         {filtered.map(p => (
-          <div key={p.id} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 10, padding: 14 }}>
-            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 4, lineHeight: 1.4 }}>{p.name}</div>
+          <div key={p.id} style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, padding: 14 }}>
+            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 4, lineHeight: 1.4, color: T.text }}>{p.name}</div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
               <Badge color="blue">{p.category}</Badge>
               {p.isNewArrival && <Badge color="green">New</Badge>}
               {p.onSale && <Badge color="red">Sale</Badge>}
             </div>
-            <div style={{ fontSize: 13, color: '#374151' }}>
+            <div style={{ fontSize: 13, color: T.textSub }}>
               <strong>{p.price}</strong>
-              {p.originalPrice && <span style={{ color: '#9ca3af', textDecoration: 'line-through', marginLeft: 6 }}>{p.originalPrice}</span>}
+              {p.originalPrice && <span style={{ color: T.textFaint, textDecoration: 'line-through', marginLeft: 6 }}>{p.originalPrice}</span>}
             </div>
-            {p.colors.length > 0 && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4 }}>Colors: {p.colors.slice(0, 3).join(', ')}{p.colors.length > 3 ? ` +${p.colors.length - 3}` : ''}</div>}
+            {p.colors.length > 0 && <div style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Colors: {p.colors.slice(0, 3).join(', ')}{p.colors.length > 3 ? ` +${p.colors.length - 3}` : ''}</div>}
           </div>
         ))}
       </div>
@@ -323,7 +376,8 @@ function CatalogTab({ catalog }) {
 }
 
 function SiteIntelTab({ siteIntel, siteAnalysis }) {
-  if (!siteIntel) return <div style={{ padding: 40, color: '#6b7280', textAlign: 'center' }}>No site intelligence data. Run npm run scrape:sites</div>
+  const T = useT()
+  if (!siteIntel) return <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No site intelligence data. Run npm run scrape:sites</div>
 
   const realGaps = (siteIntel.categoryGapAnalysis?.gaps || []).filter(g =>
     !g.category.includes('{') && !g.category.includes('.cls') && g.category.length < 50 && g.category !== 'SHOP NOW' && !/^United States/.test(g.category)
@@ -338,22 +392,22 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
           {brand.botBlocked && <Badge color="red">Bot-blocked — use Apify</Badge>}
           {brand.error && !brand.botBlocked && <div style={{ color: '#dc2626', fontSize: 13, marginBottom: 8 }}>⚠ {brand.error.substring(0, 120)}</div>}
           {brand.heroContent?.headline && (
-            <div style={{ fontSize: 13, fontStyle: 'italic', color: '#374151', marginBottom: 8, padding: '8px 12px', background: '#f9fafb', borderRadius: 6 }}>
+            <div style={{ fontSize: 13, fontStyle: 'italic', color: T.textSub, marginBottom: 8, padding: '8px 12px', background: T.bg, borderRadius: 6 }}>
               Hero: "{brand.heroContent.headline}"
             </div>
           )}
           {brand.featuredCategories?.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
               {brand.featuredCategories.slice(0, 30).map((c, i) => (
-                <span key={i} style={{ background: '#f3f4f6', color: '#374151', padding: '2px 8px', borderRadius: 12, fontSize: 12 }}>{c}</span>
+                <span key={i} style={{ background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 12, fontSize: 12 }}>{c}</span>
               ))}
             </div>
           )}
           {brand.promoBanners?.length > 0 && (
             <div style={{ marginTop: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 4 }}>PROMO BANNERS</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 4 }}>PROMO BANNERS</div>
               {brand.promoBanners.slice(0, 3).map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: '#374151', padding: '3px 0', borderBottom: '1px solid #f3f4f6' }}>"{p}"</div>
+                <div key={i} style={{ fontSize: 12, color: T.textSub, padding: '3px 0', borderBottom: `1px solid ${T.borderAlt}` }}>"{p}"</div>
               ))}
             </div>
           )}
@@ -363,7 +417,7 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
       <SectionHeader>Category Gaps ({realGaps.length} found)</SectionHeader>
       <Card subtitle="Categories on competitor sites not present on anneklein.com">
         {realGaps.map((g, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid #f9fafb' }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
             <span style={{ fontSize: 14, fontWeight: 500 }}>{g.category}</span>
             <div style={{ display: 'flex', gap: 4 }}>{g.seenAt.map(b => <Badge key={b} color="blue">{b}</Badge>)}</div>
           </div>
@@ -375,7 +429,7 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
         <Card key={i} accent="#6366f1">
           <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <div style={{ background: '#6366f1', color: '#fff', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: '#374151' }}>{rec}</p>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: T.textSub }}>{rec}</p>
           </div>
         </Card>
       ))}
@@ -383,7 +437,7 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
       <SectionHeader>Top Missing Categories (Claude Analysis)</SectionHeader>
       {(siteAnalysis?.navigationAnalysis?.missingCategories || []).map((cat, i) => (
         <Card key={i} accent="#f59e0b" title={typeof cat === 'string' ? cat : cat.category}>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: '#374151' }}>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: T.textSub }}>
             {typeof cat === 'object' ? cat.rationale : ''}
           </p>
         </Card>
@@ -393,6 +447,7 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
 }
 
 function EmailTab({ inboxData, emailAnalysis, loadData }) {
+  const T = useT()
   const [refreshing, setRefreshing] = useState(false)
   const inboxBrands = inboxData?.brands || []
   const analysis = emailAnalysis?.analysis || {}
@@ -421,8 +476,8 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
   }
 
   if (!inboxBrands.length) return (
-    <div style={{ padding: 40, color: '#6b7280', textAlign: 'center' }}>
-      No inbox data. Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run check:inbox</code>
+    <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>
+      No inbox data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run check:inbox</code>
     </div>
   )
 
@@ -447,11 +502,11 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
           <Card accent="#6366f1">
             {analysis.akEmailStrategy.programGaps?.length > 0 && (
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>PROGRAM GAPS</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>PROGRAM GAPS</div>
                 {analysis.akEmailStrategy.programGaps.map((g, i) => (
                   <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
                     <span style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>✕</span>
-                    <p style={{ margin: 0, fontSize: 14, color: '#374151', lineHeight: 1.5 }}>{g}</p>
+                    <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.5 }}>{g}</p>
                   </div>
                 ))}
               </div>
@@ -464,11 +519,11 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
             )}
             {analysis.akEmailStrategy.priorityActions?.length > 0 && (
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>PRIORITY ACTIONS</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>PRIORITY ACTIONS</div>
                 {analysis.akEmailStrategy.priorityActions.map((a, i) => (
                   <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
                     <div style={{ background: '#6366f1', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-                    <p style={{ margin: 0, fontSize: 14, color: '#374151', lineHeight: 1.6 }}>{a}</p>
+                    <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{a}</p>
                   </div>
                 ))}
               </div>
@@ -486,7 +541,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                 <div>
                   <span style={{ fontWeight: 700, fontSize: 14 }}>{b.brand}</span>
-                  {b.subjectLine && <div style={{ fontSize: 13, fontStyle: 'italic', color: '#374151', marginTop: 2 }}>"{b.subjectLine}"</div>}
+                  {b.subjectLine && <div style={{ fontSize: 13, fontStyle: 'italic', color: T.textSub, marginTop: 2 }}>"{b.subjectLine}"</div>}
                 </div>
                 {b.grade && (
                   <span style={{ background: gradeColor(b.grade), color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{b.grade}</span>
@@ -496,7 +551,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
                 {b.offer && b.offer !== 'none' && b.offer !== 'None' && <Badge color="green">{b.offer}</Badge>}
                 {b.loyaltyPush && !['no', 'none', 'not detected'].includes(b.loyaltyPush?.toLowerCase()) && <Badge color="purple">Loyalty push</Badge>}
               </div>
-              {b.tactic && <div style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{b.tactic}</div>}
+              {b.tactic && <div style={{ fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>{b.tactic}</div>}
             </Card>
           ))}
           {analysis.emailTypeAnalysis?.welcome?.akRecommendation && (
@@ -510,9 +565,9 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
 
       {/* Per-brand inbox cards */}
       <SectionHeader>Competitor Email Intelligence</SectionHeader>
-      <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>
         Monitoring {inboxBrands.length} brands · {totalReceived} emails received · {brandsActive} active
-        {!analysis.akEmailStrategy && <span> · Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run analyze:inbox</code> for strategy</span>}
+        {!analysis.akEmailStrategy && <span> · Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run analyze:inbox</code> for strategy</span>}
       </div>
 
       {inboxBrands.map(brand => {
@@ -526,8 +581,8 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#111827' }}>{brand.name}</div>
-                {brand.url && <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{brand.url}</div>}
+                <div style={{ fontWeight: 700, fontSize: 15, color: T.text }}>{brand.name}</div>
+                {brand.url && <div style={{ fontSize: 12, color: T.textFaint, marginTop: 2 }}>{brand.url}</div>}
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
                 <Badge color={hasEmail ? 'green' : 'gray'}>{hasEmail ? `${emailCount} email${emailCount > 1 ? 's' : ''} received` : 'No emails yet'}</Badge>
@@ -550,7 +605,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
                 {/* All emails list */}
                 <div>
                   {brand.emails.map((e, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: i < brand.emails.length - 1 ? '1px solid #f3f4f6' : 'none', gap: 10 }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: i < brand.emails.length - 1 ? `1px solid ${T.borderAlt}` : 'none', gap: 10 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                           {e.category && (
@@ -558,10 +613,10 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
                               {e.category}
                             </span>
                           )}
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{e.subject}</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.subject}</span>
                         </div>
                         {e.snippet && (
-                          <div style={{ fontSize: 12, color: '#9ca3af', lineHeight: 1.4 }}>
+                          <div style={{ fontSize: 12, color: T.textFaint, lineHeight: 1.4 }}>
                             {e.snippet.replace(/\s*͏\s*/g, ' ').replace(/&#39;/g, "'").trim().substring(0, 140)}
                           </div>
                         )}
@@ -580,7 +635,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
                 )}
               </>
             ) : (
-              <div style={{ fontSize: 13, color: '#9ca3af', padding: '4px 0' }}>No emails received yet.</div>
+              <div style={{ fontSize: 13, color: T.textFaint, padding: '4px 0' }}>No emails received yet.</div>
             )}
           </Card>
         )
@@ -605,10 +660,10 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
                   {t.useForAK?.toLowerCase().startsWith('yes') ? 'Use for AK' : 'Skip'}
                 </Badge>
               </div>
-              <div style={{ fontSize: 13, fontStyle: 'italic', color: '#374151', marginBottom: 4 }}>
-                "{t.example}" <span style={{ fontSize: 12, color: '#9ca3af' }}>— {t.brand}</span>
+              <div style={{ fontSize: 13, fontStyle: 'italic', color: T.textSub, marginBottom: 4 }}>
+                "{t.example}" <span style={{ fontSize: 12, color: T.textFaint }}>— {t.brand}</span>
               </div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>{t.useForAK}</div>
+              <div style={{ fontSize: 13, color: T.textMuted }}>{t.useForAK}</div>
             </Card>
           ))}
         </>
@@ -618,7 +673,8 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
 }
 
 function SocialTab({ socialIntel }) {
-  if (!socialIntel?.brands) return <div style={{ padding: 40, color: '#6b7280', textAlign: 'center' }}>No social data. Run npm run module2</div>
+  const T = useT()
+  if (!socialIntel?.brands) return <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No social data. Run npm run module2</div>
 
   const intel = socialIntel.competitiveIntel || {}
 
@@ -642,10 +698,10 @@ function SocialTab({ socialIntel }) {
 
           {b.summary?.themes?.length > 0 && (
             <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>CONTENT THEMES</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>CONTENT THEMES</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {b.summary.themes.map((t, i) => (
-                  <span key={i} style={{ background: '#f3f4f6', color: '#374151', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
+                  <span key={i} style={{ background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
                     {t.theme} <strong>({t.count})</strong>
                   </span>
                 ))}
@@ -655,7 +711,7 @@ function SocialTab({ socialIntel }) {
 
           {b.summary?.topHashtags?.length > 0 && (
             <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>TOP HASHTAGS</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>TOP HASHTAGS</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {b.summary.topHashtags.slice(0, 10).map((h, i) => (
                   <Badge key={i} color="blue">#{h.tag}</Badge>
@@ -666,11 +722,11 @@ function SocialTab({ socialIntel }) {
 
           {b.summary?.recentCaptions?.filter(c => c.caption).length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>RECENT POSTS</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>RECENT POSTS</div>
               {b.summary.recentCaptions.filter(c => c.caption).slice(0, 3).map((c, i) => (
-                <div key={i} style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px', marginBottom: 6 }}>
-                  <div style={{ fontSize: 12, color: '#374151', lineHeight: 1.6 }}>"{c.caption.substring(0, 140)}{c.caption.length > 140 ? '…' : ''}"</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>❤️ {c.likes?.toLocaleString()} · 💬 {c.comments}</div>
+                <div key={i} style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, color: T.textSub, lineHeight: 1.6 }}>"{c.caption.substring(0, 140)}{c.caption.length > 140 ? '…' : ''}"</div>
+                  <div style={{ fontSize: 11, color: T.textFaint, marginTop: 4 }}>❤️ {c.likes?.toLocaleString()} · 💬 {c.comments}</div>
                 </div>
               ))}
             </div>
@@ -686,7 +742,7 @@ function SocialTab({ socialIntel }) {
               {intel.competitorHashtagsNotUsedByAK.slice(0, 20).map((h, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <Badge color="purple">#{h.tag}</Badge>
-                  <span style={{ fontSize: 11, color: '#9ca3af' }}>{h.brand}</span>
+                  <span style={{ fontSize: 11, color: T.textFaint }}>{h.brand}</span>
                 </div>
               ))}
             </div>
@@ -698,14 +754,15 @@ function SocialTab({ socialIntel }) {
 }
 
 function SEOTab({ seoIntel, content }) {
+  const T = useT()
   if (!seoIntel?.queryAnalysis?.totalQueries) {
     return (
       <div style={{ padding: 40, textAlign: 'center' }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🔑</div>
-        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>GSC Data Not Available</div>
-        <div style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.7, maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>GSC Data Not Available</div>
+        <div style={{ color: T.textMuted, fontSize: 14, lineHeight: 1.7, maxWidth: 480, margin: '0 auto' }}>
           The Google Search Console credentials don't have permission for anneklein.com yet.<br /><br />
-          <strong>Fix:</strong> Add <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>garyclaudeai@gmail.com</code> as a verified user in GSC (Settings → Users & permissions), then run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run module4</code>.
+          <strong>Fix:</strong> Add <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>garyclaudeai@gmail.com</code> as a verified user in GSC (Settings → Users & permissions), then run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module4</code>.
         </div>
       </div>
     )
@@ -732,18 +789,18 @@ function SEOTab({ seoIntel, content }) {
             <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 500 }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
+                <tr style={{ borderBottom: `2px solid ${T.border}` }}>
                   {['Query', 'Clicks', 'Impressions', 'CTR', 'Position', 'Type'].map(h => (
-                    <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: '#6b7280', fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{h}</th>
+                    <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: T.textMuted, fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {qa.top50Queries.slice(0, 25).map((q, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                    <td style={{ padding: '7px 8px', fontWeight: 500 }}>{q.query}</td>
+                  <tr key={i} style={{ borderBottom: `1px solid ${T.borderAlt}` }}>
+                    <td style={{ padding: '7px 8px', fontWeight: 500, color: T.text }}>{q.query}</td>
                     <td style={{ padding: '7px 8px', color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>{q.clicks}</td>
-                    <td style={{ padding: '7px 8px', color: '#6b7280', whiteSpace: 'nowrap' }}>{q.impressions?.toLocaleString()}</td>
+                    <td style={{ padding: '7px 8px', color: T.textMuted, whiteSpace: 'nowrap' }}>{q.impressions?.toLocaleString()}</td>
                     <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.ctr}%</td>
                     <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.position}</td>
                     <td style={{ padding: '7px 8px' }}><Badge color={q.type === 'branded' ? 'purple' : q.type === 'transactional' ? 'green' : 'gray'}>{q.type}</Badge></td>
@@ -761,9 +818,9 @@ function SEOTab({ seoIntel, content }) {
           <SectionHeader>Quick Wins (Position 4–15)</SectionHeader>
           <Card subtitle="High impressions, achievable ranking — small content changes could move these to page 1">
             {qa.quickWins.slice(0, 15).map((q, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid #f3f4f6' }}>
-                <span style={{ fontWeight: 500, fontSize: 14 }}>{q.query}</span>
-                <div style={{ display: 'flex', gap: 12, fontSize: 13, color: '#6b7280' }}>
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                <span style={{ fontWeight: 500, fontSize: 14, color: T.text }}>{q.query}</span>
+                <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textMuted }}>
                   <span>pos <strong>{q.position}</strong></span>
                   <span>{q.impressions?.toLocaleString()} impr</span>
                   <span>{q.ctr}% CTR</span>
@@ -780,22 +837,22 @@ function SEOTab({ seoIntel, content }) {
           {content.content.seoQuickWins.seoQuickWins.map((w, i) => (
             <Card key={i} title={w.keyword} accent="#10b981">
               <div style={{ marginBottom: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>PAGE TO OPTIMIZE: </span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>PAGE TO OPTIMIZE: </span>
                 <span style={{ fontSize: 13 }}>{w.currentPage}</span>
               </div>
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 2 }}>TITLE TAG</div>
-                <div style={{ fontSize: 13, fontWeight: 600 }}>{w.titleTag}</div>
+              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>TITLE TAG</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{w.titleTag}</div>
               </div>
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 2 }}>META DESCRIPTION</div>
-                <div style={{ fontSize: 13, color: '#374151' }}>{w.metaDescription}</div>
+              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>META DESCRIPTION</div>
+                <div style={{ fontSize: 13, color: T.textSub }}>{w.metaDescription}</div>
               </div>
               {w.contentAdditions?.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 6 }}>ON-PAGE ADDITIONS</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6 }}>ON-PAGE ADDITIONS</div>
                   {w.contentAdditions.map((a, j) => (
-                    <div key={j} style={{ fontSize: 13, color: '#374151', padding: '3px 0 3px 12px', borderLeft: '3px solid #10b981', marginBottom: 4 }}>{a}</div>
+                    <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0 3px 12px', borderLeft: '3px solid #10b981', marginBottom: 4 }}>{a}</div>
                   ))}
                 </div>
               )}
@@ -837,14 +894,15 @@ function getProductsForCampaign(theme, brief, catalog, count = 4) {
 }
 
 function ProductCard({ product }) {
+  const T = useT()
   return (
     <a href={product.href} target="_blank" rel="noreferrer"
-      style={{ textDecoration: 'none', color: 'inherit', display: 'block', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
+      style={{ textDecoration: 'none', color: 'inherit', display: 'block', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
       <img src={product.image} alt={product.name}
-        style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block', background: '#f9fafb' }}
+        style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block', background: T.bg }}
         onError={e => { e.target.style.display = 'none' }} />
       <div style={{ padding: '10px 12px' }}>
-        <div style={{ fontSize: 12, fontWeight: 600, lineHeight: 1.4, marginBottom: 4, color: '#111827' }}>{product.name}</div>
+        <div style={{ fontSize: 12, fontWeight: 600, lineHeight: 1.4, marginBottom: 4, color: T.text }}>{product.name}</div>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#6366f1' }}>{product.price}</div>
         {product.onSale && <Badge color="red">Sale</Badge>}
       </div>
@@ -853,6 +911,7 @@ function ProductCard({ product }) {
 }
 
 function ContentGeneratorPanel() {
+  const T = useT()
   const CONTENT_TYPES = [
     'Email campaign',
     'Instagram caption',
@@ -892,11 +951,11 @@ function ContentGeneratorPanel() {
   return (
     <div style={{ background: '#f0f0ff', border: '2px solid #6366f1', borderRadius: 12, padding: '20px 24px', marginBottom: 28 }}>
       <div style={{ fontWeight: 700, fontSize: 16, color: '#4338ca', marginBottom: 4 }}>On-Demand Content Generator</div>
-      <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>Claude generates content grounded in AK brand intel and competitive landscape.</div>
+      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>Claude generates content grounded in AK brand intel and competitive landscape.</div>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
         <select value={contentType} onChange={e => setContentType(e.target.value)}
-          style={{ padding: '8px 14px', border: '1px solid #c4b5fd', borderRadius: 8, fontSize: 14, background: '#fff', minWidth: 200 }}>
+          style={{ padding: '8px 14px', border: '1px solid #c4b5fd', borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text, minWidth: 200 }}>
           {CONTENT_TYPES.map(t => <option key={t}>{t}</option>)}
         </select>
       </div>
@@ -904,7 +963,7 @@ function ContentGeneratorPanel() {
       <textarea value={prompt} onChange={e => setPrompt(e.target.value)}
         placeholder="Describe what you need… e.g. 'Write a welcome email for new subscribers with a 15% off offer, focusing on professional workwear'"
         rows={3}
-        style={{ width: '100%', padding: '10px 14px', border: '1px solid #c4b5fd', borderRadius: 8, fontSize: 14, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 12 }} />
+        style={{ width: '100%', padding: '10px 14px', border: '1px solid #c4b5fd', borderRadius: 8, fontSize: 14, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 12, background: T.inputBg, color: T.text }} />
 
       <button onClick={generate} disabled={loading || !prompt.trim()}
         style={{ padding: '10px 24px', background: loading || !prompt.trim() ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading || !prompt.trim() ? 'not-allowed' : 'pointer' }}>
@@ -919,12 +978,12 @@ function ContentGeneratorPanel() {
 
       {result && (
         <div style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>GENERATED {contentType.toUpperCase()}</div>
-          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '16px 18px', fontSize: 14, lineHeight: 1.7, color: '#111827', whiteSpace: 'pre-wrap' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>GENERATED {contentType.toUpperCase()}</div>
+          <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px 18px', fontSize: 14, lineHeight: 1.7, color: T.text, whiteSpace: 'pre-wrap' }}>
             {result}
           </div>
           <button onClick={() => { navigator.clipboard?.writeText(result) }}
-            style={{ marginTop: 8, padding: '6px 14px', background: '#f3f4f6', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: '#374151' }}>
+            style={{ marginTop: 8, padding: '6px 14px', background: T.surfaceAlt, border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: T.textSub }}>
             Copy to clipboard
           </button>
         </div>
@@ -934,6 +993,7 @@ function ContentGeneratorPanel() {
 }
 
 function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
+  const T = useT()
   const [activeSection, setActiveSection] = useState('email')
   const [personaFilter, setPersonaFilter] = useState(null)
   const [linkingAsset, setLinkingAsset] = useState(null)
@@ -1018,7 +1078,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       <ContentGeneratorPanel />
 
       {!c ? (
-        <div style={{ padding: 40, color: '#6b7280', textAlign: 'center' }}>No scheduled content data. Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
+        <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No scheduled content data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module5</code></div>
       ) : (
       <>
       {linkedToast && (
@@ -1027,7 +1087,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         </div>
       )}
       {scheduleToast && (
-        <div style={{ position: 'fixed', bottom: 24, right: 280, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+        <div style={{ position: 'fixed', bottom: 72, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
           📅 {scheduleToast}
         </div>
       )}
@@ -1042,8 +1102,8 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         {sections.map(s => (
           <button key={s.id} onClick={() => setActiveSection(s.id)}
             style={{ padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-              background: activeSection === s.id ? '#6366f1' : '#f3f4f6',
-              color: activeSection === s.id ? '#fff' : '#374151' }}>
+              background: activeSection === s.id ? '#6366f1' : T.surfaceAlt,
+              color: activeSection === s.id ? '#fff' : T.textSub }}>
             {s.label} {s.count ? `(${s.count})` : ''}
           </button>
         ))}
@@ -1051,17 +1111,17 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 
       {(activeSection === 'email' || activeSection === 'ig') && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20, alignItems: 'center' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', marginRight: 2 }}>PERSONA:</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: T.textFaint, marginRight: 2 }}>PERSONA:</span>
           <button onClick={() => setPersonaFilter(null)}
-            style={{ padding: '4px 12px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              background: personaFilter === null ? '#111827' : '#fff',
-              color: personaFilter === null ? '#fff' : '#374151' }}>
+            style={{ padding: '4px 12px', borderRadius: 20, border: `1px solid ${T.border}`, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+              background: personaFilter === null ? T.text : T.surface,
+              color: personaFilter === null ? T.surface : T.textSub }}>
             All
           </button>
           {PERSONAS.map(p => (
             <button key={p} onClick={() => setPersonaFilter(personaFilter === p ? null : p)}
               style={{ padding: '4px 12px', borderRadius: 20, border: `1px solid ${PERSONA_COLORS[p]}`, cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                background: personaFilter === p ? PERSONA_COLORS[p] : '#fff',
+                background: personaFilter === p ? PERSONA_COLORS[p] : T.surface,
                 color: personaFilter === p ? '#fff' : PERSONA_COLORS[p] }}>
               {p}
             </button>
@@ -1080,18 +1140,18 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
               </div>
             )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>SUBJECT LINE</div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>"{e.subjectLine}"</div>
+              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>SUBJECT LINE</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>"{e.subjectLine}"</div>
               </div>
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>PREVIEW TEXT</div>
-                <div style={{ fontSize: 13, color: '#374151' }}>{e.previewText}</div>
+              <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>PREVIEW TEXT</div>
+                <div style={{ fontSize: 13, color: T.textSub }}>{e.previewText}</div>
               </div>
             </div>
-            <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>BRIEF</div>
-              <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{e.brief}</div>
+            <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>BRIEF</div>
+              <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{e.brief}</div>
             </div>
             <div style={{ display: 'flex', gap: 12, fontSize: 13, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               <span>🎯 CTA: <strong>{e.ctaButton}</strong></span>
@@ -1111,11 +1171,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                     )}
                     <button onClick={scheduleToCalendar} disabled={!scheduleDate}
                       style={{ padding: '2px 8px', borderRadius: 5, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Add</button>
-                    <button onClick={() => setSchedulingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
+                    <button onClick={() => setSchedulingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.textMuted, fontSize: 12 }}>✕</button>
                   </div>
                 ) : (
                   <button onClick={() => { setSchedulingAsset({ key: `email-${i}`, channel: 'email', fields: e }); setScheduleDate(''); setScheduleCampaignId('') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: '#fff', color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: T.surface, color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
                     📅 Schedule
                   </button>
                 )}
@@ -1129,11 +1189,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                         <option value="">— pick campaign —</option>
                         {activeCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
-                      <button onClick={() => setLinkingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#6b7280', fontSize: 12 }}>✕</button>
+                      <button onClick={() => setLinkingAsset(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.textMuted, fontSize: 12 }}>✕</button>
                     </div>
                   ) : (
                     <button onClick={() => setLinkingAsset({ key: `email-${i}` })}
-                      style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                      style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
                       + Campaign
                     </button>
                   )
@@ -1142,7 +1202,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
             </div>
             {products.length > 0 && (
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8 }}>
                   {products.map(p => <ProductCard key={p.id} product={p} />)}
                 </div>
@@ -1154,11 +1214,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 
       {activeSection === 'hero' && (c?.heroHeadlines?.heroHeadlines || []).map((h, i) => (
         <Card key={i} accent="#8b5cf6">
-          <div style={{ fontSize: 22, fontWeight: 800, color: '#111827', marginBottom: 10, lineHeight: 1.3 }}>"{h.headline}"</div>
-          <div style={{ fontSize: 14, color: '#374151', marginBottom: 10, lineHeight: 1.6 }}>{h.subhead}</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: T.text, marginBottom: 10, lineHeight: 1.3 }}>"{h.headline}"</div>
+          <div style={{ fontSize: 14, color: T.textSub, marginBottom: 10, lineHeight: 1.6 }}>{h.subhead}</div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 13 }}>
             <Badge color="purple">CTA: {h.cta}</Badge>
-            <span style={{ color: '#6b7280' }}>{h.bestFor}</span>
+            <span style={{ color: T.textMuted }}>{h.bestFor}</span>
           </div>
         </Card>
       ))}
@@ -1173,7 +1233,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                 <span style={{ background: pColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>{g.targetPersona}</span>
               </div>
             )}
-            <div style={{ fontSize: 14, color: '#374151', lineHeight: 1.7, marginBottom: 10 }}>{g.caption}</div>
+            <div style={{ fontSize: 14, color: T.textSub, lineHeight: 1.7, marginBottom: 10 }}>{g.caption}</div>
             {g.imageryNotes && (
               <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', marginBottom: 10, fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
                 📸 {g.imageryNotes}
@@ -1182,7 +1242,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: products.length ? 14 : 0 }}>
               {(g.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
             </div>
-            {g.notes && <div style={{ fontSize: 12, color: '#6b7280', fontStyle: 'italic', marginBottom: 10 }}>{g.notes}</div>}
+            {g.notes && <div style={{ fontSize: 12, color: T.textMuted, fontStyle: 'italic', marginBottom: 10 }}>{g.notes}</div>}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: products.length ? 14 : 0 }}>
               {/* Schedule to Calendar */}
               {schedulingAsset?.key === `ig-${i}` ? (
@@ -1202,7 +1262,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                 </div>
               ) : (
                 <button onClick={() => { setSchedulingAsset({ key: `ig-${i}`, channel: 'instagram', fields: g }); setScheduleDate(''); setScheduleCampaignId('') }}
-                  style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: '#fff', color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                  style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #059669', background: T.surface, color: '#059669', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
                   📅 Schedule
                 </button>
               )}
@@ -1220,7 +1280,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                   </div>
                 ) : (
                   <button onClick={() => setLinkingAsset({ key: `ig-${i}` })}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #ec4899', background: '#fff', color: '#ec4899', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #ec4899', background: T.surface, color: '#ec4899', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
                     + Campaign
                   </button>
                 )
@@ -1228,7 +1288,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
             </div>
             {products.length > 0 && (
               <div style={{ marginTop: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>SUGGESTED PRODUCTS</div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8 }}>
                   {products.map(p => <ProductCard key={p.id} product={p} />)}
                 </div>
@@ -1244,7 +1304,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
             <Badge color="green">KW: {d.primaryKeyword}</Badge>
             {d.secondaryKeyword && <Badge color="blue">Secondary: {d.secondaryKeyword}</Badge>}
           </div>
-          <p style={{ margin: 0, fontSize: 14, color: '#374151', lineHeight: 1.7 }}>{d.description}</p>
+          <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.7 }}>{d.description}</p>
         </Card>
       ))}
 
@@ -1252,18 +1312,18 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         <Card key={i} title={`Week ${w.week}${w.dates ? ': ' + w.dates : ''}`} subtitle={w.theme} accent="#f59e0b">
           {w.email && (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>📧 EMAIL</div>
-              <div style={{ fontSize: 13, color: '#374151' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📧 EMAIL</div>
+              <div style={{ fontSize: 13, color: T.textSub }}>
                 <strong>{typeof w.email === 'object' ? w.email.subjectLine || w.email.subject : w.email}</strong>
-                {typeof w.email === 'object' && w.email.focus && <span style={{ color: '#6b7280' }}> — {w.email.focus}</span>}
+                {typeof w.email === 'object' && w.email.focus && <span style={{ color: T.textMuted }}> — {w.email.focus}</span>}
               </div>
             </div>
           )}
           {w.instagram?.length > 0 && (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>📱 INSTAGRAM</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>📱 INSTAGRAM</div>
               {(Array.isArray(w.instagram) ? w.instagram : [w.instagram]).map((post, j) => (
-                <div key={j} style={{ fontSize: 13, color: '#374151', padding: '3px 0', borderBottom: '1px solid #f9fafb' }}>
+                <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
                   {typeof post === 'object' ? `[${post.format || post.type || 'Post'}] ${post.idea || post.description || ''}` : post}
                 </div>
               ))}
@@ -1271,8 +1331,8 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
           )}
           {w.hero && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>🏠 WEBSITE HERO</div>
-              <div style={{ fontSize: 13, color: '#374151' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>🏠 WEBSITE HERO</div>
+              <div style={{ fontSize: 13, color: T.textSub }}>
                 {typeof w.hero === 'object' ? (w.hero.headline || w.hero.collection || '') : w.hero}
               </div>
             </div>
@@ -1286,12 +1346,13 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 }
 
 function PriceTab({ priceIntel }) {
+  const T = useT()
   if (!priceIntel?.akProductsTracked) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>💰</div>
-      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Price Intelligence Not Run Yet</div>
-      <div style={{ color: '#6b7280', fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
-        Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run price:track</code> to start monitoring AK sale events and competitor promotions.
+      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>Price Intelligence Not Run Yet</div>
+      <div style={{ color: T.textMuted, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+        Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run price:track</code> to start monitoring AK sale events and competitor promotions.
       </div>
     </div>
   )
@@ -1318,10 +1379,10 @@ function PriceTab({ priceIntel }) {
             {saleRateHistory.slice(-14).map((h, i) => (
               <div key={i} style={{ marginBottom: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                  <span style={{ fontSize: 12, color: '#6b7280' }}>{h.date}</span>
+                  <span style={{ fontSize: 12, color: T.textMuted }}>{h.date}</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: h.rate > 30 ? '#ef4444' : h.rate > 15 ? '#f59e0b' : '#10b981' }}>{h.rate}%</span>
                 </div>
-                <div style={{ background: '#f3f4f6', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+                <div style={{ background: T.surfaceAlt, borderRadius: 4, height: 6, overflow: 'hidden' }}>
                   <div style={{ background: h.rate > 30 ? '#ef4444' : h.rate > 15 ? '#f59e0b' : '#10b981', height: '100%', width: `${Math.min(h.rate, 100)}%`, borderRadius: 4 }} />
                 </div>
               </div>
@@ -1336,13 +1397,13 @@ function PriceTab({ priceIntel }) {
           <SectionHeader>Sale Rate by Category</SectionHeader>
           <Card>
             {categorySaleRates.map((c, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
                 <div>
-                  <span style={{ fontWeight: 600, fontSize: 14, textTransform: 'capitalize' }}>{c.category.replace(/-/g, ' ')}</span>
-                  <span style={{ fontSize: 12, color: '#9ca3af', marginLeft: 8 }}>{c.onSale}/{c.total} items</span>
+                  <span style={{ fontWeight: 600, fontSize: 14, textTransform: 'capitalize', color: T.text }}>{c.category.replace(/-/g, ' ')}</span>
+                  <span style={{ fontSize: 12, color: T.textFaint, marginLeft: 8 }}>{c.onSale}/{c.total} items</span>
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {c.avgDepth > 0 && <span style={{ fontSize: 12, color: '#6b7280' }}>avg {c.avgDepth}% off</span>}
+                  {c.avgDepth > 0 && <span style={{ fontSize: 12, color: T.textMuted }}>avg {c.avgDepth}% off</span>}
                   <Badge color={c.rate > 30 ? 'red' : c.rate > 10 ? 'yellow' : 'green'}>{c.rate}% on sale</Badge>
                 </div>
               </div>
@@ -1358,24 +1419,24 @@ function PriceTab({ priceIntel }) {
           {changes.newSaleItems?.length > 0 && (
             <Card title={`${changes.newSaleItems.length} Items Just Went On Sale`} accent="#ef4444">
               {changes.newSaleItems.slice(0, 10).map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid #f3f4f6' }}>
-                  <span style={{ fontSize: 13, color: '#374151', flex: 1 }}>{p.title}</span>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                  <span style={{ fontSize: 13, color: T.textSub, flex: 1 }}>{p.title}</span>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, textDecoration: 'line-through', color: '#9ca3af' }}>${p.compareAtPrice}</span>
+                    <span style={{ fontSize: 13, textDecoration: 'line-through', color: T.textFaint }}>${p.compareAtPrice}</span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>${p.price}</span>
                     <Badge color="red">{p.saleDepth}% off</Badge>
                   </div>
                 </div>
               ))}
-              {changes.newSaleItems.length > 10 && <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>+{changes.newSaleItems.length - 10} more</div>}
+              {changes.newSaleItems.length > 10 && <div style={{ fontSize: 12, color: T.textFaint, marginTop: 8 }}>+{changes.newSaleItems.length - 10} more</div>}
             </Card>
           )}
           {changes.endedSaleItems?.length > 0 && (
             <Card title={`${changes.endedSaleItems.length} Items Came Off Sale`} accent="#6b7280">
               {changes.endedSaleItems.slice(0, 8).map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid #f3f4f6' }}>
-                  <span style={{ fontSize: 13, color: '#374151' }}>{p.title}</span>
-                  <span style={{ fontSize: 13, color: '#6b7280' }}>back to ${p.price}</span>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                  <span style={{ fontSize: 13, color: T.textSub }}>{p.title}</span>
+                  <span style={{ fontSize: 13, color: T.textMuted }}>back to ${p.price}</span>
                 </div>
               ))}
             </Card>
@@ -1383,8 +1444,8 @@ function PriceTab({ priceIntel }) {
           {changes.priceChanges?.length > 0 && (
             <Card title={`${changes.priceChanges.length} Price Changes`} accent="#f59e0b">
               {changes.priceChanges.slice(0, 8).map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid #f3f4f6' }}>
-                  <span style={{ fontSize: 13, color: '#374151' }}>{p.title}</span>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                  <span style={{ fontSize: 13, color: T.textSub }}>{p.title}</span>
                   <span style={{ fontSize: 13, color: p.delta < 0 ? '#10b981' : '#ef4444' }}>
                     ${p.prevPrice} → ${p.price} ({p.delta > 0 ? '+' : ''}{p.delta})
                   </span>
@@ -1392,21 +1453,21 @@ function PriceTab({ priceIntel }) {
               ))}
             </Card>
           )}
-          {changes.note && <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 16, fontStyle: 'italic' }}>{changes.note}</div>}
+          {changes.note && <div style={{ fontSize: 13, color: T.textFaint, marginBottom: 16, fontStyle: 'italic' }}>{changes.note}</div>}
         </>
       )}
 
       {/* Competitor promos */}
       <SectionHeader>Competitor Promotions</SectionHeader>
-      <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
-        Extracted from site banners during last scrape · run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run scrape:sites</code> to refresh
+      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>
+        Extracted from site banners during last scrape · run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run scrape:sites</code> to refresh
       </div>
       {(competitorPromos || []).map((p, i) => (
         <Card key={i} accent={p.hasPromo ? (p.maxDiscount >= 40 ? '#ef4444' : '#f59e0b') : '#e5e7eb'}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: p.hasPromo ? 10 : 0 }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15 }}>{p.brand}</div>
-              {p.scrapedAt && <div style={{ fontSize: 11, color: '#9ca3af' }}>scraped {new Date(p.scrapedAt).toLocaleDateString()}</div>}
+              {p.scrapedAt && <div style={{ fontSize: 11, color: T.textFaint }}>scraped {new Date(p.scrapedAt).toLocaleDateString()}</div>}
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
               {p.hasPromo
@@ -1415,7 +1476,7 @@ function PriceTab({ priceIntel }) {
             </div>
           </div>
           {p.promoBanners?.map((banner, j) => (
-            <div key={j} style={{ fontSize: 13, color: '#374151', padding: '4px 0', borderBottom: '1px solid #f9fafb' }}>
+            <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '4px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
               "{banner}"
             </div>
           ))}
@@ -1426,12 +1487,13 @@ function PriceTab({ priceIntel }) {
 }
 
 function AgenticSearchTab({ agenticSearch }) {
+  const T = useT()
   if (!agenticSearch?.scores) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🤖</div>
-      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>AI Search Visibility Not Run Yet</div>
-      <div style={{ color: '#6b7280', fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
-        Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run agentic:search</code> to test how Anne Klein appears when AI assistants answer shopping queries.
+      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>AI Search Visibility Not Run Yet</div>
+      <div style={{ color: T.textMuted, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+        Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run agentic:search</code> to test how Anne Klein appears when AI assistants answer shopping queries.
       </div>
     </div>
   )
@@ -1455,11 +1517,11 @@ function AgenticSearchTab({ agenticSearch }) {
         {[{ brand: 'Anne Klein', rate: scores.visibilityRate, mentions: scores.queriesMentioned }, ...(scores.competitorVisibility || [])].map((c, i) => (
           <div key={i} style={{ marginBottom: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 13, fontWeight: c.brand === 'Anne Klein' ? 700 : 500, color: c.brand === 'Anne Klein' ? '#6366f1' : '#374151' }}>{c.brand}</span>
+              <span style={{ fontSize: 13, fontWeight: c.brand === 'Anne Klein' ? 700 : 500, color: c.brand === 'Anne Klein' ? T.accent : T.textSub }}>{c.brand}</span>
               <span style={{ fontSize: 13, fontWeight: 600, color: c.rate >= 60 ? '#10b981' : c.rate >= 30 ? '#f59e0b' : '#9ca3af' }}>{c.rate}%</span>
             </div>
-            <div style={{ background: '#f3f4f6', borderRadius: 4, height: 8, overflow: 'hidden' }}>
-              <div style={{ background: c.brand === 'Anne Klein' ? '#6366f1' : '#d1d5db', height: '100%', width: `${c.rate}%`, borderRadius: 4, transition: 'width 0.3s' }} />
+            <div style={{ background: T.surfaceAlt, borderRadius: 4, height: 8, overflow: 'hidden' }}>
+              <div style={{ background: c.brand === 'Anne Klein' ? '#6366f1' : T.border, height: '100%', width: `${c.rate}%`, borderRadius: 4, transition: 'width 0.3s' }} />
             </div>
           </div>
         ))}
@@ -1479,9 +1541,9 @@ function AgenticSearchTab({ agenticSearch }) {
           const sentimentPos = appearances.filter(r => r.visibility?.[c.brand]?.sentiment === 'positive').length
           const sentimentPct = appearances.length ? Math.round(sentimentPos / appearances.length * 100) : 0
           return (
-            <div key={c.brand} style={{ padding: '14px 0', borderBottom: i < (scores.competitorVisibility.filter(x => x.rate > 0).length - 1) ? '1px solid #f3f4f6' : 'none' }}>
+            <div key={c.brand} style={{ padding: '14px 0', borderBottom: i < (scores.competitorVisibility.filter(x => x.rate > 0).length - 1) ? `1px solid ${T.borderAlt}` : 'none' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>{c.brand}</span>
+                <span style={{ fontWeight: 700, fontSize: 14, color: T.text }}>{c.brand}</span>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <Badge color={c.rate >= 60 ? 'green' : c.rate >= 30 ? 'yellow' : 'gray'}>{c.rate}% visible</Badge>
                   <Badge color={sentimentPct >= 60 ? 'green' : sentimentPct >= 30 ? 'yellow' : 'gray'}>{sentimentPct}% positive</Badge>
@@ -1489,15 +1551,15 @@ function AgenticSearchTab({ agenticSearch }) {
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: positiveContexts.length ? 8 : 0 }}>
                 {topCats.map(([cat, count]) => (
-                  <span key={cat} style={{ background: '#f3f4f6', color: '#374151', padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
+                  <span key={cat} style={{ background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
                     {cat} <strong>({count}/{appearances.length})</strong>
                   </span>
                 ))}
               </div>
               {positiveContexts.map((p, j) => (
-                <div key={j} style={{ fontSize: 12, color: '#6b7280', background: '#f9fafb', borderRadius: 6, padding: '6px 10px', lineHeight: 1.5, fontStyle: 'italic' }}>
+                <div key={j} style={{ fontSize: 12, color: T.textMuted, background: T.bg, borderRadius: 6, padding: '6px 10px', lineHeight: 1.5, fontStyle: 'italic' }}>
                   "…{p.visibility?.[c.brand]?.context?.substring(0, 200)}…"
-                  <span style={{ display: 'block', fontSize: 11, color: '#9ca3af', marginTop: 2 }}>from query: "{p.query}"</span>
+                  <span style={{ display: 'block', fontSize: 11, color: T.textFaint, marginTop: 2 }}>from query: "{p.query}"</span>
                 </div>
               ))}
             </div>
@@ -1509,10 +1571,10 @@ function AgenticSearchTab({ agenticSearch }) {
       <SectionHeader>Visibility by Query Type</SectionHeader>
       <Card>
         {(scores.categoryBreakdown || []).map((c, i) => (
-          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{c.category}</span>
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+            <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{c.category}</span>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: '#9ca3af' }}>{c.mentioned}/{c.total} queries</span>
+              <span style={{ fontSize: 12, color: T.textFaint }}>{c.mentioned}/{c.total} queries</span>
               <Badge color={c.visibilityRate >= 60 ? 'green' : c.visibilityRate >= 30 ? 'yellow' : 'red'}>{c.visibilityRate}%</Badge>
             </div>
           </div>
@@ -1525,12 +1587,12 @@ function AgenticSearchTab({ agenticSearch }) {
           <SectionHeader>Visibility Gaps — AK Missing, Competitors Present</SectionHeader>
           <Card subtitle="These are queries where AI assistants recommend competitors but not Anne Klein">
             {scores.gaps.map((g, i) => (
-              <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#111827', marginBottom: 4 }}>"{g.query}"</div>
+              <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
+                <div style={{ fontSize: 14, fontWeight: 500, color: T.text, marginBottom: 4 }}>"{g.query}"</div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, color: '#9ca3af' }}>{g.category} ·</span>
+                  <span style={{ fontSize: 12, color: T.textFaint }}>{g.category} ·</span>
                   {g.competitorsPresent.map(b => <Badge key={b} color="blue">{b}</Badge>)}
-                  <span style={{ fontSize: 12, color: '#9ca3af' }}>mentioned instead</span>
+                  <span style={{ fontSize: 12, color: T.textFaint }}>mentioned instead</span>
                 </div>
               </div>
             ))}
@@ -1548,10 +1610,10 @@ function AgenticSearchTab({ agenticSearch }) {
                 <Badge color={r.priority === 'high' ? 'red' : 'yellow'}>{r.priority} priority</Badge>
               </div>
               <div style={{ marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>ACTION</div>
-                <p style={{ margin: 0, fontSize: 14, color: '#374151', lineHeight: 1.6 }}>{r.action}</p>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>ACTION</div>
+                <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{r.action}</p>
               </div>
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>
+              <div style={{ background: T.bg, borderRadius: 8, padding: '8px 12px', fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>
                 <strong>Why:</strong> {r.rationale}
               </div>
             </Card>
@@ -1563,11 +1625,11 @@ function AgenticSearchTab({ agenticSearch }) {
       <SectionHeader>All Query Results</SectionHeader>
       <Card subtitle="Full breakdown of how AK and competitors appeared in each AI search query">
         {(queryResults || []).filter(r => !r.error).map((r, i) => (
-          <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
+          <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
               <div style={{ flex: 1, marginRight: 12 }}>
-                <span style={{ fontSize: 12, color: '#9ca3af', marginRight: 6 }}>[{r.category}]</span>
-                <span style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>{r.query}</span>
+                <span style={{ fontSize: 12, color: T.textFaint, marginRight: 6 }}>[{r.category}]</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: T.textSub }}>{r.query}</span>
               </div>
               <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                 <Badge color={r.akMentioned ? (r.akTopOfMind ? 'green' : 'blue') : 'red'}>
@@ -1576,7 +1638,7 @@ function AgenticSearchTab({ agenticSearch }) {
               </div>
             </div>
             {r.akMentioned && r.visibility?.['Anne Klein']?.context && (
-              <div style={{ fontSize: 12, color: '#6b7280', background: '#f0fdf4', borderRadius: 6, padding: '6px 10px', marginBottom: 4, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: T.textMuted, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px', marginBottom: 4, lineHeight: 1.5 }}>
                 "…{r.visibility['Anne Klein'].context.substring(0, 150)}…"
               </div>
             )}
@@ -1591,17 +1653,18 @@ function AgenticSearchTab({ agenticSearch }) {
 }
 
 function PersonaSection({ label, items, borderColor, bullet }) {
+  const T = useT()
   if (!items?.length) return null
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', letterSpacing: '0.05em', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, letterSpacing: '0.05em', marginBottom: 8 }}>{label}</div>
       {items.map((item, j) => (
         <div key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
           {bullet
             ? <div style={{ width: 6, height: 6, borderRadius: '50%', background: borderColor, flexShrink: 0, marginTop: 5 }} />
             : <div style={{ width: 3, borderRadius: 2, background: borderColor, flexShrink: 0, alignSelf: 'stretch', minHeight: 16 }} />
           }
-          <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.55 }}>{item}</div>
+          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.55 }}>{item}</div>
         </div>
       ))}
     </div>
@@ -1610,6 +1673,7 @@ function PersonaSection({ label, items, borderColor, bullet }) {
 
 // ─── Persona Card with Chat ───────────────────────────────────────────────────
 function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
+  const T = useT()
   const [chatOpen, setChatOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -1670,15 +1734,15 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: 20, color: '#111827', marginBottom: 4 }}>{p.name}</div>
-          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 2 }}>
+          <div style={{ fontWeight: 800, fontSize: 20, color: T.text, marginBottom: 4 }}>{p.name}</div>
+          <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 2 }}>
             {[p.ageRange || p.age, p.income, p.location].filter(Boolean).join(' · ')}
           </div>
-          {occupations && <div style={{ fontSize: 13, color: '#9ca3af' }}>{occupations}</div>}
+          {occupations && <div style={{ fontSize: 13, color: T.textFaint }}>{occupations}</div>}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
           <button onClick={() => { setChatOpen(o => !o); setMessages([]); setStreamText('') }}
-            style={{ padding: '5px 14px', borderRadius: 8, border: `1px solid ${color}`, background: chatOpen ? color : '#fff', color: chatOpen ? '#fff' : color, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+            style={{ padding: '5px 14px', borderRadius: 8, border: `1px solid ${color}`, background: chatOpen ? color : T.surface, color: chatOpen ? '#fff' : color, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
             {chatOpen ? 'Close Chat' : '💬 Chat'}
           </button>
           <div style={{ background: color, color: '#fff', borderRadius: 8, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>
@@ -1689,20 +1753,20 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
 
       {/* Quote */}
       {p.quoteExample && (
-        <div style={{ background: '#f9fafb', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 14, fontStyle: 'italic', color: '#374151', lineHeight: 1.6, borderLeft: `3px solid ${color}` }}>
+        <div style={{ background: T.bg, borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 14, fontStyle: 'italic', color: T.textSub, lineHeight: 1.6, borderLeft: `3px solid ${color}` }}>
           "{p.quoteExample}"
         </div>
       )}
 
       {/* Chat Panel */}
       {chatOpen && (
-        <div style={{ border: `1px solid ${color}30`, borderRadius: 10, marginBottom: 20, overflow: 'hidden' }}>
+        <div style={{ border: `1px solid ${T.border}`, borderTop: `3px solid ${color}`, borderRadius: 10, marginBottom: 20, overflow: 'hidden' }}>
           <div style={{ background: color, color: '#fff', padding: '8px 14px', fontSize: 12, fontWeight: 700 }}>
             Chatting with {p.name} · Responses reset on refresh
           </div>
-          <div style={{ height: 260, overflowY: 'auto', padding: 14, background: '#fafafa', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ height: 260, overflowY: 'auto', padding: 14, background: T.stripeBg, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {messages.length === 0 && !streaming && (
-              <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', marginTop: 60 }}>
+              <div style={{ color: T.textFaint, fontSize: 13, textAlign: 'center', marginTop: 60 }}>
                 Ask {p.name} anything — about shopping, style, what she wants from a brand…
               </div>
             )}
@@ -1710,9 +1774,9 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 <div style={{
                   maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
-                  background: m.role === 'user' ? color : '#fff',
-                  color: m.role === 'user' ? '#fff' : '#374151',
-                  border: m.role === 'assistant' ? '1px solid #e5e7eb' : 'none',
+                  background: m.role === 'user' ? color : T.surface,
+                  color: m.role === 'user' ? '#fff' : T.textSub,
+                  border: m.role === 'assistant' ? `1px solid ${T.border}` : 'none',
                 }}>
                   {m.content}
                 </div>
@@ -1720,20 +1784,20 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
             ))}
             {(streaming || streamText) && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: '#fff', color: '#374151', border: '1px solid #e5e7eb' }}>
-                  {streamText || <span style={{ color: '#9ca3af' }}>…</span>}
+                <div style={{ maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: T.surface, color: T.textSub, border: `1px solid ${T.border}` }}>
+                  {streamText || <span style={{ color: T.textFaint }}>…</span>}
                 </div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
-          <div style={{ display: 'flex', gap: 8, padding: 10, background: '#fff', borderTop: '1px solid #e5e7eb' }}>
+          <div style={{ display: 'flex', gap: 8, padding: 10, background: T.surface, borderTop: `1px solid ${T.border}` }}>
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
               placeholder={`Ask ${p.name} something…`}
-              style={{ flex: 1, border: '1px solid #d1d5db', borderRadius: 8, padding: '7px 12px', fontSize: 13, outline: 'none' }}
+              style={{ flex: 1, border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '7px 12px', fontSize: 13, outline: 'none', background: T.inputBg, color: T.text }}
             />
             <button onClick={sendMessage} disabled={streaming || !input.trim()}
               style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: color, color: '#fff', cursor: streaming ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, opacity: streaming || !input.trim() ? 0.5 : 1 }}>
@@ -1746,18 +1810,18 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
       {/* 2-column grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20, marginBottom: 16 }}>
         <PersonaSection label="CORE VALUES"         items={p.values}            borderColor={color}     bullet />
-        <PersonaSection label="FASHION GOALS"       items={p.fashionGoals}      borderColor="#d1d5db" />
+        <PersonaSection label="FASHION GOALS"       items={p.fashionGoals}      borderColor={T.border} />
         <PersonaSection label="PURCHASE MOTIVATORS" items={p.motivators}        borderColor={color} />
         <PersonaSection label="PAIN POINTS"         items={p.painPoints}        borderColor="#fca5a5" />
         <PersonaSection label="SHOPPING BEHAVIOR"   items={p.shoppingBehaviors} borderColor="#6ee7b7" />
         {p.contentTopics?.length > 0 && (
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', letterSpacing: '0.05em', marginBottom: 8 }}>CONTENT THAT RESONATES</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, letterSpacing: '0.05em', marginBottom: 8 }}>CONTENT THAT RESONATES</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {p.contentTopics.map((t, j) => (
                 <div key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: 5 }} />
-                  <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.55 }}>{t}</div>
+                  <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.55 }}>{t}</div>
                 </div>
               ))}
             </div>
@@ -1768,44 +1832,44 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
       {p.annKleinFit && (
         <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', marginBottom: 10 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>WHY ANNE KLEIN FITS</div>
-          <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.6 }}>{p.annKleinFit}</p>
+          <p style={{ margin: 0, fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{p.annKleinFit}</p>
         </div>
       )}
 
       {p.preferredChannels?.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: (contentEmails.length || contentIg.length) ? 16 : 0 }}>
-          <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>Preferred channels:</span>
+          <span style={{ fontSize: 12, color: T.textMuted, fontWeight: 600 }}>Preferred channels:</span>
           {p.preferredChannels.map((ch, j) => (
-            <span key={j} style={{ fontSize: 12, background: '#f3f4f6', color: '#374151', borderRadius: 6, padding: '2px 10px' }}>{j + 1}. {ch}</span>
+            <span key={j} style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, borderRadius: 6, padding: '2px 10px' }}>{j + 1}. {ch}</span>
           ))}
         </div>
       )}
 
       {(contentEmails.length > 0 || contentIg.length > 0) && (
-        <div style={{ borderTop: `1px solid ${color}30`, paddingTop: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 10 }}>CONTENT ASSETS TARGETING THIS PERSONA</div>
+        <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 10 }}>CONTENT ASSETS TARGETING THIS PERSONA</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             {contentEmails.map((e, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#f5f3ff', borderRadius: 6, padding: '6px 10px' }}>
+              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.surfaceAlt, borderRadius: 6, padding: '6px 10px' }}>
                 <span style={{ fontSize: 12, color: '#6366f1' }}>📧</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>"{e.subjectLine}"</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{e.theme} · {e.sendTiming}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub }}>"{e.subjectLine}"</div>
+                  <div style={{ fontSize: 11, color: T.textFaint }}>{e.theme} · {e.sendTiming}</div>
                 </div>
               </div>
             ))}
             {contentIg.map((g, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#fdf2f8', borderRadius: 6, padding: '6px 10px' }}>
+              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.surfaceAlt, borderRadius: 6, padding: '6px 10px' }}>
                 <span style={{ fontSize: 12, color: '#ec4899' }}>📸</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{g.category}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{g.caption?.slice(0, 90)}…</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub }}>{g.category}</div>
+                  <div style={{ fontSize: 11, color: T.textFaint, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{g.caption?.slice(0, 90)}…</div>
                 </div>
               </div>
             ))}
           </div>
           {!contentEmails.length && !contentIg.length && (
-            <div style={{ fontSize: 12, color: '#9ca3af', fontStyle: 'italic' }}>No tagged content yet — re-run Module 5 to generate persona-targeted assets.</div>
+            <div style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>No tagged content yet — re-run Module 5 to generate persona-targeted assets.</div>
           )}
         </div>
       )}
@@ -1814,15 +1878,16 @@ function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
 }
 
 function PersonasTab({ personas, content }) {
+  const T = useT()
   const [suggestions, setSuggestions] = useState(null)
   const [suggesting, setSuggesting] = useState(false)
 
   if (!personas?.personas?.length) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
-      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Customer Personas Not Generated Yet</div>
-      <div style={{ color: '#6b7280', fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
-        Run <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>npm run personas</code> to generate AI-driven customer personas from all available brand intelligence.
+      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>Customer Personas Not Generated Yet</div>
+      <div style={{ color: T.textMuted, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+        Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run personas</code> to generate AI-driven customer personas from all available brand intelligence.
       </div>
     </div>
   )
@@ -1844,11 +1909,11 @@ function PersonasTab({ personas, content }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
         <SectionHeader>Customer Personas</SectionHeader>
         <button onClick={discoverPersonas} disabled={suggesting}
-          style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: suggesting ? 0.6 : 1 }}>
+          style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: suggesting ? 0.6 : 1 }}>
           {suggesting ? 'Analyzing…' : '✨ Discover Adjacent Personas'}
         </button>
       </div>
-      <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
+      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 20 }}>
         AI-generated from competitive intel, product catalog, social data, and email intelligence.
         {personas.generatedAt && <span> Last updated {new Date(personas.generatedAt).toLocaleDateString()}.</span>}
       </div>
@@ -1858,7 +1923,7 @@ function PersonasTab({ personas, content }) {
           {personas.summaryInsights.map((insight, i) => (
             <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
               <div style={{ background: '#6366f1', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-              <p style={{ margin: 0, fontSize: 14, color: '#374151', lineHeight: 1.6 }}>{insight}</p>
+              <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{insight}</p>
             </div>
           ))}
         </Card>
@@ -1869,10 +1934,10 @@ function PersonasTab({ personas, content }) {
           <SectionHeader>Adjacent Persona Opportunities</SectionHeader>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {suggestions.map((s, i) => (
-              <div key={i} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, borderTop: '3px solid #8b5cf6' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#111827', marginBottom: 4 }}>{s.name}</div>
-                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>{s.ageRange} · {s.income}</div>
-                <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, lineHeight: 1.5 }}>{s.rationale}</div>
+              <div key={i} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, borderTop: '3px solid #8b5cf6' }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 4 }}>{s.name}</div>
+                <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 8 }}>{s.ageRange} · {s.income}</div>
+                <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8, lineHeight: 1.5 }}>{s.rationale}</div>
                 <div style={{ fontSize: 12, color: '#6366f1', background: '#ede9fe', borderRadius: 6, padding: '4px 10px', marginBottom: 8 }}>{s.keyDifference}</div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: s.opportunitySize === 'high' ? '#059669' : s.opportunitySize === 'medium' ? '#d97706' : '#6b7280', textTransform: 'uppercase' }}>
                   {s.opportunitySize} opportunity
@@ -1898,6 +1963,7 @@ const STATUS_COLORS = { planning: '#6366f1', active: '#10b981', complete: '#6b72
 const CHANNELS = ['email', 'instagram', 'site', 'hero', 'sms', 'other']
 
 function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems }) {
+  const T = useT()
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({})
@@ -2013,60 +2079,60 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
       {/* Campaign Form */}
       {showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
-            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 20 }}>{editId ? 'Edit Campaign' : 'New Campaign'}</div>
+          <div style={{ background: T.surface, borderRadius: 12, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 20, color: T.text }}>{editId ? 'Edit Campaign' : 'New Campaign'}</div>
             {[
               { label: 'Campaign Name', key: 'name', type: 'text' },
               { label: 'Start Date', key: 'startDate', type: 'date' },
               { label: 'End Date', key: 'endDate', type: 'date' },
             ].map(f => (
               <div key={f.key} style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>{f.label}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>{f.label}</div>
                 <input type={f.type} value={form[f.key] || ''} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                  style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                  style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
               </div>
             ))}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Target Persona</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Target Persona</div>
               <select value={form.persona || ''} onChange={e => setForm(p => ({ ...p, persona: e.target.value }))}
-                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, background: T.inputBg, color: T.text }}>
                 <option value="">— none —</option>
                 {personaNames.map(n => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Status</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Status</div>
               <select value={form.status || 'planning'} onChange={e => setForm(p => ({ ...p, status: e.target.value }))}
-                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, background: T.inputBg, color: T.text }}>
                 {CAMPAIGN_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 10, marginTop: 4 }}>Style Guide</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.textSub, marginBottom: 10, marginTop: 4 }}>Style Guide</div>
             {[
               { label: 'Color Direction (e.g. "Navy, blush, bone")', key: 'styleGuide.colorDirection' },
               { label: 'Hero Image Direction (1 sentence)', key: 'styleGuide.heroImageDirection' },
             ].map(f => (
               <div key={f.key} style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>{f.label}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>{f.label}</div>
                 <input value={(f.key.includes('.') ? form.styleGuide?.[f.key.split('.')[1]] : form[f.key]) || ''}
                   onChange={e => setFormIn(f.key, e.target.value)}
-                  style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                  style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
               </div>
             ))}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Mood Keywords (comma separated)</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Mood Keywords (comma separated)</div>
               <input value={(form.styleGuide?.moodKeywords || []).join(', ')}
                 onChange={e => setFormIn('styleGuide.moodKeywords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
             </div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>Avoid Words (comma separated)</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Avoid Words (comma separated)</div>
               <input value={(form.styleGuide?.avoidWords || []).join(', ')}
                 onChange={e => setFormIn('styleGuide.avoidWords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowForm(false)} style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button onClick={() => setShowForm(false)} style={{ padding: '8px 18px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               <button onClick={save} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>Save</button>
             </div>
           </div>
@@ -2074,9 +2140,9 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
       )}
 
       {campaigns.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: T.textFaint }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🗂️</div>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>No campaigns yet</div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: T.textMuted }}>No campaigns yet</div>
           <div style={{ fontSize: 13 }}>Create a campaign to group content under shared creative direction.</div>
         </div>
       )}
@@ -2085,32 +2151,32 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
         <Card key={c.id} accent={STATUS_COLORS[c.status] || '#6366f1'}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 18, color: '#111827', marginBottom: 4 }}>{c.name}</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>
+              <div style={{ fontWeight: 800, fontSize: 18, color: T.text, marginBottom: 4 }}>{c.name}</div>
+              <div style={{ fontSize: 13, color: T.textMuted }}>
                 {[c.startDate, c.endDate].filter(Boolean).join(' → ')}
                 {c.persona && <span> · {c.persona}</span>}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-              <span style={{ background: STATUS_COLORS[c.status] + '20', color: STATUS_COLORS[c.status], borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>{c.status}</span>
-              <button onClick={() => openEdit(c)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 12 }}>Edit</button>
-              <button onClick={() => deleteCampaign(c.id)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
+              <span style={{ background: T.surfaceAlt, border: `1px solid ${STATUS_COLORS[c.status]}`, color: STATUS_COLORS[c.status], borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>{c.status}</span>
+              <button onClick={() => openEdit(c)} style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 12 }}>Edit</button>
+              <button onClick={() => deleteCampaign(c.id)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: T.surface, color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
             </div>
           </div>
 
           {c.styleGuide && (
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-              {c.styleGuide.colorDirection && <span style={{ fontSize: 12, background: '#f3f4f6', borderRadius: 6, padding: '3px 10px' }}>🎨 {c.styleGuide.colorDirection}</span>}
+              {c.styleGuide.colorDirection && <span style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, borderRadius: 6, padding: '3px 10px' }}>🎨 {c.styleGuide.colorDirection}</span>}
               {(c.styleGuide.moodKeywords || []).map((k, i) => <span key={i} style={{ fontSize: 12, background: '#ede9fe', color: '#6366f1', borderRadius: 6, padding: '3px 10px' }}>{k}</span>)}
               {(c.styleGuide.avoidWords || []).map((k, i) => <span key={i} style={{ fontSize: 12, background: '#fee2e2', color: '#ef4444', borderRadius: 6, padding: '3px 10px' }}>✕ {k}</span>)}
             </div>
           )}
 
           {c.brief ? (
-            <div style={{ background: '#f9fafb', borderRadius: 8, padding: 14, fontSize: 13, color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{c.brief}</div>
+            <div style={{ background: T.bg, borderRadius: 8, padding: 14, fontSize: 13, color: T.textSub, lineHeight: 1.6, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{c.brief}</div>
           ) : (
             <button onClick={() => generateBrief(c.id)} disabled={generatingBrief === c.id}
-              style={{ padding: '7px 16px', borderRadius: 8, border: '1px dashed #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, opacity: generatingBrief === c.id ? 0.6 : 1 }}>
+              style={{ padding: '7px 16px', borderRadius: 8, border: '1px dashed #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, opacity: generatingBrief === c.id ? 0.6 : 1 }}>
               {generatingBrief === c.id ? '✨ Generating brief…' : '✨ Generate Campaign Brief'}
             </button>
           )}
@@ -2118,12 +2184,12 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
           {/* Pinned content assets */}
           {(c.linkedContent || []).length > 0 && (
             <div style={{ marginTop: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 6 }}>PINNED CONTENT</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6 }}>PINNED CONTENT</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {c.linkedContent.map((a, ai) => (
-                  <div key={ai} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f9fafb', borderRadius: 6, padding: '5px 10px', fontSize: 12 }}>
+                  <div key={ai} style={{ display: 'flex', alignItems: 'center', gap: 8, background: T.bg, borderRadius: 6, padding: '5px 10px', fontSize: 12 }}>
                     <span style={{ color: a.type === 'email' ? '#6366f1' : '#ec4899', fontWeight: 700 }}>{a.type === 'email' ? '📧' : '📸'}</span>
-                    <span style={{ color: '#374151', flex: 1 }}>{a.type === 'email' ? `"${a.subjectLine}"` : a.caption?.slice(0, 80) + '…'}</span>
+                    <span style={{ color: T.textSub, flex: 1 }}>{a.type === 'email' ? `"${a.subjectLine}"` : a.caption?.slice(0, 80) + '…'}</span>
                     {a.targetPersona && <span style={{ color: PCOLS[a.targetPersona] || '#9ca3af', fontSize: 11, fontWeight: 600 }}>{a.targetPersona}</span>}
                   </div>
                 ))}
@@ -2135,26 +2201,26 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
           {contentSuggestions[c.id] && (
             <div style={{ marginTop: 14, border: '1px dashed #6366f1', borderRadius: 8, padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#6366f1' }}>SUGGESTED CONTENT FOR THIS CAMPAIGN</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.accent }}>SUGGESTED CONTENT FOR THIS CAMPAIGN</div>
                 <button onClick={() => setContentSuggestions(prev => { const n = { ...prev }; delete n[c.id]; return n })}
-                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 12 }}>dismiss</button>
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.textFaint, fontSize: 12 }}>dismiss</button>
               </div>
               {contentSuggestions[c.id].emails.map((e, ei) => (
-                <div key={ei} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: '#f9fafb', borderRadius: 6, padding: '5px 10px' }}>
-                  <span style={{ fontSize: 12, color: '#6366f1' }}>📧</span>
-                  <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>"{e.subjectLine}" <span style={{ color: '#9ca3af' }}>· {e.theme}</span></span>
+                <div key={ei} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: T.bg, borderRadius: 6, padding: '5px 10px' }}>
+                  <span style={{ fontSize: 12, color: T.accent }}>📧</span>
+                  <span style={{ fontSize: 12, color: T.textSub, flex: 1 }}>"{e.subjectLine}" <span style={{ color: T.textFaint }}>· {e.theme}</span></span>
                   {e.targetPersona && <span style={{ fontSize: 11, color: PCOLS[e.targetPersona] || '#9ca3af', fontWeight: 600 }}>{e.targetPersona}</span>}
                   <button onClick={() => pinContent(c.id, { type: 'email', subjectLine: e.subjectLine, theme: e.theme, targetPersona: e.targetPersona, brief: e.brief })}
-                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
+                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
                 </div>
               ))}
               {contentSuggestions[c.id].ig.map((g, gi) => (
-                <div key={gi} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: '#f9fafb', borderRadius: 6, padding: '5px 10px' }}>
+                <div key={gi} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: T.bg, borderRadius: 6, padding: '5px 10px' }}>
                   <span style={{ fontSize: 12, color: '#ec4899' }}>📸</span>
-                  <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>{g.category} <span style={{ color: '#9ca3af' }}>· {g.caption?.slice(0, 60)}…</span></span>
+                  <span style={{ fontSize: 12, color: T.textSub, flex: 1 }}>{g.category} <span style={{ color: T.textFaint }}>· {g.caption?.slice(0, 60)}…</span></span>
                   {g.targetPersona && <span style={{ fontSize: 11, color: PCOLS[g.targetPersona] || '#9ca3af', fontWeight: 600 }}>{g.targetPersona}</span>}
                   <button onClick={() => pinContent(c.id, { type: 'ig', caption: g.caption, category: g.category, targetPersona: g.targetPersona })}
-                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #ec4899', background: '#fff', color: '#ec4899', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
+                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #ec4899', background: T.surface, color: '#ec4899', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
                 </div>
               ))}
             </div>
@@ -2189,6 +2255,7 @@ function dateKey(d) {
 }
 
 function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, personas, catalog }) {
+  const T = useT()
   const [draft, setDraft] = useState(JSON.parse(JSON.stringify(item)))
   const [saving, setSaving] = useState(false)
   const [genBrief, setGenBrief] = useState(false)
@@ -2235,22 +2302,22 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
     setSaving(false); setGenHero(false)
   }
 
-  const iStyle = { width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }
+  const iStyle = { width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }
   const taStyle = { ...iStyle, resize: 'vertical', minHeight: 70 }
-  const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 4, marginTop: 12 }}>{children}</div>
+  const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4, marginTop: 12 }}>{children}</div>
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
       <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)' }} onClick={onClose} />
-      <div style={{ width: 520, background: '#fff', overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: 520, background: T.surface, overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
         {/* Drawer header */}
-        <div style={{ padding: '18px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9fafb' }}>
-          <div style={{ fontWeight: 800, fontSize: 16 }}>
+        <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.bg }}>
+          <div style={{ fontWeight: 800, fontSize: 16, color: T.text }}>
             {CHANNEL_ICONS[draft.channel] || '📌'} {draft.theme || 'New Item'}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => { if (confirm('Delete this item?')) onDelete(draft.id) }} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff', color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
-            <button onClick={onClose} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 12 }}>Close</button>
+            <button onClick={() => { if (confirm('Delete this item?')) onDelete(draft.id) }} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: T.surface, color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
+            <button onClick={onClose} style={{ padding: '5px 12px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 12 }}>Close</button>
             <button onClick={save} disabled={saving} style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>{saving ? 'Saving…' : 'Save'}</button>
           </div>
         </div>
@@ -2302,7 +2369,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
 
           {/* Brief */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 4 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>CONTENT BRIEF</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>CONTENT BRIEF</div>
             <button onClick={doGenBrief} disabled={genBrief || saving}
               style={{ fontSize: 12, color: '#6366f1', border: '1px dashed #6366f1', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', opacity: genBrief ? 0.6 : 1 }}>
               {genBrief ? '✨ Generating…' : '✨ Generate Brief'}
@@ -2312,7 +2379,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
 
           {/* Hero image brief */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 4 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>HERO IMAGE BRIEF</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>HERO IMAGE BRIEF</div>
             <button onClick={doGenHero} disabled={genHero || saving}
               style={{ fontSize: 12, color: '#3b82f6', border: '1px dashed #3b82f6', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', opacity: genHero ? 0.6 : 1 }}>
               {genHero ? '✨ Generating…' : '✨ Generate Hero Brief'}
@@ -2325,8 +2392,8 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
 
           {/* Product Picker */}
           <div style={{ marginTop: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 8 }}>FEATURED PRODUCTS
-              {draft.selectedProducts?.length > 0 && <span style={{ marginLeft: 8, background: '#6366f1', color: '#fff', borderRadius: 10, padding: '1px 8px', fontSize: 11 }}>{draft.selectedProducts.length} selected</span>}
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>FEATURED PRODUCTS
+              {draft.selectedProducts?.length > 0 && <span style={{ marginLeft: 8, background: T.accent, color: '#fff', borderRadius: 10, padding: '1px 8px', fontSize: 11 }}>{draft.selectedProducts.length} selected</span>}
             </div>
             {draft.selectedProducts?.length > 0 && (
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -2344,10 +2411,10 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
               {filteredProducts.map(p => (
                 <div key={p.href} onClick={() => toggleProduct(p)}
-                  style={{ border: `2px solid ${isSelected(p) ? '#6366f1' : '#e5e7eb'}`, borderRadius: 8, padding: 6, cursor: 'pointer', background: isSelected(p) ? '#ede9fe' : '#fff', textAlign: 'center' }}>
+                  style={{ border: `2px solid ${isSelected(p) ? T.accent : T.border}`, borderRadius: 8, padding: 6, cursor: 'pointer', background: isSelected(p) ? T.surfaceAlt : T.surface, textAlign: 'center' }}>
                   {p.image && <img src={p.image} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 4, marginBottom: 4 }} />}
-                  <div style={{ fontSize: 10, color: '#374151', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</div>
-                  <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>${p.price}</div>
+                  <div style={{ fontSize: 10, color: T.textSub, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</div>
+                  <div style={{ fontSize: 10, color: T.textMuted, marginTop: 2 }}>${p.price}</div>
                 </div>
               ))}
             </div>
@@ -2359,6 +2426,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
 }
 
 function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
+  const T = useT()
   const [weekStart, setWeekStart] = useState(() => {
     const today = new Date()
     const d = new Date(today)
@@ -2413,18 +2481,18 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <SectionHeader style={{ margin: 0 }}>Content Calendar</SectionHeader>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={prevWeek} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>← Prev</button>
-          <div style={{ fontWeight: 700, fontSize: 14, minWidth: 160, textAlign: 'center' }}>{monthLabel}</div>
-          <button onClick={nextWeek} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>Next →</button>
+          <button onClick={prevWeek} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>← Prev</button>
+          <div style={{ fontWeight: 700, fontSize: 14, minWidth: 160, textAlign: 'center', color: T.text }}>{monthLabel}</div>
+          <button onClick={nextWeek} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Next →</button>
         </div>
       </div>
 
       {/* Campaign legend */}
       {campaigns?.filter(c => c.startDate && c.endDate).length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af' }}>CAMPAIGNS:</span>
-          {campaigns.filter(c => c.startDate && c.endDate).map((c, ci) => (
-            <span key={c.id} style={{ fontSize: 11, background: Object.values(STATUS_COLORS)[ci % 4] + '20', color: Object.values(STATUS_COLORS)[ci % 4], borderRadius: 6, padding: '2px 8px', fontWeight: 600 }}>{c.name}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: T.textFaint }}>CAMPAIGNS:</span>
+          {campaigns.filter(c => c.startDate && c.endDate).map((c) => (
+            <span key={c.id} style={{ fontSize: 11, background: T.surfaceAlt, border: `1px solid ${Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4]}`, color: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4], borderRadius: 6, padding: '2px 8px', fontWeight: 600 }}>{c.name}</span>
           ))}
         </div>
       )}
@@ -2440,20 +2508,20 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
             return dk >= c.startDate && dk <= c.endDate
           })
           return (
-            <div key={dk} style={{ minHeight: 120, background: '#fff', borderRadius: 10, border: `1px solid ${isToday ? '#6366f1' : '#e5e7eb'}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
+            <div key={dk} style={{ minHeight: 120, background: T.surface, borderRadius: 10, border: `1px solid ${isToday ? T.accent : T.border}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
               {/* Campaign bands */}
-              {activeCamps.map((c, ci) => (
+              {activeCamps.map((c) => (
                 <div key={c.id} title={c.name}
                   style={{ height: 4, borderRadius: 2, marginBottom: 3, background: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4] }} />
               ))}
               {/* Day header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>{DAY_NAMES[di]}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: isToday ? '#6366f1' : '#111827' }}>{date.getDate()}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: 'uppercase' }}>{DAY_NAMES[di]}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: isToday ? T.accent : T.text }}>{date.getDate()}</div>
                 </div>
                 <button onClick={() => addItem(dk)}
-                  style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', lineHeight: 1 }}>+</button>
+                  style={{ width: 22, height: 22, borderRadius: '50%', border: `1px solid ${T.inputBorder}`, background: T.surface, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, lineHeight: 1 }}>+</button>
               </div>
 
               {/* Items */}
@@ -2462,7 +2530,7 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
                   <div key={item.id} onClick={() => setDrawerItem(item)}
                     style={{ background: (CHANNEL_COLORS[item.channel] || '#6b7280') + '18', borderLeft: `3px solid ${CHANNEL_COLORS[item.channel] || '#6b7280'}`, borderRadius: 5, padding: '4px 7px', cursor: 'pointer', fontSize: 11 }}>
                     <div style={{ fontWeight: 700, color: CHANNEL_COLORS[item.channel] || '#6b7280', textTransform: 'uppercase', fontSize: 10 }}>{item.channel}</div>
-                    <div style={{ color: '#374151', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.theme || '(no theme)'}</div>
+                    <div style={{ color: T.textSub, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.theme || '(no theme)'}</div>
                     <div style={{ marginTop: 2 }}>
                       <span style={{ fontSize: 10, background: STATUS_BG[item.status], color: STATUS_FG[item.status], borderRadius: 4, padding: '1px 5px', fontWeight: 600 }}>{item.status}</span>
                     </div>
@@ -2501,6 +2569,7 @@ const SEO_FILTERS = [
 ]
 
 function SeoProductTab() {
+  const T = useT()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
@@ -2630,31 +2699,31 @@ function SeoProductTab() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 16, flexWrap: 'wrap' }}>
         <div>
           <SectionHeader>SEO Product Intelligence</SectionHeader>
-          <div style={{ fontSize: 13, color: '#6b7280' }}>
+          <div style={{ fontSize: 13, color: T.textMuted }}>
             {totalAnalyzed} of {totalProducts} products analyzed ({pctDone}%)
           </div>
-          <div style={{ marginTop: 6, width: 220, height: 6, background: '#e5e7eb', borderRadius: 3, overflow: 'hidden' }}>
+          <div style={{ marginTop: 6, width: 220, height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pctDone}%`, background: '#6366f1', borderRadius: 3, transition: 'width 0.4s' }} />
           </div>
         </div>
 
         {/* Run controls */}
-        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 14, display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 14, display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>FILTER</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, marginBottom: 4 }}>FILTER</div>
             <select value={runFilter} onChange={e => setRunFilter(e.target.value)}
-              style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '6px 10px', fontSize: 13 }}>
+              style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '6px 10px', fontSize: 13, background: T.inputBg, color: T.text }}>
               {SEO_FILTERS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>BATCH SIZE</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, marginBottom: 4 }}>BATCH SIZE</div>
             <select value={runLimit} onChange={e => setRunLimit(Number(e.target.value))}
-              style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '6px 10px', fontSize: 13 }}>
+              style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '6px 10px', fontSize: 13, background: T.inputBg, color: T.text }}>
               {[25, 50, 100].map(n => <option key={n} value={n}>{n} products</option>)}
             </select>
           </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#374151', cursor: 'pointer', userSelect: 'none', paddingBottom: 2 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: T.textSub, cursor: 'pointer', userSelect: 'none', paddingBottom: 2 }}>
             <input type="checkbox" checked={forceReanalyze} onChange={e => setForceReanalyze(e.target.checked)}
               style={{ width: 14, height: 14, accentColor: '#f59e0b', cursor: 'pointer' }} />
             <span>Re-analyze existing</span>
@@ -2664,7 +2733,7 @@ function SeoProductTab() {
             {running ? '⚙️ Analyzing…' : forceReanalyze ? '🔄 Re-analyze Batch' : '✨ Analyze Next Batch'}
           </button>
           <a href="/api/seo-suggestions/export-csv" download
-            style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
             ↓ Export CSV
           </a>
         </div>
@@ -2690,7 +2759,7 @@ function SeoProductTab() {
           <div style={{ fontWeight: 700, marginBottom: 4, color: runLog.ok ? '#059669' : '#dc2626' }}>
             {runLog.ok ? `✓ Batch complete — ${runLog.totalAnalyzed} of ${runLog.totalProducts} products analyzed` : '✗ Analysis encountered errors'}
           </div>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: '#6b7280' }}>{runLog.output}</pre>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: T.textSub }}>{runLog.output}</pre>
         </div>
       )}
 
@@ -2702,7 +2771,7 @@ function SeoProductTab() {
               ? `✓ Push complete — ${pushLog.pushed} pushed to Shopify${pushLog.errors ? `, ${pushLog.errors} errors` : ''}`
               : `✗ Push failed — ${pushLog.errors} errors`}
           </div>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: '#6b7280' }}>{pushLog.output}</pre>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: T.textSub }}>{pushLog.output}</pre>
         </div>
       )}
 
@@ -2711,7 +2780,7 @@ function SeoProductTab() {
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {SEO_FILTERS.map(f => (
             <button key={f.id} onClick={() => setViewFilter(f.id)}
-              style={{ padding: '5px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: viewFilter === f.id ? '#6366f1' : '#f3f4f6', color: viewFilter === f.id ? '#fff' : '#374151' }}>
+              style={{ padding: '5px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: viewFilter === f.id ? '#6366f1' : T.surfaceAlt, color: viewFilter === f.id ? '#fff' : T.textSub }}>
               {f.label}
             </button>
           ))}
@@ -2720,9 +2789,9 @@ function SeoProductTab() {
           {['pending', 'approved', 'skipped'].map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: 'capitalize', cursor: 'pointer',
-                background: statusFilter === s ? { pending: '#ede9fe', approved: '#d1fae5', skipped: '#f3f4f6' }[s] : '#fff',
-                color: statusFilter === s ? { pending: '#6366f1', approved: '#059669', skipped: '#6b7280' }[s] : '#9ca3af',
-                border: '1px solid #e5e7eb' }}>
+                background: statusFilter === s ? { pending: '#ede9fe', approved: '#d1fae5', skipped: T.surfaceAlt }[s] : T.surface,
+                color: statusFilter === s ? { pending: '#6366f1', approved: '#059669', skipped: T.textSub }[s] : T.textMuted,
+                border: `1px solid ${T.border}` }}>
               {s}
             </button>
           ))}
@@ -2731,10 +2800,10 @@ function SeoProductTab() {
 
       {/* Bulk action bar — pending */}
       {statusFilter === 'pending' && products.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: T.surfaceAlt, borderRadius: 8, border: `1px solid ${T.border}` }}>
           <input type="checkbox" checked={selected.size === products.length && products.length > 0}
             onChange={toggleSelectAll} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-          <span style={{ fontSize: 13, color: '#6b7280' }}>
+          <span style={{ fontSize: 13, color: T.textSub }}>
             {selected.size > 0 ? `${selected.size} selected` : `Select all ${products.length}`}
           </span>
           {selected.size > 0 && (
@@ -2748,10 +2817,10 @@ function SeoProductTab() {
 
       {/* Bulk action bar — approved */}
       {statusFilter === 'approved' && products.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: T.surfaceAlt, borderRadius: 8, border: `1px solid ${T.border}` }}>
           <input type="checkbox" checked={selected.size === products.length && products.length > 0}
             onChange={toggleSelectAll} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-          <span style={{ fontSize: 13, color: '#6b7280' }}>
+          <span style={{ fontSize: 13, color: T.textSub }}>
             {selected.size > 0 ? `${selected.size} selected` : `Select all ${products.length}`}
           </span>
           {selected.size > 0 && shopifyConfig?.configured && (
@@ -2765,19 +2834,19 @@ function SeoProductTab() {
           )}
           {selected.size > 0 && shopifyConfig?.configured && (
             <button onClick={() => pushToShopify([...selected], true)} disabled={pushing}
-              style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 12 }}>
+              style={{ padding: '5px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer', fontSize: 12 }}>
               Dry run
             </button>
           )}
         </div>
       )}
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: '#9ca3af' }}>Loading…</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: T.textMuted }}>Loading…</div>}
 
       {!loading && products.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: T.textMuted }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: T.text }}>
             {totalAnalyzed === 0 ? 'No products analyzed yet' : `No ${statusFilter} suggestions`}
           </div>
           <div style={{ fontSize: 13 }}>
@@ -2793,7 +2862,7 @@ function SeoProductTab() {
         const isPushed = p.pushStatus === 'pushed'
         const isPushError = p.pushStatus === 'error'
         return (
-          <div key={p.href} style={{ background: '#fff', border: `1px solid ${isSelected ? '#6366f1' : '#e5e7eb'}`, borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
+          <div key={p.href} style={{ background: T.surface, border: `1px solid ${isSelected ? '#6366f1' : T.border}`, borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
             {/* Collapsed row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: 'pointer' }}
               onClick={() => setExpandedHref(isExpanded ? null : p.href)}>
@@ -2801,13 +2870,13 @@ function SeoProductTab() {
                 <input type="checkbox" checked={isSelected} onChange={e => { e.stopPropagation(); toggleSelect(p.href) }}
                   onClick={e => e.stopPropagation()} style={{ width: 16, height: 16, flexShrink: 0, cursor: 'pointer' }} />
               )}
-              <div style={{ width: 52, height: 52, flexShrink: 0, borderRadius: 6, overflow: 'hidden', background: '#f3f4f6' }}>
+              <div style={{ width: 52, height: 52, flexShrink: 0, borderRadius: 6, overflow: 'hidden', background: T.surfaceAlt }}>
                 {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👗</div>}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>
+                <div style={{ fontWeight: 700, fontSize: 14, color: T.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                <div style={{ fontSize: 12, color: T.textSub }}>
                   {p.category} · {p.price}
                   {p.isNewArrival && <span style={{ marginLeft: 8, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '1px 6px', fontSize: 11, fontWeight: 700 }}>NEW</span>}
                 </div>
@@ -2819,25 +2888,25 @@ function SeoProductTab() {
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4, textTransform: 'capitalize',
-                  background: { pending: '#ede9fe', approved: '#d1fae5', skipped: '#f3f4f6' }[p.status],
-                  color: { pending: '#6366f1', approved: '#059669', skipped: '#6b7280' }[p.status] }}>
+                  background: { pending: '#ede9fe', approved: '#d1fae5', skipped: T.surfaceAlt }[p.status],
+                  color: { pending: '#6366f1', approved: '#059669', skipped: T.textSub }[p.status] }}>
                   {p.status}
                 </span>
                 {p.status === 'pending' && <>
                   <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'approved') }}
                     style={{ padding: '3px 10px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✓ Approve</button>
                   <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'skipped') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Skip</button>
+                    style={{ padding: '3px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer', fontSize: 11 }}>Skip</button>
                 </>}
                 <button onClick={e => { e.stopPropagation(); reanalyzeOne(p.href) }}
                   disabled={reanalyzingHref === p.href}
                   title="Re-analyze this product with the latest AI model"
-                  style={{ padding: '3px 8px', borderRadius: 6, border: '1px solid #d1d5db', background: reanalyzingHref === p.href ? '#f3f4f6' : '#fff', color: '#6366f1', cursor: reanalyzingHref === p.href ? 'not-allowed' : 'pointer', fontSize: 11 }}>
+                  style={{ padding: '3px 8px', borderRadius: 6, border: `1px solid ${T.border}`, background: reanalyzingHref === p.href ? T.surfaceAlt : T.surface, color: '#6366f1', cursor: reanalyzingHref === p.href ? 'not-allowed' : 'pointer', fontSize: 11 }}>
                   {reanalyzingHref === p.href ? '⚙️' : '↻'}
                 </button>
                 {p.status !== 'pending' && (
                   <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'pending') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Undo</button>
+                    style={{ padding: '3px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer', fontSize: 11 }}>Undo</button>
                 )}
                 {p.status === 'approved' && shopifyConfig?.configured && !isPushed && (
                   <button onClick={e => { e.stopPropagation(); pushToShopify([p.href]) }} disabled={pushing}
@@ -2849,13 +2918,13 @@ function SeoProductTab() {
                 {isPushError && (
                   <span style={{ fontSize: 11, color: '#dc2626', fontWeight: 700 }} title={p.pushError}>⚠ Error</span>
                 )}
-                <span style={{ fontSize: 14, color: '#9ca3af', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', display: 'inline-block' }}>▾</span>
+                <span style={{ fontSize: 14, color: T.textMuted, transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', display: 'inline-block' }}>▾</span>
               </div>
             </div>
 
             {/* Expanded detail */}
             {isExpanded && (
-              <div style={{ borderTop: '1px solid #f3f4f6', padding: 16, background: '#fafafa' }}>
+              <div style={{ borderTop: `1px solid ${T.border}`, padding: 16, background: T.surfaceAlt }}>
                 {p.suggested?.image_insights && (
                   <div style={{ background: '#ede9fe', borderRadius: 8, padding: '8px 12px', marginBottom: 14, fontSize: 13, color: '#6366f1' }}>
                     <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
@@ -2863,16 +2932,16 @@ function SeoProductTab() {
                 )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 14 }}>
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
-                    <div style={{ fontSize: 12, color: '#d1d5db', textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
+                    <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
                     <div style={{ fontSize: 13, color: '#059669', fontWeight: 600, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px' }}>
                       {p.suggested?.meta_title || '—'}
-                      <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8, fontWeight: 400 }}>{(p.suggested?.meta_title || '').length}/60</span>
+                      <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8, fontWeight: 400 }}>{(p.suggested?.meta_title || '').length}/60</span>
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Tags</div>
-                    <div style={{ fontSize: 11, color: '#d1d5db', textDecoration: 'line-through', marginBottom: 6 }}>{(p.current?.tags || []).join(', ') || '(none)'}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Tags</div>
+                    <div style={{ fontSize: 11, color: T.textFaint, textDecoration: 'line-through', marginBottom: 6 }}>{(p.current?.tags || []).join(', ') || '(none)'}</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                       {(p.suggested?.tags || []).map((t, i) => (
                         <span key={i} style={{ fontSize: 11, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '2px 8px' }}>{t}</span>
@@ -2881,27 +2950,27 @@ function SeoProductTab() {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Meta Description</div>
-                  <div style={{ fontSize: 12, color: '#d1d5db', textDecoration: 'line-through', marginBottom: 6, lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Description</div>
+                  <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 6, lineHeight: 1.4 }}>
                     {(p.current?.description || '').substring(0, 160) || '(not set)'}
                   </div>
                   <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
                     {p.suggested?.meta_description || '—'}
-                    <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
+                    <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
                   </div>
                 </div>
                 {p.suggested?.alt_text && (
                   <div style={{ marginTop: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Image Alt Text <span style={{ fontWeight: 400, textTransform: 'none', color: '#9ca3af' }}>(Shopify productUpdateMedia)</span></div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Image Alt Text <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(Shopify productUpdateMedia)</span></div>
                     <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
                       {p.suggested.alt_text}
-                      <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{p.suggested.alt_text.length}/125</span>
+                      <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{p.suggested.alt_text.length}/125</span>
                     </div>
                   </div>
                 )}
                 {p.suggested?.geo_description && (
                   <div style={{ marginTop: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>GEO Description <span style={{ fontWeight: 400, textTransform: 'none', color: '#9ca3af' }}>(AI assistant discoverability)</span></div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>GEO Description <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(AI assistant discoverability)</span></div>
                     <div style={{ fontSize: 13, color: '#1d4ed8', background: '#eff6ff', borderRadius: 6, padding: '8px 12px', lineHeight: 1.6 }}>
                       {p.suggested.geo_description}
                     </div>
@@ -2921,18 +2990,18 @@ function SeoProductTab() {
                       </div>
                       {(s.shopify_taxonomy_gid || s.shopify_category) && (
                         <div style={{ fontSize: 12, marginBottom: 8 }}>
-                          <span style={{ color: '#6b7280', fontWeight: 600 }}>Shopify category: </span>
+                          <span style={{ color: T.textSub, fontWeight: 600 }}>Shopify category: </span>
                           {s.shopify_taxonomy_gid
                             ? <><span style={{ color: '#7c3aed', fontWeight: 700 }}>{TAXONOMY_LABELS[s.shopify_taxonomy_gid] || s.shopify_taxonomy_gid}</span>
-                                <span style={{ color: '#9ca3af', fontFamily: 'monospace', fontSize: 10, marginLeft: 6 }}>{s.shopify_taxonomy_gid.replace('gid://shopify/TaxonomyCategory/', '')}</span></>
-                            : <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>re-analyze to get GID</span>}
+                                <span style={{ color: T.textMuted, fontFamily: 'monospace', fontSize: 10, marginLeft: 6 }}>{s.shopify_taxonomy_gid.replace('gid://shopify/TaxonomyCategory/', '')}</span></>
+                            : <span style={{ color: T.textMuted, fontStyle: 'italic' }}>re-analyze to get GID</span>}
                         </div>
                       )}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 6 }}>
                         {visibleFields.map(([key, label]) => (
-                          <div key={key} style={{ background: '#fff', borderRadius: 6, padding: '6px 10px', border: '1px solid #e9d5ff' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
-                            <div style={{ fontSize: 12, color: s[key] ? '#374151' : '#d1d5db', fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
+                          <div key={key} style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #e9d5ff' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
+                            <div style={{ fontSize: 12, color: s[key] ? T.textSub : T.textFaint, fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
                           </div>
                         ))}
                       </div>
@@ -2952,6 +3021,7 @@ function SeoProductTab() {
 }
 
 function BrandGuidelinesTab({ guidelines }) {
+  const T = useT()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -2962,7 +3032,7 @@ function BrandGuidelinesTab({ guidelines }) {
   const data = editing ? draft : guidelines
 
   if (!data?.brandVoice) return (
-    <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>No brand guidelines data found.</div>
+    <div style={{ padding: 40, textAlign: 'center', color: T.textMuted }}>No brand guidelines data found.</div>
   )
 
   const formatLabels = { productDescription: 'Product Description', emailSubjectLine: 'Email Subject', emailPreviewText: 'Email Preview Text', instagramCaption: 'Instagram Caption', heroHeadline: 'Hero Headline' }
@@ -3043,7 +3113,7 @@ function BrandGuidelinesTab({ guidelines }) {
     })
   }
 
-  const iStyle = { border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', boxSizing: 'border-box', background: '#fff' }
+  const iStyle = { border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', boxSizing: 'border-box', background: T.inputBg, color: T.text }
   const taStyle = { ...iStyle, resize: 'vertical', minHeight: 60 }
 
   function ET({ val, path, multiline }) {
@@ -3053,14 +3123,14 @@ function BrandGuidelinesTab({ guidelines }) {
       : <input style={iStyle} value={val} onChange={e => setIn(path, e.target.value)} />
   }
 
-  function EList({ items, path, color }) {
+  function EList({ items, path }) {
     return (
       <div>
         {items.map((item, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 6 }}>
             {editing
               ? <input style={{ ...iStyle, flex: 1 }} value={item} onChange={e => setListItem(path, i, e.target.value)} />
-              : <span style={{ fontSize: 13, color: '#374151', flex: 1 }}>{item}</span>}
+              : <span style={{ fontSize: 13, color: T.textSub, flex: 1 }}>{item}</span>}
             {editing && <button onClick={() => removeListItem(path, i)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 16, padding: '2px 4px' }}>×</button>}
           </div>
         ))}
@@ -3094,21 +3164,21 @@ function BrandGuidelinesTab({ guidelines }) {
         {saveMsg && <span style={{ fontSize: 13, color: saveMsg.includes('Error') ? '#ef4444' : '#10b981', fontWeight: 600 }}>{saveMsg}</span>}
         {editing ? (
           <>
-            <button onClick={cancelEdit} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+            <button onClick={cancelEdit} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
             <button onClick={saveEdit} disabled={saving} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>{saving ? 'Saving…' : 'Save Changes'}</button>
           </>
         ) : (
-          <button onClick={startEdit} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: '#fff', color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Edit Guidelines</button>
+          <button onClick={startEdit} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Edit Guidelines</button>
         )}
       </div>
 
       {/* Brand Voice */}
       <SectionHeader>Brand Voice</SectionHeader>
       <Card>
-        <div style={{ fontSize: editing ? 13 : 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+        <div style={{ fontSize: editing ? 13 : 18, fontWeight: 700, color: T.text, marginBottom: 8 }}>
           {editing ? <ET val={brandVoice.summary} path="brandVoice.summary" multiline /> : `"${brandVoice.summary}"`}
         </div>
-        <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+        <div style={{ fontSize: 13, color: T.textSub, marginBottom: 16 }}>
           Tone: {editing ? <ET val={brandVoice.tone} path="brandVoice.tone" /> : <strong>{brandVoice.tone}</strong>}
         </div>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
@@ -3117,17 +3187,17 @@ function BrandGuidelinesTab({ guidelines }) {
             {!editing && brandVoice.personality.map((p, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
                 <span style={{ color: '#10b981', fontWeight: 700 }}>✓</span>
-                <span style={{ fontSize: 13, color: '#374151' }}>{p}</span>
+                <span style={{ fontSize: 13, color: T.textSub }}>{p}</span>
               </div>
             ))}
             {editing && <EList items={brandVoice.personality} path="brandVoice.personality" />}
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Writing Style</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Writing Style</div>
             {!editing && brandVoice.writingStyle.map((s, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
                 <span style={{ color: '#6366f1', fontWeight: 700 }}>→</span>
-                <span style={{ fontSize: 13, color: '#374151' }}>{s}</span>
+                <span style={{ fontSize: 13, color: T.textSub }}>{s}</span>
               </div>
             ))}
             {editing && <EList items={brandVoice.writingStyle} path="brandVoice.writingStyle" />}
@@ -3140,18 +3210,18 @@ function BrandGuidelinesTab({ guidelines }) {
       <Card>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <div style={{ flex: 1, minWidth: 220 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 4 }}><ET val={targetCustomer.name} path="targetCustomer.name" /></div>
-            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}><ET val={targetCustomer.name} path="targetCustomer.name" /></div>
+            <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {editing ? (
                 <>Age <ET val={targetCustomer.age} path="targetCustomer.age" /> · <ET val={targetCustomer.income} path="targetCustomer.income" /> · <ET val={targetCustomer.priceRange} path="targetCustomer.priceRange" /></>
               ) : `Age ${targetCustomer.age} · ${targetCustomer.income} · ${targetCustomer.priceRange}`}
             </div>
-            <div style={{ fontSize: 13, color: '#374151', marginBottom: 12 }}><ET val={targetCustomer.description} path="targetCustomer.description" multiline /></div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Values</div>
+            <div style={{ fontSize: 13, color: T.textSub, marginBottom: 12 }}><ET val={targetCustomer.description} path="targetCustomer.description" multiline /></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Values</div>
             <EPills items={targetCustomer.values} path="targetCustomer.values" bg="#ede9fe" color="#6366f1" />
           </div>
-          <div style={{ flex: 1, minWidth: 220, background: '#f9fafb', borderRadius: 8, padding: 16, borderLeft: '3px solid #6366f1' }}>
-            <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Her Voice</div>
+          <div style={{ flex: 1, minWidth: 220, background: T.bg, borderRadius: 8, padding: 16, borderLeft: '3px solid #6366f1' }}>
+            <div style={{ fontSize: 11, color: T.textFaint, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Her Voice</div>
             <ET val={targetCustomer.quote} path="targetCustomer.quote" multiline />
           </div>
         </div>
@@ -3163,9 +3233,9 @@ function BrandGuidelinesTab({ guidelines }) {
           <SectionHeader>Brand Values</SectionHeader>
           <Card>
             {!editing && brandValues.map((v, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: i < brandValues.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: i < brandValues.length - 1 ? `1px solid ${T.border}` : 'none' }}>
                 <span style={{ color: '#6366f1', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>◆</span>
-                <span style={{ fontSize: 13, color: '#374151' }}>{v}</span>
+                <span style={{ fontSize: 13, color: T.textSub }}>{v}</span>
               </div>
             ))}
             {editing && <EList items={brandValues} path="brandValues" />}
@@ -3181,30 +3251,30 @@ function BrandGuidelinesTab({ guidelines }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Founded</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Founded</div>
                   <ET val={brandHeritage.founded || ''} path="brandHeritage.founded" />
                   {' by '}
                   <ET val={brandHeritage.founder || ''} path="brandHeritage.founder" />
                 </div>
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Legacy</div>
-                  <span style={{ fontSize: 13, color: '#374151' }}><ET val={brandHeritage.legacy || ''} path="brandHeritage.legacy" multiline /></span>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Legacy</div>
+                  <span style={{ fontSize: 13, color: T.textSub }}><ET val={brandHeritage.legacy || ''} path="brandHeritage.legacy" multiline /></span>
                 </div>
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Design Philosophy</div>
-                  <span style={{ fontSize: 13, color: '#374151', fontStyle: editing ? 'normal' : 'italic' }}><ET val={brandHeritage.designPhilosophy || ''} path="brandHeritage.designPhilosophy" multiline /></span>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Design Philosophy</div>
+                  <span style={{ fontSize: 13, color: T.textSub, fontStyle: editing ? 'normal' : 'italic' }}><ET val={brandHeritage.designPhilosophy || ''} path="brandHeritage.designPhilosophy" multiline /></span>
                 </div>
               </div>
               <div>
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>Modern Mission</div>
-                  <span style={{ fontSize: 13, color: '#374151' }}><ET val={brandHeritage.modernMission || ''} path="brandHeritage.modernMission" multiline /></span>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Modern Mission</div>
+                  <span style={{ fontSize: 13, color: T.textSub }}><ET val={brandHeritage.modernMission || ''} path="brandHeritage.modernMission" multiline /></span>
                 </div>
                 {brandHeritage.keyFacts?.length > 0 && (
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Key Facts</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Key Facts</div>
                     {!editing && brandHeritage.keyFacts.map((f, i) => (
-                      <div key={i} style={{ fontSize: 13, color: '#374151', padding: '4px 0', borderBottom: i < brandHeritage.keyFacts.length - 1 ? '1px solid #f3f4f6' : 'none' }}>• {f}</div>
+                      <div key={i} style={{ fontSize: 13, color: T.textSub, padding: '4px 0', borderBottom: i < brandHeritage.keyFacts.length - 1 ? `1px solid ${T.border}` : 'none' }}>• {f}</div>
                     ))}
                     {editing && <EList items={brandHeritage.keyFacts} path="brandHeritage.keyFacts" />}
                   </div>
@@ -3221,17 +3291,17 @@ function BrandGuidelinesTab({ guidelines }) {
           <SectionHeader>Brand Pillars</SectionHeader>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
             {brandPillars.map((p, i) => (
-              <div key={i} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, borderTop: '3px solid #6366f1' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
-                  {editing ? <input style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%' }} value={p.pillar} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].pillar = e.target.value; setDraft(next); }} /> : p.pillar}
+              <div key={i} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, borderTop: '3px solid #6366f1' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>
+                  {editing ? <input style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', background: T.inputBg, color: T.text }} value={p.pillar} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].pillar = e.target.value; setDraft(next); }} /> : p.pillar}
                 </div>
-                <div style={{ fontSize: 13, color: '#374151', marginBottom: 8 }}>
-                  {editing ? <textarea style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', minHeight: 50, resize: 'vertical' }} value={p.description} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].description = e.target.value; setDraft(next); }} /> : p.description}
+                <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8 }}>
+                  {editing ? <textarea style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', minHeight: 50, resize: 'vertical', background: T.inputBg, color: T.text }} value={p.description} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].description = e.target.value; setDraft(next); }} /> : p.description}
                 </div>
                 {p.inCopy && (
                   <div style={{ fontSize: 12, color: '#6366f1', background: '#ede9fe', borderRadius: 6, padding: '6px 10px' }}>
                     <span style={{ fontWeight: 700 }}>In copy: </span>
-                    {editing ? <input style={{ border: 'none', background: 'transparent', color: '#6366f1', fontSize: 12, width: '80%' }} value={p.inCopy} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].inCopy = e.target.value; setDraft(next); }} /> : p.inCopy}
+                    {editing ? <input style={{ border: 'none', background: 'transparent', color: '#6366f1', fontSize: 12, width: '80%', outline: 'none' }} value={p.inCopy} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].inCopy = e.target.value; setDraft(next); }} /> : p.inCopy}
                   </div>
                 )}
               </div>
@@ -3246,11 +3316,11 @@ function BrandGuidelinesTab({ guidelines }) {
           <SectionHeader>Tone by Channel</SectionHeader>
           <Card>
             {Object.entries(toneByChannel).map(([channel, guidance], i, arr) => (
-              <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid #f3f4f6' : 'none', alignItems: 'flex-start' }}>
+              <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
                 <div style={{ minWidth: 160, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
-                <div style={{ flex: 1, fontSize: 13, color: '#374151' }}>
+                <div style={{ flex: 1, fontSize: 13, color: T.textSub }}>
                   {editing
-                    ? <textarea style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', resize: 'vertical', minHeight: 40 }} value={guidance} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.toneByChannel[channel] = e.target.value; setDraft(next); }} />
+                    ? <textarea style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', resize: 'vertical', minHeight: 40, background: T.inputBg, color: T.text }} value={guidance} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.toneByChannel[channel] = e.target.value; setDraft(next); }} />
                     : guidance}
                 </div>
               </div>
@@ -3264,18 +3334,18 @@ function BrandGuidelinesTab({ guidelines }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
         <Card title="Do">
           {!editing && writingRules.dos.map((d, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? `1px solid ${T.border}` : 'none' }}>
               <span style={{ color: '#10b981', fontWeight: 700, flexShrink: 0 }}>✓</span>
-              <span style={{ fontSize: 13, color: '#374151' }}>{d}</span>
+              <span style={{ fontSize: 13, color: T.textSub }}>{d}</span>
             </div>
           ))}
           {editing && <EList items={writingRules.dos} path="writingRules.dos" />}
         </Card>
         <Card title="Don't">
           {!editing && writingRules.donts.map((d, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.donts.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.donts.length - 1 ? `1px solid ${T.border}` : 'none' }}>
               <span style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>✕</span>
-              <span style={{ fontSize: 13, color: '#374151' }}>{d}</span>
+              <span style={{ fontSize: 13, color: T.textSub }}>{d}</span>
             </div>
           ))}
           {editing && <EList items={writingRules.donts} path="writingRules.donts" />}
@@ -3301,7 +3371,7 @@ function BrandGuidelinesTab({ guidelines }) {
       <Card>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           {Object.keys(formatLabels).map(f => (
-            <button key={f} onClick={() => setActiveFormat(f)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeFormat === f ? '#6366f1' : '#f3f4f6', color: activeFormat === f ? '#fff' : '#374151' }}>{formatLabels[f]}</button>
+            <button key={f} onClick={() => setActiveFormat(f)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeFormat === f ? '#6366f1' : T.surfaceAlt, color: activeFormat === f ? '#fff' : T.textSub }}>{formatLabels[f]}</button>
           ))}
         </div>
         {copyFormats[activeFormat] && (() => {
@@ -3309,24 +3379,24 @@ function BrandGuidelinesTab({ guidelines }) {
           const fpath = `copyFormats.${activeFormat}`
           return (
             <div>
-              {fmt.structure !== undefined && <div style={{ marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Structure: </span><ET val={fmt.structure} path={`${fpath}.structure`} /></div>}
-              {fmt.guidance !== undefined && <div style={{ marginBottom: 12 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Guidance: </span><ET val={fmt.guidance} path={`${fpath}.guidance`} multiline /></div>}
-              {fmt.paragraphGuidance !== undefined && <div style={{ marginBottom: 6, fontSize: 13, color: '#374151' }}><strong>Paragraph: </strong><ET val={fmt.paragraphGuidance} path={`${fpath}.paragraphGuidance`} multiline /></div>}
-              {fmt.bulletGuidance !== undefined && <div style={{ marginBottom: 12, fontSize: 13, color: '#374151' }}><strong>Bullets: </strong><ET val={fmt.bulletGuidance} path={`${fpath}.bulletGuidance`} multiline /></div>}
+              {fmt.structure !== undefined && <div style={{ marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase' }}>Structure: </span><ET val={fmt.structure} path={`${fpath}.structure`} /></div>}
+              {fmt.guidance !== undefined && <div style={{ marginBottom: 12 }}><span style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase' }}>Guidance: </span><ET val={fmt.guidance} path={`${fpath}.guidance`} multiline /></div>}
+              {fmt.paragraphGuidance !== undefined && <div style={{ marginBottom: 6, fontSize: 13, color: T.textSub }}><strong>Paragraph: </strong><ET val={fmt.paragraphGuidance} path={`${fpath}.paragraphGuidance`} multiline /></div>}
+              {fmt.bulletGuidance !== undefined && <div style={{ marginBottom: 12, fontSize: 13, color: T.textSub }}><strong>Bullets: </strong><ET val={fmt.bulletGuidance} path={`${fpath}.bulletGuidance`} multiline /></div>}
               {fmt.example && (
-                <div style={{ background: '#f9fafb', borderRadius: 8, padding: 14, marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 6 }}>EXAMPLE — {fmt.example.title}</div>
-                  <div style={{ fontSize: 13, color: '#374151', marginBottom: 8, fontStyle: editing ? 'normal' : 'italic' }}><ET val={fmt.example.paragraph} path={`${fpath}.example.paragraph`} multiline /></div>
+                <div style={{ background: T.surfaceAlt, borderRadius: 8, padding: 14, marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 6 }}>EXAMPLE — {fmt.example.title}</div>
+                  <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8, fontStyle: editing ? 'normal' : 'italic' }}><ET val={fmt.example.paragraph} path={`${fpath}.example.paragraph`} multiline /></div>
                   <EList items={fmt.example.bullets || []} path={`${fpath}.example.bullets`} />
                 </div>
               )}
               {fmt.examples && Array.isArray(fmt.examples) && fmt.examples.map((ex, i) => (
-                <div key={i} style={{ background: '#f9fafb', borderRadius: 8, padding: 10, marginBottom: 8 }}>
+                <div key={i} style={{ background: T.surfaceAlt, borderRadius: 8, padding: 10, marginBottom: 8 }}>
                   {typeof ex === 'string'
                     ? <ET val={ex} path={`${fpath}.examples.${i}`} />
                     : <div>
-                        <div style={{ marginBottom: 4 }}><strong style={{ fontSize: 12, color: '#9ca3af' }}>Headline: </strong><ET val={ex.headline} path={`${fpath}.examples.${i}.headline`} /></div>
-                        <div><strong style={{ fontSize: 12, color: '#9ca3af' }}>Subhead: </strong><ET val={ex.subhead} path={`${fpath}.examples.${i}.subhead`} /></div>
+                        <div style={{ marginBottom: 4 }}><strong style={{ fontSize: 12, color: T.textMuted }}>Headline: </strong><ET val={ex.headline} path={`${fpath}.examples.${i}.headline`} /></div>
+                        <div><strong style={{ fontSize: 12, color: T.textMuted }}>Subhead: </strong><ET val={ex.subhead} path={`${fpath}.examples.${i}.subhead`} /></div>
                       </div>}
                 </div>
               ))}
@@ -3346,12 +3416,12 @@ function BrandGuidelinesTab({ guidelines }) {
       <Card>
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           {sampleCategories.map(cat => (
-            <button key={cat} onClick={() => setActiveSample(cat)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeSample === cat ? '#6366f1' : '#f3f4f6', color: activeSample === cat ? '#fff' : '#374151', textTransform: 'capitalize' }}>{cat}</button>
+            <button key={cat} onClick={() => setActiveSample(cat)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeSample === cat ? '#6366f1' : T.surfaceAlt, color: activeSample === cat ? '#fff' : T.textSub, textTransform: 'capitalize' }}>{cat}</button>
           ))}
         </div>
         {(writingSamples[activeSample] || []).map((s, i) => (
-          <div key={i} style={{ padding: '14px 0', borderBottom: i < writingSamples[activeSample].length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6 }}><ET val={s.title} path={`writingSamples.${activeSample}.${i}.title`} /></div>
+          <div key={i} style={{ padding: '14px 0', borderBottom: i < writingSamples[activeSample].length - 1 ? `1px solid ${T.border}` : 'none' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}><ET val={s.title} path={`writingSamples.${activeSample}.${i}.title`} /></div>
             <div style={{ marginBottom: 8 }}><ET val={s.paragraph} path={`writingSamples.${activeSample}.${i}.paragraph`} multiline /></div>
             <EList items={s.bullets} path={`writingSamples.${activeSample}.${i}.bullets`} />
           </div>
@@ -3362,20 +3432,20 @@ function BrandGuidelinesTab({ guidelines }) {
 }
 
 const TABS = [
-  { id: 'overview',   label: '🏠 Overview' },
-  { id: 'calendar',   label: '📅 Calendar' },
-  { id: 'campaigns',  label: '🗂️ Campaigns' },
-  { id: 'catalog',    label: '👗 Catalog' },
-  { id: 'site',       label: '🔍 Site Intel' },
-  { id: 'email',      label: '📧 Email' },
-  { id: 'social',     label: '📱 Social' },
-  { id: 'seo',        label: '📊 SEO' },
+  { id: 'overview',     label: '🏠 Overview' },
+  { id: 'calendar',     label: '📅 Calendar' },
+  { id: 'campaigns',    label: '🗂️ Campaigns' },
+  { id: 'catalog',      label: '👗 Catalog',      dividerBefore: true },
+  { id: 'site',         label: '🔍 Site Intel' },
+  { id: 'email',        label: '📧 Email' },
+  { id: 'social',       label: '📱 Social' },
+  { id: 'seo',          label: '📊 SEO' },
   { id: 'seo-products', label: '🏷️ SEO Products' },
-  { id: 'content',    label: '✍️ Content' },
-  { id: 'price',      label: '💰 Pricing' },
-  { id: 'ai',         label: '🤖 AI Search' },
-  { id: 'personas',   label: '👥 Personas' },
-  { id: 'brand',      label: '📘 Brand' },
+  { id: 'content',      label: '✍️ Content',      dividerBefore: true },
+  { id: 'ai',           label: '🤖 AI Search' },
+  { id: 'personas',     label: '👥 Personas',     dividerBefore: true },
+  { id: 'brand',        label: '📘 Brand' },
+  { id: 'price',        label: '💰 Pricing' },
 ]
 
 export default function App() {
@@ -3385,6 +3455,17 @@ export default function App() {
   const [lastUpdated, setLastUpdated] = useState(null)
   const [campaigns, setCampaigns] = useState([])
   const [calItems, setCalItems] = useState([])
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('ak-dark') === '1')
+
+  function toggleDark() {
+    setDarkMode(prev => {
+      const next = !prev
+      localStorage.setItem('ak-dark', next ? '1' : '0')
+      return next
+    })
+  }
+
+  const T = darkMode ? DARK_T : LIGHT_T
 
   useEffect(() => {
     async function load() {
@@ -3427,54 +3508,69 @@ export default function App() {
   }
 
   return (
-    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: '#f9fafb', minHeight: '100vh' }}>
-      <div style={{ background: '#111827', color: '#fff', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <ThemeContext.Provider value={T}>
+    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: T.bg, minHeight: '100vh', color: T.text, transition: 'background 0.2s, color 0.2s' }}>
+      {/* Top nav */}
+      <div style={{ background: T.navBg, color: T.navText, padding: '14px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.5px' }}>ANNE KLEIN</div>
-          <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 1 }}>Brand Intelligence Platform</div>
+          <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.5px', color: T.navText }}>ANNE KLEIN</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>Brand Intelligence Platform</div>
         </div>
-        <div style={{ fontSize: 12, color: '#6b7280' }}>
-          {loading ? 'Loading data…' : `Updated ${lastUpdated}`}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+            {loading ? 'Loading data…' : `Updated ${lastUpdated}`}
+          </div>
+          <button onClick={toggleDark} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.25)', color: 'rgba(255,255,255,0.8)', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 32px', display: 'flex', gap: 4, overflowX: 'auto' }}>
+      {/* Tab bar */}
+      <div style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto' }}>
         {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-              color: tab === t.id ? '#6366f1' : '#6b7280',
-              borderBottom: tab === t.id ? '2px solid #6366f1' : '2px solid transparent',
-              whiteSpace: 'nowrap' }}>
-            {t.label}
-          </button>
+          <React.Fragment key={t.id}>
+            {t.dividerBefore && (
+              <div style={{ width: 1, background: T.border, margin: '10px 6px', alignSelf: 'stretch' }} />
+            )}
+            <button onClick={() => setTab(t.id)}
+              style={{ padding: '13px 14px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 12,
+                color: tab === t.id ? T.accent : T.textMuted,
+                borderBottom: tab === t.id ? `2px solid ${T.accent}` : '2px solid transparent',
+                whiteSpace: 'nowrap', transition: 'color 0.15s' }}>
+              {t.label}
+            </button>
+          </React.Fragment>
         ))}
       </div>
 
+      {/* Content */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 32px' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 80, color: '#6b7280' }}>
+          <div style={{ textAlign: 'center', padding: 80, color: T.textMuted }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
             <div>Loading intelligence data…</div>
           </div>
         ) : (
           <>
-            {tab === 'overview'  && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
-            {tab === 'calendar'  && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
-            {tab === 'campaigns' && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} setCalItems={setCalItems} />}
-            {tab === 'catalog'   && <CatalogTab catalog={data.catalog} />}
-            {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
-            {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={reloadEmailAnalysis} />}
-            {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
-            {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
+            {tab === 'overview'     && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
+            {tab === 'calendar'     && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
+            {tab === 'campaigns'    && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} setCalItems={setCalItems} />}
+            {tab === 'catalog'      && <CatalogTab catalog={data.catalog} />}
+            {tab === 'site'         && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
+            {tab === 'email'        && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={reloadEmailAnalysis} />}
+            {tab === 'social'       && <SocialTab socialIntel={data.socialIntel} />}
+            {tab === 'seo'          && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
             {tab === 'seo-products' && <SeoProductTab />}
-            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} loadData={reloadContent} setCalItems={setCalItems} />}
-            {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
-            {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
-            {tab === 'personas'  && <PersonasTab personas={data.personas} content={data.content} />}
-            {tab === 'brand'     && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
+            {tab === 'content'      && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} loadData={reloadContent} setCalItems={setCalItems} />}
+            {tab === 'price'        && <PriceTab priceIntel={data.priceIntel} />}
+            {tab === 'ai'           && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
+            {tab === 'personas'     && <PersonasTab personas={data.personas} content={data.content} />}
+            {tab === 'brand'        && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
           </>
         )}
       </div>
     </div>
+    </ThemeContext.Provider>
   )
 }
