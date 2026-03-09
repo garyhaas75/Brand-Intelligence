@@ -607,6 +607,25 @@ app.post('/api/seo-suggestions/run', async (req, res) => {
   });
 });
 
+// Re-analyze a single product by href
+app.post('/api/seo-suggestions/reanalyze-one', async (req, res) => {
+  const { href } = req.body || {};
+  if (!href) return res.status(400).json({ ok: false, error: 'href required' });
+  const { spawn } = require('child_process');
+  const child = spawn('node', [path.join(__dirname, 'analysis/seo_product_analyzer.js'), `--href=${href}`], {
+    env: { ...process.env },
+    cwd: __dirname,
+  });
+  let output = '';
+  child.stdout.on('data', d => { output += d.toString(); });
+  child.stderr.on('data', d => { output += d.toString(); });
+  child.on('close', code => {
+    const data = loadSeoSuggestions();
+    const product = data.products?.find(p => p.href === href) || null;
+    res.json({ ok: code === 0, output: output.slice(-1000), product });
+  });
+});
+
 // Update status of a single product suggestion (href in body to avoid Express 5 route issues)
 app.put('/api/seo-suggestions/status', (req, res) => {
   const { href, status, notes } = req.body || {};

@@ -44,6 +44,7 @@ const args = process.argv.slice(2);
 const filterArg = (args.find(a => a.startsWith('--filter=')) || '').replace('--filter=', '') || 'all';
 const limitArg  = parseInt((args.find(a => a.startsWith('--limit='))  || '').replace('--limit=', '')) || 50;
 const FORCE     = args.includes('--force');
+const hrefArg   = (args.find(a => a.startsWith('--href=')) || '').replace('--href=', '') || null;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function log(msg) {
@@ -289,7 +290,20 @@ Return ONLY valid JSON (no markdown, no explanation):
     else if (raw[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
   }
   if (end === -1) throw new Error('Unbalanced JSON');
-  return JSON.parse(raw.slice(start, end + 1));
+  const parsed = JSON.parse(raw.slice(start, end + 1));
+
+  // Validate taxonomy GID — Claude sometimes hallucinates a GID not in the options list.
+  // Build the valid set from the same options we sent, then clear if invalid.
+  const categoryGroup2 = detectCategoryGroup(product.category);
+  const validOptions = getTaxonomyOptions(categoryGroup2);
+  if (parsed.shopify_taxonomy_gid && validOptions) {
+    const validGids = new Set(validOptions.split('\n').map(line => line.split(' | ')[0].trim()));
+    if (!validGids.has(parsed.shopify_taxonomy_gid)) {
+      log(`    WARN: Claude returned invalid GID "${parsed.shopify_taxonomy_gid}" — cleared`);
+      parsed.shopify_taxonomy_gid = null;
+    }
+  }
+  return parsed;
 }
 
 // ─── Run ──────────────────────────────────────────────────────────────────────
@@ -297,7 +311,7 @@ async function run() {
   const logsDir = path.join(__dirname, '../logs');
   if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-  log(`=== SEO Product Analyzer Started — filter: ${filterArg}, limit: ${limitArg}${FORCE ? ', FORCE re-analyze' : ''} ===`);
+  log(`=== SEO Product Analyzer Started — ${hrefArg ? `single: ${hrefArg}` : `filter: ${filterArg}, limit: ${limitArg}`}${FORCE ? ', FORCE' : ''} ===`);
 
   const catalog = loadJSON(CATALOG_FILE);
   if (!catalog?.products?.length) {
@@ -308,9 +322,16 @@ async function run() {
   const suggestions = loadSuggestions();
   const analyzedHrefs = new Set(suggestions.products.map(p => p.href));
 
-  // Filter products — with --force, include already-analyzed ones too
-  const pool = filterProducts(catalog.products, filterArg)
-    .filter(p => FORCE ? true : !analyzedHrefs.has(p.href));
+  // Single-product mode (--href=): always re-analyzes that one product
+  let pool;
+  if (hrefArg) {
+    pool = catalog.products.filter(p => p.href === hrefArg);
+    if (!pool.length) { log(`FATAL: Product not found in catalog: ${hrefArg}`); process.exit(1); }
+  } else {
+    // Filter products — with --force, include already-analyzed ones too
+    pool = filterProducts(catalog.products, filterArg)
+      .filter(p => FORCE ? true : !analyzedHrefs.has(p.href));
+  }
 
   if (pool.length === 0) {
     log(`No products found for filter "${filterArg}"${FORCE ? '' : ' (all already analyzed — use --force to re-analyze)'}. Done.`);
@@ -353,7 +374,7 @@ async function run() {
         approvedAt: null,
       };
 
-      if (FORCE && analyzedHrefs.has(product.href)) {
+      if ((FORCE || hrefArg) && analyzedHrefs.has(product.href)) {
         // Update in place — preserve approval status and push state
         const idx = suggestions.products.findIndex(p => p.href === product.href);
         const existing = suggestions.products[idx];

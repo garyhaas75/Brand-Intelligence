@@ -2052,6 +2052,7 @@ function SeoProductTab() {
   const [expandedHref, setExpandedHref] = useState(null)
   const pollRef = useRef(null)
   const [shopifyConfig, setShopifyConfig] = useState(null)
+  const [reanalyzingHref, setReanalyzingHref] = useState(null)
   const [pushing, setPushing] = useState(false)
   const [pushLog, setPushLog] = useState(null)
 
@@ -2128,6 +2129,20 @@ function SeoProductTab() {
     setPushLog(result)
     setPushing(false)
     loadData()
+  }
+
+  async function reanalyzeOne(href) {
+    setReanalyzingHref(href)
+    const res = await fetch('/api/seo-suggestions/reanalyze-one', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ href }),
+    })
+    const result = await res.json()
+    if (result.product) {
+      setData(prev => ({ ...prev, products: prev.products.map(p => p.href === href ? result.product : p) }))
+    }
+    setReanalyzingHref(null)
   }
 
   function toggleSelect(href) {
@@ -2348,6 +2363,12 @@ function SeoProductTab() {
                   <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'skipped') }}
                     style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Skip</button>
                 </>}
+                <button onClick={e => { e.stopPropagation(); reanalyzeOne(p.href) }}
+                  disabled={reanalyzingHref === p.href}
+                  title="Re-analyze this product with the latest AI model"
+                  style={{ padding: '3px 8px', borderRadius: 6, border: '1px solid #d1d5db', background: reanalyzingHref === p.href ? '#f3f4f6' : '#fff', color: '#6366f1', cursor: reanalyzingHref === p.href ? 'not-allowed' : 'pointer', fontSize: 11 }}>
+                  {reanalyzingHref === p.href ? '⚙️' : '↻'}
+                </button>
                 {p.status !== 'pending' && (
                   <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'pending') }}
                     style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Undo</button>
