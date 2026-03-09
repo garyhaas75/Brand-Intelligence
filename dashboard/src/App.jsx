@@ -1038,7 +1038,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   const [generating, setGenerating] = useState(false)
   const [channelFilter, setChannelFilter] = useState('all')
   const [itemDates, setItemDates] = useState({})
-  const [addingToCalendar, setAddingToCalendar] = useState(false)
+  const [addingToCalendar, setAddingToCalendar] = useState({})
   const [plannerToast, setPlannerToast] = useState(null)
   const [volumes, setVolumes] = useState({ email: 2, instagram: 3, hero: 1 })
   const [loadingPlan, setLoadingPlan] = useState(false)
@@ -1184,29 +1184,27 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
     })
   }
 
-  async function addApprovedToCalendar() {
-    const approved = planItems.filter(i => i.approved && !i.addedToCalendar)
-    if (!approved.length) return
-    setAddingToCalendar(true)
+  async function addItemToCalendar(itemId) {
+    setAddingToCalendar(prev => ({ ...prev, [itemId]: true }))
     try {
       const res = await fetch('/api/weekly-plan/add-to-calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           weekStart,
-          itemIds: approved.map(i => i.id),
+          itemIds: [itemId],
           dates: itemDates,
         }),
       })
       const data = await res.json()
       if (data.ok) {
         if (setCalItems) setCalItems(prev => [...prev, ...data.items])
-        setPlanItems(prev => prev.map(i => approved.find(a => a.id === i.id) ? { ...i, addedToCalendar: true } : i))
-        setPlannerToast(`Added ${data.created} items to calendar`)
+        setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, addedToCalendar: true } : i))
+        setPlannerToast('Added to calendar')
         setTimeout(() => setPlannerToast(null), 3000)
       }
     } finally {
-      setAddingToCalendar(false)
+      setAddingToCalendar(prev => ({ ...prev, [itemId]: false }))
     }
   }
 
@@ -1218,8 +1216,6 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 
   const CHANNEL_COLORS = { email: '#6366f1', instagram: '#ec4899', hero: '#8b5cf6' }
   const CHANNEL_ICONS = { email: '📧', instagram: '📱', hero: '🏠' }
-
-  const approvedCount = planItems.filter(i => i.approved && !i.addedToCalendar).length
 
   return (
     <div>
@@ -1364,12 +1360,6 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                     )
                   })}
                 </div>
-                {approvedCount > 0 && (
-                  <button onClick={addApprovedToCalendar} disabled={addingToCalendar}
-                    style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 700, cursor: addingToCalendar ? 'not-allowed' : 'pointer' }}>
-                    {addingToCalendar ? 'Adding…' : `📅 Add ${approvedCount} Approved to Calendar`}
-                  </button>
-                )}
               </div>
 
               {/* Suggestion cards */}
@@ -1482,12 +1472,18 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                           </button>
                         )}
                         {item.approved && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ fontSize: 12, color: T.textMuted }}>Send date:</span>
-                            <input type="date" value={itemDates[item.id] || ''} placeholder={weekStart}
-                              onChange={e => setItemDates(prev => ({ ...prev, [item.id]: e.target.value }))}
-                              style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 12, background: T.inputBg, color: T.text }} />
-                          </div>
+                          <>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontSize: 12, color: T.textMuted }}>Send date:</span>
+                              <input type="date" value={itemDates[item.id] || ''} placeholder={weekStart}
+                                onChange={e => setItemDates(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 12, background: T.inputBg, color: T.text }} />
+                            </div>
+                            <button onClick={() => addItemToCalendar(item.id)} disabled={!!addingToCalendar[item.id]}
+                              style={{ marginLeft: 'auto', padding: '7px 16px', borderRadius: 8, border: 'none', background: '#059669', color: '#fff', fontSize: 13, fontWeight: 700, cursor: addingToCalendar[item.id] ? 'not-allowed' : 'pointer', opacity: addingToCalendar[item.id] ? 0.7 : 1 }}>
+                              {addingToCalendar[item.id] ? 'Adding…' : '📅 Add to Calendar'}
+                            </button>
+                          </>
                         )}
                       </div>
                     )}
