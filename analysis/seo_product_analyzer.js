@@ -57,14 +57,41 @@ function loadJSON(fp) {
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return null; }
 }
 
+// Anne Klein-relevant level-2 GID prefixes for clothing.
+// Excludes activewear, baby/children, lingerie, maternity, men's, sleepwear, socks, swimwear, uniforms.
+const AK_CLOTHING_PREFIXES = [
+  'aa-1-4',   // Dresses
+  'aa-1-10',  // Outerwear (coats, jackets, sport jackets)
+  'aa-1-11',  // Outfit Sets
+  'aa-1-12',  // Pants
+  'aa-1-13',  // Clothing Tops (blouses, shirts, tunics)
+  'aa-1-14',  // Shorts
+  'aa-1-15',  // Skirts
+  'aa-1-16',  // Skorts
+  'aa-1-19',  // Suits (pant suits, skirt suits, tuxedos)
+  'aa-1-3',   // Cardigans & Knitwear (if present)
+  'aa-1-5',   // Jackets & Vests (if present)
+  'aa-1-21',  // Sweaters (if present)
+];
+
 // Load taxonomy and build a focused category option list for a given group.
+// For clothing: filters to Anne Klein-relevant subcategories, sorts deepest-first.
 // Passes only level-3+ (specific) categories to Claude to keep the prompt tight.
 function getTaxonomyOptions(categoryGroup) {
   const taxonomy = loadJSON(TAXONOMY_FILE);
   if (!taxonomy?.byGroup) return null;
-  const cats = (taxonomy.byGroup[categoryGroup] || [])
-    .filter(c => c.level >= 3)        // only specific subcategories
-    .slice(0, 30);                    // cap at 30 to stay within prompt budget
+  let cats = (taxonomy.byGroup[categoryGroup] || []).filter(c => c.level >= 2);
+
+  if (categoryGroup === 'clothing') {
+    // Restrict to women's workwear-relevant subcategory trees
+    cats = cats.filter(c => AK_CLOTHING_PREFIXES.some(pfx => {
+      const id = c.gid.replace('gid://shopify/TaxonomyCategory/', '');
+      return id === pfx || id.startsWith(pfx + '-');
+    }));
+  }
+
+  // Sort deepest (most specific) first so Claude always sees leaf-level options
+  cats = cats.sort((a, b) => b.level - a.level).slice(0, 60);
   if (!cats.length) return null;
   return cats.map(c => `${c.gid} | ${c.fullName}`).join('\n');
 }
