@@ -933,12 +933,23 @@ function ContentGeneratorPanel() {
   )
 }
 
-function ContentTab({ content, catalog, campaigns }) {
+function ContentTab({ content, catalog, campaigns, loadData }) {
   const [activeSection, setActiveSection] = useState('email')
   const [personaFilter, setPersonaFilter] = useState(null)
-  const [linkingAsset, setLinkingAsset] = useState(null) // { type, key, asset } — which asset is showing campaign picker
-  const [linkedToast, setLinkedToast] = useState(null) // campaign name to show in toast
+  const [linkingAsset, setLinkingAsset] = useState(null)
+  const [linkedToast, setLinkedToast] = useState(null)
+  const [regenerating, setRegenerating] = useState(false)
   const c = content?.content
+
+  async function regenerateContent() {
+    setRegenerating(true)
+    try {
+      await fetch('/api/content-recommendations/regenerate', { method: 'POST' })
+      if (loadData) await loadData()
+    } finally {
+      setRegenerating(false)
+    }
+  }
   const activeCampaigns = (campaigns || []).filter(c => c.status !== 'archived')
 
   async function linkToCampaign(campaignId, asset) {
@@ -982,7 +993,13 @@ function ContentTab({ content, catalog, campaigns }) {
           Added to "{linkedToast}"
         </div>
       )}
-      <SectionHeader>Generated Content Assets</SectionHeader>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+        <SectionHeader style={{ marginBottom: 0 }}>Generated Content Assets</SectionHeader>
+        <button onClick={regenerateContent} disabled={regenerating}
+          style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: regenerating ? 'not-allowed' : 'pointer', opacity: regenerating ? 0.7 : 1 }}>
+          {regenerating ? 'Regenerating… (~4 min)' : 'Regenerate Content'}
+        </button>
+      </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         {sections.map(s => (
           <button key={s.id} onClick={() => setActiveSection(s.id)}
@@ -3302,6 +3319,11 @@ export default function App() {
     setData(prev => ({ ...prev, emailAnalysis }))
   }
 
+  async function reloadContent() {
+    const content = await fetchEndpoint('/content-recommendations')
+    setData(prev => ({ ...prev, content }))
+  }
+
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: '#f9fafb', minHeight: '100vh' }}>
       <div style={{ background: '#111827', color: '#fff', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -3343,7 +3365,7 @@ export default function App() {
             {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
             {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
             {tab === 'seo-products' && <SeoProductTab />}
-            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} />}
+            {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} loadData={reloadContent} />}
             {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
             {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
             {tab === 'personas'  && <PersonasTab personas={data.personas} content={data.content} />}

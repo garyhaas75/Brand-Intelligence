@@ -116,6 +116,20 @@ app.get('/api/email-intelligence',     (req, res) => res.json(loadData('email_si
 app.get('/api/social-intelligence',    (req, res) => res.json(loadData('social_intelligence.json') || {}));
 app.get('/api/seo-intelligence',       (req, res) => res.json(loadData('gsc_keywords.json') || {}));
 app.get('/api/content-recommendations',(req, res) => res.json(loadData('content_recommendations.json') || {}));
+app.post('/api/content-recommendations/regenerate', (req, res) => {
+  const { spawn } = require('child_process');
+  const child = spawn('node', [path.join(__dirname, 'analysis/content_generator.js')], {
+    env: { ...process.env },
+    cwd: __dirname,
+  });
+  let output = '';
+  child.stdout.on('data', d => { output += d.toString(); });
+  child.stderr.on('data', d => { output += d.toString(); });
+  child.on('close', code => {
+    const data = loadData('content_recommendations.json') || {};
+    res.json({ ok: code === 0, output: output.slice(-2000), generatedAt: data.generatedAt });
+  });
+});
 app.get('/api/email-inbox',            (req, res) => res.json(loadData('email_inbox.json') || {}));
 app.get('/api/email-analysis',         (req, res) => res.json(loadData('email_analysis.json') || {}));
 app.post('/api/email-analysis/refresh', (req, res) => {
