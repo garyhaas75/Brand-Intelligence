@@ -343,11 +343,11 @@ function CatalogTab({ catalog }) {
         </div>
       </Card>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search products..." style={{ flex: 1, padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }} />
+          placeholder="Search products..." style={{ flex: '1 1 180px', minWidth: 0, padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }} />
         <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-          style={{ padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }}>
+          style={{ flex: '0 1 auto', padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }}>
           {categories.map(c => <option key={c}>{c}</option>)}
         </select>
       </div>
@@ -417,9 +417,9 @@ function SiteIntelTab({ siteIntel, siteAnalysis }) {
       <SectionHeader>Category Gaps ({realGaps.length} found)</SectionHeader>
       <Card subtitle="Categories on competitor sites not present on anneklein.com">
         {realGaps.map((g, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: `1px solid ${T.stripeBg}`, gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 14, fontWeight: 500 }}>{g.category}</span>
-            <div style={{ display: 'flex', gap: 4 }}>{g.seenAt.map(b => <Badge key={b} color="blue">{b}</Badge>)}</div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>{g.seenAt.map(b => <Badge key={b} color="blue">{b}</Badge>)}</div>
           </div>
         ))}
       </Card>
@@ -486,7 +486,7 @@ function EmailTab({ inboxData, emailAnalysis, loadData }) {
   return (
     <div>
       {/* AK Strategy — top of page */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0, flexWrap: 'wrap', gap: 8 }}>
         <SectionHeader style={{ marginBottom: 0 }}>AK Email Strategy</SectionHeader>
         <button
           onClick={refreshAnalysis}
@@ -818,9 +818,9 @@ function SEOTab({ seoIntel, content }) {
           <SectionHeader>Quick Wins (Position 4–15)</SectionHeader>
           <Card subtitle="High impressions, achievable ranking — small content changes could move these to page 1">
             {qa.quickWins.slice(0, 15).map((q, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                <span style={{ fontWeight: 500, fontSize: 14, color: T.text }}>{q.query}</span>
-                <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textMuted }}>
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.borderAlt}`, gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 500, fontSize: 14, color: T.text, flex: '1 1 140px' }}>{q.query}</span>
+                <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textMuted, flexShrink: 0 }}>
                   <span>pos <strong>{q.position}</strong></span>
                   <span>{q.impressions?.toLocaleString()} impr</span>
                   <span>{q.ctr}% CTR</span>
@@ -1091,7 +1091,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
           📅 {scheduleToast}
         </div>
       )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0, flexWrap: 'wrap', gap: 8 }}>
         <SectionHeader style={{ marginBottom: 0 }}>Generated Content Assets</SectionHeader>
         <button onClick={regenerateContent} disabled={regenerating}
           style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: regenerating ? 'not-allowed' : 'pointer', opacity: regenerating ? 0.7 : 1 }}>
@@ -1906,7 +1906,7 @@ function PersonasTab({ personas, content }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <SectionHeader>Customer Personas</SectionHeader>
         <button onClick={discoverPersonas} disabled={suggesting}
           style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: suggesting ? 0.6 : 1 }}>
@@ -2069,7 +2069,7 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 8 }}>
         <SectionHeader>Campaigns</SectionHeader>
         <button onClick={openNew} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
           + New Campaign
@@ -2079,7 +2079,7 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
       {/* Campaign Form */}
       {showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: T.surface, borderRadius: 12, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+          <div style={{ background: T.surface, borderRadius: 12, padding: 'clamp(16px, 4vw, 28px)', width: 'min(560px, 95vw)', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 20, color: T.text }}>{editId ? 'Edit Campaign' : 'New Campaign'}</div>
             {[
               { label: 'Campaign Name', key: 'name', type: 'text' },
@@ -2149,15 +2149,15 @@ function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems 
 
       {campaigns.map(c => (
         <Card key={c.id} accent={STATUS_COLORS[c.status] || '#6366f1'}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-            <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
+            <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 800, fontSize: 18, color: T.text, marginBottom: 4 }}>{c.name}</div>
               <div style={{ fontSize: 13, color: T.textMuted }}>
                 {[c.startDate, c.endDate].filter(Boolean).join(' → ')}
                 {c.persona && <span> · {c.persona}</span>}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
               <span style={{ background: T.surfaceAlt, border: `1px solid ${STATUS_COLORS[c.status]}`, color: STATUS_COLORS[c.status], borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>{c.status}</span>
               <button onClick={() => openEdit(c)} style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 12 }}>Edit</button>
               <button onClick={() => deleteCampaign(c.id)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: T.surface, color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
@@ -2309,7 +2309,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
       <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)' }} onClick={onClose} />
-      <div style={{ width: 520, background: T.surface, overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: 'min(520px, 100vw)', background: T.surface, overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
         {/* Drawer header */}
         <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.bg }}>
           <div style={{ fontWeight: 800, fontSize: 16, color: T.text }}>
@@ -2324,7 +2324,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
 
         <div style={{ padding: '16px 20px', flex: 1 }}>
           {/* Row: date + channel + status */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 10 }}>
             <div><Label>Date</Label><input type="date" value={draft.date || ''} onChange={e => setDraft(p => ({ ...p, date: e.target.value }))} style={iStyle} /></div>
             <div><Label>Channel</Label>
               <select value={draft.channel || 'email'} onChange={e => setDraft(p => ({ ...p, channel: e.target.value }))} style={iStyle}>
@@ -2341,7 +2341,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
           <Label>Theme / Campaign Angle</Label>
           <input value={draft.theme || ''} onChange={e => setDraft(p => ({ ...p, theme: e.target.value }))} style={iStyle} placeholder="e.g. Spring Into Work — Monday-to-Friday formula" />
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
             <div><Label>Target Persona</Label>
               <select value={draft.personaTarget || ''} onChange={e => setDraft(p => ({ ...p, personaTarget: e.target.value }))} style={iStyle}>
                 <option value="">— none —</option>
@@ -2356,7 +2356,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
             <div><Label>Assigned To</Label><input value={draft.assignedTo || ''} onChange={e => setDraft(p => ({ ...p, assignedTo: e.target.value }))} style={iStyle} placeholder="Name or team" /></div>
           </div>
 
@@ -2408,7 +2408,7 @@ function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, person
             )}
             <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Search products by name or category…"
               style={{ ...iStyle, marginBottom: 8 }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
               {filteredProducts.map(p => (
                 <div key={p.href} onClick={() => toggleProduct(p)}
                   style={{ border: `2px solid ${isSelected(p) ? T.accent : T.border}`, borderRadius: 8, padding: 6, cursor: 'pointer', background: isSelected(p) ? T.surfaceAlt : T.surface, textAlign: 'center' }}>
@@ -2478,7 +2478,7 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
   return (
     <div>
       {/* Week nav */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <SectionHeader style={{ margin: 0 }}>Content Calendar</SectionHeader>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={prevWeek} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>← Prev</button>
@@ -2498,48 +2498,50 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
       )}
 
       {/* Week grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8 }}>
-        {weekDates.map((date, di) => {
-          const dk = dateKey(date)
-          const dayItems = calItems.filter(i => i.date === dk)
-          const isToday = dk === today
-          const activeCamps = (campaigns || []).filter(c => {
-            if (!c.startDate || !c.endDate) return false
-            return dk >= c.startDate && dk <= c.endDate
-          })
-          return (
-            <div key={dk} style={{ minHeight: 120, background: T.surface, borderRadius: 10, border: `1px solid ${isToday ? T.accent : T.border}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
-              {/* Campaign bands */}
-              {activeCamps.map((c) => (
-                <div key={c.id} title={c.name}
-                  style={{ height: 4, borderRadius: 2, marginBottom: 3, background: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4] }} />
-              ))}
-              {/* Day header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: 'uppercase' }}>{DAY_NAMES[di]}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: isToday ? T.accent : T.text }}>{date.getDate()}</div>
-                </div>
-                <button onClick={() => addItem(dk)}
-                  style={{ width: 22, height: 22, borderRadius: '50%', border: `1px solid ${T.inputBorder}`, background: T.surface, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, lineHeight: 1 }}>+</button>
-              </div>
-
-              {/* Items */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-                {dayItems.map(item => (
-                  <div key={item.id} onClick={() => setDrawerItem(item)}
-                    style={{ background: (CHANNEL_COLORS[item.channel] || '#6b7280') + '18', borderLeft: `3px solid ${CHANNEL_COLORS[item.channel] || '#6b7280'}`, borderRadius: 5, padding: '4px 7px', cursor: 'pointer', fontSize: 11 }}>
-                    <div style={{ fontWeight: 700, color: CHANNEL_COLORS[item.channel] || '#6b7280', textTransform: 'uppercase', fontSize: 10 }}>{item.channel}</div>
-                    <div style={{ color: T.textSub, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.theme || '(no theme)'}</div>
-                    <div style={{ marginTop: 2 }}>
-                      <span style={{ fontSize: 10, background: STATUS_BG[item.status], color: STATUS_FG[item.status], borderRadius: 4, padding: '1px 5px', fontWeight: 600 }}>{item.status}</span>
-                    </div>
-                  </div>
+      <div style={{ overflowX: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))', gap: 8, minWidth: 560 }}>
+          {weekDates.map((date, di) => {
+            const dk = dateKey(date)
+            const dayItems = calItems.filter(i => i.date === dk)
+            const isToday = dk === today
+            const activeCamps = (campaigns || []).filter(c => {
+              if (!c.startDate || !c.endDate) return false
+              return dk >= c.startDate && dk <= c.endDate
+            })
+            return (
+              <div key={dk} style={{ minHeight: 120, background: T.surface, borderRadius: 10, border: `1px solid ${isToday ? T.accent : T.border}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
+                {/* Campaign bands */}
+                {activeCamps.map((c) => (
+                  <div key={c.id} title={c.name}
+                    style={{ height: 4, borderRadius: 2, marginBottom: 3, background: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4] }} />
                 ))}
+                {/* Day header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: 'uppercase' }}>{DAY_NAMES[di]}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: isToday ? T.accent : T.text }}>{date.getDate()}</div>
+                  </div>
+                  <button onClick={() => addItem(dk)}
+                    style={{ width: 22, height: 22, borderRadius: '50%', border: `1px solid ${T.inputBorder}`, background: T.surface, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, lineHeight: 1 }}>+</button>
+                </div>
+
+                {/* Items */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+                  {dayItems.map(item => (
+                    <div key={item.id} onClick={() => setDrawerItem(item)}
+                      style={{ background: (CHANNEL_COLORS[item.channel] || '#6b7280') + '18', borderLeft: `3px solid ${CHANNEL_COLORS[item.channel] || '#6b7280'}`, borderRadius: 5, padding: '4px 7px', cursor: 'pointer', fontSize: 11 }}>
+                      <div style={{ fontWeight: 700, color: CHANNEL_COLORS[item.channel] || '#6b7280', textTransform: 'uppercase', fontSize: 10 }}>{item.channel}</div>
+                      <div style={{ color: T.textSub, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.theme || '(no theme)'}</div>
+                      <div style={{ marginTop: 2 }}>
+                        <span style={{ fontSize: 10, background: STATUS_BG[item.status], color: STATUS_FG[item.status], borderRadius: 4, padding: '1px 5px', fontWeight: 600 }}>{item.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
 
       {/* Drawer */}
@@ -2702,7 +2704,7 @@ function SeoProductTab() {
           <div style={{ fontSize: 13, color: T.textMuted }}>
             {totalAnalyzed} of {totalProducts} products analyzed ({pctDone}%)
           </div>
-          <div style={{ marginTop: 6, width: 220, height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
+          <div style={{ marginTop: 6, width: '100%', maxWidth: 220, height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pctDone}%`, background: '#6366f1', borderRadius: 3, transition: 'width 0.4s' }} />
           </div>
         </div>
@@ -2864,7 +2866,7 @@ function SeoProductTab() {
         return (
           <div key={p.href} style={{ background: T.surface, border: `1px solid ${isSelected ? '#6366f1' : T.border}`, borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
             {/* Collapsed row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: 'pointer' }}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: 'pointer', flexWrap: 'wrap' }}
               onClick={() => setExpandedHref(isExpanded ? null : p.href)}>
               {(statusFilter === 'pending' || statusFilter === 'approved') && (
                 <input type="checkbox" checked={isSelected} onChange={e => { e.stopPropagation(); toggleSelect(p.href) }}
@@ -2930,7 +2932,7 @@ function SeoProductTab() {
                     <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
                   </div>
                 )}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 14 }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
                     <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
@@ -3248,7 +3250,7 @@ function BrandGuidelinesTab({ guidelines }) {
         <>
           <SectionHeader>Brand Heritage</SectionHeader>
           <Card>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
               <div>
                 <div style={{ marginBottom: 12 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Founded</div>
@@ -3316,8 +3318,8 @@ function BrandGuidelinesTab({ guidelines }) {
           <SectionHeader>Tone by Channel</SectionHeader>
           <Card>
             {Object.entries(toneByChannel).map(([channel, guidance], i, arr) => (
-              <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
-                <div style={{ minWidth: 160, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
+              <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                <div style={{ minWidth: 140, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
                 <div style={{ flex: 1, fontSize: 13, color: T.textSub }}>
                   {editing
                     ? <textarea style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', resize: 'vertical', minHeight: 40, background: T.inputBg, color: T.text }} value={guidance} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.toneByChannel[channel] = e.target.value; setDraft(next); }} />
@@ -3331,7 +3333,7 @@ function BrandGuidelinesTab({ guidelines }) {
 
       {/* Writing Rules */}
       <SectionHeader>Writing Rules</SectionHeader>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
         <Card title="Do">
           {!editing && writingRules.dos.map((d, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? `1px solid ${T.border}` : 'none' }}>
@@ -3354,7 +3356,7 @@ function BrandGuidelinesTab({ guidelines }) {
 
       {/* Keywords */}
       <SectionHeader>Keywords</SectionHeader>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
         <Card title="Use These Words">
           <EPills items={keywords.positive} path="keywords.positive" bg="#d1fae5" color="#065f46" />
         </Card>
@@ -3414,7 +3416,7 @@ function BrandGuidelinesTab({ guidelines }) {
       {/* Writing Samples */}
       <SectionHeader>Writing Samples</SectionHeader>
       <Card>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
           {sampleCategories.map(cat => (
             <button key={cat} onClick={() => setActiveSample(cat)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeSample === cat ? '#6366f1' : T.surfaceAlt, color: activeSample === cat ? '#fff' : T.textSub, textTransform: 'capitalize' }}>{cat}</button>
           ))}
@@ -3511,7 +3513,7 @@ export default function App() {
     <ThemeContext.Provider value={T}>
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: T.bg, minHeight: '100vh', color: T.text, transition: 'background 0.2s, color 0.2s' }}>
       {/* Top nav */}
-      <div style={{ background: T.navBg, color: T.navText, padding: '14px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: T.navBg, color: T.navText, padding: 'clamp(10px, 2vw, 14px) clamp(12px, 3vw, 32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <div>
           <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.5px', color: T.navText }}>ANNE KLEIN</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>Brand Intelligence Platform</div>
@@ -3527,7 +3529,7 @@ export default function App() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: '0 32px', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+      <div style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: `0 clamp(8px, 3vw, 32px)`, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         {TABS.map(t => (
           <React.Fragment key={t.id}>
             {t.dividerBefore && (
@@ -3545,7 +3547,7 @@ export default function App() {
       </div>
 
       {/* Content */}
-      <div style={{ width: '100%', padding: '24px 40px', boxSizing: 'border-box' }}>
+      <div style={{ width: '100%', padding: `clamp(12px, 3vw, 24px) clamp(12px, 4vw, 40px)`, boxSizing: 'border-box' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80, color: T.textMuted }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
