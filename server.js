@@ -38,7 +38,11 @@ const DATA_DIR = path.join(__dirname, 'data');
       const live = JSON.parse(fs.readFileSync(livePath, 'utf8'));
       let changed = false;
       for (const key of Object.keys(seed)) {
-        if (!(key in live)) {
+        const liveVal = live[key];
+        const isEmpty = liveVal === null || liveVal === undefined ||
+          (typeof liveVal === 'object' && !Array.isArray(liveVal) && Object.keys(liveVal).length === 0) ||
+          (Array.isArray(liveVal) && liveVal.length === 0);
+        if (!(key in live) || isEmpty) {
           live[key] = seed[key];
           changed = true;
         }

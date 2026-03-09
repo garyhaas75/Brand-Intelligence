@@ -3527,7 +3527,7 @@ export default function App() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: '0 32px', display: 'flex', gap: 2, overflowX: 'auto' }}>
+      <div style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: '0 32px', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         {TABS.map(t => (
           <React.Fragment key={t.id}>
             {t.dividerBefore && (
