@@ -622,7 +622,7 @@ app.post('/api/seo-suggestions/reanalyze-one', async (req, res) => {
   child.on('close', code => {
     const data = loadSeoSuggestions();
     const product = data.products?.find(p => p.href === href) || null;
-    res.json({ ok: code === 0, output: output.slice(-1000), product });
+    res.json({ ok: code === 0, output: output, product });
   });
 });
 
