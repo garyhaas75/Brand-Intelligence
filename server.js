@@ -21,8 +21,18 @@ app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3001;
 const DATA_DIR = path.join(__dirname, 'data');
 
-// On startup: merge any new top-level keys from seed_data into live data files.
-// This lets us ship new fields without overwriting existing user edits on the volume.
+// Validators: return true if the live file's data is valid (no seed override needed).
+const SEED_VALIDATORS = {
+  'gsc_keywords.json':            (d) => d?.queryAnalysis?.totalQueries > 0,
+  'social_intelligence.json':     (d) => Array.isArray(d?.brands) && d.brands.length > 0,
+  'site_intelligence.json':       (d) => Array.isArray(d?.brands) && d.brands.length > 0,
+  'product_catalog.json':         (d) => Array.isArray(d?.products) && d.products.length > 0,
+  'content_recommendations.json': (d) => !!d?.content,
+  'agentic_search.json':          (d) => Array.isArray(d?.queries) && d.queries.length > 0,
+};
+
+// On startup: copy seed file if live file is missing or fails validation.
+// For files without a validator, merge any new top-level keys only.
 (function mergeSeedData() {
   const seedDir = path.join(__dirname, 'seed_data');
   if (!fs.existsSync(seedDir)) return;
@@ -33,22 +43,26 @@ const DATA_DIR = path.join(__dirname, 'data');
       const seed = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
       if (!fs.existsSync(livePath)) {
         fs.copyFileSync(seedPath, livePath);
+        console.log(`[seed] copied ${file} (missing)`);
         continue;
       }
       const live = JSON.parse(fs.readFileSync(livePath, 'utf8'));
+      const validator = SEED_VALIDATORS[file];
+      if (validator && !validator(live)) {
+        fs.copyFileSync(seedPath, livePath);
+        console.log(`[seed] replaced ${file} (failed validation)`);
+        continue;
+      }
+      // No validator — merge missing top-level keys only
       let changed = false;
       for (const key of Object.keys(seed)) {
-        const liveVal = live[key];
-        const isEmpty = liveVal === null || liveVal === undefined ||
-          (typeof liveVal === 'object' && !Array.isArray(liveVal) && Object.keys(liveVal).length === 0) ||
-          (Array.isArray(liveVal) && liveVal.length === 0);
-        if (!(key in live) || isEmpty) {
+        if (!(key in live)) {
           live[key] = seed[key];
           changed = true;
         }
       }
       if (changed) fs.writeFileSync(livePath, JSON.stringify(live, null, 2));
-    } catch {}
+    } catch (e) { console.error(`[seed] error processing ${file}:`, e.message); }
   }
 })();
 
