@@ -2140,7 +2140,7 @@ function SeoProductTab() {
         body: JSON.stringify({ href }),
       })
       const result = await res.json()
-      alert(`Re-analyze ${result.ok ? 'OK' : 'FAILED'}:\n\n${result.output || result.error || '(no output)'}`)
+      if (!result.ok) alert(`Re-analyze failed: ${result.output?.split('\n').pop() || 'unknown error'}`)
     } catch (err) {
       alert(`Re-analyze error: ${err.message}`)
     }

@@ -205,7 +205,7 @@ function getCategoryPromptSection(categoryGroup, hasImage) {
   const taxonomyOptions = getTaxonomyOptions(categoryGroup);
 
   const taxonomyInstruction = taxonomyOptions
-    ? `shopify_taxonomy_gid: Pick the single most specific matching GID from this list (return only the GID string, e.g. "gid://shopify/TaxonomyCategory/aa-1-4-3"):
+    ? `shopify_taxonomy_gid: Pick the DEEPEST (most specific leaf-level) matching GID from this list. Always prefer a subcategory over its parent — e.g. pick "Sport Jackets" over "Coats & Jackets", pick "Trousers" over "Pants". Return only the GID string, no other text:
 ${taxonomyOptions}`
     : `shopify_taxonomy_gid: The Shopify taxonomy GID for this product type (format: "gid://shopify/TaxonomyCategory/aa-X-X").`;
 
