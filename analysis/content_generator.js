@@ -227,7 +227,7 @@ For each caption, assign a "targetPersona" — one of the 4 persona names. Vary 
 
 Format as JSON: { "instagramCaptions": [ { "category": "", "caption": "", "hashtags": [], "imageryNotes": "describe the visual: product type, setting, lighting, mood — e.g. 'blazer flat lay on marble, natural morning light' or 'model at desk in tailored pants, editorial lighting'", "notes": "", "targetPersona": "" } ] }`;
 
-  allResults.instagramCaptions = await generateContent(client, igPrompt, systemPrompt, 'Instagram captions');
+  allResults.instagramCaptions = await generateContent(client, igPrompt, systemPrompt, 'Instagram captions', 3500);
 
   // --- 4. SEO Collection Descriptions ---
   const seoPrompt = `${context}
