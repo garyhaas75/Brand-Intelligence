@@ -556,7 +556,7 @@ Generate ALL of the following fields:
 
 1. meta_title: Under 60 characters. Product type + key attribute + brand name. Natural, not keyword-stuffed. Example: "Ponte Blazer with Welt Pockets | Anne Klein"
 2. meta_description: Under 160 characters. Lead with the purchase reason for a professional woman. Include 1-2 natural search phrases. Soft CTA at end.
-3. tags: 6-10 clean search-friendly tags. Mix: product type, occasion (work, office, professional), style descriptor, material. No internal codes or operational tags.
+3. tags: 6-10 NEW search-friendly SEO tags to ADD alongside the existing tags. Mix: product type, occasion (work, office, professional), style descriptor. Do NOT repeat or duplicate any existing tag. Do NOT include operational codes (style numbers, campaign names, season codes).
 4. image_insights: ${imageData ? '1-2 sentences on what the image reveals about material, silhouette, and occasion that the current description misses.' : 'null'}
 5. alt_text: Under 125 characters. Descriptive image alt text. Describe what is literally shown: product type, color, key style details. Do NOT start with "Image of" or "Photo of".
 6. geo_description: 2-3 sentences for AI assistant discoverability. Answer a query like "best blazers for work" or "professional outfit ideas". Name product type and brand naturally. Include one specific functional feature. No superlatives.
@@ -604,6 +604,15 @@ Return ONLY valid JSON (no markdown, no explanation):
       parsed.shopify_taxonomy_gid = null;
     }
   }
+  // Merge AI-generated SEO tags with existing navigational/merchandising tags.
+  // Keep all original tags that aren't internal junk; append new AI tags (no duplicates).
+  const keepTags = (product.tags || []).filter(t => !/enrich:|gorgias|discount|do.not/i.test(t));
+  const aiTags = (parsed.tags || []).map(t => String(t).trim());
+  const existingLower = new Set(keepTags.map(t => t.toLowerCase()));
+  const newOnly = aiTags.filter(t => !existingLower.has(t.toLowerCase()));
+  parsed.tags = [...keepTags, ...newOnly];
+  log(`    Tags: kept ${keepTags.length} existing + added ${newOnly.length} new = ${parsed.tags.length} total`);
+
   parsed._specificType = specificType;
   return parsed;
 }
