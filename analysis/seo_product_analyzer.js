@@ -189,78 +189,335 @@ function detectCategoryGroup(category) {
   return 'other';
 }
 
-// Returns extra field instructions + JSON schema additions per category.
-// Injects real taxonomy GIDs from the synced taxonomy file so Claude picks
-// an exact valid GID instead of guessing a free-text string.
-function getCategoryPromptSection(categoryGroup, hasImage) {
-  const imageNote = hasImage ? ' (infer from the image if visible)' : ' (infer from the product name/description)';
-  const taxonomyOptions = getTaxonomyOptions(categoryGroup);
+// ─── Detect specific product sub-type from name + category ───────────────────
+// Used to pick a richer, type-specific metafield schema.
+function detectSpecificType(product) {
+  const combined = ((product.name || '') + ' ' + (product.category || '')).toLowerCase();
+  // Shoes
+  if (/\bboot/i.test(combined)) return 'boots';
+  if (/\bpump\b|\bheel\b|\bstiletto|\bkitten.heel/i.test(combined)) return 'heels';
+  if (/\bsandal|\bmule\b|\bslide\b/i.test(combined)) return 'sandals';
+  if (/\bflat\b|\bloafer|\bmoccasin/i.test(combined)) return 'flats';
+  if (/\bsneaker|\btrainer/i.test(combined)) return 'sneakers';
+  // Jewelry
+  if (/\bearing/i.test(combined)) return 'earrings';
+  if (/\bnecklace|\bpendant|\bchain/i.test(combined)) return 'necklaces';
+  if (/\bbracelet|\bbangle/i.test(combined)) return 'bracelets';
+  if (/\bring\b/i.test(combined)) return 'rings';
+  if (/\bwatch/i.test(combined)) return 'watches';
+  if (/\bbrooch|\blapel.pin/i.test(combined)) return 'brooches';
+  if (/jewelry.set/i.test(combined)) return 'jewelry_sets';
+  // Handbags
+  if (/\bclutch/i.test(combined)) return 'clutch';
+  if (/\bcrossbody|\bcross.body/i.test(combined)) return 'crossbody';
+  if (/\btote\b|\bshopper/i.test(combined)) return 'tote';
+  if (/\bsatchel/i.test(combined)) return 'satchel';
+  if (/\bshoulder.bag/i.test(combined)) return 'shoulder_bag';
+  if (/\bwallet|\bcard.case|\bcoin.purse/i.test(combined)) return 'wallet';
+  if (/\bhandbag\b|\bpurse\b/i.test(combined)) return 'handbag_generic';
+  // Clothing — specific types
+  if (/\bblazer|\bsport.jacket|\bsport.coat/i.test(combined)) return 'blazer';
+  if (/\bdress\b/i.test(combined)) return 'dress';
+  if (/\bpant\b|\btrouser|\bchino|\blegging/i.test(combined)) return 'pants';
+  if (/\bskirt\b/i.test(combined)) return 'skirt';
+  if (/\bsuit\b/i.test(combined)) return 'suit';
+  if (/\bcoat\b|\btrench|\bparka|\bpuffer|\bovercoat/i.test(combined)) return 'coat';
+  if (/\bcardigan|\bsweater|\bknit\b/i.test(combined)) return 'sweater';
+  if (/\bblouse|\btop\b|\bshirt\b|\btunic|\btank\b/i.test(combined)) return 'top';
+  if (/\bjacket\b/i.test(combined)) return 'coat';
+  // Fall back to broad category group
+  return detectCategoryGroup(product.category);
+}
 
+// ─── Per-type metafield schemas ───────────────────────────────────────────────
+// Rules:
+//   - NEVER infer material, fabric, or any attribute from visual appearance alone.
+//   - Only fill a field if the value is explicitly stated in product name or description.
+//   - Return null for any field that is not clearly specified.
+const NO_INFER = 'ONLY fill if explicitly stated in the product name or description. Return null if not clearly specified — do NOT guess or infer from visual appearance.';
+
+const TYPE_SCHEMAS = {
+  // ── Clothing ──────────────────────────────────────────────────────────────
+  blazer: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER} E.g. "Wool-blend crepe", "Stretch ponte", "Woven polyester". Be specific, not just "fabric".`,
+      `care_instructions: One-line care instruction. ${NO_INFER} E.g. "Dry clean only" or "Machine wash cold, lay flat to dry".`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Regular", "Tailored", "Relaxed".`,
+      `closure_type: Fastening style. ${NO_INFER} E.g. "Single-breasted 2-button", "Double-breasted", "Open front".`,
+      `lining: Lining detail. ${NO_INFER} E.g. "Fully lined", "Half-lined", "Unlined".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null, "lining": null`,
+  },
+  coat: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Relaxed", "Oversized".`,
+      `closure_type: Fastening style. ${NO_INFER} E.g. "Double-breasted buttons", "Belt-tie", "Zip-front", "Snap closure".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null`,
+  },
+  dress: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "Fitted", "A-line", "Shift", "Wrap", "Bodycon".`,
+      `neckline: Neckline style. ${NO_INFER} E.g. "V-neck", "Scoop neck", "Crew neck", "Square neck", "Off-shoulder".`,
+      `sleeve_length: Sleeve length. ${NO_INFER} E.g. "Sleeveless", "Short sleeve", "3/4 sleeve", "Long sleeve".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "neckline": null, "sleeve_length": null`,
+  },
+  pants: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Leg and body fit. ${NO_INFER} E.g. "Straight leg", "Wide leg", "Slim fit", "Flared", "Bootcut".`,
+      `rise: Waist rise. ${NO_INFER} E.g. "High rise", "Mid rise", "Low rise".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "rise": null`,
+  },
+  skirt: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "A-line", "Pencil", "Wrap", "Pleated".`,
+      `length: Skirt length. ${NO_INFER} E.g. "Mini", "Knee-length", "Midi", "Maxi".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "length": null`,
+  },
+  suit: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "Tailored", "Slim", "Regular".`,
+      `lining: Lining detail. ${NO_INFER} E.g. "Fully lined", "Partially lined", "Unlined".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "lining": null`,
+  },
+  sweater: {
+    fields: [
+      `material: Primary fiber composition. ${NO_INFER} E.g. "100% merino wool", "Acrylic blend", "Cotton knit".`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Regular", "Oversized", "Relaxed".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null`,
+  },
+  top: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Regular", "Relaxed", "Fitted".`,
+      `neckline: Neckline style. ${NO_INFER} E.g. "V-neck", "Crew neck", "Cowl neck", "Wrap", "Scoop neck".`,
+      `sleeve_length: Sleeve length. ${NO_INFER} E.g. "Sleeveless", "Short sleeve", "3/4 sleeve", "Long sleeve".`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "neckline": null, "sleeve_length": null`,
+  },
+  // ── Shoes ──────────────────────────────────────────────────────────────────
+  heels: {
+    fields: [
+      `heel_height: Numeric heel height. ${NO_INFER} E.g. "3.5 inch", "2 inch", "4 inch".`,
+      `heel_style: Heel shape. ${NO_INFER} E.g. "Stiletto", "Block heel", "Kitten heel", "Cone heel", "Wedge".`,
+      `toe_shape: Toe box shape. ${NO_INFER} E.g. "Pointed toe", "Square toe", "Round toe", "Almond toe".`,
+      `closure_type: How the shoe is secured. ${NO_INFER} E.g. "Slip-on", "Ankle strap with buckle", "Slingback", "Side zip".`,
+    ],
+    schema: `"heel_height": null, "heel_style": null, "toe_shape": null, "closure_type": null`,
+  },
+  boots: {
+    fields: [
+      `heel_height: Numeric heel height. ${NO_INFER} E.g. "1.5 inch", "Flat / no heel". Return null if not stated.`,
+      `shaft_height: Boot shaft height. ${NO_INFER} E.g. "Ankle", "Mid-calf", "Knee-high", "Over-the-knee".`,
+      `closure_type: How the boot is put on. ${NO_INFER} E.g. "Side zip", "Pull-on", "Lace-up", "Chelsea pull-tab".`,
+    ],
+    schema: `"heel_height": null, "shaft_height": null, "closure_type": null`,
+  },
+  sandals: {
+    fields: [
+      `heel_style: Heel type. ${NO_INFER} E.g. "Flat", "Block heel", "Wedge", "Kitten heel", "Espadrille".`,
+      `strap_style: Strap configuration. ${NO_INFER} E.g. "T-strap", "Ankle strap", "Toe-ring", "Slide", "Gladiator".`,
+      `closure_type: Fastening. ${NO_INFER} E.g. "Buckle ankle strap", "Slip-on", "Adjustable hook-and-loop".`,
+    ],
+    schema: `"heel_style": null, "strap_style": null, "closure_type": null`,
+  },
+  flats: {
+    fields: [
+      `toe_shape: Toe shape. ${NO_INFER} E.g. "Pointed", "Round", "Square", "Almond".`,
+      `closure_type: How the shoe is secured. ${NO_INFER} E.g. "Slip-on", "Mary Jane strap", "Lace-up", "Loafer".`,
+    ],
+    schema: `"toe_shape": null, "closure_type": null`,
+  },
+  sneakers: {
+    fields: [
+      `closure_type: Fastening. ${NO_INFER} E.g. "Lace-up", "Slip-on", "Velcro".`,
+    ],
+    schema: `"closure_type": null`,
+  },
+  // ── Jewelry ────────────────────────────────────────────────────────────────
+  earrings: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER} E.g. "Gold-tone", "Silver-tone", "Rose gold-tone", "Two-tone". Must appear in name or description.`,
+      `stone_type: Stone or ornament. ${NO_INFER} E.g. "Crystal", "Cubic zirconia", "Imitation pearl", "Enamel". Return null if none mentioned.`,
+      `earring_back: Back/fastening type. ${NO_INFER} E.g. "Post with push back", "Lever back", "Clip-on", "Threader", "Hoop".`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null, "earring_back": null`,
+  },
+  necklaces: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER} E.g. "Gold-tone", "Silver-tone", "Rose gold-tone".`,
+      `stone_type: Stone or pendant ornament. ${NO_INFER} Return null if no stone/pendant mentioned.`,
+      `chain_length: Length in inches. ${NO_INFER} E.g. "16 inch", "18 inch with 2-inch extender".`,
+      `clasp_type: Closure type. ${NO_INFER} E.g. "Lobster clasp", "Spring ring", "Toggle clasp".`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null, "chain_length": null, "clasp_type": null`,
+  },
+  bracelets: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER}`,
+      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+      `clasp_type: Closure type. ${NO_INFER} E.g. "Toggle clasp", "Magnetic clasp", "Stretch", "Box clasp", "Lobster clasp".`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null, "clasp_type": null`,
+  },
+  rings: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER}`,
+      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null`,
+  },
+  watches: {
+    fields: [
+      `metal_finish: Case and band finish. ${NO_INFER} E.g. "Gold-tone case with mesh band", "Silver-tone stainless steel".`,
+      `band_material: Band/strap material. ${NO_INFER} E.g. "Mesh bracelet", "Link bracelet", "Leather strap".`,
+      `case_diameter: Case size. ${NO_INFER} E.g. "36mm", "38mm".`,
+    ],
+    schema: `"metal_finish": null, "band_material": null, "case_diameter": null`,
+  },
+  brooches: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER}`,
+      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null`,
+  },
+  jewelry_sets: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER}`,
+      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null`,
+  },
+  // ── Handbags ───────────────────────────────────────────────────────────────
+  clutch: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} E.g. "Faux leather", "Satin", "Quilted fabric". Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${NO_INFER} E.g. "Magnetic snap", "Frame clasp", "Zip-top", "Envelope flap".`,
+      `strap_type: Strap detail. ${NO_INFER} E.g. "No strap", "Detachable chain strap", "Wristlet loop". Return null if not mentioned.`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
+  },
+  crossbody: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${NO_INFER} E.g. "Zip-top", "Flap with turn-lock", "Magnetic snap".`,
+      `strap_drop: Strap drop/length. ${NO_INFER} E.g. "22-inch adjustable strap", "Detachable chain strap".`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+  },
+  tote: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${NO_INFER} E.g. "Open top", "Magnetic snap", "Zip-top". Return null if not stated.`,
+      `strap_drop: Handle/strap drop. ${NO_INFER} E.g. "10-inch top handle", "22-inch shoulder strap".`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+  },
+  satchel: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${NO_INFER}`,
+      `strap_drop: Strap drop. ${NO_INFER}`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+  },
+  shoulder_bag: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${NO_INFER}`,
+      `strap_drop: Strap drop. ${NO_INFER}`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+  },
+  handbag_generic: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${NO_INFER}`,
+      `strap_drop: Strap drop/length. ${NO_INFER}`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+  },
+  wallet: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER}`,
+      `closure_type: How it closes. ${NO_INFER} E.g. "Zip-around", "Snap closure", "Bi-fold, no closure".`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null`,
+  },
+  // ── Category group fallbacks ───────────────────────────────────────────────
+  clothing: {
+    fields: [
+      `material: Primary fabric composition. ${NO_INFER}`,
+      `care_instructions: One-line care instruction. ${NO_INFER}`,
+      `fit_type: Body fit. ${NO_INFER}`,
+    ],
+    schema: `"material": null, "care_instructions": null, "fit_type": null`,
+  },
+  shoes: {
+    fields: [
+      `heel_style: Heel type. ${NO_INFER}`,
+      `closure_type: Fastening. ${NO_INFER}`,
+    ],
+    schema: `"heel_style": null, "closure_type": null`,
+  },
+  jewelry: {
+    fields: [
+      `metal_finish: Metal color/finish. ${NO_INFER}`,
+      `stone_type: Stone if mentioned. ${NO_INFER}`,
+    ],
+    schema: `"metal_finish": null, "stone_type": null`,
+  },
+  handbags: {
+    fields: [
+      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
+      `closure_type: Closure if stated. ${NO_INFER}`,
+      `strap_drop: Strap drop if stated. ${NO_INFER}`,
+    ],
+    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+  },
+};
+
+// Returns field instructions + JSON schema for a given specific type.
+function getCategoryPromptSection(specificType, categoryGroup) {
+  const taxonomyOptions = getTaxonomyOptions(categoryGroup);
   const taxonomyInstruction = taxonomyOptions
-    ? `shopify_taxonomy_gid: Pick the DEEPEST (most specific leaf-level) matching GID from this list. Always prefer a subcategory over its parent — e.g. pick "Sport Jackets" over "Coats & Jackets", pick "Trousers" over "Pants". Return only the GID string, no other text:
-${taxonomyOptions}`
+    ? `shopify_taxonomy_gid: Pick the DEEPEST (most specific leaf-level) matching GID from this list. Always prefer a subcategory over its parent — e.g. pick "Sport Jackets" over "Coats & Jackets". Return only the GID string, no other text:\n${taxonomyOptions}`
     : `shopify_taxonomy_gid: The Shopify taxonomy GID for this product type (format: "gid://shopify/TaxonomyCategory/aa-X-X").`;
 
-  switch (categoryGroup) {
-    case 'clothing':
-      return {
-        fields: `7. material: The primary fabric or material composition${imageNote}. Be specific: "Ponte knit blend", "Stretch crepe", "Woven polyester". Not just "fabric".
-8. care_instructions: One line, practical${imageNote}. E.g., "Machine wash cold, tumble dry low" or "Hand wash or dry clean recommended".
-9. fit_type: How it fits the body${imageNote}. One of: Slim, Regular, Relaxed, Tailored, Fitted, Straight. One word or short phrase.
-10. ${taxonomyInstruction}`,
-        schema: `  "material": "",
-  "care_instructions": "",
-  "fit_type": "",
-  "shopify_taxonomy_gid": ""`,
-      };
+  const typeSchema = TYPE_SCHEMAS[specificType] || TYPE_SCHEMAS[categoryGroup] || { fields: [], schema: '' };
+  const fieldLines = typeSchema.fields.map((f, i) => `${i + 7}. ${f}`).join('\n');
+  const nextNum = typeSchema.fields.length + 7;
 
-    case 'shoes':
-      return {
-        fields: `7. material: Upper material${imageNote}. E.g., "Faux leather upper, synthetic sole" or "Suede upper, leather lining".
-8. heel_style: Heel type and height if visible${imageNote}. E.g., "Block heel, 2.5 inch", "Kitten heel, 1.5 inch", "Flat", "Wedge, 3 inch".
-9. closure_type: How the shoe is put on/secured${imageNote}. E.g., "Slip-on", "Ankle strap with buckle", "Side zip", "Lace-up".
-10. ${taxonomyInstruction}`,
-        schema: `  "material": "",
-  "heel_style": "",
-  "closure_type": "",
-  "shopify_taxonomy_gid": ""`,
-      };
-
-    case 'jewelry':
-      return {
-        fields: `7. material: Metal finish and base material${imageNote}. E.g., "Gold-tone base metal", "Silver-tone stainless steel", "Rose gold-plated brass".
-8. closure_type: How the piece fastens${imageNote}. For earrings: "Push back", "Lever back", "Clip-on". For necklaces: "Lobster clasp". For bracelets: "Toggle clasp", "Magnetic clasp".
-9. ${taxonomyInstruction}`,
-        schema: `  "material": "",
-  "closure_type": "",
-  "shopify_taxonomy_gid": ""`,
-      };
-
-    case 'handbags':
-      return {
-        fields: `7. material: Exterior material${imageNote}. E.g., "Faux leather with fabric lining", "Quilted nylon", "Smooth vegan leather".
-8. closure_type: How the bag closes${imageNote}. E.g., "Magnetic snap flap", "Zip-top", "Open top with inner zip pocket", "Flap with turn-lock".
-9. strap_drop: Strap length or carry style${imageNote}. E.g., "10-inch top handle drop", "22-inch adjustable strap", "Detachable chain strap".
-10. ${taxonomyInstruction}`,
-        schema: `  "material": "",
-  "closure_type": "",
-  "strap_drop": "",
-  "shopify_taxonomy_gid": ""`,
-      };
-
-    default:
-      return {
-        fields: `7. ${taxonomyInstruction}`,
-        schema: `  "shopify_taxonomy_gid": ""`,
-      };
-  }
+  return {
+    fields: fieldLines + `\n${nextNum}. ${taxonomyInstruction}`,
+    schema: `  ${typeSchema.schema}${typeSchema.schema ? ',\n  ' : ''}"shopify_taxonomy_gid": null`,
+  };
 }
 
 // ─── Main analysis function ───────────────────────────────────────────────────
 async function analyzeProduct(client, product, brandContext) {
   const imageData = product.image ? await fetchImageBase64(product.image) : null;
   const categoryGroup = detectCategoryGroup(product.category);
-  const catSection = getCategoryPromptSection(categoryGroup, !!imageData);
+  const specificType = detectSpecificType(product);
+  const catSection = getCategoryPromptSection(specificType, categoryGroup);
 
   const content = [];
   if (imageData) {
@@ -316,7 +573,7 @@ Return ONLY valid JSON (no markdown, no explanation):
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1200,
+    max_tokens: 1400,
     messages: [{ role: 'user', content }],
   });
 
@@ -333,7 +590,8 @@ Return ONLY valid JSON (no markdown, no explanation):
 
   // Validate taxonomy GID — Claude sometimes hallucinates a GID not in the options list.
   // Build the valid set from the same options we sent, then clear if invalid.
-  log(`    GID from Claude: ${parsed.shopify_taxonomy_gid || '(none)'} | material="${parsed.material||''}" fit="${parsed.fit_type||''}" heel="${parsed.heel_style||''}"`);
+  const fieldSummary = Object.entries(parsed).filter(([k]) => !['meta_title','meta_description','tags','image_insights','alt_text','geo_description','shopify_taxonomy_gid'].includes(k)).map(([k,v]) => `${k}="${v||''}"`).join(' | ');
+  log(`    GID: ${parsed.shopify_taxonomy_gid || '(none)'} | type: ${specificType} | ${fieldSummary}`);
   const categoryGroup2 = detectCategoryGroup(product.category);
   const validOptions = getTaxonomyOptions(categoryGroup2);
   if (parsed.shopify_taxonomy_gid && validOptions) {
@@ -343,6 +601,7 @@ Return ONLY valid JSON (no markdown, no explanation):
       parsed.shopify_taxonomy_gid = null;
     }
   }
+  parsed._specificType = specificType;
   return parsed;
 }
 
@@ -390,10 +649,13 @@ async function run() {
   for (let i = 0; i < batch.length; i++) {
     const product = batch[i];
     const categoryGroup = detectCategoryGroup(product.category);
-    log(`  [${i + 1}/${batch.length}] [${categoryGroup}] ${product.name.substring(0, 55)}`);
+    const specificType = detectSpecificType(product);
+    log(`  [${i + 1}/${batch.length}] [${specificType}] ${product.name.substring(0, 55)}`);
 
     try {
       const suggested = await analyzeProduct(client, product, brandContext);
+      const resolvedSpecificType = suggested._specificType || specificType;
+      delete suggested._specificType;
 
       const entry = {
         href: product.href,
@@ -401,6 +663,7 @@ async function run() {
         name: product.name,
         category: product.category,
         categoryGroup,
+        specificType: resolvedSpecificType,
         image: product.image || null,
         price: product.price,
         isNewArrival: product.isNewArrival || false,

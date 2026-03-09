@@ -57,6 +57,46 @@ const TAXONOMY_LABELS = {
   'gid://shopify/TaxonomyCategory/aa-5-5-7': 'Wallets',
 }
 
+// Metafield slots per specific product type — used in SEO Product Intelligence UI.
+const SPECIFIC_TYPE_FIELDS = {
+  // Clothing
+  blazer:       [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type'],['lining','Lining']],
+  coat:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type']],
+  dress:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
+  pants:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['rise','Rise']],
+  skirt:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['length','Length']],
+  suit:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['lining','Lining']],
+  sweater:      [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
+  top:          [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
+  // Shoes
+  heels:        [['heel_height','Heel Height'],['heel_style','Heel Style'],['toe_shape','Toe Shape'],['closure_type','Closure Type']],
+  boots:        [['heel_height','Heel Height'],['shaft_height','Shaft Height'],['closure_type','Closure Type']],
+  sandals:      [['heel_style','Heel Style'],['strap_style','Strap Style'],['closure_type','Closure Type']],
+  flats:        [['toe_shape','Toe Shape'],['closure_type','Closure Type']],
+  sneakers:     [['closure_type','Closure Type']],
+  // Jewelry
+  earrings:     [['metal_finish','Metal Finish'],['stone_type','Stone Type'],['earring_back','Earring Back']],
+  necklaces:    [['metal_finish','Metal Finish'],['stone_type','Stone Type'],['chain_length','Chain Length'],['clasp_type','Clasp Type']],
+  bracelets:    [['metal_finish','Metal Finish'],['stone_type','Stone Type'],['clasp_type','Clasp Type']],
+  rings:        [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
+  watches:      [['metal_finish','Metal Finish'],['band_material','Band Material'],['case_diameter','Case Diameter']],
+  brooches:     [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
+  jewelry_sets: [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
+  // Handbags
+  clutch:        [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap Type']],
+  crossbody:     [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  tote:          [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  satchel:       [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  shoulder_bag:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  handbag_generic:[['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  wallet:        [['exterior_material','Exterior Material'],['closure_type','Closure Type']],
+  // Category group fallbacks
+  clothing:  [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
+  shoes:     [['heel_style','Heel Style'],['closure_type','Closure Type']],
+  jewelry:   [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
+  handbags:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+}
+
 async function fetchEndpoint(path) {
   try {
     const res = await fetch(`${API}${path}`)
@@ -2501,18 +2541,14 @@ function SeoProductTab() {
                 {/* Category-specific Shopify metafields */}
                 {p.categoryGroup && p.categoryGroup !== 'other' && (() => {
                   const s = p.suggested || {}
-                  const catFields = {
-                    clothing:  [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
-                    shoes:     [['material','Material'],['heel_style','Heel Style'],['closure_type','Closure Type']],
-                    jewelry:   [['material','Material'],['closure_type','Closure Type']],
-                    handbags:  [['material','Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
-                  }[p.categoryGroup] || []
+                  const typeKey = p.specificType || p.categoryGroup
+                  const catFields = SPECIFIC_TYPE_FIELDS[typeKey] || SPECIFIC_TYPE_FIELDS[p.categoryGroup] || []
                   const visibleFields = catFields  // always show all slots
                   if (!s.shopify_taxonomy_gid && !s.shopify_category && catFields.every(([k]) => !s[k])) return null
                   return (
                     <div style={{ marginTop: 14, padding: '10px 12px', background: '#fdf4ff', border: '1px solid #e9d5ff', borderRadius: 8 }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 8 }}>
-                        Shopify Taxonomy — {p.categoryGroup} metafields
+                        Shopify Taxonomy — {typeKey} metafields
                       </div>
                       {(s.shopify_taxonomy_gid || s.shopify_category) && (
                         <div style={{ fontSize: 12, marginBottom: 8 }}>
