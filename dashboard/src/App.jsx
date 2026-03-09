@@ -2077,10 +2077,10 @@ function SeoProductTab() {
   }
 
   async function updateStatus(href, status) {
-    await fetch(`/api/seo-suggestions/${encodeURIComponent(href)}`, {
+    await fetch('/api/seo-suggestions/status', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ href, status }),
     })
     setData(prev => ({ ...prev, products: prev.products.map(p => p.href === href ? { ...p, status } : p) }))
     setSelected(prev => { const s = new Set(prev); s.delete(href); return s; })

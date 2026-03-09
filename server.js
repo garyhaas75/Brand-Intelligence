@@ -606,10 +606,10 @@ app.post('/api/seo-suggestions/run', async (req, res) => {
   });
 });
 
-// Update status of a single product suggestion
-app.put('/api/seo-suggestions/:href(*)', (req, res) => {
-  const href = decodeURIComponent(req.params.href);
-  const { status, notes } = req.body || {};
+// Update status of a single product suggestion (href in body to avoid Express 5 route issues)
+app.put('/api/seo-suggestions/status', (req, res) => {
+  const { href, status, notes } = req.body || {};
+  if (!href) return res.status(400).json({ error: 'href required' });
   const data = loadSeoSuggestions();
   const idx = data.products.findIndex(p => p.href === href);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
