@@ -333,7 +333,7 @@ Return ONLY valid JSON (no markdown, no explanation):
 
   // Validate taxonomy GID — Claude sometimes hallucinates a GID not in the options list.
   // Build the valid set from the same options we sent, then clear if invalid.
-  log(`    GID from Claude: ${parsed.shopify_taxonomy_gid || '(none)'}`);
+  log(`    GID from Claude: ${parsed.shopify_taxonomy_gid || '(none)'} | material="${parsed.material||''}" fit="${parsed.fit_type||''}" heel="${parsed.heel_style||''}"`);
   const categoryGroup2 = detectCategoryGroup(product.category);
   const validOptions = getTaxonomyOptions(categoryGroup2);
   if (parsed.shopify_taxonomy_gid && validOptions) {

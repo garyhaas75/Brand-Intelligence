@@ -3,6 +3,60 @@ import './App.css'
 
 const API = '/api'
 
+// Human-readable labels for Shopify taxonomy GIDs used by Anne Klein products.
+const TAXONOMY_LABELS = {
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-1': 'Bolero Jackets',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-2': 'Bomber Jackets',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-3': 'Capes',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-5': 'Overcoats',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-6': 'Parkas',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-7': 'Pea Coats',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-9': 'Puffer Jackets',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-11': 'Sport Jackets / Blazers',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-13': 'Trench Coats',
+  'gid://shopify/TaxonomyCategory/aa-1-10-2-17': 'Wrap Coats',
+  'gid://shopify/TaxonomyCategory/aa-1-10-6': 'Vests',
+  'gid://shopify/TaxonomyCategory/aa-1-13-1': 'Blouses',
+  'gid://shopify/TaxonomyCategory/aa-1-13-2': 'Bodysuits',
+  'gid://shopify/TaxonomyCategory/aa-1-13-3': 'Cardigans',
+  'gid://shopify/TaxonomyCategory/aa-1-13-5': 'Overshirts',
+  'gid://shopify/TaxonomyCategory/aa-1-13-7': 'Shirts',
+  'gid://shopify/TaxonomyCategory/aa-1-13-12': 'Sweaters',
+  'gid://shopify/TaxonomyCategory/aa-1-13-9': 'Tank Tops',
+  'gid://shopify/TaxonomyCategory/aa-1-13-11': 'Tunics',
+  'gid://shopify/TaxonomyCategory/aa-1-12-3': 'Chinos',
+  'gid://shopify/TaxonomyCategory/aa-1-12-4': 'Jeans',
+  'gid://shopify/TaxonomyCategory/aa-1-12-8': 'Leggings',
+  'gid://shopify/TaxonomyCategory/aa-1-12-11': 'Trousers / Dress Pants',
+  'gid://shopify/TaxonomyCategory/aa-1-19-1': 'Pant Suits',
+  'gid://shopify/TaxonomyCategory/aa-1-19-2': 'Skirt Suits',
+  'gid://shopify/TaxonomyCategory/aa-1-4': 'Dresses',
+  'gid://shopify/TaxonomyCategory/aa-1-11': 'Outfit Sets',
+  'gid://shopify/TaxonomyCategory/aa-1-15': 'Skirts',
+  'gid://shopify/TaxonomyCategory/aa-8-1': 'Athletic Shoes',
+  'gid://shopify/TaxonomyCategory/aa-8-3': 'Boots',
+  'gid://shopify/TaxonomyCategory/aa-8-9': 'Flats',
+  'gid://shopify/TaxonomyCategory/aa-8-10': 'Heels / Pumps',
+  'gid://shopify/TaxonomyCategory/aa-8-6': 'Sandals',
+  'gid://shopify/TaxonomyCategory/aa-8-8': 'Sneakers',
+  'gid://shopify/TaxonomyCategory/aa-6-3': 'Bracelets',
+  'gid://shopify/TaxonomyCategory/aa-6-4': 'Brooches & Lapel Pins',
+  'gid://shopify/TaxonomyCategory/aa-6-5': 'Charms & Pendants',
+  'gid://shopify/TaxonomyCategory/aa-6-6': 'Earrings',
+  'gid://shopify/TaxonomyCategory/aa-6-7': 'Jewelry Sets',
+  'gid://shopify/TaxonomyCategory/aa-6-8': 'Necklaces',
+  'gid://shopify/TaxonomyCategory/aa-6-9': 'Rings',
+  'gid://shopify/TaxonomyCategory/aa-6-11': 'Watches',
+  'gid://shopify/TaxonomyCategory/aa-5-4-5': 'Clutch Bags',
+  'gid://shopify/TaxonomyCategory/aa-5-4-7': 'Cross Body Bags',
+  'gid://shopify/TaxonomyCategory/aa-5-4-9': 'Envelope Clutches',
+  'gid://shopify/TaxonomyCategory/aa-5-4-12': 'Hobo Bags',
+  'gid://shopify/TaxonomyCategory/aa-5-4-16': 'Satchel Bags',
+  'gid://shopify/TaxonomyCategory/aa-5-4-18': 'Shopper / Tote Bags',
+  'gid://shopify/TaxonomyCategory/aa-5-4-19': 'Shoulder Bags',
+  'gid://shopify/TaxonomyCategory/aa-5-5-7': 'Wallets',
+}
+
 async function fetchEndpoint(path) {
   try {
     const res = await fetch(`${API}${path}`)
@@ -2453,26 +2507,27 @@ function SeoProductTab() {
                     jewelry:   [['material','Material'],['closure_type','Closure Type']],
                     handbags:  [['material','Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
                   }[p.categoryGroup] || []
-                  const visibleFields = catFields.filter(([k]) => s[k])
-                  if (!visibleFields.length && !s.shopify_taxonomy_gid && !s.shopify_category) return null
+                  const visibleFields = catFields  // always show all slots
+                  if (!s.shopify_taxonomy_gid && !s.shopify_category && catFields.every(([k]) => !s[k])) return null
                   return (
                     <div style={{ marginTop: 14, padding: '10px 12px', background: '#fdf4ff', border: '1px solid #e9d5ff', borderRadius: 8 }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 8 }}>
                         Shopify Taxonomy — {p.categoryGroup} metafields
                       </div>
                       {(s.shopify_taxonomy_gid || s.shopify_category) && (
-                        <div style={{ fontSize: 12, marginBottom: 6 }}>
-                          <span style={{ color: '#6b7280', fontWeight: 600 }}>category GID: </span>
+                        <div style={{ fontSize: 12, marginBottom: 8 }}>
+                          <span style={{ color: '#6b7280', fontWeight: 600 }}>Shopify category: </span>
                           {s.shopify_taxonomy_gid
-                            ? <span style={{ color: '#7c3aed', fontFamily: 'monospace', fontSize: 11 }}>{s.shopify_taxonomy_gid}</span>
-                            : <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>{s.shopify_category} — re-analyze to get GID</span>}
+                            ? <><span style={{ color: '#7c3aed', fontWeight: 700 }}>{TAXONOMY_LABELS[s.shopify_taxonomy_gid] || s.shopify_taxonomy_gid}</span>
+                                <span style={{ color: '#9ca3af', fontFamily: 'monospace', fontSize: 10, marginLeft: 6 }}>{s.shopify_taxonomy_gid.replace('gid://shopify/TaxonomyCategory/', '')}</span></>
+                            : <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>re-analyze to get GID</span>}
                         </div>
                       )}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 6 }}>
                         {visibleFields.map(([key, label]) => (
                           <div key={key} style={{ background: '#fff', borderRadius: 6, padding: '6px 10px', border: '1px solid #e9d5ff' }}>
                             <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
-                            <div style={{ fontSize: 12, color: '#374151' }}>{s[key]}</div>
+                            <div style={{ fontSize: 12, color: s[key] ? '#374151' : '#d1d5db', fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
                           </div>
                         ))}
                       </div>
