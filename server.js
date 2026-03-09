@@ -558,6 +558,106 @@ Be specific and visual. No abstract concepts.`;
   }
 });
 
+// ─── SEO Product Suggestions ─────────────────────────────────────────────────
+const SEO_SUGGESTIONS_FILE = path.join(DATA_DIR, 'seo_suggestions.json');
+
+function loadSeoSuggestions() {
+  if (!fs.existsSync(SEO_SUGGESTIONS_FILE)) return { totalAnalyzed: 0, totalProducts: 0, products: [] };
+  try { return JSON.parse(fs.readFileSync(SEO_SUGGESTIONS_FILE, 'utf8')); } catch { return { totalAnalyzed: 0, totalProducts: 0, products: [] }; }
+}
+function saveSeoSuggestions(data) {
+  fs.writeFileSync(SEO_SUGGESTIONS_FILE, JSON.stringify(data, null, 2));
+}
+
+// Get all suggestions (with optional status filter)
+app.get('/api/seo-suggestions', (req, res) => {
+  const data = loadSeoSuggestions();
+  const { status, filter } = req.query;
+  let products = data.products || [];
+  if (status) products = products.filter(p => p.status === status);
+  if (filter && filter !== 'all') {
+    const re = {
+      new_arrivals: /new.arrival|new.in/i,
+      clothing:     /clothing|blazer|jacket|pant|dress|top|skirt|suit/i,
+      shoes:        /shoe|heel|boot|flat|sandal|loafer|pump/i,
+      jewelry:      /jewelry|earring|necklace|bracelet|ring|watch/i,
+      handbags:     /handbag|bag|purse|satchel|tote|crossbody|wallet/i,
+    }[filter];
+    if (re) products = products.filter(p => re.test(p.category || ''));
+  }
+  res.json({ ...data, products });
+});
+
+// Run a new batch (triggers the analyzer script in-process)
+app.post('/api/seo-suggestions/run', async (req, res) => {
+  const { filter = 'all', limit = 50 } = req.body || {};
+  const { spawn } = require('child_process');
+  const args = [`--filter=${filter}`, `--limit=${limit}`];
+  const child = spawn('node', [path.join(__dirname, 'analysis/seo_product_analyzer.js'), ...args], {
+    env: { ...process.env },
+    cwd: __dirname,
+  });
+  let output = '';
+  child.stdout.on('data', d => { output += d.toString(); });
+  child.stderr.on('data', d => { output += d.toString(); });
+  child.on('close', code => {
+    const data = loadSeoSuggestions();
+    res.json({ ok: code === 0, output: output.slice(-2000), totalAnalyzed: data.totalAnalyzed, totalProducts: data.totalProducts });
+  });
+});
+
+// Update status of a single product suggestion
+app.put('/api/seo-suggestions/:href(*)', (req, res) => {
+  const href = decodeURIComponent(req.params.href);
+  const { status, notes } = req.body || {};
+  const data = loadSeoSuggestions();
+  const idx = data.products.findIndex(p => p.href === href);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  if (status) data.products[idx].status = status;
+  if (status === 'approved') data.products[idx].approvedAt = new Date().toISOString();
+  if (notes !== undefined) data.products[idx].notes = notes;
+  saveSeoSuggestions(data);
+  res.json(data.products[idx]);
+});
+
+// Bulk approve
+app.post('/api/seo-suggestions/bulk-approve', (req, res) => {
+  const { hrefs } = req.body || {};
+  if (!Array.isArray(hrefs)) return res.status(400).json({ error: 'hrefs array required' });
+  const data = loadSeoSuggestions();
+  const now = new Date().toISOString();
+  let count = 0;
+  for (const href of hrefs) {
+    const idx = data.products.findIndex(p => p.href === href);
+    if (idx !== -1) { data.products[idx].status = 'approved'; data.products[idx].approvedAt = now; count++; }
+  }
+  saveSeoSuggestions(data);
+  res.json({ ok: true, approved: count });
+});
+
+// Export approved as CSV
+app.get('/api/seo-suggestions/export-csv', (req, res) => {
+  const data = loadSeoSuggestions();
+  const approved = data.products.filter(p => p.status === 'approved');
+  const rows = [['Product Name', 'Category', 'Price', 'URL', 'Meta Title', 'Meta Description', 'Tags', 'Image Insights', 'Approved At']];
+  for (const p of approved) {
+    rows.push([
+      `"${(p.name || '').replace(/"/g, '""')}"`,
+      `"${p.category || ''}"`,
+      `"${p.price || ''}"`,
+      `"${p.href || ''}"`,
+      `"${(p.suggested?.meta_title || '').replace(/"/g, '""')}"`,
+      `"${(p.suggested?.meta_description || '').replace(/"/g, '""')}"`,
+      `"${(p.suggested?.tags || []).join(', ')}"`,
+      `"${(p.suggested?.image_insights || '').replace(/"/g, '""')}"`,
+      `"${p.approvedAt || ''}"`,
+    ]);
+  }
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="ak_seo_approved.csv"');
+  res.send(rows.map(r => r.join(',')).join('\n'));
+});
+
 // Apify usage
 app.get('/api/apify-usage', async (req, res) => {
   const token = process.env.APIFY_API_TOKEN;

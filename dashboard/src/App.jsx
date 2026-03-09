@@ -2027,6 +2027,292 @@ function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
   )
 }
 
+// ─── SEO Product Intelligence Tab ────────────────────────────────────────────
+const SEO_FILTERS = [
+  { id: 'all',          label: 'All' },
+  { id: 'new_arrivals', label: 'New Arrivals' },
+  { id: 'clothing',     label: 'Clothing' },
+  { id: 'shoes',        label: 'Shoes' },
+  { id: 'jewelry',      label: 'Jewelry' },
+  { id: 'handbags',     label: 'Handbags' },
+]
+
+function SeoProductTab() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [running, setRunning] = useState(false)
+  const [runLog, setRunLog] = useState(null)
+  const [viewFilter, setViewFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('pending')
+  const [runFilter, setRunFilter] = useState('new_arrivals')
+  const [runLimit, setRunLimit] = useState(50)
+  const [selected, setSelected] = useState(new Set())
+  const [bulkApproving, setBulkApproving] = useState(false)
+  const [expandedHref, setExpandedHref] = useState(null)
+
+  async function loadData() {
+    setLoading(true)
+    const params = new URLSearchParams({ status: statusFilter, filter: viewFilter })
+    const res = await fetch(`/api/seo-suggestions?${params}`)
+    const d = await res.json()
+    setData(d)
+    setSelected(new Set())
+    setLoading(false)
+  }
+
+  useEffect(() => { loadData() }, [statusFilter, viewFilter])
+
+  async function runAnalysis() {
+    setRunning(true)
+    setRunLog(null)
+    const res = await fetch('/api/seo-suggestions/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filter: runFilter, limit: runLimit }),
+    })
+    const result = await res.json()
+    setRunLog(result)
+    setRunning(false)
+    loadData()
+  }
+
+  async function updateStatus(href, status) {
+    await fetch(`/api/seo-suggestions/${encodeURIComponent(href)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    setData(prev => ({ ...prev, products: prev.products.map(p => p.href === href ? { ...p, status } : p) }))
+    setSelected(prev => { const s = new Set(prev); s.delete(href); return s; })
+  }
+
+  async function bulkApprove() {
+    setBulkApproving(true)
+    await fetch('/api/seo-suggestions/bulk-approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hrefs: [...selected] }),
+    })
+    setBulkApproving(false)
+    loadData()
+  }
+
+  function toggleSelect(href) {
+    setSelected(prev => { const s = new Set(prev); s.has(href) ? s.delete(href) : s.add(href); return s; })
+  }
+  function toggleSelectAll() {
+    const all = (data?.products || []).map(p => p.href)
+    setSelected(prev => prev.size === all.length ? new Set() : new Set(all))
+  }
+
+  const products = data?.products || []
+  const totalAnalyzed = data?.totalAnalyzed || 0
+  const totalProducts = data?.totalProducts || 0
+  const pctDone = totalProducts > 0 ? Math.round((totalAnalyzed / totalProducts) * 100) : 0
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 16, flexWrap: 'wrap' }}>
+        <div>
+          <SectionHeader>SEO Product Intelligence</SectionHeader>
+          <div style={{ fontSize: 13, color: '#6b7280' }}>
+            {totalAnalyzed} of {totalProducts} products analyzed ({pctDone}%)
+          </div>
+          <div style={{ marginTop: 6, width: 220, height: 6, background: '#e5e7eb', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${pctDone}%`, background: '#6366f1', borderRadius: 3, transition: 'width 0.4s' }} />
+          </div>
+        </div>
+
+        {/* Run controls */}
+        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 14, display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>FILTER</div>
+            <select value={runFilter} onChange={e => setRunFilter(e.target.value)}
+              style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '6px 10px', fontSize: 13 }}>
+              {SEO_FILTERS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>BATCH SIZE</div>
+            <select value={runLimit} onChange={e => setRunLimit(Number(e.target.value))}
+              style={{ border: '1px solid #d1d5db', borderRadius: 6, padding: '6px 10px', fontSize: 13 }}>
+              {[25, 50, 100].map(n => <option key={n} value={n}>{n} products</option>)}
+            </select>
+          </div>
+          <button onClick={runAnalysis} disabled={running}
+            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: running ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13, opacity: running ? 0.7 : 1 }}>
+            {running ? '⚙️ Analyzing…' : '✨ Analyze Next Batch'}
+          </button>
+          <a href="/api/seo-suggestions/export-csv" download
+            style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', color: '#374151', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
+            ↓ Export CSV
+          </a>
+        </div>
+      </div>
+
+      {/* Run log */}
+      {runLog && (
+        <div style={{ background: runLog.ok ? '#f0fdf4' : '#fef2f2', border: `1px solid ${runLog.ok ? '#bbf7d0' : '#fecaca'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
+          <div style={{ fontWeight: 700, marginBottom: 4, color: runLog.ok ? '#059669' : '#dc2626' }}>
+            {runLog.ok ? `✓ Batch complete — ${runLog.totalAnalyzed} of ${runLog.totalProducts} products analyzed` : '✗ Analysis encountered errors'}
+          </div>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: '#6b7280' }}>{runLog.output}</pre>
+        </div>
+      )}
+
+      {/* View filter pills + status tabs */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {SEO_FILTERS.map(f => (
+            <button key={f.id} onClick={() => setViewFilter(f.id)}
+              style={{ padding: '5px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: viewFilter === f.id ? '#6366f1' : '#f3f4f6', color: viewFilter === f.id ? '#fff' : '#374151' }}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {['pending', 'approved', 'skipped'].map(s => (
+            <button key={s} onClick={() => setStatusFilter(s)}
+              style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: 'capitalize', cursor: 'pointer',
+                background: statusFilter === s ? { pending: '#ede9fe', approved: '#d1fae5', skipped: '#f3f4f6' }[s] : '#fff',
+                color: statusFilter === s ? { pending: '#6366f1', approved: '#059669', skipped: '#6b7280' }[s] : '#9ca3af',
+                border: '1px solid #e5e7eb' }}>
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Bulk action bar */}
+      {statusFilter === 'pending' && products.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+          <input type="checkbox" checked={selected.size === products.length && products.length > 0}
+            onChange={toggleSelectAll} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+          <span style={{ fontSize: 13, color: '#6b7280' }}>
+            {selected.size > 0 ? `${selected.size} selected` : `Select all ${products.length}`}
+          </span>
+          {selected.size > 0 && (
+            <button onClick={bulkApprove} disabled={bulkApproving}
+              style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+              {bulkApproving ? 'Approving…' : `✓ Approve ${selected.size}`}
+            </button>
+          )}
+        </div>
+      )}
+
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: '#9ca3af' }}>Loading…</div>}
+
+      {!loading && products.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
+            {totalAnalyzed === 0 ? 'No products analyzed yet' : `No ${statusFilter} suggestions`}
+          </div>
+          <div style={{ fontSize: 13 }}>
+            {totalAnalyzed === 0 ? 'Choose a filter and batch size above, then click Analyze Next Batch.' : `All products in this view have been reviewed.`}
+          </div>
+        </div>
+      )}
+
+      {/* Product rows */}
+      {!loading && products.map(p => {
+        const isExpanded = expandedHref === p.href
+        const isSelected = selected.has(p.href)
+        return (
+          <div key={p.href} style={{ background: '#fff', border: `1px solid ${isSelected ? '#6366f1' : '#e5e7eb'}`, borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
+            {/* Collapsed row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: 'pointer' }}
+              onClick={() => setExpandedHref(isExpanded ? null : p.href)}>
+              {statusFilter === 'pending' && (
+                <input type="checkbox" checked={isSelected} onChange={e => { e.stopPropagation(); toggleSelect(p.href) }}
+                  onClick={e => e.stopPropagation()} style={{ width: 16, height: 16, flexShrink: 0, cursor: 'pointer' }} />
+              )}
+              <div style={{ width: 52, height: 52, flexShrink: 0, borderRadius: 6, overflow: 'hidden', background: '#f3f4f6' }}>
+                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👗</div>}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>
+                  {p.category} · {p.price}
+                  {p.isNewArrival && <span style={{ marginLeft: 8, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '1px 6px', fontSize: 11, fontWeight: 700 }}>NEW</span>}
+                </div>
+                {p.suggested?.meta_title && (
+                  <div style={{ fontSize: 12, color: '#6366f1', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    → {p.suggested.meta_title}
+                  </div>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4, textTransform: 'capitalize',
+                  background: { pending: '#ede9fe', approved: '#d1fae5', skipped: '#f3f4f6' }[p.status],
+                  color: { pending: '#6366f1', approved: '#059669', skipped: '#6b7280' }[p.status] }}>
+                  {p.status}
+                </span>
+                {p.status === 'pending' && <>
+                  <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'approved') }}
+                    style={{ padding: '3px 10px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✓ Approve</button>
+                  <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'skipped') }}
+                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Skip</button>
+                </>}
+                {p.status !== 'pending' && (
+                  <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'pending') }}
+                    style={{ padding: '3px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 11 }}>Undo</button>
+                )}
+                <span style={{ fontSize: 14, color: '#9ca3af', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', display: 'inline-block' }}>▾</span>
+              </div>
+            </div>
+
+            {/* Expanded detail */}
+            {isExpanded && (
+              <div style={{ borderTop: '1px solid #f3f4f6', padding: 16, background: '#fafafa' }}>
+                {p.suggested?.image_insights && (
+                  <div style={{ background: '#ede9fe', borderRadius: 8, padding: '8px 12px', marginBottom: 14, fontSize: 13, color: '#6366f1' }}>
+                    <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
+                    <div style={{ fontSize: 12, color: '#d1d5db', textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
+                    <div style={{ fontSize: 13, color: '#059669', fontWeight: 600, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px' }}>
+                      {p.suggested?.meta_title || '—'}
+                      <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8, fontWeight: 400 }}>{(p.suggested?.meta_title || '').length}/60</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Tags</div>
+                    <div style={{ fontSize: 11, color: '#d1d5db', textDecoration: 'line-through', marginBottom: 6 }}>{(p.current?.tags || []).join(', ') || '(none)'}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                      {(p.suggested?.tags || []).map((t, i) => (
+                        <span key={i} style={{ fontSize: 11, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '2px 8px' }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 6 }}>Meta Description</div>
+                  <div style={{ fontSize: 12, color: '#d1d5db', textDecoration: 'line-through', marginBottom: 6, lineHeight: 1.4 }}>
+                    {(p.current?.description || '').substring(0, 160) || '(not set)'}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
+                    {p.suggested?.meta_description || '—'}
+                    <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
+                  </div>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <a href={p.href} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: '#6366f1' }}>View on anneklein.com ↗</a>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function BrandGuidelinesTab({ guidelines }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(null)
@@ -2446,6 +2732,7 @@ const TABS = [
   { id: 'email',      label: '📧 Email' },
   { id: 'social',     label: '📱 Social' },
   { id: 'seo',        label: '📊 SEO' },
+  { id: 'seo-products', label: '🏷️ SEO Products' },
   { id: 'content',    label: '✍️ Content' },
   { id: 'price',      label: '💰 Pricing' },
   { id: 'ai',         label: '🤖 AI Search' },
@@ -2530,7 +2817,8 @@ export default function App() {
             {tab === 'site'      && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
             {tab === 'email'     && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} />}
             {tab === 'social'    && <SocialTab socialIntel={data.socialIntel} />}
-            {tab === 'seo'       && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
+            {tab === 'seo'         && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
+            {tab === 'seo-products' && <SeoProductTab />}
             {tab === 'content'   && <ContentTab content={data.content} catalog={data.catalog} />}
             {tab === 'price'     && <PriceTab priceIntel={data.priceIntel} />}
             {tab === 'ai'        && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
