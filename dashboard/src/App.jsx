@@ -83,18 +83,18 @@ const SPECIFIC_TYPE_FIELDS = {
   brooches:     [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
   jewelry_sets: [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
   // Handbags
-  clutch:        [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap Type']],
-  crossbody:     [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
-  tote:          [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
-  satchel:       [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
-  shoulder_bag:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
-  handbag_generic:[['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  clutch:        [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
+  crossbody:     [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
+  tote:          [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
+  satchel:       [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
+  shoulder_bag:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
+  handbag_generic:[['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
   wallet:        [['exterior_material','Exterior Material'],['closure_type','Closure Type']],
   // Category group fallbacks
   clothing:  [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
   shoes:     [['heel_style','Heel Style'],['closure_type','Closure Type']],
   jewelry:   [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
-  handbags:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_drop','Strap Drop']],
+  handbags:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
 }
 
 async function fetchEndpoint(path) {

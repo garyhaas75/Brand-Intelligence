@@ -235,7 +235,7 @@ function detectSpecificType(product) {
 //   NO_INFER_MAT  → material/fabric only: must be stated in name/description, never assumed from visual
 //   FROM_IMAGE    → visual attributes (fit, silhouette, closure, neckline, etc.): use image + description
 //   NO_INFER_FACT → non-visual facts (care instructions, numeric measurements): stated in description only
-const NO_INFER_MAT  = 'ONLY fill if explicitly stated in the product name or description — do NOT infer material or fabric from visual appearance alone. Return null if not clearly specified.';
+const NO_INFER_MAT  = 'Use the product name and description first. If material is clearly identified there (e.g., "faux leather", "canvas", "nylon"), use it. If the image strongly confirms what the description implies, use it. Do NOT guess a premium material (leather, suede, silk) from appearance alone if the description does not confirm it. Return null only if genuinely unclear.';
 const NO_INFER_FACT = 'ONLY fill if explicitly stated in the product name or description. Return null if not clearly specified.';
 const FROM_IMAGE    = 'Use the product image and description. If clearly visible or described, fill this in. Return null only if genuinely ambiguous.';
 
@@ -420,43 +420,43 @@ const TYPE_SCHEMAS = {
   },
   crossbody: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
       `closure_type: How it closes. ${FROM_IMAGE} E.g. "Zip-top", "Flap with turn-lock", "Magnetic snap".`,
-      `strap_drop: Strap drop/length. ${NO_INFER_FACT} E.g. "22-inch adjustable strap". Return null if not stated.`,
+      `strap_type: Strap style/carry options. ${FROM_IMAGE} E.g. "Adjustable shoulder strap", "Detachable chain strap", "Top handle + crossbody strap".`,
     ],
-    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
   tote: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
       `closure_type: How it closes. ${FROM_IMAGE} E.g. "Open top", "Magnetic snap", "Zip-top".`,
-      `strap_drop: Handle/strap drop. ${NO_INFER_FACT} E.g. "10-inch top handle", "22-inch shoulder strap". Return null if not stated.`,
+      `strap_type: Handle/strap options. ${FROM_IMAGE} E.g. "Dual top handles", "Top handle + removable strap", "Tote handles only".`,
     ],
-    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
   satchel: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${FROM_IMAGE}`,
-      `strap_drop: Strap drop. ${NO_INFER_FACT} Return null if not stated.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
+      `closure_type: How it closes. ${FROM_IMAGE} E.g. "Zip-top", "Flap with turn-lock", "Magnetic snap".`,
+      `strap_type: Strap/handle options. ${FROM_IMAGE} E.g. "Top handles + detachable shoulder strap", "Convertible top handle and crossbody strap".`,
     ],
-    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
   shoulder_bag: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
       `closure_type: How it closes. ${FROM_IMAGE}`,
-      `strap_drop: Strap drop. ${NO_INFER_FACT} Return null if not stated.`,
+      `strap_type: Strap/handle options. ${FROM_IMAGE}`,
     ],
-    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
   handbag_generic: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
       `closure_type: How it closes. ${FROM_IMAGE}`,
-      `strap_drop: Strap drop/length. ${NO_INFER_FACT} Return null if not stated.`,
+      `strap_type: Strap/handle options. ${FROM_IMAGE}`,
     ],
-    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
   wallet: {
     fields: [
@@ -490,11 +490,11 @@ const TYPE_SCHEMAS = {
   },
   handbags: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
       `closure_type: Closure if visible. ${FROM_IMAGE}`,
-      `strap_drop: Strap drop. ${NO_INFER_FACT} Return null if not stated.`,
+      `strap_type: Strap/handle options. ${FROM_IMAGE}`,
     ],
-    schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
+    schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
 };
 
@@ -546,7 +546,7 @@ PRODUCT:
 Name: ${product.name}
 Category: ${product.category || 'Unknown'} (type: ${categoryGroup})
 Price: ${product.price || 'Unknown'}
-Current description: ${(product.description || '').substring(0, 400)}
+Current description: ${(product.description || '').substring(0, 900)}
 Current tags: ${existingTags || 'none'}
 ${imageData ? 'Product image included above.' : 'No image available.'}
 
