@@ -324,7 +324,7 @@ Return ONLY valid JSON (no markdown, no explanation):
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 800,
+    max_tokens: 1200,
     messages: [{ role: 'user', content }],
   });
 
@@ -341,6 +341,7 @@ Return ONLY valid JSON (no markdown, no explanation):
 
   // Validate taxonomy GID — Claude sometimes hallucinates a GID not in the options list.
   // Build the valid set from the same options we sent, then clear if invalid.
+  log(`    GID from Claude: ${parsed.shopify_taxonomy_gid || '(none)'}`);
   const categoryGroup2 = detectCategoryGroup(product.category);
   const validOptions = getTaxonomyOptions(categoryGroup2);
   if (parsed.shopify_taxonomy_gid && validOptions) {

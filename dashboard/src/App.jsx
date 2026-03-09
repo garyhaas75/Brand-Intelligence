@@ -2133,16 +2133,21 @@ function SeoProductTab() {
 
   async function reanalyzeOne(href) {
     setReanalyzingHref(href)
-    const res = await fetch('/api/seo-suggestions/reanalyze-one', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ href }),
-    })
-    const result = await res.json()
-    if (result.product) {
-      setData(prev => ({ ...prev, products: prev.products.map(p => p.href === href ? result.product : p) }))
+    try {
+      const res = await fetch('/api/seo-suggestions/reanalyze-one', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ href }),
+      })
+      const result = await res.json()
+      if (!result.ok) {
+        alert(`Re-analyze failed:\n${result.output || result.error || 'Unknown error'}`)
+      }
+    } catch (err) {
+      alert(`Re-analyze error: ${err.message}`)
     }
     setReanalyzingHref(null)
+    loadData()
   }
 
   function toggleSelect(href) {
