@@ -221,275 +221,278 @@ function detectSpecificType(product) {
   if (/\bpant\b|\btrouser|\bchino|\blegging/i.test(combined)) return 'pants';
   if (/\bskirt\b/i.test(combined)) return 'skirt';
   if (/\bsuit\b/i.test(combined)) return 'suit';
-  if (/\bcoat\b|\btrench|\bparka|\bpuffer|\bovercoat/i.test(combined)) return 'coat';
+  if (/\btrench|\bparka|\bpuffer|\bovercoat/i.test(combined)) return 'coat';
+  // Generic "jacket" or "coat" without a more specific keyword → treat as blazer (AK workwear context)
+  if (/\bjacket\b|\bcoat\b/i.test(combined)) return 'blazer';
   if (/\bcardigan|\bsweater|\bknit\b/i.test(combined)) return 'sweater';
   if (/\bblouse|\btop\b|\bshirt\b|\btunic|\btank\b/i.test(combined)) return 'top';
-  if (/\bjacket\b/i.test(combined)) return 'coat';
   // Fall back to broad category group
   return detectCategoryGroup(product.category);
 }
 
 // ─── Per-type metafield schemas ───────────────────────────────────────────────
-// Rules:
-//   - NEVER infer material, fabric, or any attribute from visual appearance alone.
-//   - Only fill a field if the value is explicitly stated in product name or description.
-//   - Return null for any field that is not clearly specified.
-const NO_INFER = 'ONLY fill if explicitly stated in the product name or description. Return null if not clearly specified — do NOT guess or infer from visual appearance.';
+// Two rules used per field:
+//   NO_INFER_MAT  → material/fabric only: must be stated in name/description, never assumed from visual
+//   FROM_IMAGE    → visual attributes (fit, silhouette, closure, neckline, etc.): use image + description
+//   NO_INFER_FACT → non-visual facts (care instructions, numeric measurements): stated in description only
+const NO_INFER_MAT  = 'ONLY fill if explicitly stated in the product name or description — do NOT infer material or fabric from visual appearance alone. Return null if not clearly specified.';
+const NO_INFER_FACT = 'ONLY fill if explicitly stated in the product name or description. Return null if not clearly specified.';
+const FROM_IMAGE    = 'Use the product image and description. If clearly visible or described, fill this in. Return null only if genuinely ambiguous.';
 
 const TYPE_SCHEMAS = {
   // ── Clothing ──────────────────────────────────────────────────────────────
   blazer: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER} E.g. "Wool-blend crepe", "Stretch ponte", "Woven polyester". Be specific, not just "fabric".`,
-      `care_instructions: One-line care instruction. ${NO_INFER} E.g. "Dry clean only" or "Machine wash cold, lay flat to dry".`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Regular", "Tailored", "Relaxed".`,
-      `closure_type: Fastening style. ${NO_INFER} E.g. "Single-breasted 2-button", "Double-breasted", "Open front".`,
-      `lining: Lining detail. ${NO_INFER} E.g. "Fully lined", "Half-lined", "Unlined".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT} E.g. "Wool-blend crepe", "Stretch ponte", "Woven polyester". Be specific, not just "fabric".`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT} E.g. "Dry clean only" or "Machine wash cold, lay flat to dry".`,
+      `fit_type: Body fit silhouette. ${FROM_IMAGE} E.g. "Slim", "Regular", "Tailored", "Relaxed", "Oversized".`,
+      `closure_type: Fastening style. ${FROM_IMAGE} E.g. "Single-breasted 2-button", "Double-breasted 6-button", "Open front / no closure".`,
+      `lining: Lining detail. ${FROM_IMAGE} E.g. "Fully lined", "Half-lined", "Unlined".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null, "lining": null`,
   },
   coat: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Relaxed", "Oversized".`,
-      `closure_type: Fastening style. ${NO_INFER} E.g. "Double-breasted buttons", "Belt-tie", "Zip-front", "Snap closure".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Body fit silhouette. ${FROM_IMAGE} E.g. "Slim", "Relaxed", "Oversized".`,
+      `closure_type: Fastening style. ${FROM_IMAGE} E.g. "Double-breasted buttons", "Belt-tie", "Zip-front", "Snap closure".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null`,
   },
   dress: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "Fitted", "A-line", "Shift", "Wrap", "Bodycon".`,
-      `neckline: Neckline style. ${NO_INFER} E.g. "V-neck", "Scoop neck", "Crew neck", "Square neck", "Off-shoulder".`,
-      `sleeve_length: Sleeve length. ${NO_INFER} E.g. "Sleeveless", "Short sleeve", "3/4 sleeve", "Long sleeve".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Dress silhouette/fit. ${FROM_IMAGE} E.g. "Fitted sheath", "A-line", "Shift", "Wrap", "Fit-and-flare".`,
+      `neckline: Neckline style. ${FROM_IMAGE} E.g. "V-neck", "Scoop neck", "Crew neck", "Square neck", "Off-shoulder".`,
+      `sleeve_length: Sleeve length. ${FROM_IMAGE} E.g. "Sleeveless", "Short sleeve", "3/4 sleeve", "Long sleeve".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "neckline": null, "sleeve_length": null`,
   },
   pants: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Leg and body fit. ${NO_INFER} E.g. "Straight leg", "Wide leg", "Slim fit", "Flared", "Bootcut".`,
-      `rise: Waist rise. ${NO_INFER} E.g. "High rise", "Mid rise", "Low rise".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Leg and body fit. ${FROM_IMAGE} E.g. "Straight leg", "Wide leg", "Slim fit", "Flared", "Bootcut", "Tapered".`,
+      `rise: Waist rise. ${FROM_IMAGE} E.g. "High rise", "Mid rise", "Low rise".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "rise": null`,
   },
   skirt: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "A-line", "Pencil", "Wrap", "Pleated".`,
-      `length: Skirt length. ${NO_INFER} E.g. "Mini", "Knee-length", "Midi", "Maxi".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Skirt silhouette. ${FROM_IMAGE} E.g. "A-line", "Pencil", "Wrap", "Pleated", "Tiered".`,
+      `length: Skirt length. ${FROM_IMAGE} E.g. "Mini", "Knee-length", "Midi", "Maxi".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "length": null`,
   },
   suit: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "Tailored", "Slim", "Regular".`,
-      `lining: Lining detail. ${NO_INFER} E.g. "Fully lined", "Partially lined", "Unlined".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Suit silhouette. ${FROM_IMAGE} E.g. "Tailored", "Slim", "Regular", "Relaxed".`,
+      `lining: Lining detail. ${FROM_IMAGE} E.g. "Fully lined", "Partially lined", "Unlined".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "lining": null`,
   },
   sweater: {
     fields: [
-      `material: Primary fiber composition. ${NO_INFER} E.g. "100% merino wool", "Acrylic blend", "Cotton knit".`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Regular", "Oversized", "Relaxed".`,
+      `material: Primary fiber composition. ${NO_INFER_MAT} E.g. "100% merino wool", "Acrylic blend", "Cotton knit".`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Body fit. ${FROM_IMAGE} E.g. "Slim", "Regular", "Oversized", "Relaxed", "Cropped".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null`,
   },
   top: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER} E.g. "Slim", "Regular", "Relaxed", "Fitted".`,
-      `neckline: Neckline style. ${NO_INFER} E.g. "V-neck", "Crew neck", "Cowl neck", "Wrap", "Scoop neck".`,
-      `sleeve_length: Sleeve length. ${NO_INFER} E.g. "Sleeveless", "Short sleeve", "3/4 sleeve", "Long sleeve".`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Body fit. ${FROM_IMAGE} E.g. "Slim", "Regular", "Relaxed", "Fitted", "Cropped".`,
+      `neckline: Neckline style. ${FROM_IMAGE} E.g. "V-neck", "Crew neck", "Cowl neck", "Wrap", "Scoop neck", "Off-shoulder".`,
+      `sleeve_length: Sleeve length. ${FROM_IMAGE} E.g. "Sleeveless", "Short sleeve", "3/4 sleeve", "Long sleeve".`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null, "neckline": null, "sleeve_length": null`,
   },
   // ── Shoes ──────────────────────────────────────────────────────────────────
   heels: {
     fields: [
-      `heel_height: Numeric heel height. ${NO_INFER} E.g. "3.5 inch", "2 inch", "4 inch".`,
-      `heel_style: Heel shape. ${NO_INFER} E.g. "Stiletto", "Block heel", "Kitten heel", "Cone heel", "Wedge".`,
-      `toe_shape: Toe box shape. ${NO_INFER} E.g. "Pointed toe", "Square toe", "Round toe", "Almond toe".`,
-      `closure_type: How the shoe is secured. ${NO_INFER} E.g. "Slip-on", "Ankle strap with buckle", "Slingback", "Side zip".`,
+      `heel_height: Numeric heel height. ${NO_INFER_FACT} E.g. "3.5 inch", "2 inch". Return null if not stated.`,
+      `heel_style: Heel shape. ${FROM_IMAGE} E.g. "Stiletto", "Block heel", "Kitten heel", "Cone heel", "Wedge".`,
+      `toe_shape: Toe box shape. ${FROM_IMAGE} E.g. "Pointed toe", "Square toe", "Round toe", "Almond toe".`,
+      `closure_type: How the shoe is secured. ${FROM_IMAGE} E.g. "Slip-on", "Ankle strap with buckle", "Slingback", "Side zip".`,
     ],
     schema: `"heel_height": null, "heel_style": null, "toe_shape": null, "closure_type": null`,
   },
   boots: {
     fields: [
-      `heel_height: Numeric heel height. ${NO_INFER} E.g. "1.5 inch", "Flat / no heel". Return null if not stated.`,
-      `shaft_height: Boot shaft height. ${NO_INFER} E.g. "Ankle", "Mid-calf", "Knee-high", "Over-the-knee".`,
-      `closure_type: How the boot is put on. ${NO_INFER} E.g. "Side zip", "Pull-on", "Lace-up", "Chelsea pull-tab".`,
+      `heel_height: Numeric heel height. ${NO_INFER_FACT} E.g. "1.5 inch", "3 inch". Return null if not stated.`,
+      `shaft_height: Boot shaft height. ${FROM_IMAGE} E.g. "Ankle", "Mid-calf", "Knee-high", "Over-the-knee".`,
+      `closure_type: How the boot is put on. ${FROM_IMAGE} E.g. "Side zip", "Pull-on", "Lace-up", "Chelsea pull-tab".`,
     ],
     schema: `"heel_height": null, "shaft_height": null, "closure_type": null`,
   },
   sandals: {
     fields: [
-      `heel_style: Heel type. ${NO_INFER} E.g. "Flat", "Block heel", "Wedge", "Kitten heel", "Espadrille".`,
-      `strap_style: Strap configuration. ${NO_INFER} E.g. "T-strap", "Ankle strap", "Toe-ring", "Slide", "Gladiator".`,
-      `closure_type: Fastening. ${NO_INFER} E.g. "Buckle ankle strap", "Slip-on", "Adjustable hook-and-loop".`,
+      `heel_style: Heel type. ${FROM_IMAGE} E.g. "Flat", "Block heel", "Wedge", "Kitten heel", "Espadrille".`,
+      `strap_style: Strap configuration. ${FROM_IMAGE} E.g. "T-strap", "Ankle strap", "Toe-ring", "Slide", "Gladiator lace-up".`,
+      `closure_type: Fastening. ${FROM_IMAGE} E.g. "Buckle ankle strap", "Slip-on", "Adjustable hook-and-loop".`,
     ],
     schema: `"heel_style": null, "strap_style": null, "closure_type": null`,
   },
   flats: {
     fields: [
-      `toe_shape: Toe shape. ${NO_INFER} E.g. "Pointed", "Round", "Square", "Almond".`,
-      `closure_type: How the shoe is secured. ${NO_INFER} E.g. "Slip-on", "Mary Jane strap", "Lace-up", "Loafer".`,
+      `toe_shape: Toe shape. ${FROM_IMAGE} E.g. "Pointed", "Round", "Square", "Almond".`,
+      `closure_type: How the shoe is secured. ${FROM_IMAGE} E.g. "Slip-on", "Mary Jane strap", "Lace-up", "Loafer penny keeper".`,
     ],
     schema: `"toe_shape": null, "closure_type": null`,
   },
   sneakers: {
     fields: [
-      `closure_type: Fastening. ${NO_INFER} E.g. "Lace-up", "Slip-on", "Velcro".`,
+      `closure_type: Fastening. ${FROM_IMAGE} E.g. "Lace-up", "Slip-on", "Velcro".`,
     ],
     schema: `"closure_type": null`,
   },
   // ── Jewelry ────────────────────────────────────────────────────────────────
   earrings: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER} E.g. "Gold-tone", "Silver-tone", "Rose gold-tone", "Two-tone". Must appear in name or description.`,
-      `stone_type: Stone or ornament. ${NO_INFER} E.g. "Crystal", "Cubic zirconia", "Imitation pearl", "Enamel". Return null if none mentioned.`,
-      `earring_back: Back/fastening type. ${NO_INFER} E.g. "Post with push back", "Lever back", "Clip-on", "Threader", "Hoop".`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT} E.g. "Gold-tone", "Silver-tone", "Rose gold-tone", "Two-tone". Must appear in name or description.`,
+      `stone_type: Stone or ornament. ${NO_INFER_FACT} E.g. "Crystal", "Cubic zirconia", "Imitation pearl", "Enamel". Return null if none mentioned.`,
+      `earring_back: Back/fastening type. ${FROM_IMAGE} E.g. "Post with push back", "Lever back", "Clip-on", "Threader", "Hoop".`,
     ],
     schema: `"metal_finish": null, "stone_type": null, "earring_back": null`,
   },
   necklaces: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER} E.g. "Gold-tone", "Silver-tone", "Rose gold-tone".`,
-      `stone_type: Stone or pendant ornament. ${NO_INFER} Return null if no stone/pendant mentioned.`,
-      `chain_length: Length in inches. ${NO_INFER} E.g. "16 inch", "18 inch with 2-inch extender".`,
-      `clasp_type: Closure type. ${NO_INFER} E.g. "Lobster clasp", "Spring ring", "Toggle clasp".`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT} E.g. "Gold-tone", "Silver-tone", "Rose gold-tone".`,
+      `stone_type: Stone or pendant ornament. ${NO_INFER_FACT} Return null if no stone/pendant mentioned.`,
+      `chain_length: Length in inches. ${NO_INFER_FACT} E.g. "16 inch", "18 inch with 2-inch extender".`,
+      `clasp_type: Closure type. ${FROM_IMAGE} E.g. "Lobster clasp", "Spring ring", "Toggle clasp".`,
     ],
     schema: `"metal_finish": null, "stone_type": null, "chain_length": null, "clasp_type": null`,
   },
   bracelets: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER}`,
-      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
-      `clasp_type: Closure type. ${NO_INFER} E.g. "Toggle clasp", "Magnetic clasp", "Stretch", "Box clasp", "Lobster clasp".`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT}`,
+      `stone_type: Stone or ornament. ${NO_INFER_FACT} Return null if none mentioned.`,
+      `clasp_type: Closure type. ${FROM_IMAGE} E.g. "Toggle clasp", "Magnetic clasp", "Stretch", "Box clasp", "Lobster clasp".`,
     ],
     schema: `"metal_finish": null, "stone_type": null, "clasp_type": null`,
   },
   rings: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER}`,
-      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT}`,
+      `stone_type: Stone or ornament. ${NO_INFER_FACT} Return null if none mentioned.`,
     ],
     schema: `"metal_finish": null, "stone_type": null`,
   },
   watches: {
     fields: [
-      `metal_finish: Case and band finish. ${NO_INFER} E.g. "Gold-tone case with mesh band", "Silver-tone stainless steel".`,
-      `band_material: Band/strap material. ${NO_INFER} E.g. "Mesh bracelet", "Link bracelet", "Leather strap".`,
-      `case_diameter: Case size. ${NO_INFER} E.g. "36mm", "38mm".`,
+      `metal_finish: Case and band finish. ${NO_INFER_MAT} E.g. "Gold-tone case with mesh band", "Silver-tone stainless steel".`,
+      `band_material: Band/strap material. ${FROM_IMAGE} E.g. "Mesh bracelet", "Link bracelet", "Leather strap".`,
+      `case_diameter: Case size. ${NO_INFER_FACT} E.g. "36mm", "38mm".`,
     ],
     schema: `"metal_finish": null, "band_material": null, "case_diameter": null`,
   },
   brooches: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER}`,
-      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT}`,
+      `stone_type: Stone or ornament. ${NO_INFER_FACT} Return null if none mentioned.`,
     ],
     schema: `"metal_finish": null, "stone_type": null`,
   },
   jewelry_sets: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER}`,
-      `stone_type: Stone or ornament. ${NO_INFER} Return null if none mentioned.`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT}`,
+      `stone_type: Stone or ornament. ${NO_INFER_FACT} Return null if none mentioned.`,
     ],
     schema: `"metal_finish": null, "stone_type": null`,
   },
   // ── Handbags ───────────────────────────────────────────────────────────────
   clutch: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} E.g. "Faux leather", "Satin", "Quilted fabric". Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${NO_INFER} E.g. "Magnetic snap", "Frame clasp", "Zip-top", "Envelope flap".`,
-      `strap_type: Strap detail. ${NO_INFER} E.g. "No strap", "Detachable chain strap", "Wristlet loop". Return null if not mentioned.`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance. E.g. "Faux leather", "Satin", "Quilted fabric".`,
+      `closure_type: How it closes. ${FROM_IMAGE} E.g. "Magnetic snap", "Frame clasp", "Zip-top", "Envelope flap".`,
+      `strap_type: Strap detail. ${FROM_IMAGE} E.g. "No strap", "Detachable chain strap", "Wristlet loop".`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_type": null`,
   },
   crossbody: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${NO_INFER} E.g. "Zip-top", "Flap with turn-lock", "Magnetic snap".`,
-      `strap_drop: Strap drop/length. ${NO_INFER} E.g. "22-inch adjustable strap", "Detachable chain strap".`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${FROM_IMAGE} E.g. "Zip-top", "Flap with turn-lock", "Magnetic snap".`,
+      `strap_drop: Strap drop/length. ${NO_INFER_FACT} E.g. "22-inch adjustable strap". Return null if not stated.`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
   },
   tote: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${NO_INFER} E.g. "Open top", "Magnetic snap", "Zip-top". Return null if not stated.`,
-      `strap_drop: Handle/strap drop. ${NO_INFER} E.g. "10-inch top handle", "22-inch shoulder strap".`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${FROM_IMAGE} E.g. "Open top", "Magnetic snap", "Zip-top".`,
+      `strap_drop: Handle/strap drop. ${NO_INFER_FACT} E.g. "10-inch top handle", "22-inch shoulder strap". Return null if not stated.`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
   },
   satchel: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${NO_INFER}`,
-      `strap_drop: Strap drop. ${NO_INFER}`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${FROM_IMAGE}`,
+      `strap_drop: Strap drop. ${NO_INFER_FACT} Return null if not stated.`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
   },
   shoulder_bag: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${NO_INFER}`,
-      `strap_drop: Strap drop. ${NO_INFER}`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${FROM_IMAGE}`,
+      `strap_drop: Strap drop. ${NO_INFER_FACT} Return null if not stated.`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
   },
   handbag_generic: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
-      `closure_type: How it closes. ${NO_INFER}`,
-      `strap_drop: Strap drop/length. ${NO_INFER}`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `closure_type: How it closes. ${FROM_IMAGE}`,
+      `strap_drop: Strap drop/length. ${NO_INFER_FACT} Return null if not stated.`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
   },
   wallet: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER}`,
-      `closure_type: How it closes. ${NO_INFER} E.g. "Zip-around", "Snap closure", "Bi-fold, no closure".`,
+      `exterior_material: Outer material. ${NO_INFER_MAT}`,
+      `closure_type: How it closes. ${FROM_IMAGE} E.g. "Zip-around", "Snap closure", "Bi-fold, no closure".`,
     ],
     schema: `"exterior_material": null, "closure_type": null`,
   },
   // ── Category group fallbacks ───────────────────────────────────────────────
   clothing: {
     fields: [
-      `material: Primary fabric composition. ${NO_INFER}`,
-      `care_instructions: One-line care instruction. ${NO_INFER}`,
-      `fit_type: Body fit. ${NO_INFER}`,
+      `material: Primary fabric composition. ${NO_INFER_MAT}`,
+      `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
+      `fit_type: Body fit. ${FROM_IMAGE}`,
     ],
     schema: `"material": null, "care_instructions": null, "fit_type": null`,
   },
   shoes: {
     fields: [
-      `heel_style: Heel type. ${NO_INFER}`,
-      `closure_type: Fastening. ${NO_INFER}`,
+      `heel_style: Heel type. ${FROM_IMAGE}`,
+      `closure_type: Fastening. ${FROM_IMAGE}`,
     ],
     schema: `"heel_style": null, "closure_type": null`,
   },
   jewelry: {
     fields: [
-      `metal_finish: Metal color/finish. ${NO_INFER}`,
-      `stone_type: Stone if mentioned. ${NO_INFER}`,
+      `metal_finish: Metal color/finish. ${NO_INFER_MAT}`,
+      `stone_type: Stone if mentioned. ${NO_INFER_FACT}`,
     ],
     schema: `"metal_finish": null, "stone_type": null`,
   },
   handbags: {
     fields: [
-      `exterior_material: Outer material. ${NO_INFER} Do NOT assume leather from appearance.`,
-      `closure_type: Closure if stated. ${NO_INFER}`,
-      `strap_drop: Strap drop if stated. ${NO_INFER}`,
+      `exterior_material: Outer material. ${NO_INFER_MAT} Do NOT assume leather from appearance.`,
+      `closure_type: Closure if visible. ${FROM_IMAGE}`,
+      `strap_drop: Strap drop. ${NO_INFER_FACT} Return null if not stated.`,
     ],
     schema: `"exterior_material": null, "closure_type": null, "strap_drop": null`,
   },
