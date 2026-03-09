@@ -25,6 +25,7 @@ const DATA_FILES = {
   socialIntelligence:path.join(__dirname, '../data/social_intelligence.json'),
   gscKeywords:       path.join(__dirname, '../data/gsc_keywords.json'),
   emailSignups:      path.join(__dirname, '../data/email_signups.json'),
+  personas:          path.join(__dirname, '../data/personas.json'),
 };
 
 function log(message) {
@@ -138,6 +139,14 @@ ${es.signupOffers.map(o => `${o.brand}: "${o.offer}"`).join('\n')}`);
     }
   }
 
+  if (data.personas?.personas?.length) {
+    const personaSummaries = data.personas.personas.map(p =>
+      `- ${p.name} (${p.ageRange}, ${p.income}): ${p.values?.[0] || ''}. Key need: ${p.fashionGoals?.[0] || ''}. Content they love: ${p.contentTopics?.[0] || ''}. Channel preference: ${p.preferredChannels?.[0] || ''}.`
+    ).join('\n');
+    parts.push(`CUSTOMER PERSONAS (use these to target and tag every content asset):
+${personaSummaries}`);
+  }
+
   return parts.join('\n\n');
 }
 
@@ -182,7 +191,9 @@ Generate 12 email campaign angles for Anne Klein's next 4 weeks (3 emails per we
 
 If competitor signup offers exist in the data, recommend whether AK should match, beat, or differentiate.
 
-Format as JSON: { "emailCampaigns": [ { "week": 1, "dayOfWeek": "", "theme": "", "subjectLine": "", "previewText": "", "brief": "", "sendTiming": "", "ctaButton": "" } ] }`;
+For each campaign, assign a "targetPersona" — one of the 4 persona names provided. Spread campaigns across personas so all 4 are covered across the 12 emails.
+
+Format as JSON: { "emailCampaigns": [ { "week": 1, "dayOfWeek": "", "theme": "", "subjectLine": "", "previewText": "", "brief": "", "sendTiming": "", "ctaButton": "", "targetPersona": "" } ] }`;
 
   allResults.emailCampaigns = await generateContent(client, emailPrompt, systemPrompt, 'Email campaigns', 4000);
 
@@ -212,7 +223,9 @@ Each caption should:
 - Have a soft CTA (link in bio, or shop the look)
 - Be authentic, not salesy
 
-Format as JSON: { "instagramCaptions": [ { "category": "", "caption": "", "hashtags": [], "imageryNotes": "describe the visual: product type, setting, lighting, mood — e.g. 'blazer flat lay on marble, natural morning light' or 'model at desk in tailored pants, editorial lighting'", "notes": "" } ] }`;
+For each caption, assign a "targetPersona" — one of the 4 persona names. Vary personas across the 8 captions.
+
+Format as JSON: { "instagramCaptions": [ { "category": "", "caption": "", "hashtags": [], "imageryNotes": "describe the visual: product type, setting, lighting, mood — e.g. 'blazer flat lay on marble, natural morning light' or 'model at desk in tailored pants, editorial lighting'", "notes": "", "targetPersona": "" } ] }`;
 
   allResults.instagramCaptions = await generateContent(client, igPrompt, systemPrompt, 'Instagram captions');
 

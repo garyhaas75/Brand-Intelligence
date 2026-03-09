@@ -935,7 +935,16 @@ function ContentGeneratorPanel() {
 
 function ContentTab({ content, catalog }) {
   const [activeSection, setActiveSection] = useState('email')
+  const [personaFilter, setPersonaFilter] = useState(null)
   const c = content?.content
+
+  const PERSONAS = ['The Polished Professional', 'The Emerging Leader', 'The Refined Rewinder', 'The Practical Multitasker']
+  const PERSONA_COLORS = {
+    'The Polished Professional': '#6366f1',
+    'The Emerging Leader': '#10b981',
+    'The Refined Rewinder': '#f59e0b',
+    'The Practical Multitasker': '#ec4899',
+  }
 
   const sections = [
     { id: 'email',    label: '📧 Email Campaigns',    count: c?.emailCampaigns?.emailCampaigns?.length },
@@ -954,7 +963,7 @@ function ContentTab({ content, catalog }) {
       ) : (
       <>
       <SectionHeader>Generated Content Assets</SectionHeader>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         {sections.map(s => (
           <button key={s.id} onClick={() => setActiveSection(s.id)}
             style={{ padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
@@ -965,10 +974,36 @@ function ContentTab({ content, catalog }) {
         ))}
       </div>
 
-      {activeSection === 'email' && (c?.emailCampaigns?.emailCampaigns || []).map((e, i) => {
+      {(activeSection === 'email' || activeSection === 'ig') && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20, alignItems: 'center' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', marginRight: 2 }}>PERSONA:</span>
+          <button onClick={() => setPersonaFilter(null)}
+            style={{ padding: '4px 12px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 12, fontWeight: 600,
+              background: personaFilter === null ? '#111827' : '#fff',
+              color: personaFilter === null ? '#fff' : '#374151' }}>
+            All
+          </button>
+          {PERSONAS.map(p => (
+            <button key={p} onClick={() => setPersonaFilter(personaFilter === p ? null : p)}
+              style={{ padding: '4px 12px', borderRadius: 20, border: `1px solid ${PERSONA_COLORS[p]}`, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                background: personaFilter === p ? PERSONA_COLORS[p] : '#fff',
+                color: personaFilter === p ? '#fff' : PERSONA_COLORS[p] }}>
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {activeSection === 'email' && (c?.emailCampaigns?.emailCampaigns || []).filter(e => !personaFilter || e.targetPersona === personaFilter).map((e, i) => {
         const products = getProductsForCampaign(e.theme, e.brief, catalog)
+        const pColor = PERSONA_COLORS[e.targetPersona] || '#9ca3af'
         return (
           <Card key={i} title={`Week ${e.week}${e.dayOfWeek ? ' · ' + e.dayOfWeek : ''}: ${e.theme}`} accent="#6366f1">
+            {e.targetPersona && (
+              <div style={{ marginBottom: 10 }}>
+                <span style={{ background: pColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>{e.targetPersona}</span>
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 12 }}>
               <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 4 }}>SUBJECT LINE</div>
@@ -1010,10 +1045,16 @@ function ContentTab({ content, catalog }) {
         </Card>
       ))}
 
-      {activeSection === 'ig' && (c?.instagramCaptions?.instagramCaptions || []).map((g, i) => {
+      {activeSection === 'ig' && (c?.instagramCaptions?.instagramCaptions || []).filter(g => !personaFilter || g.targetPersona === personaFilter).map((g, i) => {
         const products = getProductsForCampaign(g.category, g.caption, catalog)
+        const pColor = PERSONA_COLORS[g.targetPersona] || '#9ca3af'
         return (
           <Card key={i} title={g.category} accent="#ec4899">
+            {g.targetPersona && (
+              <div style={{ marginBottom: 10 }}>
+                <span style={{ background: pColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>{g.targetPersona}</span>
+              </div>
+            )}
             <div style={{ fontSize: 14, color: '#374151', lineHeight: 1.7, marginBottom: 10 }}>{g.caption}</div>
             {g.imageryNotes && (
               <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', marginBottom: 10, fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
