@@ -1045,6 +1045,15 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   const [extraVolumes, setExtraVolumes] = useState({ email: 0, instagram: 0, hero: 0 })
   const [generatingMore, setGeneratingMore] = useState(false)
   const [showGenerateMore, setShowGenerateMore] = useState(false)
+  // Product selector state: itemId → selected products array
+  const [itemProducts, setItemProducts] = useState({})
+  // Stock status state: handle → { name, qty, status }
+  const [stockStatus, setStockStatus] = useState({})
+  const [checkingStock, setCheckingStock] = useState({})
+  // Browse products popover: itemId or null
+  const [browseOpen, setBrowseOpen] = useState(null)
+  const [browseProducts, setBrowseProducts] = useState([])
+  const [browseFilter, setBrowseFilter] = useState('')
 
   const c = content?.content
 
@@ -1075,7 +1084,9 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       fetch(`/api/weekly-plan?week=${weekStart}`).then(r => r.json()).catch(() => []),
       fetch(`/api/ownable-events?year=${year}`).then(r => r.json()).catch(() => []),
     ]).then(([plan, events]) => {
-      setPlanItems(Array.isArray(plan) ? plan : [])
+      const planArr = Array.isArray(plan) ? plan : []
+      setPlanItems(planArr)
+      syncProductsFromPlan(planArr)
       setOwnableEvents(Array.isArray(events) ? events : [])
       setLoadingPlan(false)
     })
@@ -1089,9 +1100,9 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
     setItemDates({})
   }
 
-  // Events happening in next 14 days from weekStart
+  // Events happening in next 35 days from weekStart (5-week lead time for gifting/planning)
   const weekEnd = new Date(weekStart)
-  weekEnd.setDate(weekEnd.getDate() + 14)
+  weekEnd.setDate(weekEnd.getDate() + 35)
   const upcomingEvents = ownableEvents.filter(e => {
     if (!e.date) return false
     const d = new Date(e.date)
@@ -1163,6 +1174,55 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       setTimeout(() => setPlannerToast(null), 5000)
     } finally {
       setGeneratingMore(false)
+    }
+  }
+
+  // Initialise itemProducts from planItems when plan loads
+  function syncProductsFromPlan(items) {
+    const init = {}
+    items.forEach(i => { if (i.products?.length) init[i.id] = i.products })
+    setItemProducts(init)
+  }
+
+  function toggleProduct(itemId, product) {
+    setItemProducts(prev => {
+      const current = prev[itemId] || []
+      const exists = current.find(p => p.handle === product.handle)
+      const updated = exists ? current.filter(p => p.handle !== product.handle) : [...current, product]
+      // Persist to server
+      fetch(`/api/weekly-plan/item/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weekStart, products: updated }),
+      })
+      return { ...prev, [itemId]: updated }
+    })
+  }
+
+  async function openBrowse(itemId) {
+    setBrowseOpen(itemId)
+    if (browseProducts.length === 0) {
+      const data = await fetch('/api/shopify/products?limit=100').then(r => r.json()).catch(() => ({ products: [] }))
+      setBrowseProducts(data.products || [])
+    }
+  }
+
+  async function refreshStock(handles) {
+    if (!handles?.length) return
+    setCheckingStock(prev => Object.fromEntries(handles.map(h => [h, true])))
+    try {
+      const data = await fetch('/api/shopify/check-availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handles }),
+      }).then(r => r.json())
+      if (data.ok) setStockStatus(prev => ({ ...prev, ...data.results }))
+    } finally {
+      setCheckingStock(prev => {
+        const next = { ...prev }
+        handles.forEach(h => delete next[h])
+        return next
+      })
     }
   }
 
@@ -1269,7 +1329,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
             {/* Upcoming ownable events */}
             {upcomingEvents.length > 0 && (
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ownable Events (next 14 days)</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ownable Events (next 35 days)</div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {upcomingEvents.map(e => (
                     <div key={e.id} style={{ background: e.relevance === 'high' ? '#fef3c710' : T.stripeBg, border: `1px solid ${e.relevance === 'high' ? '#f59e0b60' : T.border}`, borderRadius: 8, padding: '5px 12px', fontSize: 12, color: e.relevance === 'high' ? '#92400e' : T.textSub, fontWeight: 600 }}>
@@ -1457,6 +1517,69 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                         )}
                       </div>
                     )}
+
+                    {/* Product selector — email only */}
+                    {item.channel === 'email' && (() => {
+                      const selected = itemProducts[item.id] || item.products || []
+                      const STOCK_DOT = { inStock: '🟢', lowStock: '🟡', outOfStock: '🔴', notFound: '⚫', error: '⚫' }
+                      return (
+                        <div style={{ marginTop: 12, background: T.stripeBg, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              Featured Products {selected.length > 0 && <span style={{ background: '#6366f1', color: '#fff', borderRadius: 20, padding: '1px 7px', fontSize: 10, marginLeft: 4 }}>{selected.length}</span>}
+                            </div>
+                            {selected.length > 0 && (
+                              <button onClick={() => refreshStock(selected.map(p => p.handle))}
+                                style={{ fontSize: 11, background: 'none', border: 'none', cursor: 'pointer', color: T.textMuted, padding: '0 4px' }}
+                                title="Refresh stock status">
+                                {selected.some(p => checkingStock[p.handle]) ? '⏳' : '🔄'}
+                              </button>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                            {selected.map(p => {
+                              const s = stockStatus[p.handle]
+                              return (
+                                <div key={p.handle} style={{ display: 'flex', alignItems: 'center', gap: 4, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: '3px 10px', fontSize: 12, color: T.textSub }}>
+                                  {s ? STOCK_DOT[s.status] || '' : ''} {p.name} · ${p.price}
+                                  <button onClick={() => toggleProduct(item.id, p)}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.textMuted, fontSize: 12, padding: '0 0 0 4px', lineHeight: 1 }}>✕</button>
+                                </div>
+                              )
+                            })}
+                          </div>
+                          <button onClick={() => openBrowse(browseOpen === item.id ? null : item.id)}
+                            style={{ fontSize: 12, color: '#6366f1', background: 'none', border: '1px dashed #6366f1', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+                            + Browse products
+                          </button>
+                          {browseOpen === item.id && (
+                            <div style={{ marginTop: 8, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: 10, maxHeight: 220, overflowY: 'auto' }}>
+                              <input value={browseFilter} onChange={e => setBrowseFilter(e.target.value)}
+                                placeholder="Filter by name or type…"
+                                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '6px 10px', fontSize: 12, marginBottom: 8, background: T.inputBg, color: T.text, boxSizing: 'border-box' }} />
+                              {browseProducts
+                                .filter(p => !browseFilter || p.name.toLowerCase().includes(browseFilter.toLowerCase()) || p.productType?.toLowerCase().includes(browseFilter.toLowerCase()))
+                                .slice(0, 40)
+                                .map(p => {
+                                  const isSel = (itemProducts[item.id] || item.products || []).find(s => s.handle === p.handle)
+                                  return (
+                                    <div key={p.handle} onClick={() => toggleProduct(item.id, { handle: p.handle, name: p.name, price: p.price })}
+                                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 6px', borderRadius: 6, cursor: 'pointer', background: isSel ? '#6366f110' : 'none', marginBottom: 2 }}>
+                                      <span style={{ fontSize: 12, color: T.text }}>{isSel ? '✓ ' : ''}{p.name}</span>
+                                      <span style={{ fontSize: 11, color: T.textMuted }}>${p.price} · {p.availableQty} in stock</span>
+                                    </div>
+                                  )
+                                })}
+                              {browseProducts.length === 0 && (
+                                <div style={{ fontSize: 12, color: T.textMuted, textAlign: 'center', padding: 12 }}>
+                                  No products loaded — add SHOPIFY_ADMIN_API_TOKEN to .env
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })()}
 
                     {/* Actions row */}
                     {!item.addedToCalendar && (

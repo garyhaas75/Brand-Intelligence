@@ -13,6 +13,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 const basicAuth = require('express-basic-auth');
 const { getBrandContext } = require('./utils/brand_context');
+const { getInStockProducts, checkHandles, isConfigured: shopifyConfigured } = require('./shopify/inventory');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -943,9 +944,9 @@ app.post('/api/weekly-plan/generate', async (req, res) => {
       return { ...c, weekNum, totalWeeks, arcWeek };
     });
 
-  // Events in next 14 days (lookahead for lead time)
+  // Events in next 35 days (5-week lead time for gifting/planning)
   const lookAheadEnd = new Date(weekStartDate);
-  lookAheadEnd.setDate(lookAheadEnd.getDate() + 14);
+  lookAheadEnd.setDate(lookAheadEnd.getDate() + 35);
   const upcomingEvents = allEvents.filter(e => {
     if (!e.date) return false;
     const d = new Date(e.date);
@@ -959,6 +960,9 @@ app.post('/api/weekly-plan/generate', async (req, res) => {
   const sentHistory = calendar
     .filter(i => i.status === 'sent' && new Date(i.date) >= eightWeeksAgo)
     .map(i => ({ channel: i.channel, theme: i.theme, subjectLine: i.subjectLine, date: i.date }));
+
+  // Fetch in-stock products for product injection (gracefully returns [] if not configured)
+  const inStockProducts = await getInStockProducts({ limit: 25 }).catch(() => []);
 
   // Build Claude prompt
   const brandContext = getBrandContext();
@@ -974,7 +978,7 @@ Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w =
 
   const eventsContext = upcomingEvents.length > 0
     ? upcomingEvents.map(e => `- ${e.name} (${e.date}): ${e.suggestedAngle}`).join('\n')
-    : 'No major ownable events in the next 14 days.';
+    : 'No major ownable events in the next 35 days.';
 
   const sentContext = sentHistory.length > 0
     ? sentHistory.map(i => `[${i.date}] ${i.channel} — Theme: "${i.theme}"${i.subjectLine ? ` | Subject: "${i.subjectLine}"` : ''}`).join('\n')
@@ -984,6 +988,11 @@ Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w =
     .map(p => `${p.name}: ${p.ageRange}, ${p.income} — Motivators: ${(p.motivators || []).slice(0, 2).join(', ')}`)
     .join('\n');
 
+  const productContext = inStockProducts.length > 0
+    ? `FEATURED IN-STOCK PRODUCTS (reference these specifically — all confirmed available):\n` +
+      inStockProducts.map(p => `- ${p.name} ($${p.price}) — ${p.href} [${p.availableQty} in stock]`).join('\n')
+    : '';
+
   const prompt = `You are a marketing strategist and copywriter for Anne Klein. Generate a weekly content plan for the week of ${weekStart}.
 
 ${brandContext}
@@ -991,8 +1000,8 @@ ${brandContext}
 PLANNING WEEK: ${weekStart}
 
 ${campaignContext}
-
-UPCOMING OWNABLE EVENTS (next 14 days, plan content to land BEFORE the event):
+${productContext ? '\n' + productContext : ''}
+UPCOMING OWNABLE EVENTS (next 35 days, plan content to land BEFORE the event):
 ${eventsContext}
 
 RECENT SENT CONTENT (last 8 weeks — avoid repeating these themes/angles):
@@ -1013,6 +1022,7 @@ For EMAIL:
   "ownableEventId": "<event id or null>",
   "theme": "<short theme label>",
   "targetPersona": "<persona name>",
+  "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0}],
   "email": {
     "subjectLine": "<compelling subject, 40-60 chars>",
     "previewText": "<preview text, 80-100 chars>",
@@ -1058,6 +1068,7 @@ Rules:
 - If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
 - Do NOT repeat themes from recent sent history listed above
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
+- For EMAIL items: populate "products" with 2-4 specific products from the FEATURED IN-STOCK PRODUCTS list that fit the email's theme. If no in-stock products were provided, use an empty array.
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
   try {
@@ -1164,7 +1175,7 @@ app.post('/api/weekly-plan/add-to-calendar', (req, res) => {
         ? `Headline: ${item.hero.headline}\nSubhead: ${item.hero.subhead}\nCTA: ${item.hero.cta}\nImage direction: ${item.hero.imageDirection}`
         : '',
       heroImageBrief: null,
-      selectedProducts: [],
+      selectedProducts: item.products || [],
       assignedTo: '',
       notes: '',
       createdAt: new Date().toISOString(),
@@ -1184,6 +1195,47 @@ app.post('/api/weekly-plan/add-to-calendar', (req, res) => {
   saveWeeklyPlans(plans);
 
   res.json({ ok: true, created: created.length, items: created });
+});
+
+// ── Shopify endpoints ─────────────────────────────────────────────────────────
+
+// GET /api/shopify/products — in-stock product list for the product picker UI
+app.get('/api/shopify/products', async (req, res) => {
+  const limit = parseInt(req.query.limit) || 100;
+  const productType = req.query.type || undefined;
+  try {
+    const products = await getInStockProducts({ limit, productType });
+    res.json({ ok: true, configured: shopifyConfigured(), products });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/shopify/check-availability — check current stock for given handles
+app.post('/api/shopify/check-availability', async (req, res) => {
+  const { handles } = req.body || {};
+  if (!handles?.length) return res.status(400).json({ error: 'handles required' });
+  try {
+    const results = await checkHandles(handles);
+    res.json({ ok: true, results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/weekly-plan/item/:itemId — update products selection on a plan item
+app.patch('/api/weekly-plan/item/:itemId', (req, res) => {
+  const { itemId } = req.params;
+  const { weekStart, products } = req.body || {};
+  if (!weekStart) return res.status(400).json({ error: 'weekStart required' });
+  const plans = loadWeeklyPlans();
+  const items = plans[weekStart] || [];
+  const item = items.find(i => i.id === itemId);
+  if (!item) return res.status(404).json({ error: 'Item not found' });
+  if (products !== undefined) item.products = products;
+  plans[weekStart] = items;
+  saveWeeklyPlans(plans);
+  res.json({ ok: true, item });
 });
 
 // Serve built dashboard in production
