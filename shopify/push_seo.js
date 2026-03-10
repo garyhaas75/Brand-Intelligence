@@ -200,6 +200,45 @@ async function pushTagsAndCategory(productGid, tags, categoryGid, descriptionHtm
   return { ok: true };
 }
 
+// Activate taxonomy category metafields via productSet.
+// productSet is the documented mutation that triggers Shopify to expose the shopify.*
+// namespace metafield slots (fabric, neckline, sleeve-length-type, care-instructions)
+// for the assigned category. productUpdate sets the category value but does NOT trigger
+// the metafield slot activation — productSet does.
+// Using synchronous:true ensures activation is complete before we attempt to write values.
+async function activateProductCategory(productGid, categoryGid) {
+  if (!productGid || !categoryGid) return;
+
+  // productSet requires title when creating, but for updates (id present) it may be optional.
+  // Fetch current title to include it — avoids BLANK validation errors on title.
+  let title;
+  try {
+    const d = await shopifyGraphQL(`query { node(id: "${productGid}") { ... on Product { title } } }`);
+    title = d?.node?.title;
+  } catch { /* non-fatal */ }
+
+  const input = { id: productGid, category: categoryGid };
+  if (title) input.title = title;
+
+  const data = await shopifyGraphQL(`
+    mutation productSet($input: ProductSetInput!) {
+      productSet(synchronous: true, input: $input) {
+        product { id category { id name fullName } }
+        userErrors { field message code }
+      }
+    }
+  `, { input });
+
+  const errors = data?.productSet?.userErrors || [];
+  if (errors.length) {
+    log(`    WARN activateProductCategory: ${errors.map(e => `${e.field}: ${e.message}`).join('; ')}`);
+  }
+  const cat = data?.productSet?.product?.category;
+  if (cat) {
+    log(`    Category activated: ${cat.fullName} (${cat.id})`);
+  }
+}
+
 // Update image alt text via fileUpdate (replaces deprecated productUpdateMedia).
 // The media node ID from product.media is a valid File GID for fileUpdate.
 async function pushAltText(mediaId, altText) {
@@ -251,7 +290,7 @@ const CLOTHING_CATEGORY_GROUPS = new Set(['clothing', 'shoes', 'jewelry', 'handb
 // Push Shopify-namespace category metafields (appear in "Category metafields" section in Shopify admin).
 // Metafield type depends on the GID source:
 //   - Merchant metaobjects (age-group, target-gender, material, closure-type): list.metaobject_reference
-//   - Taxonomy attributes (fabric, neckline, sleeve-length-type, care-instructions): list.taxonomy_reference
+//   - Taxonomy attributes (fabric, neckline, sleeve-length-type, care-instructions): list.product_taxonomy_value_reference
 //
 // Confirmed actual values from live store diagnostic:
 //   age-group: "Adults" (NOT "Adult")
@@ -451,6 +490,19 @@ async function pushProduct(product, metaCache) {
 
   // 4. Push category-specific custom metafields (material, fit_type, metal_finish, etc.)
   await pushCategoryMetafields(productGid, suggested);
+
+  // 4a. Activate taxonomy category metafield slots via productSet.
+  // productSet (not productUpdate) is what triggers Shopify to expose the shopify.*
+  // namespace fields (fabric, neckline, sleeve-length-type, care-instructions) for the
+  // assigned category. We call this even if the category was already set — re-setting
+  // via productSet re-runs the activation logic.
+  if (gidStr && CLOTHING_CATEGORY_GROUPS.has(categoryGroup)) {
+    try {
+      await activateProductCategory(productGid, gidStr);
+    } catch (err) {
+      log(`    WARN: category activation via productSet failed (${err.message})`);
+    }
+  }
 
   // 5a. Push Shopify taxonomy category metafields (shopify.fabric, shopify.neckline, etc.)
   // Only for clothing products. Uses list.metaobject_reference type with store-specific GIDs.
