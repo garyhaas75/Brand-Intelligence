@@ -986,8 +986,47 @@ function validateEmailItem(item, personasData) {
     if (!item.sections || item.sections.length < 2) {
       warnings.push('component-story email must have at least 2 sections');
     } else {
+      // Check 1: thin sections
       const thinSections = item.sections.filter(s => (s.products || []).length < 2).map(s => s.label || 'unnamed');
       if (thinSections.length > 0) warnings.push(`Sections with fewer than 2 products: ${thinSections.join(', ')}`);
+
+      // Check 2: mixed product categories within a section
+      const CLOTHING = /dress|jacket|blazer|skirt|pant|top|blouse|tunic|suit|cardigan|sweater|vest|shirt|midi|maxi|mini|jumpsuit|romper|coat/i;
+      const SHOES    = /flat|heel|pump|sneaker|boot|sandal|loafer|mule|wedge|shoe/i;
+      const BAGS     = /tote|bag|clutch|crossbody|satchel|purse|wristlet/i;
+      const JEWELRY  = /necklace|earring|bracelet|ring|pendant|stud|pearl|chain/i;
+      function inferCategory(name) {
+        if (CLOTHING.test(name)) return 'clothing';
+        if (SHOES.test(name))    return 'shoes';
+        if (BAGS.test(name))     return 'bags';
+        if (JEWELRY.test(name))  return 'jewelry';
+        return null;
+      }
+      for (const section of item.sections) {
+        const cats = new Set((section.products || []).map(p => inferCategory(p.name || '')).filter(Boolean));
+        if (cats.size > 1) {
+          warnings.push(`Section "${section.label}" mixes product types (${[...cats].join(' + ')}) — each section must contain only one product category`);
+        }
+      }
+
+      // Check 3: outfit-language section names
+      const OUTFIT_WORDS = /\b(look|outfit|layered\s+look|complete|combination|paired|styled)\b/i;
+      const badLabels = item.sections.filter(s => OUTFIT_WORDS.test(s.label || '')).map(s => s.label);
+      if (badLabels.length > 0) {
+        warnings.push(`Section names sound like outfit combinations: "${badLabels.join('", "')}" — use component names like "The Dress", "The Shoe", "The Layer"`);
+      }
+
+      // Check 4: "N days" / "all week" / "N outfits" claims in subject or preview
+      const csText = (item.email?.subjectLine || '') + ' ' + (item.email?.previewText || '');
+      const csDayMatches = [...csText.matchAll(/\b(\d+|five|four|three|two|one)\s+day/gi)];
+      const csWeekMatch  = /all week/i.test(csText);
+      const csOutfitMatches = [...csText.matchAll(/\b(\d+)\s*(outfit|look)s?\b/gi)];
+      if (csDayMatches.length > 0 || csWeekMatch) {
+        warnings.push(`Subject/preview claims days or "all week" — component-story emails show options, not a weekly schedule. Remove day count claims.`);
+      }
+      if (csOutfitMatches.length > 0) {
+        warnings.push(`Subject/preview claims N outfits/looks — component-story emails don't promise specific outfits. Rewrite to describe the wardrobe concept.`);
+      }
     }
     return { valid: warnings.length === 0, warnings };
   }
@@ -1044,6 +1083,16 @@ function validateEmailItem(item, personasData) {
 async function critiqueAndRevise(item, warnings, anthropic) {
   const prefs = loadContentPreferences();
   const stylingRules = prefs?.stylingRules ? JSON.stringify(prefs.stylingRules) : '{}';
+  const isComponentStory = item.template === 'component-story';
+  const fixInstructions = isComponentStory ? `Fix ALL the issues above for this component-story email:
+- MIXED CATEGORIES: If a section contains products from more than one type (e.g. dress + shoe in same section), split them into separate sections — one section per product category. Each section = only dresses, or only shoes, or only blazers/jackets, or only bags, etc.
+- OUTFIT SECTION NAMES: If any section is named like an outfit ("The Layered Look", "The Complete Outfit", "The Paired Set"), rename it to a product-category name ("The Dress", "The Layer", "The Shoe", "The Bag").
+- DAY/OUTFIT CLAIMS: If the subject line or preview text claims "N days", "all week", or "N outfits/looks", rewrite it to describe the wardrobe concept instead (e.g. "Your spring foundation", "Three ways to dress this season", "The pieces that carry you").
+- Keep the same theme, persona, template, campaign, and overall angle.` : `Fix ALL the issues above:
+- If subject claims N outfits/looks/days, adjust the looks array to have exactly N looks with unique hero products, OR rewrite the subject to match the actual look count — whichever requires fewer changes
+- Each look must have a DIFFERENT first (hero) product handle
+- Every look needs at least 2 products
+- Keep the same theme, persona, template, campaign, and overall styling angle`;
   try {
     const res = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -1060,11 +1109,7 @@ Styling rules: ${stylingRules}
 Current item JSON:
 ${JSON.stringify(item, null, 2)}
 
-Fix ALL the issues above:
-- If subject claims N outfits/looks/days, adjust the looks array to have exactly N looks with unique hero products, OR rewrite the subject to match the actual look count — whichever requires fewer changes
-- Each look must have a DIFFERENT first (hero) product handle
-- Every look needs at least 2 products
-- Keep the same theme, persona, template, campaign, and overall styling angle
+${fixInstructions}
 
 Return ONLY the corrected item as valid JSON (same schema as input, no commentary).`,
       }],
@@ -1313,7 +1358,10 @@ CRITICAL EMAIL RULES for looks-based templates (multi-look, story-led, category-
 3. COMPLETE OUTFITS ONLY: Each look must have at least 2 products — a top or jacket AND a bottom or dress. Shoes should appear in at least half the looks. A single product is not a look.
 4. OUTFIT LOGIC: Never pair two stiff/structured pieces (e.g. blazer over a sheath dress is fine; blazer over a structured jacket is not). Every structured top needs something soft underneath or alongside.
 5. SELF-CHECK BEFORE OUTPUT: Re-read your subject line. Count your looks. Do they match? Are all hero products unique? If not — fix it before returning.
-(component-story emails: skip the above rules — sections do not need outfit logic or look counts)
+CRITICAL RULES for component-story emails — check these before returning JSON:
+1. ONE CATEGORY PER SECTION: Each section must contain products of the SAME type ONLY. "The Dress" = only dresses. "The Shoe" = only shoes. "The Layer" = only jackets/blazers/cardigans. NEVER put a dress and a shoe in the same section. NEVER mix two product types in one section.
+2. COMPONENT NAMES ONLY: Section labels must name a product category, not an outfit. CORRECT: "The Dress", "The Shoe", "The Layer", "The Bag", "The Jewel". WRONG: "The Layered Look", "The Complete Outfit", "The Paired Set", "The Capsule Look".
+3. NO DAY OR OUTFIT CLAIMS: Do NOT write "5 days", "all week", "3 outfits", or "N looks" anywhere in the subject line or preview text. Component-story emails show options — they do not promise a weekly outfit schedule. Use wardrobe language instead: "Your spring foundation", "The pieces that carry you", "Three ways to dress this season".
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -1331,15 +1379,22 @@ CRITICAL EMAIL RULES for looks-based templates (multi-look, story-led, category-
 
     const generated = JSON.parse(raw.slice(start, end + 1));
 
-    // Validate + auto-fix email items
+    // Validate + auto-fix email items — up to 3 attempts per item
     const validated = await Promise.all(generated.map(async (item) => {
       if (item.channel !== 'email') return item;
-      const { valid, warnings } = validateEmailItem(item, personas);
-      if (valid) return item;
-      console.log(`[validate] Fixing "${item.theme}": ${warnings.join('; ')}`);
-      const fixed = await critiqueAndRevise(item, warnings, anthropic);
-      const { valid: stillValid, warnings: remaining } = validateEmailItem(fixed, personas);
-      return { ...fixed, validationWarnings: stillValid ? [] : remaining };
+      let current = item;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const { valid, warnings } = validateEmailItem(current, personas);
+        if (valid) {
+          if (attempt > 1) console.log(`[validate] "${current.theme}" passed on attempt ${attempt}`);
+          return current;
+        }
+        console.log(`[validate] Attempt ${attempt}/3 fixing "${current.theme}": ${warnings.join('; ')}`);
+        current = await critiqueAndRevise(current, warnings, anthropic);
+      }
+      const { valid: finalValid, warnings: finalWarnings } = validateEmailItem(current, personas);
+      if (!finalValid) console.log(`[validate] "${current.theme}" still has issues after 3 attempts: ${finalWarnings.join('; ')}`);
+      return { ...current, validationWarnings: finalValid ? [] : finalWarnings };
     }));
 
     const now = Date.now();
