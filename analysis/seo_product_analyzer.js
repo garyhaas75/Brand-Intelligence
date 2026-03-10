@@ -144,17 +144,43 @@ function saveSuggestions(data) {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
 }
 
+// Resize Shopify CDN image URLs to max 600px wide before fetching.
+// A full-res product photo is 2-4MB; the 600px version is ~60-120KB.
+// Sending 4MB base64 to Claude takes minutes to upload — this caps it at seconds.
+// Format: image.jpg?v=xxx  →  image_600x.jpg?v=xxx
+function resizeShopifyUrl(url, width = 600) {
+  if (!url || !url.includes('cdn.shopify.com')) return url;
+  return url.replace(/(\.\w{3,4})(\?|$)/, `_${width}x$1$2`);
+}
+
 // Fetch image as base64 for Claude Vision.
-// Promise.race with a hard 10s wall-clock deadline — unconditionally wins even
-// if the TCP handshake itself never completes (req.setTimeout only fires after
-// connection is established, so it can't rescue a stalled SYN).
+// Uses Promise.race with a hard 15s wall-clock deadline — unconditionally wins
+// regardless of whether the TCP handshake or data transfer stalls.
 function fetchImageBase64(url) {
   if (!url || !url.startsWith('http')) return Promise.resolve(null);
 
-  const deadline = new Promise(resolve => setTimeout(() => resolve(null), 10000));
+  const deadline = new Promise(resolve => setTimeout(() => resolve(null), 15000));
 
-  const fetch = new Promise((resolve) => {
+  const doFetch = new Promise((resolve) => {
     const req = https.get(url, (res) => {
+      // Follow a single redirect if needed
+      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
+        const redir = new Promise((r) => {
+          const r2 = https.get(res.headers.location, (res2) => {
+            const chunks = [];
+            res2.on('data', c => chunks.push(c));
+            res2.on('end', () => {
+              const buf = Buffer.concat(chunks);
+              const ct = res2.headers['content-type'] || 'image/jpeg';
+              r({ base64: buf.toString('base64'), mediaType: ct.split(';')[0] });
+            });
+            res2.on('error', () => r(null));
+          });
+          r2.on('error', () => r(null));
+        });
+        redir.then(resolve);
+        return;
+      }
       const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => {
@@ -167,7 +193,7 @@ function fetchImageBase64(url) {
     req.on('error', () => resolve(null));
   });
 
-  return Promise.race([fetch, deadline]);
+  return Promise.race([doFetch, deadline]);
 }
 
 // ─── Product filtering ────────────────────────────────────────────────────────
@@ -532,7 +558,17 @@ function getCategoryPromptSection(specificType, categoryGroup) {
 
 // ─── Main analysis function ───────────────────────────────────────────────────
 async function analyzeProduct(client, product, brandContext) {
-  const imageData = product.image ? await fetchImageBase64(product.image) : null;
+  // Resize Shopify CDN images to 600px wide before fetching — full-res images
+  // are 2-4MB and take minutes to upload to the Claude API.
+  const imageUrl = resizeShopifyUrl(product.image);
+  log(`    → fetching image${imageUrl !== product.image ? ' (600px)' : ''}…`);
+  const t0 = Date.now();
+  const imageData = imageUrl ? await fetchImageBase64(imageUrl) : null;
+  if (imageData) {
+    log(`    → image: ${Math.round(imageData.base64.length / 1024)}KB base64 (${Date.now() - t0}ms)`);
+  } else {
+    log(`    → image: none (${Date.now() - t0}ms)`);
+  }
   const categoryGroup = detectCategoryGroup(product.category);
   const specificType = detectSpecificType(product);
   const catSection = getCategoryPromptSection(specificType, categoryGroup);
@@ -591,11 +627,17 @@ Return ONLY valid JSON (no markdown, no explanation):
 }`,
   });
 
-  const response = await client.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 2000,
-    messages: [{ role: 'user', content }],
-  }, { timeout: 120000 }); // 2 min timeout — Opus can be slow on large images
+  log(`    → calling Claude (opus-4-6)…`);
+  const t1 = Date.now();
+  // Promise.race gives a hard 90s wall-clock cap — more reliable than SDK timeout option
+  const claudeDeadline = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Claude API timeout after 90s')), 90000)
+  );
+  const response = await Promise.race([
+    client.messages.create({ model: 'claude-opus-4-6', max_tokens: 2000, messages: [{ role: 'user', content }] }),
+    claudeDeadline,
+  ]);
+  log(`    → Claude responded (${Date.now() - t1}ms)`);
 
   const raw = response.content[0].text;
   const start = raw.indexOf('{');
