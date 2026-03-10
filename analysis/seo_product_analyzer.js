@@ -739,7 +739,7 @@ async function run() {
     // For products with a known taxonomy GID (from a previous analysis), build taxonomy attribute
     // cache to constrain Claude's output to valid Shopify taxonomy values (fabric, neckline, etc.).
     let metaCache = baseMerchantCache;
-    const existingEntry = seoData.products?.find(p => p.href === product.href);
+    const existingEntry = suggestions.products?.find(p => p.href === product.href);
     const knownCategoryGid = existingEntry?.suggested?.shopify_taxonomy_gid || null;
     const rawCategoryGid = knownCategoryGid && typeof knownCategoryGid === 'object' ? knownCategoryGid.id : knownCategoryGid;
     if (rawCategoryGid) {
