@@ -1,0 +1,106 @@
+{
+  "updatedAt": "2026-03-09T00:00:00.000Z",
+  "monthlyEmailMix": {
+    "description": "Target email type distribution per 4-week month across all personas",
+    "slots": [
+      {
+        "type": "solution",
+        "label": "Solution / Capsule Email",
+        "perMonth": 2,
+        "templates": ["multi-look", "component-story"],
+        "description": "Show how AK pieces solve a real wardrobe problem — '5 days, 9 pieces, zero stress' capsule logic. Persona: Polished Professional or Emerging Leader. Occasion-specific (board meeting, client travel, office-to-dinner). Component-story preferred when showcasing category depth (all blazers, all flats, all totes)."
+      },
+      {
+        "type": "category",
+        "label": "Category Spotlight",
+        "perMonth": 1,
+        "templates": ["category-focus", "single-hero"],
+        "description": "Feature one product category in depth — rotate through Handbags, Shoes, Watches, Jewelry, Clothing. Show range within the category (3-6 options at varied price points). Lean on the 883-product catalog depth. Link copy to collection page."
+      },
+      {
+        "type": "persona",
+        "label": "Persona Moment Email",
+        "perMonth": 1,
+        "templates": ["story-led", "multi-look"],
+        "description": "Write directly to one persona's specific life moment — salary negotiation outfit, work travel packing list, back-to-school morning routine, holiday party circuit. Name the moment precisely. Rotate through all 4 personas over the month."
+      }
+    ]
+  },
+  "categoryRotation": {
+    "description": "Ensure each category gets a spotlight email at least once per cycle",
+    "categories": ["Shoes", "Handbags", "Jewelry", "Watches", "Clothing", "Accessories"],
+    "frequencyWeeks": 6,
+    "rationale": "Shoes (211 in-stock) and Handbags are the highest-revenue accessory categories and resonate across all personas. Jewelry (284 in-stock) drives add-on and gifting purchases. Watches are the aspiration/occasion category. Clothing spotlights reinforce AK as a full outfit destination, not just accessories."
+  },
+  "personaRotation": {
+    "description": "All 4 personas should be the primary target in at least one email and one IG post per month",
+    "rotationWeeks": 4,
+    "personas": [
+      {
+        "name": "The Polished Professional",
+        "primaryContentTypes": ["solution capsule", "category spotlight — workwear shoes/clothing"],
+        "topTopics": ["5-day work outfit formulas", "pieces that transition desk to dinner", "structured bags for the boardroom", "wrinkle-resistant fabrics"],
+        "avoidTopics": ["trend-led content", "weekend casual", "anything with 'effortless' or 'fresh'"]
+      },
+      {
+        "name": "The Emerging Leader",
+        "primaryContentTypes": ["persona moment — career milestone", "category spotlight — shoes/jewelry"],
+        "topTopics": ["how to look senior at 28", "commuter-friendly shoes", "jewelry that elevates basics", "first board presentation outfit"],
+        "avoidTopics": ["high price-point positioning", "aspirational loft photography", "girlboss language"]
+      },
+      {
+        "name": "The Weekend Sophisticate",
+        "primaryContentTypes": ["story-led", "component-story"],
+        "topTopics": ["Saturday errands with polish", "brunch to gallery to dinner", "casual-but-considered dressing", "investment casual pieces"],
+        "avoidTopics": ["workwear framing", "office occasions", "productivity messaging"]
+      },
+      {
+        "name": "The Occasion Dresser",
+        "primaryContentTypes": ["single-hero", "story-led"],
+        "topTopics": ["wedding guest outfits", "holiday party circuit", "milestone event dressing", "Mother's Day gifting"],
+        "avoidTopics": ["workwear", "capsule wardrobes", "everyday staples"]
+      }
+    ]
+  },
+  "instagramWeeklyMix": {
+    "description": "Target IG post type distribution per week — 5 posts total",
+    "slots": [
+      {
+        "type": "product",
+        "label": "Product Feature",
+        "perWeek": 2,
+        "description": "Clean product shot with precise occasion copy and styling context. Name the specific moment — 'The bag for the long-haul flight' not 'Shop our travel edit.' Tag the product. Price in caption."
+      },
+      {
+        "type": "outfit",
+        "label": "Outfit / Styling Post",
+        "perWeek": 2,
+        "description": "2-3 AK pieces styled into a complete look for a named occasion. Show the blazer with the pant AND the shoe. Short declarative caption, no more than 3 lines. One strong hook sentence."
+      },
+      {
+        "type": "editorial",
+        "label": "Brand POV / Editorial",
+        "perWeek": 1,
+        "description": "Brand voice content — no hard product push. A manifesto line, a styling truth, a behind-the-design thought. This is the post that earns saves and shares. Tone: authoritative, considered, never self-congratulatory."
+      }
+    ]
+  },
+  "heroWeeklyFocus": {
+    "description": "Hero banner hierarchy",
+    "priority": [
+      "If a campaign is active: reinforce the campaign message and week's arc theme",
+      "If a category spotlight email is going out this week: match hero to that category",
+      "Default: feature the week's highest-priority persona moment with a complete outfit visual"
+    ]
+  },
+  "globalRules": [
+    "Every email must feature at least one clothing item (dress, blazer, jacket, pant, skirt) — never an accessories-only email",
+    "No single category should represent more than 60% of featured products across all content in one week",
+    "The subject line must match what is actually in the email — if it claims '3 looks' there must be exactly 3 looks",
+    "Every Instagram outfit post must name a specific occasion, not a generic one ('the Tuesday client lunch', not 'work')",
+    "The Polished Professional and Emerging Leader personas together should be the target of at least 3 of every 4 emails — they are the primary commercial audience",
+    "Jewelry and shoes should appear in at least 50% of email looks as add-on opportunity items",
+    "Category spotlight emails should reference the Shopify collection URL in the CTA, not the homepage",
+    "Copy tone across all channels: short declarative sentences, no exclamation points, no words: fresh, effortless, trendy, stunning, must-have, chic, vibrant"
+  ]
+}

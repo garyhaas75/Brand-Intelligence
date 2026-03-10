@@ -32,6 +32,7 @@ const SEED_VALIDATORS = {
   'agentic_search.json':          (d) => Array.isArray(d?.queries) && d.queries.length > 0,
   'ownable_events.json':          (d) => Array.isArray(d) && d.length > 0,
   'campaigns.json':               (d) => Array.isArray(d) && d.some(c => Array.isArray(c.storyArc) && c.storyArc.length > 0),
+  'content_strategy.json':        (d) => d && Array.isArray(d.globalRules) && d.globalRules.length > 0,
 };
 
 // On startup: copy seed file if live file is missing or fails validation.
@@ -917,6 +918,14 @@ const CONTENT_FEEDBACK_LOG = path.join(DATA_DIR, 'content_feedback_log.json');
 function loadContentPreferences() {
   try { return JSON.parse(fs.readFileSync(CONTENT_PREFS_FILE, 'utf8')); } catch { return null; }
 }
+
+const CONTENT_STRATEGY_FILE = path.join(DATA_DIR, 'content_strategy.json');
+function loadContentStrategy() {
+  try { return fs.existsSync(CONTENT_STRATEGY_FILE) ? JSON.parse(fs.readFileSync(CONTENT_STRATEGY_FILE, 'utf8')) : null; } catch { return null; }
+}
+function saveContentStrategy(strategy) {
+  fs.writeFileSync(CONTENT_STRATEGY_FILE, JSON.stringify({ ...strategy, updatedAt: new Date().toISOString() }, null, 2));
+}
 function saveContentPreferences(data) {
   data.updatedAt = new Date().toISOString();
   fs.writeFileSync(CONTENT_PREFS_FILE, JSON.stringify(data, null, 2));
@@ -1302,6 +1311,29 @@ Past corrections (apply these lessons):
 ${prefs.revisedExamples.slice(-5).map(e => `- Feedback "${e.feedback}" → changed "${e.original}" to "${e.revised}"`).join('\n')}` : ''}
 ` : '';
 
+  // Inject content strategy rules
+  const strategy = loadContentStrategy();
+  const strategyContext = strategy ? `
+CONTENT STRATEGY — honor when selecting email types, Instagram angles, and product focus:
+
+Email monthly mix (targets per 4-week month):
+${(strategy.monthlyEmailMix?.slots || []).map(s => `  - ${s.label} (target: ${s.perMonth}x/month, templates: ${s.templates.join('/')}): ${s.description}`).join('\n')}
+
+Instagram weekly mix (targets per week):
+${(strategy.instagramWeeklyMix?.slots || []).map(s => `  - ${s.label} (target: ${s.perWeek}x/week): ${s.description}`).join('\n')}
+
+Category rotation order: ${(strategy.categoryRotation?.categories || []).join(' → ')}
+Rule: No category should go unspotlighted for more than ${strategy.categoryRotation?.frequencyWeeks || 6} weeks.
+
+Persona rotation: Cycle all personas so each is the primary target at least once every ${strategy.personaRotation?.rotationWeeks || 4} weeks.
+${(strategy.personaRotation?.personas || []).map(p => `  - ${p.name}: focus on ${p.topTopics?.slice(0, 2).join(', ')}; avoid ${p.avoidTopics?.slice(0, 1).join(', ')}`).join('\n')}
+
+Hero banner hierarchy: ${(strategy.heroWeeklyFocus?.priority || []).join(' | ')}
+
+Global content rules:
+${(strategy.globalRules || []).map(r => `  - ${r}`).join('\n')}
+` : '';
+
   // ── System prompt: stable brand context, personas, schemas, rules ──────────
   const systemPrompt = `You are a marketing strategist, fashion stylist, and copywriter for Anne Klein (anneklein.com). You generate weekly content plans — email campaigns, Instagram posts, and hero banners — that reflect the Anne Klein brand: sophisticated professional fashion for accomplished women 35–55.
 
@@ -1309,7 +1341,7 @@ ${brandContext}
 
 CUSTOMER PERSONAS:
 ${personasContext}
-${prefsContext}
+${prefsContext}${strategyContext}
 OUTPUT SCHEMAS — every item must match one of these exactly:
 
 For EMAIL (looks-based templates: multi-look, story-led, category-focus, single-hero):
@@ -1614,6 +1646,31 @@ app.get('/api/shopify/products', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// POST /api/shopify/catalog/refresh — bust 30-min cache and re-fetch all products immediately
+app.post('/api/shopify/catalog/refresh', async (_req, res) => {
+  if (!shopifyConfigured()) return res.status(400).json({ error: 'Shopify not configured' });
+  try {
+    invalidateCache();
+    const products = await getInStockProducts({ limit: 9999 });
+    res.json({ ok: true, count: products.length, refreshedAt: new Date().toISOString() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/content-strategy — load the persistent content strategy config
+app.get('/api/content-strategy', (_req, res) => {
+  res.json({ ok: true, strategy: loadContentStrategy() });
+});
+
+// PUT /api/content-strategy — save updated content strategy config
+app.put('/api/content-strategy', (req, res) => {
+  const { strategy } = req.body || {};
+  if (!strategy) return res.status(400).json({ error: 'strategy required' });
+  saveContentStrategy(strategy);
+  res.json({ ok: true, strategy: loadContentStrategy() });
 });
 
 // POST /api/shopify/check-availability — check current stock for given handles
