@@ -363,13 +363,7 @@ async function pushProduct(product) {
   // 4. Push category-specific custom metafields (material, fit_type, metal_finish, etc.)
   await pushCategoryMetafields(productGid, suggested);
 
-  // 5. Push Shopify taxonomy category metafields (namespace: shopify — "Category metafields" in admin)
-  //    Populates: age-group, target-gender, fabric, care-instructions, neckline, sleeve-length-type
-  if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup)) {
-    await pushShopifyTaxonomyMetafields(productGid, suggested);
-  }
-
-  // 6. Push image alt text via fileUpdate
+  // 5. Push image alt text via fileUpdate
   if (suggested.alt_text && mediaId) {
     await pushAltText(mediaId, suggested.alt_text);
   }
