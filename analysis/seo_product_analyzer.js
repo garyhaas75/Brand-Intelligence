@@ -501,7 +501,8 @@ const TYPE_SCHEMAS = {
 // Maps our analyzer field keys → Shopify metaobject cache keys.
 // These fields get constrained to exact Shopify valid values when cache is available.
 const TAXONOMY_FIELD_CACHE_MAP = {
-  material:          'fabric',
+  material:          'material',
+  closure_type:      'closure-type',
   care_instructions: 'care-instructions',
   neckline:          'neckline',
   sleeve_length:     'sleeve-length-type',
