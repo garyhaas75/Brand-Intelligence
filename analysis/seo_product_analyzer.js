@@ -31,7 +31,6 @@ require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
 const { getBrandContext } = require('../utils/brand_context');
 
 const LOG_FILE       = path.join(__dirname, '../logs/seo_product_analyzer.log');
@@ -144,56 +143,12 @@ function saveSuggestions(data) {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
 }
 
-// Resize Shopify CDN image URLs to max 600px wide before fetching.
-// A full-res product photo is 2-4MB; the 600px version is ~60-120KB.
-// Sending 4MB base64 to Claude takes minutes to upload — this caps it at seconds.
-// Format: image.jpg?v=xxx  →  image_600x.jpg?v=xxx
-function resizeShopifyUrl(url, width = 600) {
+// Resize Shopify CDN image URLs to max 800px wide.
+// Claude fetches from URL directly — this just keeps the image a sensible size.
+// Format: image.jpg?v=xxx  →  image_800x.jpg?v=xxx
+function resizeShopifyUrl(url, width = 800) {
   if (!url || !url.includes('cdn.shopify.com')) return url;
   return url.replace(/(\.\w{3,4})(\?|$)/, `_${width}x$1$2`);
-}
-
-// Fetch image as base64 for Claude Vision.
-// Uses Promise.race with a hard 15s wall-clock deadline — unconditionally wins
-// regardless of whether the TCP handshake or data transfer stalls.
-function fetchImageBase64(url) {
-  if (!url || !url.startsWith('http')) return Promise.resolve(null);
-
-  const deadline = new Promise(resolve => setTimeout(() => resolve(null), 15000));
-
-  const doFetch = new Promise((resolve) => {
-    const req = https.get(url, (res) => {
-      // Follow a single redirect if needed
-      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
-        const redir = new Promise((r) => {
-          const r2 = https.get(res.headers.location, (res2) => {
-            const chunks = [];
-            res2.on('data', c => chunks.push(c));
-            res2.on('end', () => {
-              const buf = Buffer.concat(chunks);
-              const ct = res2.headers['content-type'] || 'image/jpeg';
-              r({ base64: buf.toString('base64'), mediaType: ct.split(';')[0] });
-            });
-            res2.on('error', () => r(null));
-          });
-          r2.on('error', () => r(null));
-        });
-        redir.then(resolve);
-        return;
-      }
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => {
-        const buf = Buffer.concat(chunks);
-        const ct = res.headers['content-type'] || 'image/jpeg';
-        resolve({ base64: buf.toString('base64'), mediaType: ct.split(';')[0] });
-      });
-      res.on('error', () => resolve(null));
-    });
-    req.on('error', () => resolve(null));
-  });
-
-  return Promise.race([doFetch, deadline]);
 }
 
 // ─── Product filtering ────────────────────────────────────────────────────────
@@ -558,26 +513,20 @@ function getCategoryPromptSection(specificType, categoryGroup) {
 
 // ─── Main analysis function ───────────────────────────────────────────────────
 async function analyzeProduct(client, product, brandContext) {
-  // Resize Shopify CDN images to 600px wide before fetching — full-res images
-  // are 2-4MB and take minutes to upload to the Claude API.
+  // Pass the image URL directly to Claude — Anthropic's servers fetch it.
+  // No local download, no base64 encoding, no large upload. Near-instant.
   const imageUrl = resizeShopifyUrl(product.image);
-  log(`    → fetching image${imageUrl !== product.image ? ' (600px)' : ''}…`);
-  const t0 = Date.now();
-  const imageData = imageUrl ? await fetchImageBase64(imageUrl) : null;
-  if (imageData) {
-    log(`    → image: ${Math.round(imageData.base64.length / 1024)}KB base64 (${Date.now() - t0}ms)`);
-  } else {
-    log(`    → image: none (${Date.now() - t0}ms)`);
-  }
+  const hasImage = !!(imageUrl && imageUrl.startsWith('http'));
+
   const categoryGroup = detectCategoryGroup(product.category);
   const specificType = detectSpecificType(product);
   const catSection = getCategoryPromptSection(specificType, categoryGroup);
 
   const content = [];
-  if (imageData) {
+  if (hasImage) {
     content.push({
       type: 'image',
-      source: { type: 'base64', media_type: imageData.mediaType, data: imageData.base64 },
+      source: { type: 'url', url: imageUrl },
     });
   }
 
@@ -599,16 +548,16 @@ Category: ${product.category || 'Unknown'} (type: ${categoryGroup})
 Price: ${product.price || 'Unknown'}
 Current description: ${(product.description || '').substring(0, 900)}
 Current tags: ${existingTags || 'none'}
-${imageData ? 'Product image included above.' : 'No image available.'}
+${hasImage ? 'Product image included above.' : 'No image available.'}
 
-${imageData ? 'First, analyze the product image: material appearance, silhouette/cut, construction details, occasion suitability.' : ''}
+${hasImage ? 'First, analyze the product image: material appearance, silhouette/cut, construction details, occasion suitability.' : ''}
 
 Generate ALL of the following fields:
 
 1. meta_title: Under 60 characters. Product type + key attribute + brand name. Natural, not keyword-stuffed. Example: "Ponte Blazer with Welt Pockets | Anne Klein"
 2. meta_description: Under 160 characters. Lead with the purchase reason for a professional woman. Include 1-2 natural search phrases. Soft CTA at end.
 3. tags: 6-10 NEW search-friendly SEO tags to ADD alongside the existing tags. Mix: product type, occasion (work, office, professional), style descriptor. Do NOT repeat or duplicate any existing tag. Do NOT include operational codes (style numbers, campaign names, season codes).
-4. image_insights: ${imageData ? '1-2 sentences on what the image reveals about material, silhouette, and occasion that the current description misses.' : 'null'}
+4. image_insights: ${hasImage ? '1-2 sentences on what the image reveals about material, silhouette, and occasion that the current description misses.' : 'null'}
 5. alt_text: Under 125 characters. Descriptive image alt text. Describe what is literally shown: product type, color, key style details. Do NOT start with "Image of" or "Photo of".
 6. geo_description: 2-3 sentences for AI assistant discoverability. Answer a query like "best blazers for work" or "professional outfit ideas". Name product type and brand naturally. Include one specific functional feature. No superlatives.
 7. suggested_description: A fresh Shopify product description, 150-200 words. Format as clean HTML with 2-3 <p> tags. Structure: (1) lead sentence naming the specific occasion + product type and its standout feature, (2) 2-3 sentences on construction details, fabric feel, and functional benefits — pull from the image and description, be specific, (3) closing sentence on versatility or styling context for a professional woman. Follow ALL brand writing rules from the context above. No exclamation marks. Short declarative sentences. Never use: fresh, effortless, trendy, stunning, must-have, chic, vibrant.
