@@ -1106,7 +1106,7 @@ async function critiqueAndRevise(item, warnings, anthropic) {
   try {
     const res = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2000,
+      max_tokens: 4000,
       messages: [{
         role: 'user',
         content: `You are a fashion editor and copywriter for Anne Klein reviewing a generated email content card.
@@ -1159,7 +1159,7 @@ async function visionValidateLooks(item, anthropic, catalogByHandle) {
 
       const res = await anthropic.messages.create({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 300,
+        max_tokens: 500,
         messages: [{
           role: 'user',
           content: [
@@ -1240,7 +1240,7 @@ app.post('/api/weekly-plan/generate', async (req, res) => {
     .map(i => ({ channel: i.channel, theme: i.theme, subjectLine: i.subjectLine, date: i.date }));
 
   // Fetch rich product catalog for Claude (grouped by category, with descriptions + tags)
-  const productCatalog = await getProductCatalogForPrompt({ perCategory: 6 }).catch(() => '');
+  const productCatalog = await getProductCatalogForPrompt({ perCategory: 12 }).catch(() => '');
 
   // Build handle → product map for vision validation (reuses the 30-min Shopify cache)
   const allProducts = await getInStockProducts({ limit: 999 }).catch(() => []);
@@ -1302,29 +1302,17 @@ Past corrections (apply these lessons):
 ${prefs.revisedExamples.slice(-5).map(e => `- Feedback "${e.feedback}" → changed "${e.original}" to "${e.revised}"`).join('\n')}` : ''}
 ` : '';
 
-  const prompt = `You are a marketing strategist and copywriter for Anne Klein. Generate a weekly content plan for the week of ${weekStart}.
+  // ── System prompt: stable brand context, personas, schemas, rules ──────────
+  const systemPrompt = `You are a marketing strategist, fashion stylist, and copywriter for Anne Klein (anneklein.com). You generate weekly content plans — email campaigns, Instagram posts, and hero banners — that reflect the Anne Klein brand: sophisticated professional fashion for accomplished women 35–55.
 
 ${brandContext}
-
-PLANNING WEEK: ${weekStart}
-
-${campaignContext}
-${productContext ? '\n' + productContext : ''}
-UPCOMING OWNABLE EVENTS (next 35 days, plan content to land BEFORE the event):
-${eventsContext}
-
-RECENT SENT CONTENT (last 8 weeks — avoid repeating these themes/angles):
-${sentContext}
 
 CUSTOMER PERSONAS:
 ${personasContext}
 ${prefsContext}
-YOUR TASK:
-Generate EXACTLY ${volumes.email || 0} email pieces, ${volumes.instagram || 0} Instagram posts, and ${volumes.hero || 0} hero/site banner pieces for this week.
+OUTPUT SCHEMAS — every item must match one of these exactly:
 
-Return a JSON array (no markdown, no commentary) with EXACTLY ${(volumes.email || 0) + (volumes.instagram || 0) + (volumes.hero || 0)} items total. Each item must match this schema exactly:
-
-For EMAIL:
+For EMAIL (looks-based templates: multi-look, story-led, category-focus, single-hero):
 {
   "channel": "email",
   "campaignId": "<campaign id or null>",
@@ -1372,13 +1360,6 @@ For component-story template ONLY — omit "looks" entirely and use "sections" i
   }
 }
 
-Template guidance:
-- "multi-look": 3-4 named looks, each with 2-3 products — default for editorial/narrative campaign emails
-- "story-led": 1-2 looks, editorial narrative focus — best for event-driven emails (Mother's Day, etc.)
-- "category-focus": 1 look with 4-6 products from one category — best for category launches
-- "single-hero": 1 look with 1 hero product + 2 supporting items — best for hero product launches
-- "component-story": 3-4 sections each showing 2-3 options of ONE product type (all dresses, all shoes, all blazers, all bags) — best for capsule/workwear planning emails where the customer mixes and matches herself. Use this instead of multi-look when the email theme is about building a wardrobe, not showing specific outfit combinations. Subject line should speak to the wardrobe concept, not claim a specific number of outfits.
-
 For INSTAGRAM:
 {
   "channel": "instagram",
@@ -1409,34 +1390,60 @@ For HERO:
   }
 }
 
-Rules:
+TEMPLATE GUIDANCE:
+- "multi-look": 3-4 named looks, each with 2-3 products — default for editorial/narrative campaign emails
+- "story-led": 1-2 looks, editorial narrative focus — best for event-driven emails (Mother's Day, etc.)
+- "category-focus": 1 look with 4-6 products from one category — best for category launches
+- "single-hero": 1 look with 1 hero product + 2 supporting items — best for hero product launches
+- "component-story": 3-4 sections each showing 2-3 options of ONE product type (all dresses, all shoes, all blazers, all bags) — best for capsule/workwear planning emails where the customer mixes and matches herself. Use this instead of multi-look when the email theme is about building a wardrobe, not showing specific outfit combinations.
+
+RULES:
 - Each piece must feel DIFFERENT from the others — vary tone, product focus, and angle
 - If a campaign arc week is defined, ALL pieces should reinforce that arc's theme and key message
 - If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
-- Do NOT repeat themes from recent sent history listed above
+- Do NOT repeat themes from recent sent history provided in the user message
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
-- For EMAIL looks (multi-look, story-led, category-focus, single-hero templates): assign products from the IN-STOCK PRODUCTS catalog above. Each look must have at least one UNIQUE hero product not used in any other look — do NOT repeat the same product across multiple looks. Each look gets 2-3 complementary products. Apply the outfit logic rules: structured jacket needs a soft piece underneath, every look needs a bottom or dress, shoes should appear. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
-- For EMAIL sections (component-story template): each section must contain 2-3 products from the SAME category type — all dresses, OR all shoes, OR all blazers, OR all bags. Never mix clothing and accessories in one section. Section labels should be evocative ("The Dress", "The Shoe", "The Layer", "The Foundation", "The Topper", "The Bag"). Subject line should speak to the wardrobe concept — do NOT claim a specific number of outfits.
-- PERSONA TAILORING: Write every email as if you ARE a trusted stylist speaking directly to that specific persona. Use the persona's fashion goals, pain points, and her own voice (quoteExample) to shape the look names, angles, and subject line. The Polished Professional should feel understood and efficient. The Emerging Leader should feel mentored not lectured. The Refined Rewinder should feel respected not patronized. The Practical Multitasker should feel seen not judged.
+- For EMAIL looks (multi-look, story-led, category-focus, single-hero): each look must have at least one UNIQUE hero product not used in any other look. Each look gets 2-3 complementary products. Structured jacket needs a soft piece underneath; every look needs a bottom or dress; shoes should appear. Use the handle exactly as shown in the catalog. If no catalog was provided, use empty products arrays.
+- For EMAIL sections (component-story): each section must contain 2-3 products from the SAME category type — all dresses, OR all shoes, OR all blazers, OR all bags. Never mix categories in one section. Subject line must speak to the wardrobe concept, not claim a specific number of outfits.
+- PERSONA TAILORING: Write every email as if you ARE a trusted stylist speaking directly to that specific persona. Use the persona's fashion goals, pain points, and her own voice to shape look names, angles, and subject lines. The Polished Professional should feel understood and efficient. The Emerging Leader should feel mentored not lectured. The Refined Rewinder should feel respected not patronized. The Practical Multitasker should feel seen not judged.
 
-CRITICAL EMAIL RULES for looks-based templates (multi-look, story-led, category-focus, single-hero) — check these before returning JSON:
-1. SUBJECT LINE MATH: Count the number of looks you wrote. If your subject line says "N outfits", "N looks", or "N days" — the looks array MUST contain exactly N looks. "All week" means 5 looks. "3 outfits" means 3 looks. If the count is wrong, either add the missing looks or rewrite the subject line to match.
-2. NO REPEATED HEROES: Every look must have a DIFFERENT first (hero) product. The same product handle must not appear as the hero in more than one look. If you find yourself reusing a hero, swap it for a different product from the catalog.
-3. COMPLETE OUTFITS ONLY: Each look must have at least 2 products — a top or jacket AND a bottom or dress. Shoes should appear in at least half the looks. A single product is not a look.
-4. OUTFIT LOGIC: Never pair two stiff/structured pieces (e.g. blazer over a sheath dress is fine; blazer over a structured jacket is not). Every structured top needs something soft underneath or alongside.
-5. SELF-CHECK BEFORE OUTPUT: Re-read your subject line. Count your looks. Do they match? Are all hero products unique? If not — fix it before returning.
-CRITICAL RULES for component-story emails — check these before returning JSON:
-1. ONE CATEGORY PER SECTION: Each section must contain products of the SAME type ONLY. "The Dress" = only dresses. "The Shoe" = only shoes. "The Layer" = only jackets/blazers/cardigans. NEVER put a dress and a shoe in the same section. NEVER mix two product types in one section.
-2. COMPONENT NAMES ONLY: Section labels must name a product category, not an outfit. CORRECT: "The Dress", "The Shoe", "The Layer", "The Bag", "The Jewel". WRONG: "The Layered Look", "The Complete Outfit", "The Paired Set", "The Capsule Look".
-3. NO DAY OR OUTFIT CLAIMS: Do NOT write "5 days", "all week", "3 outfits", or "N looks" anywhere in the subject line or preview text. Component-story emails show options — they do not promise a weekly outfit schedule. Use wardrobe language instead: "Your spring foundation", "The pieces that carry you", "Three ways to dress this season".
-- Return ONLY the JSON array, starting with [ and ending with ]`;
+CRITICAL EMAIL RULES for looks-based templates — verify before outputting:
+1. SUBJECT LINE MATH: If your subject says "N outfits", "N looks", or "N days" — the looks array MUST contain exactly N looks. "All week" = 5 looks. Fix the count or rewrite the subject.
+2. NO REPEATED HEROES: Every look must have a DIFFERENT first (hero) product handle. Swap if reused.
+3. COMPLETE OUTFITS ONLY: Each look needs at least 2 products — a top or jacket AND a bottom or dress. Shoes in at least half the looks. No look = accessories only.
+4. OUTFIT LOGIC: Never pair two stiff/structured pieces. Every structured top needs something soft underneath.
+5. SELF-CHECK: Re-read subject line, count looks, verify all hero products are unique before returning.
+
+CRITICAL RULES for component-story emails — verify before outputting:
+1. ONE CATEGORY PER SECTION: "The Dress" = only dresses. "The Shoe" = only shoes. NEVER mix two product types in one section.
+2. COMPONENT NAMES ONLY: Labels must name a product category. CORRECT: "The Dress", "The Shoe", "The Layer". WRONG: "The Layered Look", "The Complete Outfit".
+3. NO DAY OR OUTFIT CLAIMS: Do NOT write "5 days", "all week", or "N outfits" in subject or preview. Use wardrobe language: "Your spring foundation", "The pieces that carry you".`;
+
+  // ── User message: week-specific context + task ───────────────────────────
+  const userPrompt = `Generate a weekly content plan for the week of ${weekStart}.
+
+PLANNING WEEK: ${weekStart}
+
+${campaignContext}
+${productContext ? '\nIN-STOCK PRODUCTS (use these handles exactly):\n' + productContext : ''}
+UPCOMING OWNABLE EVENTS (next 35 days — plan content to land BEFORE the event):
+${eventsContext}
+
+RECENT SENT CONTENT (last 8 weeks — do NOT repeat these themes/angles):
+${sentContext}
+
+YOUR TASK:
+Generate EXACTLY ${volumes.email || 0} email pieces, ${volumes.instagram || 0} Instagram posts, and ${volumes.hero || 0} hero/site banner pieces for this week.
+
+Return ONLY a JSON array with EXACTLY ${(volumes.email || 0) + (volumes.instagram || 0) + (volumes.hero || 0)} items, starting with [ and ending with ]. No markdown, no commentary.`;
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   try {
     const msg = await anthropic.messages.create({
       model: 'claude-opus-4-6',
       max_tokens: 8000,
-      messages: [{ role: 'user', content: prompt }],
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
     });
 
     const raw = msg.content[0].text.trim();
