@@ -300,8 +300,18 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
   `, { metafields });
 
   const errors = data?.metafieldsSet?.userErrors || [];
-  if (errors.length) throw new Error(errors.map(e => `${e.field}: ${e.message}`).join('; '));
-  return { ok: true, count: metafields.length };
+  const accessErrors = errors.filter(e => e.message?.includes('Access to this namespace'));
+  const otherErrors  = errors.filter(e => !e.message?.includes('Access to this namespace'));
+  if (accessErrors.length) {
+    // Taxonomy fields need to be added in Shopify Admin first:
+    // Open the product → Category metafields → click "+ Fabric", "+ Neckline", etc.
+    // Once added there, these will populate automatically on the next push.
+    const blocked = metafields.filter((_, i) => accessErrors.some(e => e.field?.includes(String(i)))).map(f => f.key);
+    log(`    INFO: taxonomy fields need to be added in Shopify Admin first: ${blocked.join(', ') || accessErrors.length + ' fields'}`);
+  }
+  if (otherErrors.length) throw new Error(otherErrors.map(e => `${e.field}: ${e.message}`).join('; '));
+  const pushed = metafields.length - accessErrors.length;
+  return { ok: true, count: pushed };
 }
 
 // Build category-specific metafield entries (namespace: custom).
@@ -356,6 +366,9 @@ async function pushGeoMetafields(productGid, suggested) {
   for (const key of GEO_FIELD_KEYS) {
     const val = suggested[key];
     if (val === null || val === undefined) continue;
+    // Skip empty objects {} and empty arrays [] — means Claude returned nothing useful
+    if (typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length === 0) continue;
+    if (Array.isArray(val) && val.length === 0) continue;
     metafields.push({
       ownerId: productGid,
       namespace: 'custom',

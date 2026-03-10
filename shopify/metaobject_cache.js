@@ -312,11 +312,12 @@ function resolveToGid(cache, fieldKey, displayValue) {
 /**
  * Get the correct Shopify metafield type for a cache field.
  * - 'metaobject' source → 'list.metaobject_reference'
- * - 'taxonomy' source   → 'list.taxonomy_reference'
+ * - 'taxonomy' source   → 'list.product_taxonomy_value_reference'
+ *   (TaxonomyValue GIDs are gid://shopify/TaxonomyValue/X — referenced via product_taxonomy_value_reference)
  */
 function getMetafieldType(cache, fieldKey) {
   const source = cache?.[fieldKey]?.source;
-  return source === 'taxonomy' ? 'list.taxonomy_reference' : 'list.metaobject_reference';
+  return source === 'taxonomy' ? 'list.product_taxonomy_value_reference' : 'list.metaobject_reference';
 }
 
 module.exports = { buildCache, buildTaxonomyAttributeCache, buildFullCache, getValidValues, resolveToGid, getMetafieldType };
