@@ -38,12 +38,23 @@ async function getInStockProducts({ limit = 30, productType } = {}) {
   }
 
   try {
-    const { data } = await axios.get(shopifyUrl('/products.json'), {
-      headers: shopifyHeaders(),
-      params: { fields: 'id,title,handle,product_type,body_html,tags,variants,images', limit: 250 },
-    });
+    // Paginate through all products (Shopify caps each page at 250)
+    let allRaw = [];
+    let params = { fields: 'id,title,handle,product_type,body_html,tags,variants,images', limit: 250 };
+    while (true) {
+      const { data, headers } = await axios.get(shopifyUrl('/products.json'), {
+        headers: shopifyHeaders(),
+        params,
+      });
+      allRaw = allRaw.concat(data.products || []);
+      // Parse Link header for next page cursor
+      const link = headers['link'] || '';
+      const nextMatch = link.match(/<[^>]+page_info=([^&>]+)[^>]*>;\s*rel="next"/);
+      if (!nextMatch) break;
+      params = { fields: params.fields, limit: 250, page_info: nextMatch[1] };
+    }
 
-    const all = (data.products || [])
+    const all = allRaw
       .map(p => {
         const qty = (p.variants || []).reduce((sum, v) => sum + (parseInt(v.inventory_quantity) || 0), 0);
         const price = parseFloat(p.variants?.[0]?.price || 0);
@@ -87,7 +98,7 @@ async function getInStockProducts({ limit = 30, productType } = {}) {
  */
 async function getProductCatalogForPrompt({ perCategory = 6 } = {}) {
   if (!isConfigured()) return '';
-  const all = await getInStockProducts({ limit: 250 });
+  const all = await getInStockProducts({ limit: 9999 });
   if (!all.length) return '';
 
   // Group by productType
