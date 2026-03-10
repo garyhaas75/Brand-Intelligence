@@ -526,9 +526,12 @@ function getCategoryPromptSection(specificType, categoryGroup, metaCache) {
     const fieldKey = fieldStr.slice(0, colonIdx).trim();
     const cacheKey = TAXONOMY_FIELD_CACHE_MAP[fieldKey];
     if (!cacheKey) return fieldStr;
-    const validValues = getValidValues(metaCache, cacheKey);
-    if (!validValues || !validValues.length) return fieldStr;
-    return `${fieldKey}: Choose EXACTLY one value from this valid Shopify list (return null if none match — do NOT return any other value): ${validValues.join(', ')}.`;
+    const rawValues = getValidValues(metaCache, cacheKey);
+    if (!rawValues || !rawValues.length) return fieldStr;
+    // Exclude "Other" — Claude should return null rather than use a catch-all placeholder.
+    const validValues = rawValues.filter(v => v !== 'Other');
+    if (!validValues.length) return fieldStr;
+    return `${fieldKey}: Choose EXACTLY one value from this valid Shopify list — only if it is a clear, accurate match. Return null if no value is a precise fit (do NOT pick "close enough" or guess): ${validValues.join(', ')}.`;
   });
 
   const fieldLines = constrainedFields.map((f, i) => `${i + 8}. ${f}`).join('\n');
