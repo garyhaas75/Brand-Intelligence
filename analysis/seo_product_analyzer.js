@@ -701,18 +701,17 @@ async function run() {
       };
 
       if ((FORCE || hrefArg) && analyzedHrefs.has(product.href)) {
-        // Update in place — preserve approval status and push state
+        // Update in place — preserve approval status but reset push state
+        // (analysis data has changed, old push is now stale)
         const idx = suggestions.products.findIndex(p => p.href === product.href);
         const existing = suggestions.products[idx];
         suggestions.products[idx] = {
           ...entry,
           status: existing.status,
           approvedAt: existing.approvedAt,
-          pushStatus: existing.pushStatus,
-          pushedAt: existing.pushedAt,
-          shopifyGid: existing.shopifyGid,
+          // pushStatus/pushedAt intentionally reset — new analysis needs re-push
         };
-        log(`    → Updated (was ${existing.status})`);
+        log(`    → Updated (was ${existing.status}, push reset)`);
       } else {
         suggestions.products.push(entry);
       }
