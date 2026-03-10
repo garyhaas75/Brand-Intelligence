@@ -1329,6 +1329,8 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         // Instantly update the card from the response, then sync full state
         if (data.updatedItem) {
           setPlanItems(prev => prev.map(i => i.id === id ? data.updatedItem : i))
+          // Also update the preview modal if it's open for this item
+          setEmailPreviewItem(prev => prev?.id === id ? data.updatedItem : prev)
         }
         loadData()
       } else {

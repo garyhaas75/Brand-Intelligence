@@ -1790,6 +1790,8 @@ PRODUCT SWAPS — CRITICAL RULES:
 - ALWAYS pick replacement products from the IN-STOCK PRODUCTS list below. Never invent products.
 - When swapping a product, use the exact handle, name, and price from the catalog.
 - Product object format: { "handle": "exact-handle", "name": "Exact Product Name", "price": 00.00, "image": "copy image url exactly from catalog" }
+- EVERY product object MUST include the image field. If the catalog entry has an image URL, always copy it. Never omit the image field.
+- When returning the full sections or looks array, preserve the image field for every product that already had one. Only set image to null if the catalog genuinely has no image for that product.
 - For looks-based emails: return the full updated "looks" array with the swap applied.
 - For component-story emails: return the full updated "sections" array with the swap applied. Each section has { label, angle, products[] }.
 - If no suitable replacement exists in the catalog, say so in one sentence — do NOT invent a product.
