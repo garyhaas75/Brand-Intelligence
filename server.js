@@ -13,7 +13,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 const basicAuth = require('express-basic-auth');
 const { getBrandContext } = require('./utils/brand_context');
-const { getInStockProducts, getProductCatalogForPrompt, checkHandles, isConfigured: shopifyConfigured } = require('./shopify/inventory');
+const { getInStockProducts, getProductCatalogForPrompt, checkHandles, invalidateCache, isConfigured: shopifyConfigured } = require('./shopify/inventory');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
