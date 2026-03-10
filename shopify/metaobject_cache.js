@@ -4,19 +4,22 @@
  * Used by both the SEO analyzer (to constrain Claude's output to valid values)
  * and push_seo.js (to resolve exact display values to their store-specific GIDs).
  *
- * ALL Shopify category metafields (shopify.fabric, shopify.neckline, etc.) use
- * list.metaobject_reference type — not text. Each value is a store-specific GID
- * like gid://shopify/Metaobject/12345. This module discovers those GIDs from live
- * Shopify data via the Admin GraphQL API.
+ * ALL Shopify category metafields use list.metaobject_reference type.
+ * Each value is a store-specific GID like gid://shopify/Metaobject/12345.
+ *
+ * IMPORTANT: metaobjectDefinitions only returns merchant-created definitions,
+ * NOT Shopify's system-managed taxonomy metaobjects. We skip definition discovery
+ * and directly query metaobjects by well-known Shopify type strings instead.
+ *
+ * Type→key naming: Shopify metaobject type "shopify--material" → metafield key "material".
+ * Strip "shopify--" prefix from type to get the metafield key.
  *
  * Cache freshness: buildCache() always queries Shopify fresh — no disk caching.
- * Call once at the start of each analyzer/push run. Adds <1s per run (~2 GQL calls).
+ * Call once at the start of each analyzer/push run.
  *
- * Usage:
- *   const { buildCache, getValidValues, resolveToGid } = require('./metaobject_cache');
- *   const cache = await buildCache().catch(() => ({}));
- *   const fabrics = getValidValues(cache, 'fabric'); // ["Wool", "Cotton", ...]
- *   const gid = resolveToGid(cache, 'fabric', 'Wool'); // "gid://shopify/Metaobject/123"
+ * Run this file directly for diagnostics:
+ *   node shopify/metaobject_cache.js
+ *   node shopify/metaobject_cache.js --definitions  (list all metaobject definitions)
  */
 
 require('dotenv').config();
@@ -26,15 +29,24 @@ const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
 const ADMIN_TOKEN  = process.env.SHOPIFY_ADMIN_API_TOKEN;
 const API_VERSION  = process.env.SHOPIFY_API_VERSION || '2025-07';
 
-// Maps our field key → substring to search for in Shopify metaobject definition types.
-// Shopify taxonomy metaobjects are typically named like "shopify--fabric", "shopify--neckline", etc.
-const FIELD_KEY_TO_TYPE_PATTERN = {
-  'fabric':             'fabric',
-  'neckline':           'neckline',
-  'sleeve-length-type': 'sleeve-length',
-  'care-instructions':  'care-instruction',
-  'age-group':          'age-group',
-  'target-gender':      'target-gender',
+// Field keys and their Shopify type strings to query.
+// Key = cache field key (also used as the Shopify metafield key, without shopify-- prefix).
+// Candidates = type strings to try in order; first one with entries is used.
+const FIELD_KEY_CANDIDATES = {
+  'material':                  ['shopify--material'],
+  'closure-type':              ['shopify--closure-type'],
+  'occasion-style':            ['shopify--occasion-style'],
+  'age-group':                 ['shopify--age-group'],
+  'target-gender':             ['shopify--target-gender'],
+  'skirt-style':               ['shopify--skirt-style'],
+  'skirt-dress-length-type':   ['shopify--skirt-dress-length-type'],
+  'color-pattern':             ['shopify--color-pattern'],
+  'toe-style':                 ['shopify--toe-style'],
+  // Retained in case Shopify adds these entries later:
+  'fabric':                    ['shopify--fabric'],
+  'neckline':                  ['shopify--neckline'],
+  'sleeve-length-type':        ['shopify--sleeve-length-type'],
+  'care-instructions':         ['shopify--care-instructions'],
 };
 
 function shopifyGraphQL(query, variables = {}) {
@@ -67,10 +79,32 @@ function shopifyGraphQL(query, variables = {}) {
   });
 }
 
+// Fetch entries for a specific metaobject type. Returns [] if type doesn't exist.
+async function fetchEntries(type) {
+  try {
+    const data = await shopifyGraphQL(`
+      query GetEntries($type: String!) {
+        metaobjects(type: $type, first: 250) {
+          edges {
+            node {
+              id
+              displayName
+            }
+          }
+        }
+      }
+    `, { type });
+    return (data?.metaobjects?.edges || []).map(e => e.node).filter(e => e.displayName);
+  } catch {
+    return [];
+  }
+}
+
+// Fetch all merchant-visible metaobject definitions (for diagnostics only).
 async function fetchDefinitions() {
   const data = await shopifyGraphQL(`
     query {
-      metaobjectDefinitions(first: 100) {
+      metaobjectDefinitions(first: 250) {
         edges {
           node {
             type
@@ -83,26 +117,11 @@ async function fetchDefinitions() {
   return (data?.metaobjectDefinitions?.edges || []).map(e => e.node);
 }
 
-async function fetchEntries(type) {
-  const data = await shopifyGraphQL(`
-    query GetEntries($type: String!) {
-      metaobjects(type: $type, first: 250) {
-        edges {
-          node {
-            id
-            displayName
-          }
-        }
-      }
-    }
-  `, { type });
-  return (data?.metaobjects?.edges || []).map(e => e.node);
-}
-
 /**
  * Build a fresh lookup cache from Shopify.
  * Returns: { [fieldKey]: { type, nameToGid, gidToName, validValues } }
  *
+ * Only includes field keys that actually have entries in the store.
  * If Shopify credentials are not configured, returns {} gracefully.
  */
 async function buildCache() {
@@ -110,39 +129,32 @@ async function buildCache() {
     return {};
   }
 
-  const definitions = await fetchDefinitions();
   const cache = {};
+  const verbose = process.env.NODE_ENV !== 'test';
 
-  for (const [fieldKey, pattern] of Object.entries(FIELD_KEY_TO_TYPE_PATTERN)) {
-    const matched = definitions.find(d => d.type.toLowerCase().includes(pattern.toLowerCase()));
-    if (!matched) {
-      // Not found — log but don't fail
-      if (process.env.NODE_ENV !== 'test') {
-        console.log(`[metaobject_cache] WARN: no definition found for field "${fieldKey}" (pattern: "${pattern}")`);
-      }
-      continue;
-    }
+  for (const [fieldKey, candidates] of Object.entries(FIELD_KEY_CANDIDATES)) {
+    for (const typeStr of candidates) {
+      const entries = await fetchEntries(typeStr);
+      if (!entries.length) continue;
 
-    const entries = await fetchEntries(matched.type);
-    const nameToGid = {};
-    const gidToName = {};
-
-    for (const entry of entries) {
-      if (entry.displayName && entry.id) {
+      const nameToGid = {};
+      const gidToName = {};
+      for (const entry of entries) {
         nameToGid[entry.displayName] = entry.id;
         gidToName[entry.id] = entry.displayName;
       }
-    }
 
-    cache[fieldKey] = {
-      type: matched.type,
-      nameToGid,
-      gidToName,
-      validValues: Object.keys(nameToGid).sort(),
-    };
+      cache[fieldKey] = {
+        type: typeStr,
+        nameToGid,
+        gidToName,
+        validValues: Object.keys(nameToGid).sort(),
+      };
 
-    if (process.env.NODE_ENV !== 'test') {
-      console.log(`[metaobject_cache] ${fieldKey} (${matched.type}): ${Object.keys(nameToGid).length} entries — ${Object.keys(nameToGid).join(', ')}`);
+      if (verbose) {
+        console.log(`[metaobject_cache] ${fieldKey} (${typeStr}): ${entries.length} entries — ${Object.keys(nameToGid).slice(0, 8).join(', ')}${entries.length > 8 ? '…' : ''}`);
+      }
+      break;
     }
   }
 
@@ -151,8 +163,7 @@ async function buildCache() {
 
 /**
  * Get valid display-value strings for a field key.
- * Used to constrain Claude's output to exact Shopify values during analysis.
- * Returns array like ["Wool", "Cotton", "Silk"] or null if field not in cache.
+ * Returns array like ["Wool", "Cotton"] or null if field not in cache.
  */
 function getValidValues(cache, fieldKey) {
   return cache?.[fieldKey]?.validValues || null;
@@ -160,8 +171,7 @@ function getValidValues(cache, fieldKey) {
 
 /**
  * Resolve an exact display value to its Shopify metaobject GID.
- * Used at push time. Returns GID string or null if not found.
- * No fuzzy matching — Claude returns the exact valid value (constrained during analysis).
+ * Returns GID string or null if not found.
  */
 function resolveToGid(cache, fieldKey, displayValue) {
   if (!cache?.[fieldKey]?.nameToGid) return null;
@@ -169,3 +179,40 @@ function resolveToGid(cache, fieldKey, displayValue) {
 }
 
 module.exports = { buildCache, getValidValues, resolveToGid };
+
+// ─── Diagnostic CLI ───────────────────────────────────────────────────────────
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  (async () => {
+    if (!STORE_DOMAIN || !ADMIN_TOKEN) {
+      console.error('ERROR: SHOPIFY_STORE_DOMAIN and SHOPIFY_ADMIN_API_TOKEN must be set in .env');
+      process.exit(1);
+    }
+    console.log(`Shopify Metaobject Cache Diagnostic`);
+    console.log(`Store: ${STORE_DOMAIN} | API: ${API_VERSION}\n`);
+
+    if (args.includes('--definitions')) {
+      console.log('=== Metaobject Definitions ===');
+      const defs = await fetchDefinitions();
+      if (!defs.length) {
+        console.log('(none found)');
+      } else {
+        defs.forEach(d => console.log(`  type="${d.type}"  name="${d.name}"`));
+      }
+      console.log();
+    }
+
+    console.log('=== Cache Build ===');
+    const cache = await buildCache();
+    const keys = Object.keys(cache);
+    if (!keys.length) {
+      console.log('\nWARN: Cache is empty. No taxonomy metaobjects found in store.');
+    } else {
+      console.log(`\nCache: ${keys.length} field(s) populated`);
+      for (const [key, data] of Object.entries(cache)) {
+        console.log(`\n  ${key} (type: ${data.type}, ${data.validValues.length} entries)`);
+        data.validValues.forEach(v => console.log(`    - "${v}"  →  ${data.nameToGid[v]}`));
+      }
+    }
+  })().catch(err => { console.error('ERROR:', err.message); process.exit(1); });
+}

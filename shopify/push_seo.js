@@ -230,25 +230,32 @@ const SEO_FIELDS = new Set([
 ]);
 
 // Mapping from our analyzed field keys → Shopify shopify.* namespace category metafield keys.
-// These populate the "Category metafields" section in Shopify admin.
-// Value type: list.single_line_text_field — value must be a JSON-encoded string array.
+// Key = our field name, Value = Shopify metafield key (strip "shopify--" prefix from type name).
+// Derived from diagnostic: metaobjectDefinitions shows actual types available in this store.
+// - shopify--material → key 'material' (clothing fabric; entries: Polyester, Viscose, Cotton, Leather…)
+// - shopify--closure-type → key 'closure-type' (shoes/clothing)
+// - neckline, sleeve-length-type, care-instructions: NOT in this store — commented out
 const SHOPIFY_CATEGORY_FIELD_MAP = {
-  material:          'fabric',
-  care_instructions: 'care-instructions',
-  neckline:          'neckline',
-  sleeve_length:     'sleeve-length-type',
+  material:     'material',       // shopify--material (was 'fabric' — wrong key)
+  closure_type: 'closure-type',   // shopify--closure-type
+  // care_instructions: 'care-instructions',  // not in this store
+  // neckline:          'neckline',            // not in this store
+  // sleeve_length:     'sleeve-length-type',  // not in this store
 };
 
-// Category groups that get Shopify taxonomy metafields (age-group, target-gender, fabric, etc.)
-const CLOTHING_CATEGORY_GROUPS = new Set(['clothing']);
+// All product category groups that get Shopify taxonomy metafields pushed.
+// age-group="Adults" and target-gender="Female" apply to all AK products.
+// SHOPIFY_CATEGORY_FIELD_MAP fields (material, closure-type) only resolve if the
+// product's analyzed value exists in the metaobject cache — others are silently skipped.
+const CLOTHING_CATEGORY_GROUPS = new Set(['clothing', 'shoes', 'jewelry', 'handbags']);
 
 // Push Shopify-namespace category metafields (appear in "Category metafields" section in Shopify admin).
 // ALL category metafields use list.metaobject_reference type — NOT text. Each value is a JSON array
 // containing a store-specific GID like ["gid://shopify/Metaobject/12345"].
 //
-// age-group and target-gender are always "Adult" / "Women" for AK products.
-// material → fabric, care_instructions → care-instructions, neckline, sleeve_length are
-// resolved from the analyzer output (Claude returns exact valid values) via the metaobject cache.
+// Confirmed actual values from live store diagnostic:
+//   age-group: "Adults" (NOT "Adult")
+//   target-gender: "Female" (NOT "Women")
 async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
   if (!cache || !Object.keys(cache).length) {
     log('    SKIP taxonomy metafields — metaobject cache unavailable');
@@ -257,14 +264,15 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
 
   const metafields = [];
 
-  // age-group and target-gender are constants for AK (women's workwear brand)
-  const ageGid    = resolveToGid(cache, 'age-group', 'Adult');
-  const genderGid = resolveToGid(cache, 'target-gender', 'Women');
+  // age-group and target-gender are constants for AK (women's workwear brand).
+  // IMPORTANT: store values are "Adults" and "Female" — confirmed via diagnostic.
+  const ageGid    = resolveToGid(cache, 'age-group', 'Adults');
+  const genderGid = resolveToGid(cache, 'target-gender', 'Female');
   if (ageGid)    metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'age-group',     type: 'list.metaobject_reference', value: JSON.stringify([ageGid]) });
   if (genderGid) metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'target-gender', type: 'list.metaobject_reference', value: JSON.stringify([genderGid]) });
 
-  if (!ageGid)    log('    WARN: no GID for age-group="Adult" — check metaobject cache');
-  if (!genderGid) log('    WARN: no GID for target-gender="Women" — check metaobject cache');
+  if (!ageGid)    log('    WARN: no GID for age-group="Adults" — check metaobject cache');
+  if (!genderGid) log('    WARN: no GID for target-gender="Female" — check metaobject cache');
 
   // Analyzed taxonomy fields — Claude returned exact valid values (constrained during analysis)
   for (const [ourKey, shopifyKey] of Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)) {
@@ -403,7 +411,7 @@ async function pushProduct(product, metaCache) {
     if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup) && metaCache && Object.keys(metaCache).length) {
       const taxFields = Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)
         .map(([k, sk]) => `${sk}="${suggested[k] || '(none)'}"`).join(', ');
-      log(`    taxonomy metafields: age-group="Adult", target-gender="Women", ${taxFields}`);
+      log(`    taxonomy metafields: age-group="Adults", target-gender="Female", ${taxFields}`);
     }
     const geoFields = GEO_FIELD_KEYS.filter(k => suggested[k]).map(k => `${k}=✓`).join(', ');
     if (geoFields) log(`    GEO metafields: ${geoFields}`);
