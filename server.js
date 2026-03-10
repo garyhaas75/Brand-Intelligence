@@ -1606,7 +1606,7 @@ app.post('/api/weekly-plan/add-to-calendar', (req, res) => {
 
 // GET /api/shopify/products — in-stock product list for the product picker UI
 app.get('/api/shopify/products', async (req, res) => {
-  const limit = parseInt(req.query.limit) || 100;
+  const limit = parseInt(req.query.limit) || 999;
   const productType = req.query.type || undefined;
   try {
     const products = await getInStockProducts({ limit, productType });

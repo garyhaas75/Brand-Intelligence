@@ -1211,7 +1211,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
     if (browseProducts.length > 0) {
       products = browseProducts
     } else {
-      const d = await fetch('/api/shopify/products?limit=200').then(r => r.json()).catch(() => ({ products: [] }))
+      const d = await fetch('/api/shopify/products').then(r => r.json()).catch(() => ({ products: [] }))
       products = d.products || []
       setBrowseProducts(products)
     }
@@ -1616,7 +1616,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                             <input value={browseFilter} onChange={async e => {
                               setBrowseFilter(e.target.value)
                               if (browseProducts.length === 0 && e.target.value.length > 0) {
-                                const d = await fetch('/api/shopify/products?limit=200').then(r => r.json()).catch(() => ({ products: [] }))
+                                const d = await fetch('/api/shopify/products').then(r => r.json()).catch(() => ({ products: [] }))
                                 setBrowseProducts(d.products || [])
                               }
                             }}
