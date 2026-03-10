@@ -4119,6 +4119,94 @@ function SeoProductTab() {
                     </div>
                   </div>
                 )}
+                {/* AI Product Intelligence — GEO metafields (UCP + ACP) */}
+                {(() => {
+                  const s = p.suggested || {}
+                  const geoFields = ['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases'].filter(k => s[k])
+                  if (!geoFields.length) return null
+                  return (
+                    <div style={{ marginTop: 14, padding: '10px 12px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 10 }}>
+                        AI Product Intelligence <span style={{ fontWeight: 400, textTransform: 'none', color: '#6b7280', fontSize: 10 }}>(Shopify UCP + ChatGPT ACP)</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {s.why_it_works && (
+                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Why It Works</div>
+                            {s.why_it_works.headline && <div style={{ fontSize: 12, fontWeight: 600, color: '#111827', marginBottom: 4 }}>{s.why_it_works.headline}</div>}
+                            {Array.isArray(s.why_it_works.reasons) && (
+                              <ul style={{ margin: 0, paddingLeft: 16 }}>
+                                {s.why_it_works.reasons.map((r, i) => <li key={i} style={{ fontSize: 12, color: '#374151', marginBottom: 2 }}>{r}</li>)}
+                              </ul>
+                            )}
+                          </div>
+                        )}
+                        {s.use_cases && Array.isArray(s.use_cases) && (
+                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 6 }}>Use Cases</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                              {s.use_cases.map((u, i) => <span key={i} style={{ fontSize: 11, background: '#dcfce7', color: '#166534', borderRadius: 4, padding: '2px 8px' }}>{u}</span>)}
+                            </div>
+                          </div>
+                        )}
+                        {s.compatibility && (
+                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Compatibility</div>
+                            {Array.isArray(s.compatibility.pairs_with) && (
+                              <div style={{ marginBottom: 4 }}>
+                                {s.compatibility.pairs_with.map((pw, i) => (
+                                  <span key={i} style={{ fontSize: 11, color: '#374151', marginRight: 6 }}>
+                                    {typeof pw === 'object' ? pw.item : pw}
+                                    {typeof pw === 'object' && pw.relationship_type && <span style={{ color: '#9ca3af', fontSize: 10 }}> ({pw.relationship_type})</span>}
+                                    {i < s.compatibility.pairs_with.length - 1 ? ' ·' : ''}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {Array.isArray(s.compatibility.outfit_contexts) && (
+                              <div style={{ fontSize: 11, color: '#6b7280' }}>Contexts: {s.compatibility.outfit_contexts.join(' · ')}</div>
+                            )}
+                          </div>
+                        )}
+                        {s.fit_logic && (
+                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Fit Logic</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
+                              {Object.entries(s.fit_logic).filter(([,v]) => v).map(([k,v]) => (
+                                <div key={k} style={{ fontSize: 11, color: '#374151' }}>
+                                  <span style={{ color: '#9ca3af', textTransform: 'capitalize' }}>{k.replace(/_/g,' ')}: </span>{v}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {s.care_notes && (
+                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Care Notes</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
+                              {Object.entries(s.care_notes).filter(([,v]) => v).map(([k,v]) => (
+                                <div key={k} style={{ fontSize: 11, color: '#374151' }}>
+                                  <span style={{ color: '#9ca3af', textTransform: 'capitalize' }}>{k.replace(/_/g,' ')}: </span>{v}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {s.customer_qa && Array.isArray(s.customer_qa) && (
+                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 6 }}>Customer Q&amp;A</div>
+                            {s.customer_qa.map((qa, i) => (
+                              <div key={i} style={{ marginBottom: i < s.customer_qa.length - 1 ? 6 : 0 }}>
+                                <div style={{ fontSize: 11, fontWeight: 600, color: '#1f2937' }}>Q: {qa.question}</div>
+                                <div style={{ fontSize: 11, color: '#4b5563', marginLeft: 8 }}>A: {qa.answer}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
                 {/* Category-specific Shopify metafields */}
                 {p.categoryGroup && p.categoryGroup !== 'other' && (() => {
                   const s = p.suggested || {}

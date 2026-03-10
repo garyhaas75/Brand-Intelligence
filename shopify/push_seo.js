@@ -35,6 +35,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { buildCache, resolveToGid } = require('./metaobject_cache');
 
 const SEO_FILE = path.join(__dirname, '../data/seo_suggestions.json');
 const LOG_FILE = path.join(__dirname, '../logs/shopify_push.log');
@@ -218,11 +219,14 @@ async function pushAltText(mediaId, altText) {
   return { ok: true };
 }
 
-// Fields handled by dedicated push steps — excluded from custom metafields
+// Fields handled by dedicated push steps — excluded from custom metafields (single_line_text_field).
+// GEO fields are excluded here because they are JSON type and pushed by pushGeoMetafields instead.
 const SEO_FIELDS = new Set([
   'meta_title', 'meta_description', 'tags', 'alt_text',
   'image_insights', 'geo_description', 'suggested_description',
   'shopify_taxonomy_gid', 'shopify_category',
+  // GEO JSON fields — pushed separately as json type metafields
+  'why_it_works', 'compatibility', 'care_notes', 'fit_logic', 'customer_qa', 'use_cases',
 ]);
 
 // Mapping from our analyzed field keys → Shopify shopify.* namespace category metafield keys.
@@ -238,27 +242,43 @@ const SHOPIFY_CATEGORY_FIELD_MAP = {
 // Category groups that get Shopify taxonomy metafields (age-group, target-gender, fabric, etc.)
 const CLOTHING_CATEGORY_GROUPS = new Set(['clothing']);
 
-// Push Shopify-namespace category metafields (appear in Shopify admin "Category metafields" section).
-// Always sets age-group and target-gender for women's clothing.
-// Maps material → fabric, care_instructions → care-instructions, neckline, sleeve_length.
-async function pushShopifyTaxonomyMetafields(productGid, suggested) {
-  const metafields = [
-    { ownerId: productGid, namespace: 'shopify', key: 'age-group',     type: 'list.single_line_text_field', value: '["Adult"]' },
-    { ownerId: productGid, namespace: 'shopify', key: 'target-gender', type: 'list.single_line_text_field', value: '["Women"]' },
-  ];
+// Push Shopify-namespace category metafields (appear in "Category metafields" section in Shopify admin).
+// ALL category metafields use list.metaobject_reference type — NOT text. Each value is a JSON array
+// containing a store-specific GID like ["gid://shopify/Metaobject/12345"].
+//
+// age-group and target-gender are always "Adult" / "Women" for AK products.
+// material → fabric, care_instructions → care-instructions, neckline, sleeve_length are
+// resolved from the analyzer output (Claude returns exact valid values) via the metaobject cache.
+async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
+  if (!cache || !Object.keys(cache).length) {
+    log('    SKIP taxonomy metafields — metaobject cache unavailable');
+    return { ok: true, count: 0 };
+  }
 
+  const metafields = [];
+
+  // age-group and target-gender are constants for AK (women's workwear brand)
+  const ageGid    = resolveToGid(cache, 'age-group', 'Adult');
+  const genderGid = resolveToGid(cache, 'target-gender', 'Women');
+  if (ageGid)    metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'age-group',     type: 'list.metaobject_reference', value: JSON.stringify([ageGid]) });
+  if (genderGid) metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'target-gender', type: 'list.metaobject_reference', value: JSON.stringify([genderGid]) });
+
+  if (!ageGid)    log('    WARN: no GID for age-group="Adult" — check metaobject cache');
+  if (!genderGid) log('    WARN: no GID for target-gender="Women" — check metaobject cache');
+
+  // Analyzed taxonomy fields — Claude returned exact valid values (constrained during analysis)
   for (const [ourKey, shopifyKey] of Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)) {
     const val = suggested[ourKey];
-    if (val && typeof val === 'string' && val.trim()) {
-      metafields.push({
-        ownerId: productGid,
-        namespace: 'shopify',
-        key: shopifyKey,
-        type: 'list.single_line_text_field',
-        value: JSON.stringify([val.trim()]),
-      });
+    if (!val || typeof val !== 'string' || !val.trim()) continue;
+    const gid = resolveToGid(cache, shopifyKey, val.trim());
+    if (gid) {
+      metafields.push({ ownerId: productGid, namespace: 'shopify', key: shopifyKey, type: 'list.metaobject_reference', value: JSON.stringify([gid]) });
+    } else {
+      log(`    WARN: no GID for ${shopifyKey}="${val}" — value not in metaobject cache, skipped`);
     }
   }
+
+  if (!metafields.length) return { ok: true, count: 0 };
 
   const data = await shopifyGraphQL(`
     mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
@@ -314,8 +334,47 @@ async function pushCategoryMetafields(productGid, suggested) {
   return { ok: true, count: metafields.length };
 }
 
+// GEO metafield keys — JSON type, custom namespace.
+// These populate the AI/GEO product discovery metafields for Shopify Semantic Search,
+// Shop app, Google Shopping AI (UCP), and ChatGPT product feeds (ACP).
+const GEO_FIELD_KEYS = ['why_it_works', 'compatibility', 'care_notes', 'fit_logic', 'customer_qa', 'use_cases'];
+
+// Push GEO JSON metafields (custom.why_it_works, custom.compatibility, etc.).
+// Non-blocking — logs warnings on error, never throws.
+async function pushGeoMetafields(productGid, suggested) {
+  const metafields = [];
+  for (const key of GEO_FIELD_KEYS) {
+    const val = suggested[key];
+    if (val === null || val === undefined) continue;
+    metafields.push({
+      ownerId: productGid,
+      namespace: 'custom',
+      key,
+      type: 'json',
+      value: JSON.stringify(val),
+    });
+  }
+  if (!metafields.length) return;
+
+  const data = await shopifyGraphQL(`
+    mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
+      metafieldsSet(metafields: $metafields) {
+        metafields { id key }
+        userErrors { field message }
+      }
+    }
+  `, { metafields });
+
+  const errors = data?.metafieldsSet?.userErrors || [];
+  if (errors.length) {
+    log(`    WARN GEO metafields: ${errors.map(e => `${e.field}: ${e.message}`).join('; ')}`);
+  } else {
+    log(`    GEO metafields: ${metafields.length} pushed (${metafields.map(f => f.key).join(', ')})`);
+  }
+}
+
 // ─── Push a single product ────────────────────────────────────────────────────
-async function pushProduct(product) {
+async function pushProduct(product, metaCache) {
   const handle = extractHandle(product.href);
   if (!handle) throw new Error(`Could not extract handle from href: ${product.href}`);
 
@@ -339,8 +398,15 @@ async function pushProduct(product) {
     }
     const catFields = buildCategoryMetafields('(gid)', suggested);
     if (catFields.length) {
-      log(`    category metafields: ${catFields.map(f => `${f.key}="${f.value}"`).join(', ')}`);
+      log(`    custom metafields: ${catFields.map(f => `${f.key}="${f.value}"`).join(', ')}`);
     }
+    if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup) && metaCache && Object.keys(metaCache).length) {
+      const taxFields = Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)
+        .map(([k, sk]) => `${sk}="${suggested[k] || '(none)'}"`).join(', ');
+      log(`    taxonomy metafields: age-group="Adult", target-gender="Women", ${taxFields}`);
+    }
+    const geoFields = GEO_FIELD_KEYS.filter(k => suggested[k]).map(k => `${k}=✓`).join(', ');
+    if (geoFields) log(`    GEO metafields: ${geoFields}`);
     return { ok: true, dryRun: true };
   }
 
@@ -363,7 +429,22 @@ async function pushProduct(product) {
   // 4. Push category-specific custom metafields (material, fit_type, metal_finish, etc.)
   await pushCategoryMetafields(productGid, suggested);
 
-  // 5. Push image alt text via fileUpdate
+  // 5a. Push Shopify taxonomy category metafields (shopify.fabric, shopify.neckline, etc.)
+  // Only for clothing products. Uses list.metaobject_reference type with store-specific GIDs.
+  if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup)) {
+    try {
+      const taxResult = await pushShopifyTaxonomyMetafields(productGid, suggested, metaCache);
+      if (taxResult.count > 0) log(`    taxonomy metafields: ${taxResult.count} pushed`);
+    } catch (err) {
+      log(`    WARN taxonomy metafields: ${err.message}`);
+    }
+  }
+
+  // 5b. Push GEO JSON metafields (custom.why_it_works, custom.compatibility, etc.)
+  // Powers Shopify Semantic Search, Shop app (UCP) and ChatGPT product feeds (ACP).
+  await pushGeoMetafields(productGid, suggested);
+
+  // 6. Push image alt text via fileUpdate
   if (suggested.alt_text && mediaId) {
     await pushAltText(mediaId, suggested.alt_text);
   }
@@ -379,6 +460,21 @@ async function run() {
   if (!DRY_RUN && (!STORE_DOMAIN || !ADMIN_TOKEN)) {
     log('FATAL: SHOPIFY_STORE_DOMAIN and SHOPIFY_ADMIN_API_TOKEN must be set in .env');
     process.exit(1);
+  }
+
+  // Build metaobject cache fresh at start of every push run — ensures taxonomy GIDs are current.
+  log('Building Shopify metaobject cache…');
+  const metaCache = DRY_RUN ? {} : await buildCache().catch(err => {
+    log(`WARN: metaobject cache build failed (${err.message}) — taxonomy metafields will be skipped`);
+    return {};
+  });
+  if (!DRY_RUN) {
+    const cachedKeys = Object.keys(metaCache);
+    if (cachedKeys.length) {
+      log(`Metaobject cache ready: ${cachedKeys.map(k => `${k}(${metaCache[k].validValues.length})`).join(', ')}`);
+    } else {
+      log('Metaobject cache: empty — taxonomy metafields will be skipped');
+    }
   }
 
   const seoData = loadSeo();
@@ -413,7 +509,7 @@ async function run() {
     log(`  [${i + 1}/${targets.length}] ${product.name?.substring(0, 60)}`);
 
     try {
-      const result = await pushProduct(product);
+      const result = await pushProduct(product, metaCache);
       const idx = seoData.products.findIndex(p => p.href === product.href);
       if (idx !== -1) {
         seoData.products[idx].pushStatus = 'pushed';

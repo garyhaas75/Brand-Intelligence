@@ -32,6 +32,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
 const { getBrandContext } = require('../utils/brand_context');
+const { buildCache, getValidValues } = require('../shopify/metaobject_cache');
 
 const LOG_FILE       = path.join(__dirname, '../logs/seo_product_analyzer.log');
 const CATALOG_FILE   = path.join(__dirname, '../data/product_catalog.json');
@@ -497,25 +498,62 @@ const TYPE_SCHEMAS = {
   },
 };
 
+// Maps our analyzer field keys → Shopify metaobject cache keys.
+// These fields get constrained to exact Shopify valid values when cache is available.
+const TAXONOMY_FIELD_CACHE_MAP = {
+  material:          'fabric',
+  care_instructions: 'care-instructions',
+  neckline:          'neckline',
+  sleeve_length:     'sleeve-length-type',
+};
+
 // Returns field instructions + JSON schema for a given specific type.
-function getCategoryPromptSection(specificType, categoryGroup) {
+// metaCache: result of buildCache(), or null if unavailable.
+function getCategoryPromptSection(specificType, categoryGroup, metaCache) {
   const taxonomyOptions = getTaxonomyOptions(categoryGroup);
   const taxonomyInstruction = taxonomyOptions
     ? `shopify_taxonomy_gid: Pick the DEEPEST (most specific leaf-level) matching GID from this list. Always prefer a subcategory over its parent — e.g. pick "Sport Jackets" over "Coats & Jackets". Return only the GID string, no other text:\n${taxonomyOptions}`
     : `shopify_taxonomy_gid: The Shopify taxonomy GID for this product type (format: "gid://shopify/TaxonomyCategory/aa-X-X").`;
 
   const typeSchema = TYPE_SCHEMAS[specificType] || TYPE_SCHEMAS[categoryGroup] || { fields: [], schema: '' };
-  const fieldLines = typeSchema.fields.map((f, i) => `${i + 8}. ${f}`).join('\n');
-  const nextNum = typeSchema.fields.length + 8;
+
+  // Replace taxonomy-mapped field instructions with constrained valid-value lists when cache is available.
+  // This ensures Claude returns an exact Shopify value that can be directly looked up to a GID — no fuzzy matching.
+  const constrainedFields = typeSchema.fields.map(fieldStr => {
+    const colonIdx = fieldStr.indexOf(':');
+    if (colonIdx === -1 || !metaCache) return fieldStr;
+    const fieldKey = fieldStr.slice(0, colonIdx).trim();
+    const cacheKey = TAXONOMY_FIELD_CACHE_MAP[fieldKey];
+    if (!cacheKey) return fieldStr;
+    const validValues = getValidValues(metaCache, cacheKey);
+    if (!validValues || !validValues.length) return fieldStr;
+    return `${fieldKey}: Choose EXACTLY one value from this valid Shopify list (return null if none match — do NOT return any other value): ${validValues.join(', ')}.`;
+  });
+
+  const fieldLines = constrainedFields.map((f, i) => `${i + 8}. ${f}`).join('\n');
+  const nextNum = constrainedFields.length + 8;
+
+  // GEO fields — structured JSON for AI/agentic commerce protocols (UCP + ACP).
+  // These populate custom.* JSON metafields for Shopify Semantic Search, Shop app,
+  // Google Shopping AI, and ChatGPT product feeds.
+  const geoStartNum = nextNum;
+  const geoFields = `${geoStartNum}. why_it_works: JSON object. {"headline": "one sentence — the main reason to buy this product", "reasons": ["specific reason 1 — construction or design detail", "specific reason 2 — occasion or lifestyle fit", "specific reason 3 — wardrobe logic or versatility"]}. Reasons must be specific to THIS product. No generic statements like "great quality" or "versatile".
+${geoStartNum + 1}. compatibility: JSON object. {"pairs_with": [{"item": "product type name", "relationship_type": "often_bought_with"}, ...], "outfit_contexts": ["Named occasion 1", "Named occasion 2"]}. relationship_type must be exactly one of: often_bought_with, accessory, layering_piece. 2-4 pairs_with entries. 2-3 outfit_contexts as named moments (e.g. "Client lunch", not "Casual wear").
+${geoStartNum + 2}. care_notes: JSON object. {"fabric": "material composition", "washing": "wash instruction", "drying": "drying instruction", "ironing": "ironing note or null", "special_notes": "any care nuance or null"}. Only fill from confirmed product info — return null for the whole field if care details are not available.
+${geoStartNum + 3}. fit_logic: JSON object. {"silhouette": "fit description", "best_for": "body type or styling context", "sizing": "runs true to size / size up / size down", "styling_tip": "one concrete tip"}. Return null for sizing if not determinable from product info.
+${geoStartNum + 4}. customer_qa: JSON array of exactly 3 objects. [{"question": "real customer question", "answer": "specific helpful answer"}, ...]. Questions must mirror what a real shopper would ask (fit, fabric, occasion, care). Answers must be specific to this product.
+${geoStartNum + 5}. use_cases: JSON array of strings. Named moments this product is built for. Be specific: "Tuesday board meeting" not "work". "Weekend farmers market" not "casual". 3-5 items.`;
+
+  const taxNum = geoStartNum + 6;
 
   return {
-    fields: fieldLines + `\n${nextNum}. ${taxonomyInstruction}`,
-    schema: `  ${typeSchema.schema}${typeSchema.schema ? ',\n  ' : ''}"shopify_taxonomy_gid": null`,
+    fields: fieldLines + `\n${geoFields}\n${taxNum}. ${taxonomyInstruction}`,
+    schema: `  ${typeSchema.schema}${typeSchema.schema ? ',\n  ' : ''}"why_it_works": null,\n  "compatibility": null,\n  "care_notes": null,\n  "fit_logic": null,\n  "customer_qa": null,\n  "use_cases": null,\n  "shopify_taxonomy_gid": null`,
   };
 }
 
 // ─── Main analysis function ───────────────────────────────────────────────────
-async function analyzeProduct(client, product, brandContext) {
+async function analyzeProduct(client, product, brandContext, metaCache) {
   // Pass the image URL directly to Claude — Anthropic's servers fetch it.
   // No local download, no base64 encoding, no large upload. Near-instant.
   const imageUrl = resizeShopifyUrl(product.image);
@@ -523,7 +561,7 @@ async function analyzeProduct(client, product, brandContext) {
 
   const categoryGroup = detectCategoryGroup(product.category);
   const specificType = detectSpecificType(product);
-  const catSection = getCategoryPromptSection(specificType, categoryGroup);
+  const catSection = getCategoryPromptSection(specificType, categoryGroup, metaCache);
 
   const content = [];
   if (hasImage) {
@@ -586,7 +624,7 @@ Return ONLY valid JSON (no markdown, no explanation):
     setTimeout(() => reject(new Error(`Claude API timeout after ${timeoutMs / 1000}s`)), timeoutMs)
   );
   const response = await Promise.race([
-    client.messages.create({ model: MODEL, max_tokens: 2000, messages: [{ role: 'user', content }] }),
+    client.messages.create({ model: MODEL, max_tokens: 3000, messages: [{ role: 'user', content }] }),
     claudeDeadline,
   ]);
   log(`    → Claude responded (${Date.now() - t1}ms)`);
@@ -604,8 +642,10 @@ Return ONLY valid JSON (no markdown, no explanation):
 
   // Validate taxonomy GID — Claude sometimes hallucinates a GID not in the options list.
   // Build the valid set from the same options we sent, then clear if invalid.
-  const fieldSummary = Object.entries(parsed).filter(([k]) => !['meta_title','meta_description','tags','image_insights','alt_text','geo_description','shopify_taxonomy_gid'].includes(k)).map(([k,v]) => `${k}="${v||''}"`).join(' | ');
-  log(`    GID: ${parsed.shopify_taxonomy_gid || '(none)'} | type: ${specificType} | ${fieldSummary}`);
+  const GEO_KEYS = new Set(['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases']);
+  const fieldSummary = Object.entries(parsed).filter(([k]) => !['meta_title','meta_description','tags','image_insights','alt_text','geo_description','shopify_taxonomy_gid'].includes(k) && !GEO_KEYS.has(k)).map(([k,v]) => `${k}="${v||''}"`).join(' | ');
+  const geoSummary = Object.entries(parsed).filter(([k]) => GEO_KEYS.has(k)).map(([k,v]) => `${k}=${v?'✓':'✗'}`).join(' ');
+  log(`    GID: ${parsed.shopify_taxonomy_gid || '(none)'} | type: ${specificType} | ${fieldSummary} | GEO: ${geoSummary}`);
   const categoryGroup2 = detectCategoryGroup(product.category);
   const validOptions = getTaxonomyOptions(categoryGroup2);
   if (parsed.shopify_taxonomy_gid && validOptions) {
@@ -666,6 +706,20 @@ async function run() {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext();
 
+  // Build metaobject cache once — queries Shopify for valid taxonomy values per field.
+  // Used to constrain Claude's output so taxonomy fields return exact GID-resolvable strings.
+  log('Building Shopify metaobject cache…');
+  const metaCache = await buildCache().catch(err => {
+    log(`WARN: metaobject cache build failed (${err.message}) — taxonomy fields will use freeform values`);
+    return {};
+  });
+  const cachedKeys = Object.keys(metaCache);
+  if (cachedKeys.length) {
+    log(`Metaobject cache ready: ${cachedKeys.map(k => `${k}(${metaCache[k].validValues.length})`).join(', ')}`);
+  } else {
+    log('Metaobject cache: empty (Shopify not configured or no taxonomy metaobjects found)');
+  }
+
   let successCount = 0;
   let errorCount = 0;
 
@@ -676,7 +730,7 @@ async function run() {
     log(`  [${i + 1}/${batch.length}] [${specificType}] ${product.name.substring(0, 55)}`);
 
     try {
-      const suggested = await analyzeProduct(client, product, brandContext);
+      const suggested = await analyzeProduct(client, product, brandContext, metaCache);
       const resolvedSpecificType = suggested._specificType || specificType;
       delete suggested._specificType;
 
