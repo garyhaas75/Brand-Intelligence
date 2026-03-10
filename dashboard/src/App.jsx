@@ -1134,6 +1134,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
     return { ...camp, weekNum, totalWeeks, arcWeek }
   })
 
+  // Auto-load strategy when Content Strategy sub-tab is active
+  useEffect(() => {
+    if (subTab === 'strategy' && !strategy && !strategyLoading) loadStrategy()
+  }, [subTab])
+
   // Sync volumes from first active campaign's contentVolumes
   useEffect(() => {
     const camp = activeCampaigns[0]
@@ -2261,7 +2266,8 @@ function PriceTab({ priceIntel }) {
             </button>
           </div>
 
-          {strategyLoading && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Loading…</div>}
+          {strategyLoading && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Loading strategy…</div>}
+          {!strategyLoading && !strategy && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Could not load strategy. <button onClick={loadStrategy} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: 14, textDecoration: 'underline' }}>Retry</button></div>}
 
           {strategy && (<>
             {/* Email Monthly Mix */}
