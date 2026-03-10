@@ -108,12 +108,12 @@ const TAXONOMY_LABELS = {
 // Metafield slots per specific product type — used in SEO Product Intelligence UI.
 const SPECIFIC_TYPE_FIELDS = {
   // Clothing
-  blazer:       [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type'],['lining','Lining']],
-  coat:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type']],
+  blazer:       [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type'],['lining','Lining'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
+  coat:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
   dress:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
   pants:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['rise','Rise']],
   skirt:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['length','Length']],
-  suit:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['lining','Lining']],
+  suit:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['lining','Lining'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
   sweater:      [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
   top:          [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
   // Shoes
@@ -4139,6 +4139,17 @@ function SeoProductTab() {
                             <div style={{ fontSize: 12, color: s[key] ? T.textSub : T.textFaint, fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
                           </div>
                         ))}
+                        {/* Shopify Category constants — always pushed for clothing */}
+                        {p.categoryGroup === 'clothing' && <>
+                          <div style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #c4b5fd', opacity: 0.7 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 2 }}>Age Group</div>
+                            <div style={{ fontSize: 12, color: '#7c3aed' }}>Adult <span style={{ color: T.textMuted, fontSize: 10 }}>(auto)</span></div>
+                          </div>
+                          <div style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #c4b5fd', opacity: 0.7 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 2 }}>Target Gender</div>
+                            <div style={{ fontSize: 12, color: '#7c3aed' }}>Women <span style={{ color: T.textMuted, fontSize: 10 }}>(auto)</span></div>
+                          </div>
+                        </>}
                       </div>
                     </div>
                   )
