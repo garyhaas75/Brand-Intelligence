@@ -1839,6 +1839,145 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
           <ContentGeneratorPanel />
         </div>
       )}
+
+      {/* ══════════ CONTENT STRATEGY ══════════ */}
+      {subTab === 'strategy' && (
+        <div>
+          {strategyToast && (
+            <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+              {strategyToast}
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>Content Strategy</div>
+              <div style={{ fontSize: 13, color: T.textMuted }}>These rules are injected into every content generation. Claude honors this mix when selecting email types, Instagram angles, and product focus.</div>
+            </div>
+            <button onClick={saveStrategy} disabled={strategySaving || !strategy}
+              style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: strategySaving ? 0.6 : 1 }}>
+              {strategySaving ? 'Saving…' : 'Save Strategy'}
+            </button>
+          </div>
+
+          {strategyLoading && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Loading strategy…</div>}
+          {!strategyLoading && !strategy && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Could not load strategy. <button onClick={loadStrategy} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: 14, textDecoration: 'underline' }}>Retry</button></div>}
+
+          {strategy && (<>
+            {/* Email Monthly Mix */}
+            <Card title="Email Monthly Mix" accent="#6366f1">
+              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>{strategy.monthlyEmailMix?.description}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {(strategy.monthlyEmailMix?.slots || []).map((slot, i) => (
+                  <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
+                      <input value={slot.label} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].label = e.target.value; return s; })}
+                        style={{ flex: 1, fontWeight: 700, fontSize: 14, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', background: T.inputBg, color: T.text }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                        <span style={{ fontSize: 12, color: T.textMuted }}>per month:</span>
+                        <input type="number" min="0" max="10" value={slot.perMonth} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].perMonth = parseInt(e.target.value) || 0; return s; })}
+                          style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 6 }}>Templates: <strong style={{ color: T.textSub }}>{slot.templates?.join(', ')}</strong></div>
+                    <textarea value={slot.description} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].description = e.target.value; return s; })}
+                      rows={3} style={{ width: '100%', fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box' }} />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Instagram Weekly Mix */}
+            <Card title="Instagram Weekly Mix" accent="#ec4899">
+              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>{strategy.instagramWeeklyMix?.description}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {(strategy.instagramWeeklyMix?.slots || []).map((slot, i) => (
+                  <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
+                      <input value={slot.label} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].label = e.target.value; return s; })}
+                        style={{ flex: 1, fontWeight: 700, fontSize: 14, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', background: T.inputBg, color: T.text }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                        <span style={{ fontSize: 12, color: T.textMuted }}>per week:</span>
+                        <input type="number" min="0" max="10" value={slot.perWeek} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].perWeek = parseInt(e.target.value) || 0; return s; })}
+                          style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
+                      </div>
+                    </div>
+                    <textarea value={slot.description} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].description = e.target.value; return s; })}
+                      rows={2} style={{ width: '100%', fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box' }} />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Category Rotation */}
+            <Card title="Category Spotlight Rotation" accent="#f59e0b">
+              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 12 }}>{strategy.categoryRotation?.rationale}</div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>Spotlight every</span>
+                <input type="number" min="1" max="26" value={strategy.categoryRotation?.frequencyWeeks || 6}
+                  onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.frequencyWeeks = parseInt(e.target.value) || 6; return s; })}
+                  style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
+                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>weeks · Rotation order:</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {(strategy.categoryRotation?.categories || []).map((cat, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, background: T.stripeBg, borderRadius: 20, padding: '4px 10px 4px 14px' }}>
+                    <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600, marginRight: 2 }}>{i + 1}.</span>
+                    <input value={cat} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories[i] = e.target.value; return s; })}
+                      style={{ width: 90, fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 4, padding: '3px 8px', background: T.inputBg, color: T.text }} />
+                    <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories.splice(i, 1); return s; })}
+                      style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 2 }}>×</button>
+                  </div>
+                ))}
+                <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories.push(''); return s; })}
+                  style={{ padding: '4px 14px', borderRadius: 20, border: `1px dashed ${T.border}`, background: 'none', color: T.textMuted, fontSize: 13, cursor: 'pointer' }}>+ Add</button>
+              </div>
+            </Card>
+
+            {/* Persona Rotation */}
+            <Card title="Persona Rotation" accent="#8b5cf6">
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
+                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>Each persona as primary target at least once every</span>
+                <input type="number" min="1" max="12" value={strategy.personaRotation?.rotationWeeks || 4}
+                  onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.personaRotation.rotationWeeks = parseInt(e.target.value) || 4; return s; })}
+                  style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
+                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>weeks</span>
+              </div>
+              {(strategy.personaRotation?.personas || []).map((p, i) => (
+                <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '12px 14px', marginBottom: 8 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: T.text, marginBottom: 6 }}>{p.name}</div>
+                  <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>Focus: {p.topTopics?.join(', ')}</div>
+                  <div style={{ fontSize: 12, color: T.textMuted }}>Avoid: {p.avoidTopics?.join(', ')}</div>
+                </div>
+              ))}
+            </Card>
+
+            {/* Global Rules */}
+            <Card title="Global Content Rules" accent="#374151">
+              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>Applied to every piece of generated content across all channels.</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {(strategy.globalRules || []).map((rule, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: 14, color: T.textMuted, marginTop: 8, flexShrink: 0 }}>—</span>
+                    <textarea value={rule} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules[i] = e.target.value; return s; })}
+                      rows={2} style={{ flex: 1, fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical' }} />
+                    <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules.splice(i, 1); return s; })}
+                      style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 16, marginTop: 6, flexShrink: 0 }}>×</button>
+                  </div>
+                ))}
+                <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules.push(''); return s; })}
+                  style={{ alignSelf: 'flex-start', padding: '7px 16px', borderRadius: 8, border: `1px dashed ${T.border}`, background: 'none', color: T.textMuted, fontSize: 13, cursor: 'pointer', marginTop: 4 }}>+ Add Rule</button>
+              </div>
+            </Card>
+
+            <div style={{ textAlign: 'right', marginTop: 8, marginBottom: 24 }}>
+              <button onClick={saveStrategy} disabled={strategySaving}
+                style={{ padding: '10px 24px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: strategySaving ? 0.6 : 1 }}>
+                {strategySaving ? 'Saving…' : 'Save Strategy'}
+              </button>
+            </div>
+          </>)}
+        </div>
+      )}
     </div>
 
     {/* Email Preview Modal — AK-style email mockup */}
@@ -2247,8 +2386,7 @@ function PriceTab({ priceIntel }) {
         </>
       )}
 
-      {/* ══════════ CONTENT STRATEGY ══════════ */}
-      {subTab === 'strategy' && (
+      {false && (
         <div>
           {strategyToast && (
             <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
