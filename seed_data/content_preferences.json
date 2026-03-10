@@ -1,41 +1,86 @@
 {
-  "updatedAt": "2026-03-09T00:00:00.000Z",
+  "updatedAt": "2026-03-10T00:00:00.000Z",
   "email": {
     "dos": [
-      "Lead with the outfit story or occasion, not just the product name",
-      "Subject lines under 50 characters — specific beats generic",
-      "Reference the woman's day/context (board meeting, client lunch, weekend getaway)",
-      "Name each look with an evocative moment or place (e.g. 'The Boardroom Entrance', 'Friday Closing')",
-      "Use 3–4 distinct looks per email so the woman can see herself in at least one"
+      "Lead with the occasion, not the product — 'The Tuesday board presentation' not 'This blazer'",
+      "Subject lines under 50 characters — specific beats generic — name the moment or the problem solved",
+      "Name each look with a specific moment: 'The Closing Meeting', 'Friday at 6', 'The Red-Eye Back'",
+      "Give each look an angle that explains the styling logic — why these pieces together, not just what they are",
+      "Use 3-4 looks per email so the woman sees herself in at least one scenario",
+      "Always pair a structured top with something softer underneath (knit, silk, fluid blouse)",
+      "Mention the specific products' key attribute — 'the stretch-wool trouser' not just 'trousers'"
     ],
     "donts": [
-      "Never use the words: trendy, fresh, hot, effortless, must-have",
-      "Don't list products without styling context — always pair them into a look",
-      "Avoid discount language or urgency based on scarcity",
-      "Don't write subject lines that start with 'Your' — too generic",
-      "Avoid passive constructions ('can be worn with') — prefer active ('pairs with', 'anchors')"
+      "Never use: effortless, fresh, trendy, hot, chic, stunning, must-have, elevated, sophisticated",
+      "Don't list products without styling context — every piece needs a reason to be in the look",
+      "No all-black looks described as a 'look' — it's too generic unless the pieces have interesting contrast in texture",
+      "Don't float a single hero product without showing what it pairs with",
+      "Avoid subject lines starting with 'Your' — too generic and low-open-rate",
+      "No discount language, no urgency via scarcity, no countdown language",
+      "Don't mix warm and cool tones in a look without a deliberate reason stated",
+      "Never two boxy or structured pieces together without a fitted element to balance"
     ],
     "toneNotes": [
-      "Authoritative and aspirational — never breathless or salesy",
-      "The Anne Klein woman is 35–55, professionally accomplished, values quality over trend",
-      "Write like a trusted stylist friend, not a marketer",
-      "Anne Klein is classic American sportswear with modern edge — not fast fashion, not luxury"
+      "Authoritative, not aspirational — she already has authority, this confirms it",
+      "Short declarative sentences. Period. Not exclamation points.",
+      "Anne Klein woman is 35-55, professionally accomplished, dresses for impact not trend",
+      "She buys fewer pieces but wears them more — quality and versatility over quantity",
+      "Write like a trusted stylist who knows her wardrobe, not a brand talking at her"
     ]
   },
   "instagram": {
     "dos": [
-      "Conversational, behind-the-look perspective",
-      "Start with a strong visual hook in the first line",
-      "Use 3–5 targeted hashtags maximum"
+      "Open with a hook that names a specific moment or problem — 'The meeting that ran long'",
+      "Conversational, present tense — 'This blazer goes from...' not 'This blazer can go from...'",
+      "Reference specific product details — 'the notch collar', 'the patch pocket', 'the pleated front'",
+      "Max 5 hashtags — specific beats generic (#WorkwearWednesday over #Fashion)",
+      "Imagery direction should be specific: 'Flat lay on marble, navy blazer folded over ivory blouse, camel trouser, nude pump' not 'woman in blazer'"
     ],
     "donts": [
-      "No hashtag spam — max 5 hashtags",
-      "Don't restate what's visually obvious in the image",
-      "Avoid exclamation points in every sentence"
+      "No hashtag spam — max 5",
+      "Don't restate what's visible in the image",
+      "No exclamation points",
+      "Avoid 'head-to-toe' outfit descriptions that read like a receipt"
     ],
     "toneNotes": [
-      "More casual than email — the woman is scrolling, not shopping intentionally yet",
-      "Intrigue over information — make her tap 'more'"
+      "More casual than email but never breathless",
+      "Intrigue over information — make her tap 'more'",
+      "The woman is scrolling, not actively shopping — catch her mid-scroll with a specific, unexpected detail"
+    ]
+  },
+  "stylingRules": {
+    "colorCombinations": {
+      "approved": [
+        "Navy + camel (always works — classic AK)",
+        "Black + ivory/white dove (contrast, clean)",
+        "Burgundy + camel (rich, warm, autumn/winter)",
+        "Navy + blush (softer, spring/summer)",
+        "Black + burgundy (monochromatic depth)",
+        "Camel + bone white (tonal, effortlessly polished)"
+      ],
+      "avoid": [
+        "All-black without texture contrast — too generic",
+        "Brown + navy (clashing warm/cool)",
+        "More than 3 colors in a single look",
+        "Neon or bright accents against AK's muted base palette"
+      ]
+    },
+    "outfitLogic": [
+      "Blazer + matching trouser = suiting look — needs a soft element underneath (silk blouse, knit)",
+      "Blazer + contrasting pant = modern mix — textures must vary (tweed jacket, crepe trouser)",
+      "A structured jacket always needs a soft underneath — never two stiff layers",
+      "A fluid midi dress stands alone — don't overcomplicate with a jacket unless the occasion calls for layering",
+      "Heels elevate any trouser look for business; block-heel or flat for travel/casual reads",
+      "Statement earrings finish any look — AK jewelry should always appear in email looks",
+      "Shoes are mandatory in any 'full look' — never show a complete outfit without footwear"
+    ],
+    "occasionFraming": [
+      "Boardroom / presentation: structured blazer, polished trouser or pencil skirt, low/block heel",
+      "Client lunch: blazer or cardigan over blouse, tailored pant, simple jewelry, comfortable heel",
+      "Work travel: wrinkle-resistant pieces, layerable, 1 blazer that works day+night",
+      "Friday/end of week: blazer off, fluid blouse or knit, same tailored trouser — dressed down not dressed out",
+      "Evening/event: midi dress or wide-leg pant + silk blouse, statement jewelry, heels",
+      "Weekend with polish: clean trouser or straight-leg denim (not in AK catalog — avoid), knit top, loafer or flat"
     ]
   },
   "approvedExamples": [],

@@ -1059,10 +1059,16 @@ Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w =
   // Inject learned content preferences
   const prefs = loadContentPreferences();
   const prefsContext = prefs ? `
-CONTENT PREFERENCES (learned from past feedback — follow these strictly):
+CONTENT RULES (apply to all output):
 EMAIL dos: ${prefs.email?.dos?.join(' | ') || 'none yet'}
 EMAIL don'ts: ${prefs.email?.donts?.join(' | ') || 'none yet'}
-Tone notes: ${prefs.email?.toneNotes?.join(' | ') || 'none yet'}${prefs.revisedExamples?.length ? `
+Tone: ${prefs.email?.toneNotes?.join(' | ') || 'none yet'}
+
+STYLING RULES (apply when building looks and product pairings):
+Color combos approved: ${prefs.stylingRules?.colorCombinations?.approved?.join(' | ') || ''}
+Color combos to avoid: ${prefs.stylingRules?.colorCombinations?.avoid?.join(' | ') || ''}
+Outfit logic: ${prefs.stylingRules?.outfitLogic?.join(' | ') || ''}
+Occasion framing: ${prefs.stylingRules?.occasionFraming?.join(' | ') || ''}${prefs.revisedExamples?.length ? `
 Past corrections (apply these lessons):
 ${prefs.revisedExamples.slice(-5).map(e => `- Feedback "${e.feedback}" → changed "${e.original}" to "${e.revised}"`).join('\n')}` : ''}
 ` : '';
@@ -1348,18 +1354,42 @@ app.post('/api/weekly-plan/item/:itemId/chat', async (req, res) => {
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-    const systemPrompt = `You are a marketing editor for Anne Klein, a classic American women's fashion brand. You are refining a single content card based on user feedback. The Anne Klein woman is 35–55, professionally accomplished. Tone: authoritative and aspirational, never breathless or salesy.
+    const systemPrompt = `You are a senior marketing editor and fashion stylist for Anne Klein, a classic American women's fashion brand (think: understated authority, not fast fashion).
 
-When the user gives feedback, revise only the relevant fields. Always return:
-1. A JSON block (wrapped in \`\`\`json ... \`\`\`) containing the full updated item fields (email, looks, template, theme — only the fields that exist on this item)
-2. On a new line after the JSON block, a brief plain-text explanation of what you changed (1-2 sentences)`;
+THE ANNE KLEIN WOMAN: 35–55, professionally accomplished, dresses for impact not trend. Her occasions: boardroom presentations, client lunches, work travel, weekend errands with polish. She buys fewer pieces but wears them more.
+
+STYLING RULES you enforce in all content:
+- Outfit logic: blazer + matching trouser OR contrasting texture pant. A structured jacket always pairs with a soft underneath (knit, silk blouse). Never two boxy pieces together.
+- Color: AK palette is navy/ivory/camel/black/blush/burgundy. Safe combos: navy+camel, black+ivory, burgundy+camel. Avoid: all-black described as a "look" (too generic), mismatched warm+cool unless intentional.
+- Occasion specificity: name the moment — "the Tuesday board meeting" not "work." "A long-haul flight" not "travel."
+- Product pairing: shoes should always be mentioned with footwear-adjacent outfits. A blazer look needs a bottom. Never float a single piece without context.
+- Copy tone: short declarative sentences. No exclamation points. No words: fresh, effortless, trendy, stunning, must-have, chic. Yes words: precise, polished, considered, built for, made to.
+
+RESPONDING TO FEEDBACK:
+- If the message is a QUESTION (starts with "what", "why", "how", "did you", "can you explain") → answer in 1-2 sentences only. No JSON.
+- If the message is a REVISION REQUEST → make the change, return ONLY:
+  1. \`\`\`json block with the revised fields (only what changed — email, looks, instagram, hero, or theme)
+  2. One sentence: "Changed [X] from '[old]' to '[new]'."
+  Never explain your reasoning. Never be defensive. Just change it and say what you changed.
+- Keep ALL responses under 3 sentences unless showing JSON.`;
+
+    // Only prepend the card context on the first message (when no history yet)
+    const isFirstMessage = history.length === 0;
+    const userContent = isFirstMessage
+      ? `Content card to work with:\n${originalSnapshot}\n\nInstruction: ${message}`
+      : message;
 
     const chatMessages = [
-      ...history.map(h => ({ role: h.role, content: h.content })),
-      {
+      // Seed the conversation with the card context as the first exchange if we have history
+      ...(history.length > 0 ? [{
         role: 'user',
-        content: `Current content card:\n${originalSnapshot}\n\nFeedback: ${message}`,
-      },
+        content: `Content card:\n${originalSnapshot}`,
+      }, {
+        role: 'assistant',
+        content: 'Ready. Tell me what to change.',
+      }] : []),
+      ...history.map(h => ({ role: h.role, content: h.content })),
+      { role: 'user', content: userContent },
     ];
 
     const msg = await anthropic.messages.create({
