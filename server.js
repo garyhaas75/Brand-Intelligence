@@ -1064,6 +1064,16 @@ function validateEmailItem(item, personasData) {
     warnings.push(`Looks with fewer than 2 products: ${thinLooks.join(', ')}`);
   }
 
+  // Check 3b: Clothing presence — each look must include at least one clothing item
+  const CLOTHING_KW = /dress|jacket|blazer|skirt|pant|top|blouse|tunic|suit|cardigan|sweater|vest|shirt|midi|maxi|mini|jumpsuit|romper|coat/i;
+  const accessoryOnlyLooks = looks.filter(l =>
+    (l.products || []).length > 0 &&
+    !(l.products || []).some(p => CLOTHING_KW.test(p.name || ''))
+  ).map(l => l.name);
+  if (accessoryOnlyLooks.length > 0) {
+    warnings.push(`Looks contain no clothing items (only shoes/bags/jewelry): ${accessoryOnlyLooks.join(', ')} — each look needs at least one dress, jacket, top, or pants`);
+  }
+
   // Check 4: Persona price coherence
   if (personasData && item.targetPersona) {
     const persona = (personasData.personas || []).find(p => p.name === item.targetPersona);
@@ -1126,6 +1136,59 @@ Return ONLY the corrected item as valid JSON (same schema as input, no commentar
   }
 }
 
+// Vision validation for looks-based email templates.
+// Passes each look's product images to Haiku Vision to confirm it's a coherent outfit.
+// Gracefully skips looks where images are unavailable or the API fails.
+async function visionValidateLooks(item, anthropic, catalogByHandle) {
+  const LOOKS_TEMPLATES = ['multi-look', 'story-led', 'single-hero'];
+  if (!LOOKS_TEMPLATES.includes(item.template) || !item.looks?.length) return [];
+
+  const warnings = [];
+  for (const look of item.looks) {
+    const withImages = (look.products || [])
+      .map(p => ({ ...p, imageUrl: (catalogByHandle[p.handle] || {}).image || null }))
+      .filter(p => p.imageUrl);
+
+    if (withImages.length === 0) continue; // no images available — text check is the fallback
+
+    try {
+      const imageContent = withImages.flatMap(p => [
+        { type: 'image', source: { type: 'url', url: p.imageUrl } },
+        { type: 'text', text: `${p.name} ($${p.price})` },
+      ]);
+
+      const res = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: [
+            ...imageContent,
+            {
+              type: 'text',
+              text: `These ${withImages.length} products are proposed as one outfit look named "${look.name}" in an Anne Klein email for a professional woman.\n\nEvaluate:\n1. CLOTHING: Does this combination include at least one clothing item (dress, blazer, jacket, top, pants, skirt)? Shoes, bags, and jewelry alone are NOT an outfit.\n2. COHERENCE: Do these pieces work together as a complete, polished professional outfit?\n\nRespond ONLY in JSON with no commentary: {"valid": true|false, "issues": ["issue1"]}`,
+            },
+          ],
+        }],
+      });
+
+      const raw = res.content[0].text.trim();
+      const start = raw.indexOf('{');
+      const end = raw.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        const result = JSON.parse(raw.slice(start, end + 1));
+        if (!result.valid && result.issues?.length > 0) {
+          warnings.push(`Look "${look.name}" failed visual check: ${result.issues.join('; ')}`);
+        }
+      }
+    } catch (e) {
+      console.error(`[vision] Skipping look "${look.name}":`, e.message);
+      // Graceful degradation — text checks already ran, don't block on vision failure
+    }
+  }
+  return warnings;
+}
+
 app.get('/api/weekly-plan', (req, res) => {
   const { week } = req.query;
   if (!week) return res.status(400).json({ error: 'week param required (YYYY-MM-DD)' });
@@ -1178,6 +1241,10 @@ app.post('/api/weekly-plan/generate', async (req, res) => {
 
   // Fetch rich product catalog for Claude (grouped by category, with descriptions + tags)
   const productCatalog = await getProductCatalogForPrompt({ perCategory: 6 }).catch(() => '');
+
+  // Build handle → product map for vision validation (reuses the 30-min Shopify cache)
+  const allProducts = await getInStockProducts({ limit: 999 }).catch(() => []);
+  const catalogByHandle = Object.fromEntries(allProducts.map(p => [p.handle, p]));
 
   // Build Claude prompt
   const brandContext = getBrandContext();
@@ -1379,22 +1446,29 @@ CRITICAL RULES for component-story emails — check these before returning JSON:
 
     const generated = JSON.parse(raw.slice(start, end + 1));
 
-    // Validate + auto-fix email items — up to 3 attempts per item
+    // Validate + auto-fix email items — up to 3 attempts per item (text + vision)
     const validated = await Promise.all(generated.map(async (item) => {
       if (item.channel !== 'email') return item;
+      const isLooksBased = ['multi-look', 'story-led', 'single-hero', 'category-focus'].includes(item.template);
       let current = item;
       for (let attempt = 1; attempt <= 3; attempt++) {
-        const { valid, warnings } = validateEmailItem(current, personas);
-        if (valid) {
+        const { warnings: textWarnings } = validateEmailItem(current, personas);
+        const visionWarnings = isLooksBased
+          ? await visionValidateLooks(current, anthropic, catalogByHandle)
+          : [];
+        const allWarnings = [...textWarnings, ...visionWarnings];
+        if (allWarnings.length === 0) {
           if (attempt > 1) console.log(`[validate] "${current.theme}" passed on attempt ${attempt}`);
           return current;
         }
-        console.log(`[validate] Attempt ${attempt}/3 fixing "${current.theme}": ${warnings.join('; ')}`);
-        current = await critiqueAndRevise(current, warnings, anthropic);
+        console.log(`[validate] Attempt ${attempt}/3 fixing "${current.theme}": ${allWarnings.join('; ')}`);
+        current = await critiqueAndRevise(current, allWarnings, anthropic);
       }
-      const { valid: finalValid, warnings: finalWarnings } = validateEmailItem(current, personas);
-      if (!finalValid) console.log(`[validate] "${current.theme}" still has issues after 3 attempts: ${finalWarnings.join('; ')}`);
-      return { ...current, validationWarnings: finalValid ? [] : finalWarnings };
+      const { warnings: finalTextWarnings } = validateEmailItem(current, personas);
+      const finalVisionWarnings = isLooksBased ? await visionValidateLooks(current, anthropic, catalogByHandle) : [];
+      const finalWarnings = [...finalTextWarnings, ...finalVisionWarnings];
+      if (finalWarnings.length > 0) console.log(`[validate] "${current.theme}" still has issues after 3 attempts: ${finalWarnings.join('; ')}`);
+      return { ...current, validationWarnings: finalWarnings.length > 0 ? finalWarnings : [] };
     }));
 
     const now = Date.now();
