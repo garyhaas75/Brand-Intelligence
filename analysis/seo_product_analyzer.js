@@ -32,7 +32,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
 const { getBrandContext } = require('../utils/brand_context');
-const { buildCache, getValidValues } = require('../shopify/metaobject_cache');
+const { buildFullCache, getValidValues } = require('../shopify/metaobject_cache');
 
 const LOG_FILE       = path.join(__dirname, '../logs/seo_product_analyzer.log');
 const CATALOG_FILE   = path.join(__dirname, '../data/product_catalog.json');
@@ -707,19 +707,22 @@ async function run() {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext();
 
-  // Build metaobject cache once — queries Shopify for valid taxonomy values per field.
-  // Used to constrain Claude's output so taxonomy fields return exact GID-resolvable strings.
+  // Build merchant metaobject cache once — base cache used for all products.
+  // Per-product taxonomy attribute cache is merged in below when category GID is known.
   log('Building Shopify metaobject cache…');
-  const metaCache = await buildCache().catch(err => {
+  const baseMerchantCache = await buildFullCache(null).catch(err => {
     log(`WARN: metaobject cache build failed (${err.message}) — taxonomy fields will use freeform values`);
     return {};
   });
-  const cachedKeys = Object.keys(metaCache);
+  const cachedKeys = Object.keys(baseMerchantCache);
   if (cachedKeys.length) {
-    log(`Metaobject cache ready: ${cachedKeys.map(k => `${k}(${metaCache[k].validValues.length})`).join(', ')}`);
+    log(`Metaobject cache ready: ${cachedKeys.map(k => `${k}(${baseMerchantCache[k].validValues.length})`).join(', ')}`);
   } else {
     log('Metaobject cache: empty (Shopify not configured or no taxonomy metaobjects found)');
   }
+
+  // Per-category taxonomy cache — memoized by category GID.
+  const taxonomyCacheByGid = {};
 
   let successCount = 0;
   let errorCount = 0;
@@ -729,6 +732,21 @@ async function run() {
     const categoryGroup = detectCategoryGroup(product.category);
     const specificType = detectSpecificType(product);
     log(`  [${i + 1}/${batch.length}] [${specificType}] ${product.name.substring(0, 55)}`);
+
+    // For products with a known taxonomy GID (from a previous analysis), build taxonomy attribute
+    // cache to constrain Claude's output to valid Shopify taxonomy values (fabric, neckline, etc.).
+    let metaCache = baseMerchantCache;
+    const existingEntry = seoData.products?.find(p => p.href === product.href);
+    const knownCategoryGid = existingEntry?.suggested?.shopify_taxonomy_gid || null;
+    const rawCategoryGid = knownCategoryGid && typeof knownCategoryGid === 'object' ? knownCategoryGid.id : knownCategoryGid;
+    if (rawCategoryGid) {
+      if (!taxonomyCacheByGid[rawCategoryGid]) {
+        taxonomyCacheByGid[rawCategoryGid] = await buildFullCache(rawCategoryGid).catch(() => baseMerchantCache);
+        const taxKeys = Object.keys(taxonomyCacheByGid[rawCategoryGid]).filter(k => taxonomyCacheByGid[rawCategoryGid][k].source === 'taxonomy');
+        if (taxKeys.length) log(`    taxonomy attributes for this category: ${taxKeys.join(', ')}`);
+      }
+      metaCache = taxonomyCacheByGid[rawCategoryGid];
+    }
 
     try {
       const suggested = await analyzeProduct(client, product, brandContext, metaCache);

@@ -1,25 +1,31 @@
 /**
- * Shopify Metaobject Cache
- * Builds a name→GID lookup for Shopify taxonomy category metafields.
- * Used by both the SEO analyzer (to constrain Claude's output to valid values)
- * and push_seo.js (to resolve exact display values to their store-specific GIDs).
+ * Shopify Metaobject + Taxonomy Attribute Cache
+ * Builds a name→GID lookup for Shopify category metafields — two sources:
  *
- * ALL Shopify category metafields use list.metaobject_reference type.
- * Each value is a store-specific GID like gid://shopify/Metaobject/12345.
+ * 1. Merchant metaobjects (source: 'metaobject')
+ *    - Queried via metaobjects(type: "shopify--X") — merchant-created entries
+ *    - GIDs are store-specific: gid://shopify/Metaobject/12345
+ *    - Push type: list.metaobject_reference
+ *    - Examples: material, closure-type, age-group, target-gender
  *
- * IMPORTANT: metaobjectDefinitions only returns merchant-created definitions,
- * NOT Shopify's system-managed taxonomy metaobjects. We skip definition discovery
- * and directly query metaobjects by well-known Shopify type strings instead.
+ * 2. Shopify taxonomy attributes (source: 'taxonomy')
+ *    - Queried via taxonomyCategory(id: $id) → attributes → values
+ *    - GIDs are globally standardized: gid://shopify/TaxonomyValue/6
+ *    - Push type: list.taxonomy_reference
+ *    - Examples: fabric, neckline, sleeve-length-type, care-instructions
  *
- * Type→key naming: Shopify metaobject type "shopify--material" → metafield key "material".
- * Strip "shopify--" prefix from type to get the metafield key.
+ * Exports:
+ *   buildCache()                  — merchant metaobjects only (legacy, still used)
+ *   buildTaxonomyAttributeCache(categoryGid) — taxonomy attributes for one category
+ *   buildFullCache(categoryGid)   — combines both; taxonomy wins on key conflict
+ *   getValidValues(cache, key)    — ["Wool", "Cotton"] or null
+ *   resolveToGid(cache, key, val) — GID string or null
+ *   getMetafieldType(cache, key)  — 'list.metaobject_reference' | 'list.taxonomy_reference'
  *
- * Cache freshness: buildCache() always queries Shopify fresh — no disk caching.
- * Call once at the start of each analyzer/push run.
- *
- * Run this file directly for diagnostics:
+ * Run directly for diagnostics:
  *   node shopify/metaobject_cache.js
- *   node shopify/metaobject_cache.js --definitions  (list all metaobject definitions)
+ *   node shopify/metaobject_cache.js --definitions
+ *   node shopify/metaobject_cache.js --taxonomy=gid://shopify/TaxonomyCategory/aa-4-1-3
  */
 
 require('dotenv').config();
@@ -29,9 +35,8 @@ const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
 const ADMIN_TOKEN  = process.env.SHOPIFY_ADMIN_API_TOKEN;
 const API_VERSION  = process.env.SHOPIFY_API_VERSION || '2025-07';
 
-// Field keys and their Shopify type strings to query.
-// Key = cache field key (also used as the Shopify metafield key, without shopify-- prefix).
-// Candidates = type strings to try in order; first one with entries is used.
+// Merchant metaobject types to query (source: 'metaobject').
+// Key = cache field key = Shopify metafield key.
 const FIELD_KEY_CANDIDATES = {
   'material':                  ['shopify--material'],
   'closure-type':              ['shopify--closure-type'],
@@ -42,11 +47,6 @@ const FIELD_KEY_CANDIDATES = {
   'skirt-dress-length-type':   ['shopify--skirt-dress-length-type'],
   'color-pattern':             ['shopify--color-pattern'],
   'toe-style':                 ['shopify--toe-style'],
-  // Retained in case Shopify adds these entries later:
-  'fabric':                    ['shopify--fabric'],
-  'neckline':                  ['shopify--neckline'],
-  'sleeve-length-type':        ['shopify--sleeve-length-type'],
-  'care-instructions':         ['shopify--care-instructions'],
 };
 
 function shopifyGraphQL(query, variables = {}) {
@@ -79,7 +79,7 @@ function shopifyGraphQL(query, variables = {}) {
   });
 }
 
-// Fetch entries for a specific metaobject type. Returns [] if type doesn't exist.
+// Fetch entries for a specific merchant metaobject type. Returns [] if type doesn't exist.
 async function fetchEntries(type) {
   try {
     const data = await shopifyGraphQL(`
@@ -118,16 +118,11 @@ async function fetchDefinitions() {
 }
 
 /**
- * Build a fresh lookup cache from Shopify.
- * Returns: { [fieldKey]: { type, nameToGid, gidToName, validValues } }
- *
- * Only includes field keys that actually have entries in the store.
- * If Shopify credentials are not configured, returns {} gracefully.
+ * Build merchant metaobject cache (source: 'metaobject').
+ * Returns: { [fieldKey]: { source: 'metaobject', type, nameToGid, gidToName, validValues } }
  */
 async function buildCache() {
-  if (!STORE_DOMAIN || !ADMIN_TOKEN) {
-    return {};
-  }
+  if (!STORE_DOMAIN || !ADMIN_TOKEN) return {};
 
   const cache = {};
   const verbose = process.env.NODE_ENV !== 'test';
@@ -145,6 +140,7 @@ async function buildCache() {
       }
 
       cache[fieldKey] = {
+        source: 'metaobject',
         type: typeStr,
         nameToGid,
         gidToName,
@@ -161,6 +157,141 @@ async function buildCache() {
   return cache;
 }
 
+// Attribute names from Shopify taxonomy → the metafield key we use for them.
+// Shopify uses "Fabric" but the metafield key is "fabric", "Neckline" → "neckline", etc.
+// Any attribute name not in this map is skipped (e.g. Color, Size, Pattern, Age group —
+// those are either pushed separately or not used in our flow).
+const TAXONOMY_ATTR_NAME_TO_KEY = {
+  'Fabric':              'fabric',
+  'Neckline':            'neckline',
+  'Sleeve length type':  'sleeve-length-type',
+  'Care instructions':   'care-instructions',
+};
+
+/**
+ * Build taxonomy attribute cache for a specific Shopify taxonomy category.
+ *
+ * Approach: strip the last GID segment to get the parent category, then query
+ * childrenOf(parent) to get the first sibling — all siblings share the same attribute
+ * definitions. Extracts only the attribute types we care about (fabric, neckline, etc.).
+ *
+ * TaxonomyValue GIDs are globally standardized (gid://shopify/TaxonomyValue/X).
+ * Push type for these is list.taxonomy_reference (not list.metaobject_reference).
+ *
+ * Returns {} gracefully on any error.
+ */
+async function buildTaxonomyAttributeCache(categoryGid) {
+  if (!STORE_DOMAIN || !ADMIN_TOKEN || !categoryGid) return {};
+
+  const verbose = process.env.NODE_ENV !== 'test';
+
+  try {
+    // Derive parent GID by stripping the last hyphen-segment from the category ID.
+    // e.g. "gid://shopify/TaxonomyCategory/aa-1-10-2-11" → parent "gid://shopify/TaxonomyCategory/aa-1-10-2"
+    const prefix = 'gid://shopify/TaxonomyCategory/';
+    const idPart = categoryGid.replace(prefix, ''); // e.g. "aa-1-10-2-11"
+    const segments = idPart.split('-');
+    segments.pop(); // remove last segment
+    if (segments.length < 2) {
+      if (verbose) console.log(`[taxonomy_cache] GID too shallow to derive parent: ${categoryGid}`);
+      return {};
+    }
+    const parentGid = prefix + segments.join('-');
+
+    const data = await shopifyGraphQL(`
+      query TaxonomyParentChildren($parent: ID!) {
+        taxonomy {
+          categories(first: 1, childrenOf: $parent) {
+            edges {
+              node {
+                id
+                name
+                attributes(first: 30) {
+                  edges {
+                    node {
+                      ... on TaxonomyChoiceListAttribute {
+                        id
+                        name
+                        values(first: 100) {
+                          edges {
+                            node {
+                              id
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `, { parent: parentGid });
+
+    const catEdges = data?.taxonomy?.categories?.edges || [];
+    if (!catEdges.length) {
+      if (verbose) console.log(`[taxonomy_cache] No categories found under parent: ${parentGid}`);
+      return {};
+    }
+
+    const repCategory = catEdges[0].node;
+    if (verbose) console.log(`[taxonomy_cache] Using attributes from: ${repCategory.name} (${repCategory.id})`);
+
+    const cache = {};
+    const attrEdges = repCategory.attributes?.edges || [];
+
+    for (const edge of attrEdges) {
+      const attr = edge.node;
+      if (!attr.name || !attr.values) continue; // skip non-choice-list (TaxonomyMeasurementAttribute)
+
+      const metafieldKey = TAXONOMY_ATTR_NAME_TO_KEY[attr.name];
+      if (!metafieldKey) continue; // skip Color, Size, Pattern, etc.
+
+      const values = attr.values.edges.map(e => e.node).filter(v => v.id && v.name);
+      if (!values.length) continue;
+
+      const nameToGid = {};
+      const gidToName = {};
+      for (const v of values) {
+        nameToGid[v.name] = v.id;
+        gidToName[v.id] = v.name;
+      }
+
+      cache[metafieldKey] = {
+        source: 'taxonomy',
+        nameToGid,
+        gidToName,
+        validValues: Object.keys(nameToGid).sort(),
+      };
+
+      if (verbose) {
+        console.log(`[taxonomy_cache] ${metafieldKey} (${attr.name}): ${values.length} values — ${Object.keys(nameToGid).slice(0, 8).join(', ')}${values.length > 8 ? '…' : ''}`);
+      }
+    }
+
+    return cache;
+  } catch (err) {
+    if (verbose) console.log(`[taxonomy_cache] WARN: ${err.message} — taxonomy attributes unavailable`);
+    return {};
+  }
+}
+
+/**
+ * Build combined cache: merchant metaobjects + taxonomy attributes for a category.
+ * Taxonomy entries override merchant entries on key conflict (taxonomy is more specific).
+ * Call once per run; pass the product's shopify_taxonomy_gid if known.
+ */
+async function buildFullCache(categoryGid) {
+  const [merchantCache, taxonomyCache] = await Promise.all([
+    buildCache(),
+    categoryGid ? buildTaxonomyAttributeCache(categoryGid) : Promise.resolve({}),
+  ]);
+  return { ...merchantCache, ...taxonomyCache };
+}
+
 /**
  * Get valid display-value strings for a field key.
  * Returns array like ["Wool", "Cotton"] or null if field not in cache.
@@ -170,7 +301,7 @@ function getValidValues(cache, fieldKey) {
 }
 
 /**
- * Resolve an exact display value to its Shopify metaobject GID.
+ * Resolve an exact display value to its Shopify GID.
  * Returns GID string or null if not found.
  */
 function resolveToGid(cache, fieldKey, displayValue) {
@@ -178,7 +309,17 @@ function resolveToGid(cache, fieldKey, displayValue) {
   return cache[fieldKey].nameToGid[displayValue] || null;
 }
 
-module.exports = { buildCache, getValidValues, resolveToGid };
+/**
+ * Get the correct Shopify metafield type for a cache field.
+ * - 'metaobject' source → 'list.metaobject_reference'
+ * - 'taxonomy' source   → 'list.taxonomy_reference'
+ */
+function getMetafieldType(cache, fieldKey) {
+  const source = cache?.[fieldKey]?.source;
+  return source === 'taxonomy' ? 'list.taxonomy_reference' : 'list.metaobject_reference';
+}
+
+module.exports = { buildCache, buildTaxonomyAttributeCache, buildFullCache, getValidValues, resolveToGid, getMetafieldType };
 
 // ─── Diagnostic CLI ───────────────────────────────────────────────────────────
 if (require.main === module) {
@@ -188,7 +329,7 @@ if (require.main === module) {
       console.error('ERROR: SHOPIFY_STORE_DOMAIN and SHOPIFY_ADMIN_API_TOKEN must be set in .env');
       process.exit(1);
     }
-    console.log(`Shopify Metaobject Cache Diagnostic`);
+    console.log(`Shopify Metaobject + Taxonomy Cache Diagnostic`);
     console.log(`Store: ${STORE_DOMAIN} | API: ${API_VERSION}\n`);
 
     if (args.includes('--definitions')) {
@@ -202,7 +343,24 @@ if (require.main === module) {
       console.log();
     }
 
-    console.log('=== Cache Build ===');
+    const taxonomyGid = (args.find(a => a.startsWith('--taxonomy=')) || '').replace('--taxonomy=', '') || null;
+
+    if (taxonomyGid) {
+      console.log(`=== Taxonomy Attribute Cache (${taxonomyGid}) ===`);
+      const taxCache = await buildTaxonomyAttributeCache(taxonomyGid);
+      const taxKeys = Object.keys(taxCache);
+      if (!taxKeys.length) {
+        console.log('  (no taxonomy attributes found)');
+      } else {
+        for (const [key, data] of Object.entries(taxCache)) {
+          console.log(`\n  ${key} (taxonomy, ${data.validValues.length} values)`);
+          data.validValues.forEach(v => console.log(`    - "${v}"  →  ${data.nameToGid[v]}`));
+        }
+      }
+      console.log();
+    }
+
+    console.log('=== Merchant Metaobject Cache ===');
     const cache = await buildCache();
     const keys = Object.keys(cache);
     if (!keys.length) {
