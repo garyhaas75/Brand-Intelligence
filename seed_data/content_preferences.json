@@ -83,6 +83,62 @@
       "Weekend with polish: clean trouser or straight-leg denim (not in AK catalog — avoid), knit top, loafer or flat"
     ]
   },
+  "personas": {
+    "The Polished Professional": {
+      "dos": [
+        "Always show the complete look: jacket, bottom, shoe — she wants zero assembly required",
+        "Name her exact moment: 'The Tuesday board presentation', 'Q2 review', 'The client who flew in from Chicago'",
+        "Lead with efficiency — she is time-starved and wants authority without effort",
+        "Reference quality and longevity — she invests in pieces she'll wear 30+ times",
+        "Show her how one blazer transitions from 9am to dinner — versatility is her currency"
+      ],
+      "donts": [
+        "Don't suggest 'building' a wardrobe over time — she wants to buy complete looks now",
+        "Never use trend language — she dresses for credibility and impact, not trend cycles",
+        "Don't show casual looks — even her 'relaxed Friday' is intentionally polished",
+        "Never make her assemble the outfit herself — the look should be complete and obvious"
+      ]
+    },
+    "The Emerging Leader": {
+      "dos": [
+        "Show her how to look senior without aging herself up — that's the exact tension she lives",
+        "Pair each look with an aspirational occasion just one level above her current role",
+        "Mention price value honestly — she stretches for quality but is budget-aware",
+        "Styling language should feel like a mentor tip, not a brand lecture"
+      ],
+      "donts": [
+        "Don't assume boardroom access — she's in the conference room, not leading it yet",
+        "Never show looks that read as 'mom dressing' — she's ambitious and still defining her style",
+        "Don't price her out — if looks average over $200/item, she feels excluded not inspired"
+      ]
+    },
+    "The Refined Rewinder": {
+      "dos": [
+        "Treat her as the most sophisticated buyer in the room — she reads fabric composition and construction details",
+        "Reference her freedom — fewer obligations, more discretion, she buys what she loves not what she needs",
+        "Quality and longevity over seasonality — she buys pieces she'll wear for years, not seasons",
+        "Speak to her as an equal, not a demographic — she's been buying quality clothing for 30 years"
+      ],
+      "donts": [
+        "Never tokenize her age — she wants to be styled beautifully, not represented as a diversity checkbox",
+        "Avoid anything that reads as 'age appropriate' — she's ageless, not matronly",
+        "No fast-fashion framing, no urgency language — she shops on her own timeline"
+      ]
+    },
+    "The Practical Multitasker": {
+      "dos": [
+        "Show versatility explicitly and literally: 'School drop-off at 8am, client presentation at 2pm, dinner at 7pm — one outfit'",
+        "Emphasize reliability — she needs pieces that won't let her down on a hard day",
+        "Price-conscious framing is appropriate — she responds to smart value, not luxury signaling",
+        "Washable, wrinkle-resistant, low-maintenance details matter to her — mention them"
+      ],
+      "donts": [
+        "Don't make her feel guilty for needing practical — her life is full and her wardrobe needs to keep up",
+        "Avoid high-maintenance looks — anything that needs dry cleaning after one wear is wrong for her",
+        "Don't show single-occasion looks — everything must work for at least two different contexts"
+      ]
+    }
+  },
   "approvedExamples": [],
   "revisedExamples": []
 }

@@ -977,6 +977,96 @@ Return ONLY valid JSON matching the existing structure, no commentary.`,
   }
 }
 
+function validateEmailItem(item, personasData) {
+  const warnings = [];
+  if (item.channel !== 'email' || !item.looks) return { valid: true, warnings };
+
+  const looks = item.looks;
+  const subject = (item.email?.subjectLine || '') + ' ' + (item.email?.previewText || '');
+
+  // Check 1: Number claims in subject vs actual look count
+  const numMatch = subject.match(/\b(\d+)\s*(outfit|look|piece|day)/i);
+  const allWeek = /all week/i.test(subject);
+  if (allWeek && looks.length < 5) {
+    warnings.push(`Subject says "all week" (5 days) but has only ${looks.length} looks`);
+  } else if (numMatch) {
+    const claimed = parseInt(numMatch[1]);
+    const noun = numMatch[2].toLowerCase();
+    if (['outfit', 'look', 'day'].includes(noun) && looks.length !== claimed) {
+      warnings.push(`Subject claims ${claimed} ${noun}s but has ${looks.length} looks`);
+    }
+  }
+
+  // Check 2: Duplicate hero products (within this email)
+  const heroHandles = looks.map(l => (l.products || [])[0]?.handle).filter(Boolean);
+  const heroSet = new Set(heroHandles);
+  if (heroSet.size < heroHandles.length) {
+    const dupes = heroHandles.filter((h, i) => heroHandles.indexOf(h) !== i);
+    warnings.push(`Duplicate hero products across looks: ${dupes.join(', ')}`);
+  }
+
+  // Check 3: Any look with fewer than 2 products
+  const thinLooks = looks.filter(l => (l.products || []).length < 2).map(l => l.name);
+  if (thinLooks.length > 0) {
+    warnings.push(`Looks with fewer than 2 products: ${thinLooks.join(', ')}`);
+  }
+
+  // Check 4: Persona price coherence
+  if (personasData && item.targetPersona) {
+    const persona = (personasData.personas || []).find(p => p.name === item.targetPersona);
+    if (persona) {
+      const isEntryPersona = /\$55k|\$65k/.test(persona.income || '');
+      const allPrices = looks.flatMap(l => (l.products || []).map(p => p.price || 0)).filter(p => p > 0);
+      const avgPrice = allPrices.length > 0 ? allPrices.reduce((a, b) => a + b, 0) / allPrices.length : 0;
+      if (isEntryPersona && avgPrice > 200) {
+        warnings.push(`Price mismatch: ${item.targetPersona} but avg product price is $${Math.round(avgPrice)} — too high for her budget`);
+      }
+    }
+  }
+
+  return { valid: warnings.length === 0, warnings };
+}
+
+async function critiqueAndRevise(item, warnings, anthropic) {
+  const prefs = loadContentPreferences();
+  const stylingRules = prefs?.stylingRules ? JSON.stringify(prefs.stylingRules) : '{}';
+  try {
+    const res = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      messages: [{
+        role: 'user',
+        content: `You are a fashion editor and copywriter for Anne Klein reviewing a generated email content card.
+
+The following issues were found:
+${warnings.map((w, i) => `${i + 1}. ${w}`).join('\n')}
+
+Styling rules: ${stylingRules}
+
+Current item JSON:
+${JSON.stringify(item, null, 2)}
+
+Fix ALL the issues above:
+- If subject claims N outfits/looks/days, adjust the looks array to have exactly N looks with unique hero products, OR rewrite the subject to match the actual look count — whichever requires fewer changes
+- Each look must have a DIFFERENT first (hero) product handle
+- Every look needs at least 2 products
+- Keep the same theme, persona, template, campaign, and overall styling angle
+
+Return ONLY the corrected item as valid JSON (same schema as input, no commentary).`,
+      }],
+    });
+    const raw = res.content[0].text.trim();
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start === -1 || end === -1) return item;
+    const revised = JSON.parse(raw.slice(start, end + 1));
+    return { ...item, ...revised, id: item.id, weekOf: item.weekOf, generatedAt: item.generatedAt };
+  } catch (e) {
+    console.error('[critique] Haiku revision failed:', e.message);
+    return item;
+  }
+}
+
 app.get('/api/weekly-plan', (req, res) => {
   const { week } = req.query;
   if (!week) return res.status(400).json({ error: 'week param required (YYYY-MM-DD)' });
@@ -1050,14 +1140,27 @@ Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w =
     ? sentHistory.map(i => `[${i.date}] ${i.channel} — Theme: "${i.theme}"${i.subjectLine ? ` | Subject: "${i.subjectLine}"` : ''}`).join('\n')
     : 'No sent history yet.';
 
-  const personasContext = (personas?.personas || []).slice(0, 3)
-    .map(p => `${p.name}: ${p.ageRange}, ${p.income} — Motivators: ${(p.motivators || []).slice(0, 2).join(', ')}`)
-    .join('\n');
+  const personasContext = (personas?.personas || []).slice(0, 3).map(p => `
+PERSONA: ${p.name} | Age: ${p.ageRange} | Income: ${p.income}
+Lifestyle: ${(p.lifestyle || []).slice(0, 2).join(' | ')}
+Fashion goals: ${(p.fashionGoals || []).join(' | ')}
+Pain points: ${(p.painPoints || []).slice(0, 3).join(' | ')}
+Shopping triggers: ${(p.motivators || []).slice(0, 3).join(' | ')}
+Content that resonates: ${(p.contentTopics || []).slice(0, 3).join(' | ')}
+Her voice: "${p.quoteExample || ''}"
+Occasions she dresses for: ${(p.lifestyle || []).filter(l => /meeting|lunch|client|travel|event/i.test(l)).join(' | ') || 'professional settings, business travel, evening events'}
+`).join('\n---\n');
 
   const productContext = productCatalog || '';
 
   // Inject learned content preferences
   const prefs = loadContentPreferences();
+  const activePersonaNames = activeCampaigns.map(c => c.persona).filter(Boolean);
+  const personaRuleText = activePersonaNames.map(name => {
+    const r = (prefs?.personas || {})[name];
+    if (!r) return '';
+    return `\n${name} specific rules:\nDos: ${(r.dos || []).join(' | ')}\nDon'ts: ${(r.donts || []).join(' | ')}`;
+  }).filter(Boolean).join('\n');
   const prefsContext = prefs ? `
 CONTENT RULES (apply to all output):
 EMAIL dos: ${prefs.email?.dos?.join(' | ') || 'none yet'}
@@ -1068,7 +1171,7 @@ STYLING RULES (apply when building looks and product pairings):
 Color combos approved: ${prefs.stylingRules?.colorCombinations?.approved?.join(' | ') || ''}
 Color combos to avoid: ${prefs.stylingRules?.colorCombinations?.avoid?.join(' | ') || ''}
 Outfit logic: ${prefs.stylingRules?.outfitLogic?.join(' | ') || ''}
-Occasion framing: ${prefs.stylingRules?.occasionFraming?.join(' | ') || ''}${prefs.revisedExamples?.length ? `
+Occasion framing: ${prefs.stylingRules?.occasionFraming?.join(' | ') || ''}${personaRuleText}${prefs.revisedExamples?.length ? `
 Past corrections (apply these lessons):
 ${prefs.revisedExamples.slice(-5).map(e => `- Feedback "${e.feedback}" → changed "${e.original}" to "${e.revised}"`).join('\n')}` : ''}
 ` : '';
@@ -1162,10 +1265,18 @@ Rules:
 - Do NOT repeat themes from recent sent history listed above
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
 - For EMAIL looks: assign products from the IN-STOCK PRODUCTS catalog above. Each look must have at least one UNIQUE hero product not used in any other look — do NOT repeat the same product across multiple looks. Each look gets 2-3 complementary products. Apply the outfit logic rules: structured jacket needs a soft piece underneath, every look needs a bottom or dress, shoes should appear. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
+- PERSONA TAILORING: Write every email as if you ARE a trusted stylist speaking directly to that specific persona. Use the persona's fashion goals, pain points, and her own voice (quoteExample) to shape the look names, angles, and subject line. The Polished Professional should feel understood and efficient. The Emerging Leader should feel mentored not lectured. The Refined Rewinder should feel respected not patronized. The Practical Multitasker should feel seen not judged.
+
+CRITICAL EMAIL RULES — check these before returning JSON:
+1. SUBJECT LINE MATH: Count the number of looks you wrote. If your subject line says "N outfits", "N looks", or "N days" — the looks array MUST contain exactly N looks. "All week" means 5 looks. "3 outfits" means 3 looks. If the count is wrong, either add the missing looks or rewrite the subject line to match.
+2. NO REPEATED HEROES: Every look must have a DIFFERENT first (hero) product. The same product handle must not appear as the hero in more than one look. If you find yourself reusing a hero, swap it for a different product from the catalog.
+3. COMPLETE OUTFITS ONLY: Each look must have at least 2 products — a top or jacket AND a bottom or dress. Shoes should appear in at least half the looks. A single product is not a look.
+4. OUTFIT LOGIC: Never pair two stiff/structured pieces (e.g. blazer over a sheath dress is fine; blazer over a structured jacket is not). Every structured top needs something soft underneath or alongside.
+5. SELF-CHECK BEFORE OUTPUT: Re-read your subject line. Count your looks. Do they match? Are all hero products unique? If not — fix it before returning.
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const msg = await anthropic.messages.create({
       model: 'claude-opus-4-6',
       max_tokens: 8000,
@@ -1178,8 +1289,20 @@ Rules:
     if (start === -1 || end === -1) throw new Error('Claude did not return a valid JSON array');
 
     const generated = JSON.parse(raw.slice(start, end + 1));
+
+    // Validate + auto-fix email items
+    const validated = await Promise.all(generated.map(async (item) => {
+      if (item.channel !== 'email') return item;
+      const { valid, warnings } = validateEmailItem(item, personas);
+      if (valid) return item;
+      console.log(`[validate] Fixing "${item.theme}": ${warnings.join('; ')}`);
+      const fixed = await critiqueAndRevise(item, warnings, anthropic);
+      const { valid: stillValid, warnings: remaining } = validateEmailItem(fixed, personas);
+      return { ...fixed, validationWarnings: stillValid ? [] : remaining };
+    }));
+
     const now = Date.now();
-    const items = generated.map((item, i) => {
+    const items = validated.map((item, i) => {
       // Flatten looks → products, deduped by handle
       const seenHandles = new Set();
       const flatProducts = (item.looks

@@ -1499,6 +1499,13 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                     {/* Theme */}
                     {item.theme && <div style={{ fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 10 }}>{item.theme}</div>}
 
+                    {/* Validation warning badge — only if auto-fix couldn't fully resolve issues */}
+                    {item.validationWarnings?.length > 0 && (
+                      <div style={{ background: '#FFF3CD', border: '1px solid #FFC107', borderRadius: 6, padding: '6px 12px', fontSize: 12, color: '#856404', marginBottom: 10, lineHeight: 1.5 }}>
+                        ⚠ Needs review: {item.validationWarnings.join(' · ')}
+                      </div>
+                    )}
+
                     {/* Channel-specific content */}
                     {item.channel === 'email' && item.email && (
                       <div style={{ display: 'grid', gap: 8 }}>
