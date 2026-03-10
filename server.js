@@ -911,6 +911,72 @@ function saveWeeklyPlans(data) {
   fs.writeFileSync(WEEKLY_PLANS_FILE, JSON.stringify(data, null, 2));
 }
 
+const CONTENT_PREFS_FILE = path.join(DATA_DIR, 'content_preferences.json');
+const CONTENT_FEEDBACK_LOG = path.join(DATA_DIR, 'content_feedback_log.json');
+
+function loadContentPreferences() {
+  try { return JSON.parse(fs.readFileSync(CONTENT_PREFS_FILE, 'utf8')); } catch { return null; }
+}
+function saveContentPreferences(data) {
+  data.updatedAt = new Date().toISOString();
+  fs.writeFileSync(CONTENT_PREFS_FILE, JSON.stringify(data, null, 2));
+}
+function appendFeedbackLog(entry) {
+  try {
+    let log = [];
+    if (fs.existsSync(CONTENT_FEEDBACK_LOG)) {
+      log = JSON.parse(fs.readFileSync(CONTENT_FEEDBACK_LOG, 'utf8'));
+    }
+    log.push({ ts: new Date().toISOString(), ...entry });
+    fs.writeFileSync(CONTENT_FEEDBACK_LOG, JSON.stringify(log, null, 2));
+  } catch {}
+}
+
+// Background: update content_preferences.json with learnings from a feedback event.
+// Uses Haiku (cheap/fast) since this is bookkeeping, not user-facing.
+async function updatePreferencesFromFeedback(channel, feedback, originalSnippet, revisedSnippet) {
+  try {
+    const prefs = loadContentPreferences() || {
+      email: { dos: [], donts: [], toneNotes: [] },
+      instagram: { dos: [], donts: [], toneNotes: [] },
+      approvedExamples: [],
+      revisedExamples: [],
+    };
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 900,
+      messages: [{
+        role: 'user',
+        content: `You maintain a content preferences file for Anne Klein marketing.
+Current preferences: ${JSON.stringify(prefs)}
+
+New feedback event:
+- Channel: ${channel}
+- User feedback: "${feedback}"
+- Original content snippet: ${originalSnippet}
+- Revised content snippet: ${revisedSnippet}
+
+Update the preferences JSON:
+- Add any new dos/donts/toneNotes implied by this feedback to the appropriate channel arrays
+- Avoid duplicating existing entries
+- Add a concise entry to revisedExamples (keep max 20 total)
+- Do not remove existing entries unless they directly contradict this feedback
+
+Return ONLY valid JSON matching the existing structure, no commentary.`,
+      }],
+    });
+    const raw = msg.content[0].text.trim();
+    const start = raw.indexOf('{'), end = raw.lastIndexOf('}');
+    if (start !== -1 && end !== -1) {
+      const updated = JSON.parse(raw.slice(start, end + 1));
+      saveContentPreferences(updated);
+    }
+  } catch (err) {
+    console.error('[prefs update] failed:', err.message);
+  }
+}
+
 app.get('/api/weekly-plan', (req, res) => {
   const { week } = req.query;
   if (!week) return res.status(400).json({ error: 'week param required (YYYY-MM-DD)' });
@@ -990,6 +1056,17 @@ Prior arc weeks: ${(c.storyArc || []).filter(w => w.weekNum < c.weekNum).map(w =
 
   const productContext = productCatalog || '';
 
+  // Inject learned content preferences
+  const prefs = loadContentPreferences();
+  const prefsContext = prefs ? `
+CONTENT PREFERENCES (learned from past feedback — follow these strictly):
+EMAIL dos: ${prefs.email?.dos?.join(' | ') || 'none yet'}
+EMAIL don'ts: ${prefs.email?.donts?.join(' | ') || 'none yet'}
+Tone notes: ${prefs.email?.toneNotes?.join(' | ') || 'none yet'}${prefs.revisedExamples?.length ? `
+Past corrections (apply these lessons):
+${prefs.revisedExamples.slice(-5).map(e => `- Feedback "${e.feedback}" → changed "${e.original}" to "${e.revised}"`).join('\n')}` : ''}
+` : '';
+
   const prompt = `You are a marketing strategist and copywriter for Anne Klein. Generate a weekly content plan for the week of ${weekStart}.
 
 ${brandContext}
@@ -1006,7 +1083,7 @@ ${sentContext}
 
 CUSTOMER PERSONAS:
 ${personasContext}
-
+${prefsContext}
 YOUR TASK:
 Generate EXACTLY ${volumes.email || 0} email pieces, ${volumes.instagram || 0} Instagram posts, and ${volumes.hero || 0} hero/site banner pieces for this week.
 
@@ -1019,15 +1096,28 @@ For EMAIL:
   "ownableEventId": "<event id or null>",
   "theme": "<short theme label>",
   "targetPersona": "<persona name>",
-  "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0}],
+  "template": "<multi-look|story-led|category-focus|single-hero>",
+  "looks": [
+    {
+      "name": "<evocative look name, e.g. 'The Board Meeting' or 'Friday Closing'>",
+      "angle": "<1-sentence styling angle for this look>",
+      "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0}]
+    }
+  ],
   "email": {
-    "subjectLine": "<compelling subject, 40-60 chars>",
+    "subjectLine": "<compelling subject, under 50 chars — specific beats generic>",
     "previewText": "<preview text, 80-100 chars>",
     "bodyOutline": "<3-4 bullet points describing body sections>",
     "cta": "<CTA button text>",
     "sendDay": "<recommended day, e.g. Tuesday>"
   }
 }
+
+Template guidance:
+- "multi-look": 3-4 named looks, each with 2-3 products — default for most campaign emails
+- "story-led": 1-2 looks, editorial narrative focus — best for event-driven emails (Mother's Day, etc.)
+- "category-focus": 1 look with 4-6 products from one category — best for category launches
+- "single-hero": 1 look with 1 hero product + 2 supporting items — best for hero product launches
 
 For INSTAGRAM:
 {
@@ -1038,7 +1128,7 @@ For INSTAGRAM:
   "targetPersona": "<persona name>",
   "instagram": {
     "caption": "<full caption, 150-220 chars>",
-    "hashtags": ["<5-8 hashtags>"],
+    "hashtags": ["<max 5 hashtags>"],
     "imageryDirection": "<brief art direction for the image>",
     "productFeature": "<product category or specific piece to feature>"
   }
@@ -1065,7 +1155,7 @@ Rules:
 - If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
 - Do NOT repeat themes from recent sent history listed above
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
-- For EMAIL items: populate "products" with 2-4 specific products chosen from the IN-STOCK PRODUCTS catalog above. Match products to the email's specific theme, arc week, and persona — pick items whose category, tags, and description align with the email angle. Use the handle exactly as shown. If no catalog was provided, use an empty array.
+- For EMAIL looks: assign products from the IN-STOCK PRODUCTS catalog above. Each look should get 2-3 complementary products that work together as an outfit. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
   try {
@@ -1083,14 +1173,21 @@ Rules:
 
     const generated = JSON.parse(raw.slice(start, end + 1));
     const now = Date.now();
-    const items = generated.map((item, i) => ({
-      id: `gen_${now}_${i}`,
-      weekOf: weekStart,
-      approved: false,
-      skipped: false,
-      generatedAt: new Date().toISOString(),
-      ...item,
-    }));
+    const items = generated.map((item, i) => {
+      // Flatten looks → products for backward compat with product selector / calendar
+      const flatProducts = item.looks
+        ? item.looks.flatMap(l => l.products || [])
+        : (item.products || []);
+      return {
+        id: `gen_${now}_${i}`,
+        weekOf: weekStart,
+        approved: false,
+        skipped: false,
+        generatedAt: new Date().toISOString(),
+        ...item,
+        products: flatProducts,
+      };
+    });
 
     if (mode === 'append') {
       plans[weekStart] = [...(plans[weekStart] || []), ...items];
@@ -1233,6 +1330,96 @@ app.patch('/api/weekly-plan/item/:itemId', (req, res) => {
   plans[weekStart] = items;
   saveWeeklyPlans(plans);
   res.json({ ok: true, item });
+});
+
+// POST /api/weekly-plan/item/:itemId/chat — Claude revises a single content card based on feedback
+app.post('/api/weekly-plan/item/:itemId/chat', async (req, res) => {
+  const { itemId } = req.params;
+  const { weekStart, message, history = [] } = req.body || {};
+  if (!weekStart || !message) return res.status(400).json({ error: 'weekStart and message required' });
+
+  const plans = loadWeeklyPlans();
+  const items = plans[weekStart] || [];
+  const item = items.find(i => i.id === itemId);
+  if (!item) return res.status(404).json({ error: 'Item not found' });
+
+  const originalSnapshot = JSON.stringify({ email: item.email, looks: item.looks, template: item.template, theme: item.theme });
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    const systemPrompt = `You are a marketing editor for Anne Klein, a classic American women's fashion brand. You are refining a single content card based on user feedback. The Anne Klein woman is 35–55, professionally accomplished. Tone: authoritative and aspirational, never breathless or salesy.
+
+When the user gives feedback, revise only the relevant fields. Always return:
+1. A JSON block (wrapped in \`\`\`json ... \`\`\`) containing the full updated item fields (email, looks, template, theme — only the fields that exist on this item)
+2. On a new line after the JSON block, a brief plain-text explanation of what you changed (1-2 sentences)`;
+
+    const chatMessages = [
+      ...history.map(h => ({ role: h.role, content: h.content })),
+      {
+        role: 'user',
+        content: `Current content card:\n${originalSnapshot}\n\nFeedback: ${message}`,
+      },
+    ];
+
+    const msg = await anthropic.messages.create({
+      model: 'claude-opus-4-6',
+      max_tokens: 1500,
+      system: systemPrompt,
+      messages: chatMessages,
+    });
+
+    const raw = msg.content[0].text.trim();
+
+    // Extract JSON block
+    let updatedFields = null;
+    const jsonMatch = raw.match(/```json\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      try { updatedFields = JSON.parse(jsonMatch[1].trim()); } catch {}
+    }
+    // Fallback: look for bare { ... }
+    if (!updatedFields) {
+      const s = raw.indexOf('{'), e = raw.lastIndexOf('}');
+      if (s !== -1 && e !== -1) {
+        try { updatedFields = JSON.parse(raw.slice(s, e + 1)); } catch {}
+      }
+    }
+
+    // Extract explanation (text after the JSON block)
+    const explanation = raw.replace(/```json[\s\S]*?```/, '').trim() || 'Content updated.';
+
+    if (updatedFields) {
+      // Merge revised fields, preserve identity fields
+      Object.assign(item, updatedFields);
+      item.id = itemId; // never overwrite
+      item.weekOf = weekStart;
+      // Re-flatten looks → products if looks were updated
+      if (updatedFields.looks) {
+        item.products = updatedFields.looks.flatMap(l => l.products || []);
+      }
+      item.lastEditedAt = new Date().toISOString();
+      plans[weekStart] = items;
+      saveWeeklyPlans(plans);
+    }
+
+    // Log feedback
+    const revisedSnapshot = JSON.stringify({ email: item.email, looks: item.looks, template: item.template });
+    appendFeedbackLog({
+      itemId,
+      channel: item.channel,
+      theme: item.theme,
+      message,
+      originalSnapshot,
+      revisedSnapshot,
+    });
+
+    // Async background: update preferences from this feedback (fire and forget)
+    updatePreferencesFromFeedback(item.channel, message, originalSnapshot, revisedSnapshot);
+
+    res.json({ ok: true, reply: explanation, updatedItem: item });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Serve built dashboard in production

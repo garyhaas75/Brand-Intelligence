@@ -5,7 +5,7 @@ buildCommand = "npm install"
 
 [deploy]
 # Start server + scheduler together (same as npm run start:full minus the dashboard dev server)
-startCommand = "cp -n /app/seed_data/*.json /app/data/; node server.js & node scheduler/index.js & wait"
+startCommand = "cp -n /app/seed_data/*.json /app/data/ 2>/dev/null; node server.js & node scheduler/index.js & wait"
 healthcheckPath = "/api/status"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"

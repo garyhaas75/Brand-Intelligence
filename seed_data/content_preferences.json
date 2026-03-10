@@ -1,0 +1,43 @@
+{
+  "updatedAt": "2026-03-09T00:00:00.000Z",
+  "email": {
+    "dos": [
+      "Lead with the outfit story or occasion, not just the product name",
+      "Subject lines under 50 characters — specific beats generic",
+      "Reference the woman's day/context (board meeting, client lunch, weekend getaway)",
+      "Name each look with an evocative moment or place (e.g. 'The Boardroom Entrance', 'Friday Closing')",
+      "Use 3–4 distinct looks per email so the woman can see herself in at least one"
+    ],
+    "donts": [
+      "Never use the words: trendy, fresh, hot, effortless, must-have",
+      "Don't list products without styling context — always pair them into a look",
+      "Avoid discount language or urgency based on scarcity",
+      "Don't write subject lines that start with 'Your' — too generic",
+      "Avoid passive constructions ('can be worn with') — prefer active ('pairs with', 'anchors')"
+    ],
+    "toneNotes": [
+      "Authoritative and aspirational — never breathless or salesy",
+      "The Anne Klein woman is 35–55, professionally accomplished, values quality over trend",
+      "Write like a trusted stylist friend, not a marketer",
+      "Anne Klein is classic American sportswear with modern edge — not fast fashion, not luxury"
+    ]
+  },
+  "instagram": {
+    "dos": [
+      "Conversational, behind-the-look perspective",
+      "Start with a strong visual hook in the first line",
+      "Use 3–5 targeted hashtags maximum"
+    ],
+    "donts": [
+      "No hashtag spam — max 5 hashtags",
+      "Don't restate what's visually obvious in the image",
+      "Avoid exclamation points in every sentence"
+    ],
+    "toneNotes": [
+      "More casual than email — the woman is scrolling, not shopping intentionally yet",
+      "Intrigue over information — make her tap 'more'"
+    ]
+  },
+  "approvedExamples": [],
+  "revisedExamples": []
+}

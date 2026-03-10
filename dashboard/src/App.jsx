@@ -1054,6 +1054,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
   const [browseFilter, setBrowseFilter] = useState('')
   const [emailPreviewItem, setEmailPreviewItem] = useState(null)
   const [previewImages, setPreviewImages] = useState({}) // handle → imageUrl
+  // Per-card chat state
+  const [chatOpen, setChatOpen] = useState({})       // itemId → bool
+  const [chatHistory, setChatHistory] = useState({}) // itemId → [{role,content}]
+  const [chatInput, setChatInput] = useState({})     // itemId → string
+  const [chatLoading, setChatLoading] = useState({}) // itemId → bool
 
   const c = content?.content
 
@@ -1231,6 +1236,36 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         handles.forEach(h => delete next[h])
         return next
       })
+    }
+  }
+
+  async function sendChat(item, message) {
+    if (!message.trim() || chatLoading[item.id]) return
+    const id = item.id
+    setChatLoading(prev => ({ ...prev, [id]: true }))
+    const history = chatHistory[id] || []
+    const userMsg = { role: 'user', content: message }
+    setChatHistory(prev => ({ ...prev, [id]: [...history, userMsg] }))
+    setChatInput(prev => ({ ...prev, [id]: '' }))
+    try {
+      const data = await fetch(`/api/weekly-plan/item/${id}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weekStart, message, history }),
+      }).then(r => r.json())
+      if (data.ok) {
+        const assistantMsg = { role: 'assistant', content: data.reply }
+        setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), assistantMsg] }))
+        loadData() // refresh card with revised content
+      } else {
+        const errMsg = { role: 'assistant', content: `Error: ${data.error || 'Something went wrong'}` }
+        setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), errMsg] }))
+      }
+    } catch (err) {
+      const errMsg = { role: 'assistant', content: `Error: ${err.message}` }
+      setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), errMsg] }))
+    } finally {
+      setChatLoading(prev => ({ ...prev, [id]: false }))
     }
   }
 
@@ -1593,9 +1628,67 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                       )
                     })()}
 
+                    {/* Per-card chat panel */}
+                    {chatOpen[item.id] && (
+                      <div style={{ marginTop: 12, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden', background: T.surface }}>
+                        <div style={{ padding: '10px 14px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: T.textSub, letterSpacing: '0.06em' }}>REFINE WITH CLAUDE</span>
+                          <button onClick={() => setChatOpen(prev => ({ ...prev, [item.id]: false }))}
+                            style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+                        </div>
+                        {/* Chat history */}
+                        {(chatHistory[item.id] || []).length > 0 && (
+                          <div style={{ padding: '10px 14px', maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {(chatHistory[item.id] || []).map((msg, i) => (
+                              <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                                <div style={{
+                                  maxWidth: '80%', padding: '7px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
+                                  background: msg.role === 'user' ? '#1f2937' : T.bg,
+                                  color: msg.role === 'user' ? '#fff' : T.text,
+                                  border: msg.role === 'assistant' ? `1px solid ${T.border}` : 'none',
+                                }}>
+                                  {msg.content}
+                                </div>
+                              </div>
+                            ))}
+                            {chatLoading[item.id] && (
+                              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                <div style={{ padding: '7px 12px', borderRadius: 10, fontSize: 13, background: T.bg, border: `1px solid ${T.border}`, color: T.textMuted }}>
+                                  Claude is revising…
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {/* Input row */}
+                        <div style={{ padding: '10px 14px', borderTop: (chatHistory[item.id] || []).length > 0 ? `1px solid ${T.border}` : 'none', display: 'flex', gap: 8 }}>
+                          <input
+                            placeholder="e.g. Make the subject line more urgent…"
+                            value={chatInput[item.id] || ''}
+                            onChange={e => setChatInput(prev => ({ ...prev, [item.id]: e.target.value }))}
+                            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(item, chatInput[item.id] || '') } }}
+                            disabled={chatLoading[item.id]}
+                            style={{ flex: 1, border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '7px 12px', fontSize: 13, background: T.inputBg, color: T.text, outline: 'none' }}
+                          />
+                          <button
+                            onClick={() => sendChat(item, chatInput[item.id] || '')}
+                            disabled={chatLoading[item.id] || !(chatInput[item.id] || '').trim()}
+                            style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: '#1f2937', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: chatLoading[item.id] || !(chatInput[item.id] || '').trim() ? 0.5 : 1 }}>
+                            →
+                          </button>
+                        </div>
+                        <div style={{ padding: '4px 14px 8px', fontSize: 11, color: T.textFaint }}>Changes are saved automatically · Feedback improves future content</div>
+                      </div>
+                    )}
+
                     {/* Actions row */}
                     {!item.addedToCalendar && (
                       <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+                        <button
+                          onClick={() => setChatOpen(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
+                          style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${chatOpen[item.id] ? '#6366f1' : T.border}`, background: chatOpen[item.id] ? '#eef2ff' : T.surface, color: chatOpen[item.id] ? '#6366f1' : T.textSub, fontSize: 13, cursor: 'pointer' }}>
+                          💬 Chat
+                        </button>
                         {item.channel === 'email' && item.email && (
                           <button onClick={() => openEmailPreview(item)}
                             style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -1665,16 +1758,149 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
     {emailPreviewItem && (() => {
       const item = emailPreviewItem
       const em = item.email || {}
-      const products = itemProducts[item.id] || item.products || []
+      const looks = item.looks || []
+      const flatProducts = itemProducts[item.id] || item.products || []
       const campaign = campaigns.find(c => c.id === item.campaignId)
       const colorDir = campaign?.styleGuide?.colorDirection || 'Navy, blush, bone white'
       const heroBg = '#111827'
+
+      // Template switcher state lives inside the IIFE via a ref-like hack —
+      // we use the item's template as the default and store selection in a dataset attr
+      const TEMPLATES = [
+        { id: 'multi-look', label: 'Multi-Look' },
+        { id: 'story-led', label: 'Story-Led' },
+        { id: 'category-focus', label: 'Category Focus' },
+        { id: 'single-hero', label: 'Single Hero' },
+      ]
+
+      // Use item.template as default; user can switch via state stored on the modal container
+      // We track template selection in a sibling state on the modal via data-template attr
+      // Simple approach: use a query selector on mount — instead we store in a separate state
+      // Actually we already have emailPreviewItem state — we'll just add a template field to it
+
+      const activeTemplate = emailPreviewItem._previewTemplate || item.template || 'multi-look'
+
+      function switchTemplate(t) {
+        setEmailPreviewItem(prev => ({ ...prev, _previewTemplate: t }))
+      }
+
+      // Helper: render a single product card
+      function ProductCard({ p }) {
+        const img = previewImages[p.handle]
+        return (
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ background: '#f5f5f5', aspectRatio: '3/4', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 2 }}>
+              {img
+                ? <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <div style={{ color: '#bbb', fontSize: 11, padding: 8, textAlign: 'center' }}>{p.name}</div>
+              }
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#111', marginBottom: 2, lineHeight: 1.3 }}>{p.name}</div>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>${p.price}</div>
+            <div style={{ display: 'inline-block', border: '1px solid #111', color: '#111', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', padding: '6px 14px' }}>SHOP NOW</div>
+          </div>
+        )
+      }
+
+      // Render template-specific body content
+      function TemplateBody() {
+        if (activeTemplate === 'multi-look') {
+          // 3-4 named looks, each with products
+          const displayLooks = looks.length > 0 ? looks : (flatProducts.length > 0 ? [{ name: 'Featured Look', angle: '', products: flatProducts }] : [])
+          return (
+            <div>
+              {displayLooks.map((look, li) => (
+                <div key={li} style={{ borderTop: li > 0 ? '1px solid #f0f0f0' : 'none' }}>
+                  <div style={{ padding: '24px 28px 8px' }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#111', letterSpacing: '0.04em', marginBottom: 4 }}>{look.name}</div>
+                    {look.angle && <div style={{ fontSize: 12, color: '#777', marginBottom: 16, fontStyle: 'italic' }}>{look.angle}</div>}
+                  </div>
+                  {(look.products || []).length > 0 && (
+                    <div style={{ padding: '0 28px 24px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(look.products.length, 3)}, 1fr)`, gap: 12 }}>
+                      {(look.products || []).map(p => <ProductCard key={p.handle} p={p} />)}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )
+        }
+
+        if (activeTemplate === 'story-led') {
+          const heroLook = looks[0] || null
+          const restProducts = looks.slice(1).flatMap(l => l.products || [])
+          return (
+            <div>
+              {heroLook && (
+                <div style={{ padding: '28px 28px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#111', letterSpacing: '0.04em', marginBottom: 4 }}>{heroLook.name}</div>
+                  {heroLook.angle && <div style={{ fontSize: 13, color: '#555', marginBottom: 20, fontStyle: 'italic', lineHeight: 1.5 }}>{heroLook.angle}</div>}
+                  {(heroLook.products || []).length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(heroLook.products.length, 3)}, 1fr)`, gap: 14, marginBottom: 24 }}>
+                      {(heroLook.products || []).map(p => <ProductCard key={p.handle} p={p} />)}
+                    </div>
+                  )}
+                </div>
+              )}
+              {restProducts.length > 0 && (
+                <div style={{ borderTop: '1px solid #f0f0f0', padding: '20px 28px 24px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 16, textAlign: 'center' }}>STYLED WITH</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(restProducts.length, 4)}, 1fr)`, gap: 12 }}>
+                    {restProducts.map(p => <ProductCard key={p.handle} p={p} />)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        }
+
+        if (activeTemplate === 'category-focus') {
+          const allP = flatProducts.length > 0 ? flatProducts : looks.flatMap(l => l.products || [])
+          return (
+            <div style={{ padding: '24px 28px' }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 6 }}>THE COLLECTION</div>
+                <div style={{ width: 40, height: 2, background: '#000', margin: '0 auto' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                {allP.map(p => <ProductCard key={p.handle} p={p} />)}
+              </div>
+            </div>
+          )
+        }
+
+        if (activeTemplate === 'single-hero') {
+          const heroP = flatProducts[0] || (looks[0]?.products || [])[0] || null
+          const supporting = flatProducts.slice(1).length > 0 ? flatProducts.slice(1) : looks.flatMap(l => l.products || []).slice(1)
+          return (
+            <div>
+              {heroP && (
+                <div style={{ padding: '28px 28px 0', textAlign: 'center' }}>
+                  <div style={{ maxWidth: 240, margin: '0 auto 20px' }}>
+                    <ProductCard p={heroP} />
+                  </div>
+                </div>
+              )}
+              {supporting.length > 0 && (
+                <div style={{ borderTop: '1px solid #f0f0f0', padding: '20px 28px 24px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 16, textAlign: 'center' }}>COMPLETE THE LOOK</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(supporting.length, 3)}, 1fr)`, gap: 12 }}>
+                    {supporting.slice(0, 3).map(p => <ProductCard key={p.handle} p={p} />)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        }
+
+        return null
+      }
 
       return (
         <div onClick={() => setEmailPreviewItem(null)}
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '24px 16px' }}>
           <div onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: 620, background: '#f4f4f4', borderRadius: 12, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)', marginBottom: 24 }}>
+            style={{ width: '100%', maxWidth: 640, background: '#f4f4f4', borderRadius: 12, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)', marginBottom: 24 }}>
 
             {/* Preview chrome — email client header */}
             <div style={{ background: '#1f2937', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1685,6 +1911,17 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
               </div>
               <button onClick={() => setEmailPreviewItem(null)}
                 style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontSize: 13 }}>✕ Close</button>
+            </div>
+
+            {/* Template switcher */}
+            <div style={{ background: '#f0f0f0', padding: '10px 20px', display: 'flex', gap: 6, alignItems: 'center', borderBottom: '1px solid #e0e0e0', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, color: '#888', marginRight: 4, fontWeight: 600 }}>LAYOUT:</span>
+              {TEMPLATES.map(t => (
+                <button key={t.id} onClick={() => switchTemplate(t.id)}
+                  style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${activeTemplate === t.id ? '#1f2937' : '#ccc'}`, background: activeTemplate === t.id ? '#1f2937' : '#fff', color: activeTemplate === t.id ? '#fff' : '#555', fontSize: 12, fontWeight: activeTemplate === t.id ? 700 : 400, cursor: 'pointer' }}>
+                  {t.label}
+                </button>
+              ))}
             </div>
 
             {/* Email body */}
@@ -1704,64 +1941,37 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
               </div>
 
               {/* Hero section */}
-              <div style={{ background: heroBg, padding: '48px 32px', textAlign: 'center' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)', marginBottom: 12, textTransform: 'uppercase' }}>
+              <div style={{ background: heroBg, padding: '40px 32px', textAlign: 'center' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)', marginBottom: 10, textTransform: 'uppercase' }}>
                   {campaign?.name || 'Spring 2026'}
                 </div>
-                <div style={{ fontSize: 30, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.5px' }}>
+                <div style={{ fontSize: 28, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.5px' }}>
                   {em.subjectLine?.replace(/[✨💫🌸]/g, '').trim()}
                 </div>
-                <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: 440, margin: '0 auto 24px' }}>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: 440, margin: '0 auto 22px' }}>
                   {em.previewText}
                 </div>
-                <div style={{ display: 'inline-block', background: '#fff', color: '#000', fontWeight: 800, fontSize: 13, letterSpacing: '0.1em', padding: '12px 32px' }}>
+                <div style={{ display: 'inline-block', background: '#fff', color: '#000', fontWeight: 800, fontSize: 12, letterSpacing: '0.1em', padding: '11px 28px' }}>
                   {em.cta || 'SHOP NOW'}
                 </div>
               </div>
 
               {/* Color direction tag */}
-              <div style={{ background: '#f9f9f9', padding: '8px 20px', textAlign: 'center', borderBottom: '1px solid #eee' }}>
+              <div style={{ background: '#f9f9f9', padding: '7px 20px', textAlign: 'center', borderBottom: '1px solid #eee' }}>
                 <span style={{ fontSize: 11, color: '#999', fontStyle: 'italic' }}>Color direction: {colorDir}</span>
               </div>
 
-              {/* Product grid */}
-              {products.length > 0 && (
-                <div style={{ padding: '32px 24px' }}>
-                  <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 6 }}>FEATURED PIECES</div>
-                    <div style={{ width: 40, height: 2, background: '#000', margin: '0 auto' }} />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: products.length === 1 ? '1fr' : products.length === 3 ? 'repeat(3,1fr)' : 'repeat(2,1fr)', gap: 16 }}>
-                    {products.map(p => {
-                      const img = previewImages[p.handle]
-                      return (
-                        <div key={p.handle} style={{ textAlign: 'center' }}>
-                          <div style={{ background: '#f5f5f5', aspectRatio: '3/4', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 2 }}>
-                            {img
-                              ? <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              : <div style={{ color: '#bbb', fontSize: 11, padding: 8 }}>{p.name}</div>
-                            }
-                          </div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111', marginBottom: 2, lineHeight: 1.3 }}>{p.name}</div>
-                          <div style={{ fontSize: 13, color: '#666', marginBottom: 10 }}>${p.price}</div>
-                          <div style={{ display: 'inline-block', border: '1px solid #111', color: '#111', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', padding: '7px 18px' }}>
-                            SHOP NOW
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* Template-driven body */}
+              <TemplateBody />
 
               {/* Body outline */}
               {em.bodyOutline && (
-                <div style={{ padding: '0 32px 32px', borderTop: products.length > 0 ? '1px solid #f0f0f0' : 'none' }}>
-                  {products.length > 0 && <div style={{ height: 24 }} />}
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 14, textAlign: 'center' }}>EMAIL STRUCTURE</div>
-                  <div style={{ background: '#fafafa', borderRadius: 4, padding: '16px 20px', border: '1px solid #eee' }}>
+                <div style={{ padding: '0 28px 28px', borderTop: '1px solid #f0f0f0' }}>
+                  <div style={{ height: 20 }} />
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 12, textAlign: 'center' }}>EMAIL STRUCTURE</div>
+                  <div style={{ background: '#fafafa', borderRadius: 4, padding: '14px 18px', border: '1px solid #eee' }}>
                     {em.bodyOutline.split(/\n|•/).filter(s => s.trim()).map((section, i, arr) => (
-                      <div key={i} style={{ display: 'flex', gap: 10, marginBottom: i < arr.length - 1 ? 10 : 0 }}>
+                      <div key={i} style={{ display: 'flex', gap: 10, marginBottom: i < arr.length - 1 ? 8 : 0 }}>
                         <span style={{ color: '#000', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>—</span>
                         <span style={{ fontSize: 13, color: '#444', lineHeight: 1.5 }}>{section.trim()}</span>
                       </div>
@@ -1771,19 +1981,19 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
               )}
 
               {/* Primary CTA */}
-              <div style={{ padding: '24px 32px 40px', textAlign: 'center' }}>
+              <div style={{ padding: '20px 28px 36px', textAlign: 'center' }}>
                 <div style={{ background: '#000', color: '#fff', fontWeight: 800, fontSize: 13, letterSpacing: '0.12em', padding: '14px 48px', width: '100%', boxSizing: 'border-box' }}>
                   {em.cta || 'SHOP NOW'}
                 </div>
-                {em.sendDay && <div style={{ fontSize: 11, color: '#999', marginTop: 10 }}>Recommended send day: {em.sendDay}</div>}
+                {em.sendDay && <div style={{ fontSize: 11, color: '#999', marginTop: 8 }}>Recommended send day: {em.sendDay}</div>}
               </div>
 
               {/* Footer */}
-              <div style={{ background: '#f9f9f9', borderTop: '1px solid #e5e5e5', padding: '20px', textAlign: 'center' }}>
+              <div style={{ background: '#f9f9f9', borderTop: '1px solid #e5e5e5', padding: '18px', textAlign: 'center' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', color: '#333', marginBottom: 8 }}>ANNE KLEIN</div>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 10 }}>
                   {['f', 'in', 'ig'].map(s => (
-                    <div key={s} style={{ width: 28, height: 28, borderRadius: '50%', background: '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#666', fontWeight: 700 }}>{s}</div>
+                    <div key={s} style={{ width: 26, height: 26, borderRadius: '50%', background: '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#666', fontWeight: 700 }}>{s}</div>
                   ))}
                 </div>
                 <div style={{ fontSize: 10, color: '#aaa', lineHeight: 1.6 }}>
