@@ -1525,6 +1525,18 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                           <span>🎯 <strong>{item.email.cta}</strong></span>
                           {item.email.sendDay && <span>📅 Send: <strong>{item.email.sendDay}</strong></span>}
                         </div>
+                        {/* Component-story sections summary */}
+                        {item.template === 'component-story' && item.sections?.length > 0 && (
+                          <div style={{ background: T.bg, borderRadius: 8, padding: '8px 14px', fontSize: 12, color: T.textSub }}>
+                            <span style={{ fontWeight: 700, color: T.textMuted, fontSize: 11, marginRight: 8 }}>SECTIONS</span>
+                            {item.sections.map((s, si) => (
+                              <span key={si}>
+                                <strong>{s.label}</strong> ({(s.products || []).length})
+                                {si < item.sections.length - 1 && <span style={{ color: T.textMuted }}> · </span>}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -1774,10 +1786,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       // Template switcher state lives inside the IIFE via a ref-like hack —
       // we use the item's template as the default and store selection in a dataset attr
       const TEMPLATES = [
-        { id: 'multi-look', label: 'Multi-Look' },
-        { id: 'story-led', label: 'Story-Led' },
-        { id: 'category-focus', label: 'Category Focus' },
-        { id: 'single-hero', label: 'Single Hero' },
+        { id: 'multi-look',      label: 'Multi-Look' },
+        { id: 'story-led',       label: 'Story-Led' },
+        { id: 'category-focus',  label: 'Category Focus' },
+        { id: 'single-hero',     label: 'Single Hero' },
+        { id: 'component-story', label: 'Component Story' },
       ]
 
       // Use item.template as default; user can switch via state stored on the modal container
@@ -1895,6 +1908,30 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                     {supporting.slice(0, 3).map(p => <ProductCard key={p.handle} p={p} />)}
                   </div>
                 </div>
+              )}
+            </div>
+          )
+        }
+
+        if (activeTemplate === 'component-story') {
+          const displaySections = item.sections || []
+          return (
+            <div>
+              {displaySections.map((section, si) => (
+                <div key={si} style={{ borderTop: si > 0 ? '1px solid #f0f0f0' : 'none' }}>
+                  <div style={{ padding: '24px 28px 8px' }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#111', letterSpacing: '0.04em', marginBottom: 4 }}>{section.label}</div>
+                    {section.angle && <div style={{ fontSize: 12, color: '#777', marginBottom: 16, fontStyle: 'italic' }}>{section.angle}</div>}
+                  </div>
+                  {(section.products || []).length > 0 && (
+                    <div style={{ padding: '0 28px 24px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(section.products.length, 3)}, 1fr)`, gap: 12 }}>
+                      {(section.products || []).map(p => <ProductCard key={p.handle} p={p} />)}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {displaySections.length === 0 && (
+                <div style={{ padding: '40px 28px', textAlign: 'center', color: '#bbb', fontSize: 13 }}>No sections — regenerate this email as component-story</div>
               )}
             </div>
           )

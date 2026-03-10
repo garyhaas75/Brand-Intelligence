@@ -979,21 +979,35 @@ Return ONLY valid JSON matching the existing structure, no commentary.`,
 
 function validateEmailItem(item, personasData) {
   const warnings = [];
-  if (item.channel !== 'email' || !item.looks) return { valid: true, warnings };
+  if (item.channel !== 'email') return { valid: true, warnings };
+
+  // component-story uses sections, not looks — different validation path
+  if (item.template === 'component-story') {
+    if (!item.sections || item.sections.length < 2) {
+      warnings.push('component-story email must have at least 2 sections');
+    } else {
+      const thinSections = item.sections.filter(s => (s.products || []).length < 2).map(s => s.label || 'unnamed');
+      if (thinSections.length > 0) warnings.push(`Sections with fewer than 2 products: ${thinSections.join(', ')}`);
+    }
+    return { valid: warnings.length === 0, warnings };
+  }
+
+  if (!item.looks) return { valid: true, warnings };
 
   const looks = item.looks;
   const subject = (item.email?.subjectLine || '') + ' ' + (item.email?.previewText || '');
 
-  // Check 1: Number claims in subject vs actual look count
-  const numMatch = subject.match(/\b(\d+)\s*(outfit|look|piece|day)/i);
+  // Check 1: ALL number claims in subject vs actual look count (matchAll catches "3 pieces, 5 days" — not just first)
   const allWeek = /all week/i.test(subject);
   if (allWeek && looks.length < 5) {
     warnings.push(`Subject says "all week" (5 days) but has only ${looks.length} looks`);
-  } else if (numMatch) {
-    const claimed = parseInt(numMatch[1]);
-    const noun = numMatch[2].toLowerCase();
-    if (['outfit', 'look', 'day'].includes(noun) && looks.length !== claimed) {
-      warnings.push(`Subject claims ${claimed} ${noun}s but has ${looks.length} looks`);
+  } else {
+    const allNumMatches = [...subject.matchAll(/\b(\d+)\s*(outfit|look|day)s?\b/gi)];
+    for (const m of allNumMatches) {
+      const claimed = parseInt(m[1]);
+      if (looks.length !== claimed) {
+        warnings.push(`Subject claims ${claimed} ${m[2].toLowerCase()}s but has ${looks.length} looks`);
+      }
     }
   }
 
@@ -1205,7 +1219,7 @@ For EMAIL:
   "ownableEventId": "<event id or null>",
   "theme": "<short theme label>",
   "targetPersona": "<persona name>",
-  "template": "<multi-look|story-led|category-focus|single-hero>",
+  "template": "<multi-look|story-led|category-focus|single-hero|component-story>",
   "looks": [
     {
       "name": "<evocative look name, e.g. 'The Board Meeting' or 'Friday Closing'>",
@@ -1222,11 +1236,36 @@ For EMAIL:
   }
 }
 
+For component-story template ONLY — omit "looks" entirely and use "sections" instead:
+{
+  "channel": "email",
+  "campaignId": "<campaign id or null>",
+  "ownableEventId": "<event id or null>",
+  "theme": "<short theme label>",
+  "targetPersona": "<persona name>",
+  "template": "component-story",
+  "sections": [
+    {
+      "label": "<component label, e.g. 'The Dress', 'The Shoe', 'The Layer', 'The Foundation', 'The Bag'>",
+      "angle": "<1-sentence description of this component's role in the wardrobe>",
+      "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0}]
+    }
+  ],
+  "email": {
+    "subjectLine": "<compelling subject, under 50 chars>",
+    "previewText": "<preview text, 80-100 chars>",
+    "bodyOutline": "<3-4 bullet points describing body sections>",
+    "cta": "<CTA button text>",
+    "sendDay": "<recommended day, e.g. Tuesday>"
+  }
+}
+
 Template guidance:
-- "multi-look": 3-4 named looks, each with 2-3 products — default for most campaign emails
+- "multi-look": 3-4 named looks, each with 2-3 products — default for editorial/narrative campaign emails
 - "story-led": 1-2 looks, editorial narrative focus — best for event-driven emails (Mother's Day, etc.)
 - "category-focus": 1 look with 4-6 products from one category — best for category launches
 - "single-hero": 1 look with 1 hero product + 2 supporting items — best for hero product launches
+- "component-story": 3-4 sections each showing 2-3 options of ONE product type (all dresses, all shoes, all blazers, all bags) — best for capsule/workwear planning emails where the customer mixes and matches herself. Use this instead of multi-look when the email theme is about building a wardrobe, not showing specific outfit combinations. Subject line should speak to the wardrobe concept, not claim a specific number of outfits.
 
 For INSTAGRAM:
 {
@@ -1264,15 +1303,17 @@ Rules:
 - If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
 - Do NOT repeat themes from recent sent history listed above
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
-- For EMAIL looks: assign products from the IN-STOCK PRODUCTS catalog above. Each look must have at least one UNIQUE hero product not used in any other look — do NOT repeat the same product across multiple looks. Each look gets 2-3 complementary products. Apply the outfit logic rules: structured jacket needs a soft piece underneath, every look needs a bottom or dress, shoes should appear. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
+- For EMAIL looks (multi-look, story-led, category-focus, single-hero templates): assign products from the IN-STOCK PRODUCTS catalog above. Each look must have at least one UNIQUE hero product not used in any other look — do NOT repeat the same product across multiple looks. Each look gets 2-3 complementary products. Apply the outfit logic rules: structured jacket needs a soft piece underneath, every look needs a bottom or dress, shoes should appear. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
+- For EMAIL sections (component-story template): each section must contain 2-3 products from the SAME category type — all dresses, OR all shoes, OR all blazers, OR all bags. Never mix clothing and accessories in one section. Section labels should be evocative ("The Dress", "The Shoe", "The Layer", "The Foundation", "The Topper", "The Bag"). Subject line should speak to the wardrobe concept — do NOT claim a specific number of outfits.
 - PERSONA TAILORING: Write every email as if you ARE a trusted stylist speaking directly to that specific persona. Use the persona's fashion goals, pain points, and her own voice (quoteExample) to shape the look names, angles, and subject line. The Polished Professional should feel understood and efficient. The Emerging Leader should feel mentored not lectured. The Refined Rewinder should feel respected not patronized. The Practical Multitasker should feel seen not judged.
 
-CRITICAL EMAIL RULES — check these before returning JSON:
+CRITICAL EMAIL RULES for looks-based templates (multi-look, story-led, category-focus, single-hero) — check these before returning JSON:
 1. SUBJECT LINE MATH: Count the number of looks you wrote. If your subject line says "N outfits", "N looks", or "N days" — the looks array MUST contain exactly N looks. "All week" means 5 looks. "3 outfits" means 3 looks. If the count is wrong, either add the missing looks or rewrite the subject line to match.
 2. NO REPEATED HEROES: Every look must have a DIFFERENT first (hero) product. The same product handle must not appear as the hero in more than one look. If you find yourself reusing a hero, swap it for a different product from the catalog.
 3. COMPLETE OUTFITS ONLY: Each look must have at least 2 products — a top or jacket AND a bottom or dress. Shoes should appear in at least half the looks. A single product is not a look.
 4. OUTFIT LOGIC: Never pair two stiff/structured pieces (e.g. blazer over a sheath dress is fine; blazer over a structured jacket is not). Every structured top needs something soft underneath or alongside.
 5. SELF-CHECK BEFORE OUTPUT: Re-read your subject line. Count your looks. Do they match? Are all hero products unique? If not — fix it before returning.
+(component-story emails: skip the above rules — sections do not need outfit logic or look counts)
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -1303,11 +1344,14 @@ CRITICAL EMAIL RULES — check these before returning JSON:
 
     const now = Date.now();
     const items = validated.map((item, i) => {
-      // Flatten looks → products, deduped by handle
+      // Flatten sections/looks → products, deduped by handle
       const seenHandles = new Set();
-      const flatProducts = (item.looks
-        ? item.looks.flatMap(l => l.products || [])
-        : (item.products || [])
+      const flatProducts = (
+        item.sections
+          ? item.sections.flatMap(s => s.products || [])
+          : item.looks
+            ? item.looks.flatMap(l => l.products || [])
+            : (item.products || [])
       ).filter(p => p.handle && !seenHandles.has(p.handle) && seenHandles.add(p.handle));
       return {
         id: `gen_${now}_${i}`,
