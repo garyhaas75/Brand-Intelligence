@@ -248,8 +248,10 @@ const TYPE_SCHEMAS = {
       `fit_type: Body fit silhouette. ${FROM_IMAGE} E.g. "Slim", "Regular", "Tailored", "Relaxed", "Oversized".`,
       `closure_type: Fastening style. ${FROM_IMAGE} E.g. "Single-breasted 2-button", "Double-breasted 6-button", "Open front / no closure".`,
       `lining: Lining detail. ${FROM_IMAGE} E.g. "Fully lined", "Half-lined", "Unlined".`,
+      `neckline: Lapel or collar style. ${FROM_IMAGE} E.g. "Notched lapel", "Peak lapel", "Shawl collar", "Collarless", "Mandarin collar".`,
+      `sleeve_length: Sleeve length. ${FROM_IMAGE} E.g. "Long sleeve", "3/4 sleeve", "Short sleeve", "Sleeveless".`,
     ],
-    schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null, "lining": null`,
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null, "lining": null, "neckline": null, "sleeve_length": null`,
   },
   coat: {
     fields: [
@@ -257,8 +259,10 @@ const TYPE_SCHEMAS = {
       `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
       `fit_type: Body fit silhouette. ${FROM_IMAGE} E.g. "Slim", "Relaxed", "Oversized".`,
       `closure_type: Fastening style. ${FROM_IMAGE} E.g. "Double-breasted buttons", "Belt-tie", "Zip-front", "Snap closure".`,
+      `neckline: Lapel or collar style. ${FROM_IMAGE} E.g. "Notched lapel", "Peak lapel", "Shawl collar", "Funnel neck", "Collarless".`,
+      `sleeve_length: Sleeve length. ${FROM_IMAGE} E.g. "Long sleeve", "3/4 sleeve".`,
     ],
-    schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null`,
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "closure_type": null, "neckline": null, "sleeve_length": null`,
   },
   dress: {
     fields: [
@@ -294,8 +298,10 @@ const TYPE_SCHEMAS = {
       `care_instructions: One-line care instruction. ${NO_INFER_FACT}`,
       `fit_type: Suit silhouette. ${FROM_IMAGE} E.g. "Tailored", "Slim", "Regular", "Relaxed".`,
       `lining: Lining detail. ${FROM_IMAGE} E.g. "Fully lined", "Partially lined", "Unlined".`,
+      `neckline: Jacket lapel or collar style. ${FROM_IMAGE} E.g. "Notched lapel", "Peak lapel", "Collarless".`,
+      `sleeve_length: Jacket sleeve length. ${FROM_IMAGE} E.g. "Long sleeve", "3/4 sleeve".`,
     ],
-    schema: `"material": null, "care_instructions": null, "fit_type": null, "lining": null`,
+    schema: `"material": null, "care_instructions": null, "fit_type": null, "lining": null, "neckline": null, "sleeve_length": null`,
   },
   sweater: {
     fields: [
@@ -506,8 +512,8 @@ function getCategoryPromptSection(specificType, categoryGroup) {
     : `shopify_taxonomy_gid: The Shopify taxonomy GID for this product type (format: "gid://shopify/TaxonomyCategory/aa-X-X").`;
 
   const typeSchema = TYPE_SCHEMAS[specificType] || TYPE_SCHEMAS[categoryGroup] || { fields: [], schema: '' };
-  const fieldLines = typeSchema.fields.map((f, i) => `${i + 7}. ${f}`).join('\n');
-  const nextNum = typeSchema.fields.length + 7;
+  const fieldLines = typeSchema.fields.map((f, i) => `${i + 8}. ${f}`).join('\n');
+  const nextNum = typeSchema.fields.length + 8;
 
   return {
     fields: fieldLines + `\n${nextNum}. ${taxonomyInstruction}`,
@@ -560,6 +566,7 @@ Generate ALL of the following fields:
 4. image_insights: ${imageData ? '1-2 sentences on what the image reveals about material, silhouette, and occasion that the current description misses.' : 'null'}
 5. alt_text: Under 125 characters. Descriptive image alt text. Describe what is literally shown: product type, color, key style details. Do NOT start with "Image of" or "Photo of".
 6. geo_description: 2-3 sentences for AI assistant discoverability. Answer a query like "best blazers for work" or "professional outfit ideas". Name product type and brand naturally. Include one specific functional feature. No superlatives.
+7. suggested_description: A fresh Shopify product description, 150-200 words. Format as clean HTML with 2-3 <p> tags. Structure: (1) lead sentence naming the specific occasion + product type and its standout feature, (2) 2-3 sentences on construction details, fabric feel, and functional benefits — pull from the image and description, be specific, (3) closing sentence on versatility or styling context for a professional woman. Follow ALL brand writing rules from the context above. No exclamation marks. Short declarative sentences. Never use: fresh, effortless, trendy, stunning, must-have, chic, vibrant.
 ${catSection.fields}
 
 Return ONLY valid JSON (no markdown, no explanation):
@@ -570,13 +577,14 @@ Return ONLY valid JSON (no markdown, no explanation):
   "image_insights": "",
   "alt_text": "",
   "geo_description": "",
+  "suggested_description": "",
   ${catSection.schema}
 }`,
   });
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1400,
+    model: 'claude-opus-4-6',
+    max_tokens: 2000,
     messages: [{ role: 'user', content }],
   });
 

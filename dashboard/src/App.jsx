@@ -306,7 +306,7 @@ function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel
   )
 }
 
-function CatalogTab({ catalog }) {
+function CatalogTab({ catalog, onRefreshComplete }) {
   const T = useT()
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('All')
@@ -318,7 +318,13 @@ function CatalogTab({ catalog }) {
     setRefreshResult(null)
     try {
       const d = await fetch('/api/shopify/catalog/refresh', { method: 'POST' }).then(r => r.json())
-      setRefreshResult(d.ok ? `Refreshed — ${d.count} products` : (d.error || 'Error'))
+      if (d.ok) {
+        const freshCatalog = await fetch('/api/shopify/products').then(r => r.json())
+        onRefreshComplete?.(freshCatalog)
+        setRefreshResult(`Refreshed — ${d.count} products`)
+      } else {
+        setRefreshResult(d.error || 'Error')
+      }
     } catch (e) {
       setRefreshResult('Error: ' + e.message)
     } finally {
@@ -4685,7 +4691,7 @@ export default function App() {
             {tab === 'overview'     && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
             {tab === 'calendar'     && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
             {tab === 'campaigns'    && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} setCalItems={setCalItems} />}
-            {tab === 'catalog'      && <CatalogTab catalog={data.catalog} />}
+            {tab === 'catalog'      && <CatalogTab catalog={data.catalog} onRefreshComplete={(freshCatalog) => setData(prev => ({ ...prev, catalog: freshCatalog }))} />}
             {tab === 'site'         && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
             {tab === 'email'        && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={reloadEmailAnalysis} />}
             {tab === 'social'       && <SocialTab socialIntel={data.socialIntel} />}

@@ -171,16 +171,18 @@ async function pushMetafields(productGid, metaTitle, metaDescription) {
   return { ok: true };
 }
 
-// Push product tags and taxonomy category.
+// Push product tags, taxonomy category, and description HTML in a single productUpdate call.
 // API 2024-10+ breaking change: argument renamed from `input: ProductInput!`
 // to `product: ProductUpdateInput!`.
 // ProductUpdateInput.category is a bare ID scalar (not an object wrapper).
-async function pushTagsAndCategory(productGid, tags, categoryGid) {
+async function pushTagsAndCategory(productGid, tags, categoryGid, descriptionHtml) {
   const product = { id: productGid };
   // Shopify enforces max 255 chars per tag
   if (tags?.length) product.tags = tags.map(t => String(t).slice(0, 255));
   // category is a bare ID scalar — do NOT wrap in { id: ... }
   if (categoryGid) product.category = categoryGid;
+  // Push improved product description if provided
+  if (descriptionHtml) product.descriptionHtml = descriptionHtml;
   if (Object.keys(product).length === 1) return { ok: true }; // nothing beyond id
 
   const data = await shopifyGraphQL(`
@@ -219,9 +221,58 @@ async function pushAltText(mediaId, altText) {
 // Fields handled by dedicated push steps — excluded from custom metafields
 const SEO_FIELDS = new Set([
   'meta_title', 'meta_description', 'tags', 'alt_text',
-  'image_insights', 'geo_description',
+  'image_insights', 'geo_description', 'suggested_description',
   'shopify_taxonomy_gid', 'shopify_category',
 ]);
+
+// Mapping from our analyzed field keys → Shopify shopify.* namespace category metafield keys.
+// These populate the "Category metafields" section in Shopify admin.
+// Value type: list.single_line_text_field — value must be a JSON-encoded string array.
+const SHOPIFY_CATEGORY_FIELD_MAP = {
+  material:          'fabric',
+  care_instructions: 'care-instructions',
+  neckline:          'neckline',
+  sleeve_length:     'sleeve-length-type',
+};
+
+// Category groups that get Shopify taxonomy metafields (age-group, target-gender, fabric, etc.)
+const CLOTHING_CATEGORY_GROUPS = new Set(['clothing']);
+
+// Push Shopify-namespace category metafields (appear in Shopify admin "Category metafields" section).
+// Always sets age-group and target-gender for women's clothing.
+// Maps material → fabric, care_instructions → care-instructions, neckline, sleeve_length.
+async function pushShopifyTaxonomyMetafields(productGid, suggested) {
+  const metafields = [
+    { ownerId: productGid, namespace: 'shopify', key: 'age-group',     type: 'list.single_line_text_field', value: '["Adult"]' },
+    { ownerId: productGid, namespace: 'shopify', key: 'target-gender', type: 'list.single_line_text_field', value: '["Women"]' },
+  ];
+
+  for (const [ourKey, shopifyKey] of Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)) {
+    const val = suggested[ourKey];
+    if (val && typeof val === 'string' && val.trim()) {
+      metafields.push({
+        ownerId: productGid,
+        namespace: 'shopify',
+        key: shopifyKey,
+        type: 'list.single_line_text_field',
+        value: JSON.stringify([val.trim()]),
+      });
+    }
+  }
+
+  const data = await shopifyGraphQL(`
+    mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
+      metafieldsSet(metafields: $metafields) {
+        metafields { id key value }
+        userErrors { field message }
+      }
+    }
+  `, { metafields });
+
+  const errors = data?.metafieldsSet?.userErrors || [];
+  if (errors.length) throw new Error(errors.map(e => `${e.field}: ${e.message}`).join('; '));
+  return { ok: true, count: metafields.length };
+}
 
 // Build category-specific metafield entries (namespace: custom).
 // Dynamically pushes all attribute fields the analyzer generated,
@@ -282,6 +333,10 @@ async function pushProduct(product) {
     log(`    tags:             ${(suggested.tags || []).join(', ')}`);
     log(`    alt_text:         ${suggested.alt_text || '(none)'}`);
     log(`    taxonomy_gid:     ${gidStr || '(none)'}`);
+    if (suggested.suggested_description) {
+      const preview = suggested.suggested_description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+      log(`    description:      ${preview}…`);
+    }
     const catFields = buildCategoryMetafields('(gid)', suggested);
     if (catFields.length) {
       log(`    category metafields: ${catFields.map(f => `${f.key}="${f.value}"`).join(', ')}`);
@@ -299,16 +354,22 @@ async function pushProduct(product) {
     await pushMetafields(productGid, suggested.meta_title, suggested.meta_description);
   }
 
-  // 3. Push tags + taxonomy category GID via productUpdate
+  // 3. Push tags, taxonomy category GID, and suggested description via productUpdate
   // category is passed as a bare ID string per Shopify's ProductUpdateInput schema
-  if (suggested.tags?.length || gidStr) {
-    await pushTagsAndCategory(productGid, suggested.tags, gidStr);
+  if (suggested.tags?.length || gidStr || suggested.suggested_description) {
+    await pushTagsAndCategory(productGid, suggested.tags, gidStr, suggested.suggested_description || null);
   }
 
   // 4. Push category-specific custom metafields (material, fit_type, metal_finish, etc.)
   await pushCategoryMetafields(productGid, suggested);
 
-  // 5. Push image alt text via fileUpdate
+  // 5. Push Shopify taxonomy category metafields (namespace: shopify — "Category metafields" in admin)
+  //    Populates: age-group, target-gender, fabric, care-instructions, neckline, sleeve-length-type
+  if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup)) {
+    await pushShopifyTaxonomyMetafields(productGid, suggested);
+  }
+
+  // 6. Push image alt text via fileUpdate
   if (suggested.alt_text && mediaId) {
     await pushAltText(mediaId, suggested.alt_text);
   }
