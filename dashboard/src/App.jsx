@@ -1398,10 +1398,17 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       )}
 
       {/* Sub-tab toggle */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: `1px solid ${T.border}`, paddingBottom: 0 }}>
+      <div className="ak-sub-tabs" style={{
+        display: 'flex', gap: 0, flexWrap: 'nowrap',
+        background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`,
+        marginLeft: `calc(-1 * clamp(12px, 4vw, 40px))`,
+        marginRight: `calc(-1 * clamp(12px, 4vw, 40px))`,
+        paddingLeft: `clamp(12px, 4vw, 40px)`,
+        marginBottom: 24,
+      }}>
         {[{ id: 'planner', label: '📅 Weekly Planner' }, { id: 'library', label: '⚡ Quick Create' }, { id: 'strategy', label: '🎯 Content Strategy' }].map(t => (
           <button key={t.id} onClick={() => { setSubTab(t.id); if (t.id === 'strategy' && !strategy) loadStrategy() }}
-            style={{ padding: '10px 20px', border: 'none', borderBottom: subTab === t.id ? '2px solid #6366f1' : '2px solid transparent', background: 'none', color: subTab === t.id ? '#6366f1' : T.textSub, fontWeight: 700, fontSize: 14, cursor: 'pointer', marginBottom: -1 }}>
+            style={{ padding: '11px 18px', border: 'none', borderBottom: subTab === t.id ? `2px solid ${T.accent}` : '2px solid transparent', background: 'none', color: subTab === t.id ? T.accent : T.textMuted, fontWeight: 600, fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}>
             {t.label}
           </button>
         ))}
@@ -4631,7 +4638,7 @@ export default function App() {
 
   return (
     <ThemeContext.Provider value={T}>
-    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: T.bg, minHeight: '100vh', color: T.text, transition: 'background 0.2s, color 0.2s' }}>
+    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: T.bg, minHeight: '100vh', width: '100%', color: T.text, transition: 'background 0.2s, color 0.2s', overflowX: 'hidden' }}>
       {/* Top nav */}
       <div className="ak-nav" style={{ background: T.navBg, color: T.navText, padding: 'clamp(10px, 2vw, 14px) clamp(12px, 3vw, 32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <div>
@@ -4649,7 +4656,7 @@ export default function App() {
       </div>
 
       {/* Tab bar */}
-      <div className="ak-tabs" style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: `0 clamp(8px, 3vw, 32px)`, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+      <div className="ak-tabs" style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: `0 clamp(8px, 3vw, 32px)`, display: 'flex', gap: 0, flexWrap: 'nowrap' }}>
         {TABS.map(t => (
           <React.Fragment key={t.id}>
             {t.dividerBefore && (

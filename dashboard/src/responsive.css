@@ -14,8 +14,9 @@
   }
 }
 
-/* ── Tab bar ── */
-.ak-tabs { flex-wrap: wrap; }
+/* ── Tab bar — horizontal scroll, never wraps ── */
+.ak-tabs { flex-wrap: nowrap; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+.ak-tabs::-webkit-scrollbar { display: none; }
 @media (max-width: 768px) {
   .ak-tabs { padding: 0 12px !important; }
 }

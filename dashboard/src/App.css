@@ -1,4 +1,13 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; overflow-x: hidden; }
 body { background: var(--bg, #f9fafb); transition: background 0.2s; }
-#root { min-height: 100vh; }
+#root { width: 100%; min-height: 100vh; }
 input, select, textarea { color-scheme: light dark; }
+
+/* Tab bars — hide scrollbar, allow horizontal scroll */
+.ak-tabs, .ak-sub-tabs { overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+.ak-tabs::-webkit-scrollbar, .ak-sub-tabs::-webkit-scrollbar { display: none; }
+
+/* Responsive grid helpers */
+.ak-grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.ak-grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
