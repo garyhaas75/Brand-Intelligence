@@ -144,11 +144,11 @@ function saveSuggestions(data) {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
 }
 
-// Fetch image as base64 for Claude Vision
+// Fetch image as base64 for Claude Vision — 10 second timeout
 function fetchImageBase64(url) {
   return new Promise((resolve) => {
     if (!url || !url.startsWith('http')) return resolve(null);
-    https.get(url, (res) => {
+    const req = https.get(url, (res) => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => {
@@ -157,7 +157,9 @@ function fetchImageBase64(url) {
         resolve({ base64: buf.toString('base64'), mediaType: ct.split(';')[0] });
       });
       res.on('error', () => resolve(null));
-    }).on('error', () => resolve(null));
+    });
+    req.on('error', () => resolve(null));
+    req.setTimeout(10000, () => { req.destroy(); resolve(null); });
   });
 }
 
@@ -586,7 +588,7 @@ Return ONLY valid JSON (no markdown, no explanation):
     model: 'claude-opus-4-6',
     max_tokens: 2000,
     messages: [{ role: 'user', content }],
-  });
+  }, { timeout: 120000 }); // 2 min timeout — Opus can be slow on large images
 
   const raw = response.content[0].text;
   const start = raw.indexOf('{');
