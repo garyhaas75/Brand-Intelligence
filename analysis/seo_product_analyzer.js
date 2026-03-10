@@ -718,6 +718,12 @@ async function run() {
       }
 
       successCount++;
+      // Save after each product so progress persists if the run is cancelled
+      suggestions.lastRunAt = new Date().toISOString();
+      suggestions.totalAnalyzed = suggestions.products.length;
+      suggestions.totalProducts = catalog.totalProducts;
+      suggestions.filterUsed = filterArg;
+      saveSuggestions(suggestions);
     } catch (err) {
       log(`    ERROR: ${err.message}`);
       errorCount++;

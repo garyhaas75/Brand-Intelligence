@@ -669,6 +669,7 @@ Be specific and visual. No abstract concepts.`;
 
 // ─── SEO Product Suggestions ─────────────────────────────────────────────────
 const SEO_SUGGESTIONS_FILE = path.join(DATA_DIR, 'seo_suggestions.json');
+let seoAnalyzerRunning = false;
 
 function loadSeoSuggestions() {
   if (!fs.existsSync(SEO_SUGGESTIONS_FILE)) return { totalAnalyzed: 0, totalProducts: 0, products: [] };
@@ -694,11 +695,12 @@ app.get('/api/seo-suggestions', (req, res) => {
     }[filter];
     if (re) products = products.filter(p => re.test(p.category || ''));
   }
-  res.json({ ...data, products });
+  res.json({ ...data, products, running: seoAnalyzerRunning });
 });
 
-// Run a new batch (triggers the analyzer script in-process)
-app.post('/api/seo-suggestions/run', async (req, res) => {
+// Run a new batch — responds immediately, analyzer runs in background
+app.post('/api/seo-suggestions/run', (req, res) => {
+  if (seoAnalyzerRunning) return res.json({ ok: false, error: 'Analyzer already running' });
   const { filter = 'all', limit = 50, force = false } = req.body || {};
   const { spawn } = require('child_process');
   const args = [`--filter=${filter}`, `--limit=${limit}`];
@@ -707,13 +709,14 @@ app.post('/api/seo-suggestions/run', async (req, res) => {
     env: { ...process.env },
     cwd: __dirname,
   });
-  let output = '';
-  child.stdout.on('data', d => { output += d.toString(); });
-  child.stderr.on('data', d => { output += d.toString(); });
+  seoAnalyzerRunning = true;
+  child.stdout.on('data', d => process.stdout.write(d));
+  child.stderr.on('data', d => process.stderr.write(d));
   child.on('close', code => {
-    const data = loadSeoSuggestions();
-    res.json({ ok: code === 0, output: output.slice(-2000), totalAnalyzed: data.totalAnalyzed, totalProducts: data.totalProducts });
+    seoAnalyzerRunning = false;
+    console.log(`[SEO Analyzer] Done. exit code: ${code}`);
   });
+  res.json({ ok: true, started: true, filter, limit });
 });
 
 // Re-analyze a single product by href

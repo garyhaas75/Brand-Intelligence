@@ -3742,25 +3742,31 @@ function SeoProductTab() {
   async function runAnalysis() {
     setRunning(true)
     setRunLog(null)
-    // Poll every 3s to update progress bar while the child process runs
-    pollRef.current = setInterval(async () => {
-      try {
-        const r = await fetch('/api/seo-suggestions')
-        const d = await r.json()
-        setData(prev => prev ? { ...prev, totalAnalyzed: d.totalAnalyzed, totalProducts: d.totalProducts } : d)
-      } catch {}
-    }, 3000)
     const res = await fetch('/api/seo-suggestions/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filter: runFilter, limit: runLimit, force: forceReanalyze }),
     })
-    clearInterval(pollRef.current)
-    pollRef.current = null
     const result = await res.json()
-    setRunLog(result)
-    setRunning(false)
-    loadData()
+    if (!result.ok) {
+      setRunLog(result)
+      setRunning(false)
+      return
+    }
+    // Analyzer is running in background — poll every 3s until running=false
+    pollRef.current = setInterval(async () => {
+      try {
+        const r = await fetch('/api/seo-suggestions')
+        const d = await r.json()
+        setData(prev => prev ? { ...prev, totalAnalyzed: d.totalAnalyzed, totalProducts: d.totalProducts } : d)
+        if (!d.running) {
+          clearInterval(pollRef.current)
+          pollRef.current = null
+          setRunning(false)
+          loadData()
+        }
+      } catch {}
+    }, 3000)
   }
 
   async function updateStatus(href, status) {
