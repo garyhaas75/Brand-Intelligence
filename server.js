@@ -1161,7 +1161,7 @@ Rules:
 - If an ownable event applies, naturally integrate it — do not force it if it doesn't fit
 - Do NOT repeat themes from recent sent history listed above
 - Distribute emails across different send days (Mon, Tue, Wed, Thu) — not all on the same day
-- For EMAIL looks: assign products from the IN-STOCK PRODUCTS catalog above. Each look should get 2-3 complementary products that work together as an outfit. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
+- For EMAIL looks: assign products from the IN-STOCK PRODUCTS catalog above. Each look must have at least one UNIQUE hero product not used in any other look — do NOT repeat the same product across multiple looks. Each look gets 2-3 complementary products. Apply the outfit logic rules: structured jacket needs a soft piece underneath, every look needs a bottom or dress, shoes should appear. Match to the email theme, arc week, and persona. Use the handle exactly as shown. If no catalog was provided, use empty products arrays.
 - Return ONLY the JSON array, starting with [ and ending with ]`;
 
   try {
@@ -1180,10 +1180,12 @@ Rules:
     const generated = JSON.parse(raw.slice(start, end + 1));
     const now = Date.now();
     const items = generated.map((item, i) => {
-      // Flatten looks → products for backward compat with product selector / calendar
-      const flatProducts = item.looks
+      // Flatten looks → products, deduped by handle
+      const seenHandles = new Set();
+      const flatProducts = (item.looks
         ? item.looks.flatMap(l => l.products || [])
-        : (item.products || []);
+        : (item.products || [])
+      ).filter(p => p.handle && !seenHandles.has(p.handle) && seenHandles.add(p.handle));
       return {
         id: `gen_${now}_${i}`,
         weekOf: weekStart,
@@ -1425,7 +1427,9 @@ RESPONDING TO FEEDBACK:
       item.weekOf = weekStart;
       // Re-flatten looks → products if looks were updated
       if (updatedFields.looks) {
-        item.products = updatedFields.looks.flatMap(l => l.products || []);
+        const seen2 = new Set();
+        item.products = updatedFields.looks.flatMap(l => l.products || [])
+          .filter(p => p.handle && !seen2.has(p.handle) && seen2.add(p.handle));
       }
       item.lastEditedAt = new Date().toISOString();
       plans[weekStart] = items;
