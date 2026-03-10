@@ -3724,6 +3724,9 @@ function SeoProductTab() {
   const [reanalyzingHref, setReanalyzingHref] = useState(null)
   const [pushing, setPushing] = useState(false)
   const [pushLog, setPushLog] = useState(null)
+  const [editingHref, setEditingHref] = useState(null)
+  const [editDraft, setEditDraft] = useState({})
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     fetch('/api/shopify/status').then(r => r.json()).then(setShopifyConfig).catch(() => {})
@@ -3821,6 +3824,49 @@ function SeoProductTab() {
     }
     setReanalyzingHref(null)
     loadData()
+  }
+
+  function startEdit(p) {
+    const s = p.suggested || {}
+    // Flatten JSON fields to strings for textarea editing
+    const draft = { ...s }
+    ;['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases'].forEach(k => {
+      if (draft[k] && typeof draft[k] === 'object') draft[k] = JSON.stringify(draft[k], null, 2)
+    })
+    if (Array.isArray(draft.tags)) draft.tags = draft.tags.join(', ')
+    setEditDraft(draft)
+    setEditingHref(p.href)
+  }
+
+  function cancelEdit() {
+    setEditingHref(null)
+    setEditDraft({})
+  }
+
+  async function saveEdit(href) {
+    setSaving(true)
+    try {
+      const out = { ...editDraft }
+      // Parse tags back to array
+      if (typeof out.tags === 'string') out.tags = out.tags.split(',').map(t => t.trim()).filter(Boolean)
+      // Parse JSON fields back to objects
+      ;['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases'].forEach(k => {
+        if (typeof out[k] === 'string' && out[k].trim()) {
+          try { out[k] = JSON.parse(out[k]) } catch { /* leave as string if invalid JSON */ }
+        }
+      })
+      const res = await fetch('/api/seo-suggestions/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ href, suggested: out }),
+      })
+      const result = await res.json()
+      if (!result.ok) alert('Save failed')
+      else { setEditingHref(null); setEditDraft({}); loadData() }
+    } catch (err) {
+      alert(`Save error: ${err.message}`)
+    }
+    setSaving(false)
   }
 
   function toggleSelect(href) {
@@ -4068,6 +4114,19 @@ function SeoProductTab() {
             {/* Expanded detail */}
             {isExpanded && (
               <div style={{ borderTop: `1px solid ${T.border}`, padding: 16, background: T.surfaceAlt }}>
+                {/* Edit / Save / Cancel bar */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12, gap: 8 }}>
+                  {editingHref === p.href ? (
+                    <>
+                      <button onClick={cancelEdit} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer' }}>Cancel</button>
+                      <button onClick={() => saveEdit(p.href)} disabled={saving} style={{ fontSize: 12, padding: '4px 14px', borderRadius: 6, border: 'none', background: '#059669', color: 'white', cursor: 'pointer', fontWeight: 600 }}>
+                        {saving ? 'Saving…' : 'Save changes'}
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => startEdit(p)} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer' }}>✏ Edit</button>
+                  )}
+                </div>
                 {p.suggested?.image_insights && (
                   <div style={{ background: '#ede9fe', borderRadius: 8, padding: '8px 12px', marginBottom: 14, fontSize: 13, color: '#6366f1' }}>
                     <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
@@ -4077,19 +4136,35 @@ function SeoProductTab() {
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
                     <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
-                    <div style={{ fontSize: 13, color: '#059669', fontWeight: 600, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px' }}>
-                      {p.suggested?.meta_title || '—'}
-                      <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8, fontWeight: 400 }}>{(p.suggested?.meta_title || '').length}/60</span>
-                    </div>
+                    {editingHref === p.href ? (
+                      <div>
+                        <input value={editDraft.meta_title || ''} onChange={e => setEditDraft(d => ({ ...d, meta_title: e.target.value }))} maxLength={70}
+                          style={{ width: '100%', fontSize: 13, padding: '6px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
+                        <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{(editDraft.meta_title || '').length}/60</div>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: 13, color: '#059669', fontWeight: 600, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px' }}>
+                        {p.suggested?.meta_title || '—'}
+                        <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8, fontWeight: 400 }}>{(p.suggested?.meta_title || '').length}/60</span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Tags</div>
                     <div style={{ fontSize: 11, color: T.textFaint, textDecoration: 'line-through', marginBottom: 6 }}>{(p.current?.tags || []).join(', ') || '(none)'}</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                      {(p.suggested?.tags || []).map((t, i) => (
-                        <span key={i} style={{ fontSize: 11, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '2px 8px' }}>{t}</span>
-                      ))}
-                    </div>
+                    {editingHref === p.href ? (
+                      <div>
+                        <input value={editDraft.tags || ''} onChange={e => setEditDraft(d => ({ ...d, tags: e.target.value }))} placeholder="tag1, tag2, tag3"
+                          style={{ width: '100%', fontSize: 12, padding: '6px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
+                        <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>comma-separated</div>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {(p.suggested?.tags || []).map((t, i) => (
+                          <span key={i} style={{ fontSize: 11, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '2px 8px' }}>{t}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -4097,28 +4172,45 @@ function SeoProductTab() {
                   <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 6, lineHeight: 1.4 }}>
                     {(p.current?.description || '').substring(0, 160) || '(not set)'}
                   </div>
-                  <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
-                    {p.suggested?.meta_description || '—'}
-                    <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
-                  </div>
+                  {editingHref === p.href ? (
+                    <div>
+                      <textarea value={editDraft.meta_description || ''} onChange={e => setEditDraft(d => ({ ...d, meta_description: e.target.value }))} maxLength={180} rows={3}
+                        style={{ width: '100%', fontSize: 13, padding: '8px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, lineHeight: 1.5, boxSizing: 'border-box', resize: 'vertical' }} />
+                      <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{(editDraft.meta_description || '').length}/160</div>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
+                      {p.suggested?.meta_description || '—'}
+                      <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
+                    </div>
+                  )}
                 </div>
-                {p.suggested?.alt_text && (
-                  <div style={{ marginTop: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Image Alt Text <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(Shopify productUpdateMedia)</span></div>
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Image Alt Text <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(Shopify productUpdateMedia)</span></div>
+                  {editingHref === p.href ? (
+                    <div>
+                      <input value={editDraft.alt_text || ''} onChange={e => setEditDraft(d => ({ ...d, alt_text: e.target.value }))} maxLength={130}
+                        style={{ width: '100%', fontSize: 13, padding: '6px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
+                      <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{(editDraft.alt_text || '').length}/125</div>
+                    </div>
+                  ) : p.suggested?.alt_text ? (
                     <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
                       {p.suggested.alt_text}
                       <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{p.suggested.alt_text.length}/125</span>
                     </div>
-                  </div>
-                )}
-                {p.suggested?.geo_description && (
-                  <div style={{ marginTop: 14 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>GEO Description <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(AI assistant discoverability)</span></div>
+                  ) : <div style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>not set</div>}
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>GEO Description <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(AI assistant discoverability)</span></div>
+                  {editingHref === p.href ? (
+                    <textarea value={editDraft.geo_description || ''} onChange={e => setEditDraft(d => ({ ...d, geo_description: e.target.value }))} rows={3}
+                      style={{ width: '100%', fontSize: 13, padding: '8px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, lineHeight: 1.5, boxSizing: 'border-box', resize: 'vertical' }} />
+                  ) : p.suggested?.geo_description ? (
                     <div style={{ fontSize: 13, color: '#1d4ed8', background: '#eff6ff', borderRadius: 6, padding: '8px 12px', lineHeight: 1.6 }}>
                       {p.suggested.geo_description}
                     </div>
-                  </div>
-                )}
+                  ) : <div style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>not set</div>}
+                </div>
                 {/* AI Product Intelligence — GEO metafields (UCP + ACP) */}
                 {(() => {
                   const s = p.suggested || {}
@@ -4232,7 +4324,12 @@ function SeoProductTab() {
                         {visibleFields.map(([key, label]) => (
                           <div key={key} style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #e9d5ff' }}>
                             <div style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
-                            <div style={{ fontSize: 12, color: s[key] ? T.textSub : T.textFaint, fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
+                            {editingHref === p.href ? (
+                              <input value={editDraft[key] || ''} onChange={e => setEditDraft(d => ({ ...d, [key]: e.target.value }))}
+                                style={{ width: '100%', fontSize: 12, padding: '3px 6px', borderRadius: 4, border: `1px solid ${T.border}`, background: '#fff8', color: T.text, boxSizing: 'border-box' }} />
+                            ) : (
+                              <div style={{ fontSize: 12, color: s[key] ? T.textSub : T.textFaint, fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
+                            )}
                           </div>
                         ))}
                         {/* Shopify Category constants — always pushed for clothing */}

@@ -752,6 +752,20 @@ app.put('/api/seo-suggestions/status', (req, res) => {
   res.json(data.products[idx]);
 });
 
+// Update suggested fields for a product (inline edits from dashboard)
+app.put('/api/seo-suggestions/update', (req, res) => {
+  const { href, suggested } = req.body || {};
+  if (!href || !suggested) return res.status(400).json({ error: 'href and suggested required' });
+  const data = loadSeoSuggestions();
+  const idx = data.products.findIndex(p => p.href === href);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  // Merge incoming fields into existing suggested object (don't overwrite fields not sent)
+  data.products[idx].suggested = { ...(data.products[idx].suggested || {}), ...suggested };
+  data.products[idx].editedAt = new Date().toISOString();
+  saveSeoSuggestions(data);
+  res.json({ ok: true, product: data.products[idx] });
+});
+
 // Bulk approve
 app.post('/api/seo-suggestions/bulk-approve', (req, res) => {
   const { hrefs } = req.body || {};
