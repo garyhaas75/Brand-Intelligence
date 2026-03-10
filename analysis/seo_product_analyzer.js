@@ -144,10 +144,16 @@ function saveSuggestions(data) {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
 }
 
-// Fetch image as base64 for Claude Vision — 10 second timeout
+// Fetch image as base64 for Claude Vision.
+// Promise.race with a hard 10s wall-clock deadline — unconditionally wins even
+// if the TCP handshake itself never completes (req.setTimeout only fires after
+// connection is established, so it can't rescue a stalled SYN).
 function fetchImageBase64(url) {
-  return new Promise((resolve) => {
-    if (!url || !url.startsWith('http')) return resolve(null);
+  if (!url || !url.startsWith('http')) return Promise.resolve(null);
+
+  const deadline = new Promise(resolve => setTimeout(() => resolve(null), 10000));
+
+  const fetch = new Promise((resolve) => {
     const req = https.get(url, (res) => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
@@ -159,8 +165,9 @@ function fetchImageBase64(url) {
       res.on('error', () => resolve(null));
     });
     req.on('error', () => resolve(null));
-    req.setTimeout(10000, () => { req.destroy(); resolve(null); });
   });
+
+  return Promise.race([fetch, deadline]);
 }
 
 // ─── Product filtering ────────────────────────────────────────────────────────
