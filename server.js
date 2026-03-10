@@ -1356,7 +1356,7 @@ For EMAIL (looks-based templates: multi-look, story-led, category-focus, single-
     {
       "name": "<evocative look name, e.g. 'The Board Meeting' or 'Friday Closing'>",
       "angle": "<1-sentence styling angle for this look>",
-      "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0}]
+      "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0, "image": "<image url from catalog, copy exactly>"}]
     }
   ],
   "email": {
@@ -1380,7 +1380,7 @@ For component-story template ONLY — omit "looks" entirely and use "sections" i
     {
       "label": "<component label, e.g. 'The Dress', 'The Shoe', 'The Layer', 'The Foundation', 'The Bag'>",
       "angle": "<1-sentence description of this component's role in the wardrobe>",
-      "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0}]
+      "products": [{"handle": "<product handle>", "name": "<product name>", "price": 0, "image": "<image url from catalog, copy exactly>"}]
     }
   ],
   "email": {
@@ -1733,7 +1733,7 @@ STYLING RULES you enforce in all content:
 PRODUCT SWAPS — CRITICAL RULES:
 - ALWAYS pick replacement products from the IN-STOCK PRODUCTS list below. Never invent products.
 - When swapping a product, use the exact handle, name, and price from the catalog.
-- Product object format: { "handle": "exact-handle", "name": "Exact Product Name", "price": 00.00 }
+- Product object format: { "handle": "exact-handle", "name": "Exact Product Name", "price": 00.00, "image": "copy image url exactly from catalog" }
 - For looks-based emails: return the full updated "looks" array with the swap applied.
 - For component-story emails: return the full updated "sections" array with the swap applied. Each section has { label, angle, products[] }.
 - If no suitable replacement exists in the catalog, say so in one sentence — do NOT invent a product.

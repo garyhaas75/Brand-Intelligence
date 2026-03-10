@@ -1869,7 +1869,13 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
 
       // Helper: render a single product card
       function ProductCard({ p }) {
-        const img = previewImages[p.handle]
+        // Use image embedded in product (new), fall back to handle lookup, then name-prefix match
+        let img = p.image || previewImages[p.handle]
+        if (!img && browseProducts.length > 0) {
+          const nameLower = (p.name || '').toLowerCase()
+          const match = browseProducts.find(bp => bp.image && nameLower.startsWith((bp.name || '').toLowerCase().slice(0, 25)))
+          if (match) img = match.image
+        }
         return (
           <div style={{ textAlign: 'center' }}>
             <div style={{ background: '#f5f5f5', aspectRatio: '3/4', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 2 }}>

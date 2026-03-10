@@ -114,7 +114,8 @@ async function getProductCatalogForPrompt({ perCategory = 6 } = {}) {
     lines.push(`\n${type.toUpperCase()}:`);
     for (const p of products) {
       const tagStr = p.tags.length ? ` [${p.tags.join(', ')}]` : '';
-      lines.push(`  • ${p.name} ($${p.price})${tagStr} — ${p.description || 'No description'} | handle: ${p.handle}`);
+      const imgStr = p.image ? ` | image: ${p.image}` : '';
+      lines.push(`  • ${p.name} ($${p.price})${tagStr} — ${p.description || 'No description'} | handle: ${p.handle}${imgStr}`);
     }
   }
 
