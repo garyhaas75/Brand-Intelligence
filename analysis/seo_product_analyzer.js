@@ -44,6 +44,9 @@ const filterArg = (args.find(a => a.startsWith('--filter=')) || '').replace('--f
 const limitArg  = parseInt((args.find(a => a.startsWith('--limit='))  || '').replace('--limit=', '')) || 50;
 const FORCE     = args.includes('--force');
 const hrefArg   = (args.find(a => a.startsWith('--href=')) || '').replace('--href=', '') || null;
+// Model: sonnet (default, ~10s/product) or opus (--model=opus, ~90s, for single-product quality runs)
+const modelArg  = (args.find(a => a.startsWith('--model=')) || '').replace('--model=', '') || 'sonnet';
+const MODEL     = modelArg === 'opus' ? 'claude-opus-4-6' : 'claude-sonnet-4-6';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function log(msg) {
@@ -576,14 +579,14 @@ Return ONLY valid JSON (no markdown, no explanation):
 }`,
   });
 
-  log(`    → calling Claude (opus-4-6)…`);
+  log(`    → calling Claude (${MODEL})…`);
   const t1 = Date.now();
-  // Promise.race gives a hard 90s wall-clock cap — more reliable than SDK timeout option
+  const timeoutMs = MODEL.includes('opus') ? 120000 : 60000;
   const claudeDeadline = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Claude API timeout after 90s')), 90000)
+    setTimeout(() => reject(new Error(`Claude API timeout after ${timeoutMs / 1000}s`)), timeoutMs)
   );
   const response = await Promise.race([
-    client.messages.create({ model: 'claude-opus-4-6', max_tokens: 2000, messages: [{ role: 'user', content }] }),
+    client.messages.create({ model: MODEL, max_tokens: 2000, messages: [{ role: 'user', content }] }),
     claudeDeadline,
   ]);
   log(`    → Claude responded (${Date.now() - t1}ms)`);
@@ -630,7 +633,7 @@ async function run() {
   const logsDir = path.join(__dirname, '../logs');
   if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-  log(`=== SEO Product Analyzer Started — ${hrefArg ? `single: ${hrefArg}` : `filter: ${filterArg}, limit: ${limitArg}`}${FORCE ? ', FORCE' : ''} ===`);
+  log(`=== SEO Product Analyzer Started — ${hrefArg ? `single: ${hrefArg}` : `filter: ${filterArg}, limit: ${limitArg}`}${FORCE ? ', FORCE' : ''} | model: ${MODEL} ===`);
 
   const catalog = loadJSON(CATALOG_FILE);
   if (!catalog?.products?.length) {
