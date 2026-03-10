@@ -1256,7 +1256,11 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
       if (data.ok) {
         const assistantMsg = { role: 'assistant', content: data.reply }
         setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), assistantMsg] }))
-        loadData() // refresh card with revised content
+        // Instantly update the card from the response, then sync full state
+        if (data.updatedItem) {
+          setPlanItems(prev => prev.map(i => i.id === id ? data.updatedItem : i))
+        }
+        loadData()
       } else {
         const errMsg = { role: 'assistant', content: `Error: ${data.error || 'Something went wrong'}` }
         setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), errMsg] }))
@@ -1682,7 +1686,7 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
                         {/* Input row */}
                         <div style={{ padding: '10px 14px', borderTop: (chatHistory[item.id] || []).length > 0 ? `1px solid ${T.border}` : 'none', display: 'flex', gap: 8 }}>
                           <input
-                            placeholder="e.g. Make the subject line more urgent…"
+                            placeholder="e.g. Replace the white blazer with a black one, or find a heel instead of a flat…"
                             value={chatInput[item.id] || ''}
                             onChange={e => setChatInput(prev => ({ ...prev, [item.id]: e.target.value }))}
                             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(item, chatInput[item.id] || '') } }}

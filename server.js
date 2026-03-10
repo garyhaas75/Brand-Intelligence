@@ -1659,6 +1659,9 @@ app.post('/api/weekly-plan/item/:itemId/chat', async (req, res) => {
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+    // Inject live product catalog so Claude can find real products for swaps
+    const productCatalog = await getProductCatalogForPrompt({ perCategory: 12 }).catch(() => '');
+
     const systemPrompt = `You are a senior marketing editor and fashion stylist for Anne Klein, a classic American women's fashion brand (think: understated authority, not fast fashion).
 
 THE ANNE KLEIN WOMAN: 35–55, professionally accomplished, dresses for impact not trend. Her occasions: boardroom presentations, client lunches, work travel, weekend errands with polish. She buys fewer pieces but wears them more.
@@ -1670,10 +1673,20 @@ STYLING RULES you enforce in all content:
 - Product pairing: shoes should always be mentioned with footwear-adjacent outfits. A blazer look needs a bottom. Never float a single piece without context.
 - Copy tone: short declarative sentences. No exclamation points. No words: fresh, effortless, trendy, stunning, must-have, chic. Yes words: precise, polished, considered, built for, made to.
 
+PRODUCT SWAPS — CRITICAL RULES:
+- ALWAYS pick replacement products from the IN-STOCK PRODUCTS list below. Never invent products.
+- When swapping a product, use the exact handle, name, and price from the catalog.
+- Product object format: { "handle": "exact-handle", "name": "Exact Product Name", "price": 00.00 }
+- For looks-based emails: return the full updated "looks" array with the swap applied.
+- For component-story emails: return the full updated "sections" array with the swap applied. Each section has { label, angle, products[] }.
+- If no suitable replacement exists in the catalog, say so in one sentence — do NOT invent a product.
+
+${productCatalog ? `IN-STOCK PRODUCTS (use ONLY these for product swaps):\n${productCatalog}` : ''}
+
 RESPONDING TO FEEDBACK:
 - If the message is a QUESTION (starts with "what", "why", "how", "did you", "can you explain") → answer in 1-2 sentences only. No JSON.
 - If the message is a REVISION REQUEST → make the change, return ONLY:
-  1. \`\`\`json block with the revised fields (only what changed — email, looks, instagram, hero, or theme)
+  1. \`\`\`json block with the revised fields (only what changed — email, looks, sections, instagram, hero, or theme)
   2. One sentence: "Changed [X] from '[old]' to '[new]'."
   Never explain your reasoning. Never be defensive. Just change it and say what you changed.
 - Keep ALL responses under 3 sentences unless showing JSON.`;
@@ -1728,10 +1741,14 @@ RESPONDING TO FEEDBACK:
       Object.assign(item, updatedFields);
       item.id = itemId; // never overwrite
       item.weekOf = weekStart;
-      // Re-flatten looks → products if looks were updated
+      // Re-flatten products list from whichever structure was updated
       if (updatedFields.looks) {
         const seen2 = new Set();
         item.products = updatedFields.looks.flatMap(l => l.products || [])
+          .filter(p => p.handle && !seen2.has(p.handle) && seen2.add(p.handle));
+      } else if (updatedFields.sections) {
+        const seen2 = new Set();
+        item.products = updatedFields.sections.flatMap(s => s.products || [])
           .filter(p => p.handle && !seen2.has(p.handle) && seen2.add(p.handle));
       }
       item.lastEditedAt = new Date().toISOString();
