@@ -1872,8 +1872,14 @@ function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
         // Use image embedded in product (new), fall back to handle lookup, then name-prefix match
         let img = p.image || previewImages[p.handle]
         if (!img && browseProducts.length > 0) {
-          const nameLower = (p.name || '').toLowerCase()
-          const match = browseProducts.find(bp => bp.image && nameLower.startsWith((bp.name || '').toLowerCase().slice(0, 25)))
+          const genName = (p.name || '').toLowerCase()
+          // Claude often appends color suffix (e.g. "- Crisp White") to the catalog product name.
+          // Find a catalog product whose name (first 28 chars) is contained anywhere in the generated name.
+          const match = browseProducts.find(bp => {
+            if (!bp.image) return false
+            const catName = (bp.name || '').toLowerCase()
+            return catName.length > 10 && genName.includes(catName.substring(0, Math.min(catName.length, 28)))
+          })
           if (match) img = match.image
         }
         return (
