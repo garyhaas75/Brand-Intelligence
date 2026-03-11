@@ -1205,6 +1205,9 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
   const [data, setData] = useState(null)
   const [view, setView] = useState('seo')
   const [kwCat, setKwCat] = useState('brandTerms')
+  const [kwFilter, setKwFilter] = useState('all')
+  const [expandedCluster, setExpandedCluster] = useState(null)
+  const [showAllKeywords, setShowAllKeywords] = useState(false)
   const [geoAgent, setGeoAgent] = useState('claude')
   const [expandedPage, setExpandedPage] = useState(null)
 
@@ -1218,6 +1221,11 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
   const seo = data.onPageSeo || {}
   const geo = data.geoSection || {}
   const kw = data.keywordUniverse || {}
+  const ki = data.keywordIntelligence || null
+  const INTENT_COLORS = { transactional: '#059669', commercial: '#2563eb', informational: '#d97706', navigational: '#6b7280' }
+  const COMPETITION_COLORS = { low: '#059669', medium: '#d97706', high: '#dc2626' }
+  const OPPORTUNITY_COLORS = { high: '#7c3aed', medium: '#2563eb', low: '#6b7280' }
+  const CONTENT_TYPE_LABELS = { 'category-page': 'Category Page', 'blog-post': 'Blog / Guide', 'landing-page': 'Landing Page', 'faq-page': 'FAQ Page', 'product-page': 'Product Page' }
   const speedColors = { fast: 'green', medium: 'yellow', slow: 'red', unknown: 'gray' }
   const byAgent = geo.byAgent || {}
   const agents = Object.keys(byAgent)
@@ -1474,28 +1482,173 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
       {view === 'keywords' && (
         <div>
+          {!ki && (
+            <Card style={{ marginBottom: 16, borderLeft: '4px solid #d97706' }}>
+              <p style={{ color: T.textSub, fontSize: 13 }}>Keyword intelligence not yet generated. Re-run Search & SEO analysis to unlock opportunity clusters, content gaps, and ranked recommendations.</p>
+            </Card>
+          )}
+
+          {ki && (() => {
+            const summary = ki.opportunitySummary || {}
+            const clusters = ki.clusters || []
+            const gaps = ki.topContentGaps || []
+            const filterBtns = [
+              { key: 'all', label: 'All Clusters' },
+              { key: 'quickwins', label: `Quick Wins (${clusters.filter(c => c.isQuickWin).length})` },
+              { key: 'gaps', label: `Content Gaps (${clusters.filter(c => !c.hasExistingPage).length})` },
+              { key: 'high', label: `High Opportunity (${clusters.filter(c => c.opportunity === 'high').length})` },
+            ]
+            const filtered = clusters.filter(c => {
+              if (kwFilter === 'quickwins') return c.isQuickWin
+              if (kwFilter === 'gaps') return !c.hasExistingPage
+              if (kwFilter === 'high') return c.opportunity === 'high'
+              return true
+            })
+            return (
+              <>
+                {/* Opportunity Summary Bar */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+                  {[
+                    { label: 'Quick Wins', value: summary.quickWins ?? clusters.filter(c => c.isQuickWin).length, color: '#059669', desc: 'Existing pages to optimize' },
+                    { label: 'Content to Create', value: summary.contentToCreate ?? clusters.filter(c => !c.hasExistingPage && c.opportunity !== 'low').length, color: '#2563eb', desc: 'New pages needed' },
+                    { label: 'Content Gaps', value: summary.contentGaps ?? gaps.length, color: '#dc2626', desc: 'High-value missed searches' },
+                    { label: 'Total Opportunities', value: summary.totalOpportunities ?? clusters.length, color: '#7c3aed', desc: 'Keyword clusters identified' },
+                  ].map(s => (
+                    <Card key={s.label} style={{ textAlign: 'center', padding: 16 }}>
+                      <p style={{ fontSize: 32, fontWeight: 800, color: s.color, lineHeight: 1, marginBottom: 4 }}>{s.value}</p>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 2 }}>{s.label}</p>
+                      <p style={{ fontSize: 11, color: T.textMuted }}>{s.desc}</p>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Top Content Gaps */}
+                {gaps.length > 0 && (
+                  <Card style={{ marginBottom: 20 }}>
+                    <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Top Content Gaps</h3>
+                    <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>High-value searches where your site has no matching page — each is a missed ranking opportunity.</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {gaps.map((g, i) => (
+                        <div key={i} style={{ borderLeft: '4px solid #dc2626', paddingLeft: 14, paddingTop: 4, paddingBottom: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <span style={{ fontWeight: 700, fontSize: 14, color: T.text }}>{g.title}</span>
+                            <span style={{ fontSize: 11, background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{g.estimatedMonthlySearches} searches/mo</span>
+                            <span style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 10 }}>{CONTENT_TYPE_LABELS[g.recommendedContentType] || g.recommendedContentType}</span>
+                          </div>
+                          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 6 }}>{g.description}</p>
+                          {(g.exampleKeywords || []).length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                              {g.exampleKeywords.map(k => (
+                                <span key={k} style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 10, border: `1px solid ${T.border}` }}>{k}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Keyword Clusters */}
+                <Card style={{ marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Keyword Clusters by Opportunity</h3>
+                    <span style={{ fontSize: 12, color: T.textMuted }}>{filtered.length} of {clusters.length} clusters</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+                    {filterBtns.map(f => (
+                      <button key={f.key} onClick={() => setKwFilter(f.key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: kwFilter === f.key ? 700 : 400, background: kwFilter === f.key ? T.accent : T.surfaceAlt, color: kwFilter === f.key ? '#fff' : T.textSub, border: kwFilter === f.key ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {filtered.map(c => {
+                      const isOpen = expandedCluster === c.id
+                      return (
+                        <div key={c.id} style={{ border: `1px solid ${T.border}`, borderRadius: 8, overflow: 'hidden' }}>
+                          <button onClick={() => setExpandedCluster(isOpen ? null : c.id)} style={{ width: '100%', background: isOpen ? T.surfaceAlt : T.surface, border: 'none', padding: '12px 16px', cursor: 'pointer', textAlign: 'left' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: 700, fontSize: 14, color: T.text, flex: 1 }}>{c.name}</span>
+                              {c.isQuickWin && <span style={{ fontSize: 11, background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>Quick Win</span>}
+                              {!c.hasExistingPage && <span style={{ fontSize: 11, background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>No Page</span>}
+                              <span style={{ fontSize: 11, background: `${OPPORTUNITY_COLORS[c.opportunity]}22`, color: OPPORTUNITY_COLORS[c.opportunity], padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
+                                {c.opportunity?.charAt(0).toUpperCase() + c.opportunity?.slice(1)} Opportunity
+                              </span>
+                              <span style={{ fontSize: 11, background: `${COMPETITION_COLORS[c.competition]}22`, color: COMPETITION_COLORS[c.competition], padding: '2px 8px', borderRadius: 10 }}>
+                                {c.competition?.charAt(0).toUpperCase() + c.competition?.slice(1)} Competition
+                              </span>
+                              <span style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 10, border: `1px solid ${T.border}` }}>
+                                {c.intent}
+                              </span>
+                              <span style={{ fontSize: 12, color: T.textMuted }}>{c.estimatedMonthlySearches} searches/mo</span>
+                              <span style={{ fontSize: 16, color: T.textMuted, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
+                            </div>
+                          </button>
+                          {isOpen && (
+                            <div style={{ padding: '14px 16px', borderTop: `1px solid ${T.border}`, background: T.surface }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12 }}>
+                                <div>
+                                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Content Gap</p>
+                                  <p style={{ fontSize: 13, color: T.textSub }}>{c.contentGap}</p>
+                                </div>
+                                <div>
+                                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Recommended Action</p>
+                                  <p style={{ fontSize: 13, color: T.textSub }}>{c.recommendation}</p>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 10, border: `1px solid ${T.border}` }}>
+                                  {CONTENT_TYPE_LABELS[c.contentType] || c.contentType}
+                                </span>
+                                {(c.keywords || []).map(k => (
+                                  <span key={k} style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 10, border: `1px solid ${T.border}` }}>{k}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                    {filtered.length === 0 && <p style={{ color: T.textFaint, fontSize: 13, padding: 8 }}>No clusters match this filter.</p>}
+                  </div>
+                </Card>
+              </>
+            )
+          })()}
+
+          {/* Browse All Keywords (existing) */}
           <Card style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Keyword Universe</h3>
-              {kw.totalCount > 0 && <span style={{ fontSize: 13, color: T.textMuted }}>{kw.totalCount} total terms</span>}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 16 }}>
-              {KW_CATEGORIES.map(({ key, label }) => {
-                const count = (kw[key] || []).length
-                if (!count) return null
-                return (
-                  <button key={key} onClick={() => setKwCat(key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: kwCat === key ? 700 : 400, background: kwCat === key ? T.accent : T.surfaceAlt, color: kwCat === key ? '#fff' : T.textSub, border: kwCat === key ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
-                    {label} <span style={{ opacity: 0.7 }}>({count})</span>
-                  </button>
-                )
-              })}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {(kw[kwCat] || []).map(k => (
-                <span key={k} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '5px 14px', borderRadius: 20, border: `1px solid ${T.border}` }}>{k}</span>
-              ))}
-              {!(kw[kwCat] || []).length && <p style={{ color: T.textFaint, fontSize: 13 }}>No terms in this category yet.</p>}
-            </div>
+            <button onClick={() => setShowAllKeywords(!showAllKeywords)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Browse All Keywords</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {kw.totalCount > 0 && <span style={{ fontSize: 13, color: T.textMuted }}>{kw.totalCount} total terms</span>}
+                  <span style={{ fontSize: 16, color: T.textMuted }}>{showAllKeywords ? '▲' : '▼'}</span>
+                </div>
+              </div>
+            </button>
+            {showAllKeywords && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 16 }}>
+                  {KW_CATEGORIES.map(({ key, label }) => {
+                    const count = (kw[key] || []).length
+                    if (!count) return null
+                    return (
+                      <button key={key} onClick={() => setKwCat(key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: kwCat === key ? 700 : 400, background: kwCat === key ? T.accent : T.surfaceAlt, color: kwCat === key ? '#fff' : T.textSub, border: kwCat === key ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
+                        {label} <span style={{ opacity: 0.7 }}>({count})</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {(kw[kwCat] || []).map(k => (
+                    <span key={k} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '5px 14px', borderRadius: 20, border: `1px solid ${T.border}` }}>{k}</span>
+                  ))}
+                  {!(kw[kwCat] || []).length && <p style={{ color: T.textFaint, fontSize: 13 }}>No terms in this category yet.</p>}
+                </div>
+              </div>
+            )}
           </Card>
         </div>
       )}

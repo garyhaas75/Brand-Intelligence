@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-11T22:39:55.227Z",
+  "generatedAt": "2026-03-11T23:17:16.179Z",
   "brandSlug": "toysrus-com-lb",
   "brandName": "Toys R Us",
   "onPageSeo": {
@@ -140,95 +140,95 @@
       ],
       "schemaMarkup": [],
       "canonicalTag": "https://chez-les-petits.com/",
-      "pageSpeedSignal": "fast",
+      "pageSpeedSignal": "medium",
       "error": null
     }
   ],
   "competitorBenchmarks": [
     {
-      "signal": "Meta Description",
-      "competitorName": "PlayOne",
-      "competitorValue": "The biggest online toy store in Lebanon. Shopping is easy, safe and fun with PlayOne.",
-      "targetValue": "Missing",
-      "callout": "When someone searches for toys in Lebanon, Google shows a short preview sentence under each result to help people decide where to click. PlayOne has a compelling preview that sells their brand; Toys R Us has nothing, so Google either shows random text from the page or nothing useful. This directly costs Toys R Us clicks and potential customers."
-    },
-    {
       "signal": "Title Tag",
       "competitorName": "Chez Les Petits",
       "competitorValue": "Baby Items & Toys — Chez Les Petits - Shop Online and in Stores",
       "targetValue": "Toys R Us",
-      "callout": "The title tag is the clickable blue headline people see in Google search results, and it is one of the strongest signals Google uses to understand what a page is about. Chez Les Petits clearly tells Google and shoppers what they sell and how they sell it, while Toys R Us only shows its brand name — missing a major opportunity to rank for searches like 'buy toys Lebanon' or 'online toy store.'"
+      "callout": "When someone searches Google for toys in Lebanon, the page title is the first thing they see in the results. Chez Les Petits clearly tells shoppers what they sell and where — Toys R Us just shows its brand name, giving Google and customers almost no useful information. This makes it far less likely that Toys R Us appears when people search for products rather than the brand by name."
+    },
+    {
+      "signal": "Meta Description",
+      "competitorName": "PlayOne",
+      "competitorValue": "The biggest online toy store in Lebanon. Shopping is easy, safe and fun with PlayOne.",
+      "targetValue": "Missing",
+      "callout": "The meta description is the short promotional blurb that appears beneath a website's link in Google search results — think of it as a free advertising slot. PlayOne uses it to pitch their store and reassure shoppers, while Toys R Us has nothing there at all. Without it, Google will randomly pull text from the page, which often looks messy and fails to convince people to click."
     },
     {
       "signal": "Canonical Tag",
       "competitorName": "PlayOne",
       "competitorValue": "https://playone.com.lb/",
       "targetValue": "Missing",
-      "callout": "A canonical tag is like a 'this is my official address' signal sent to Google, preventing confusion if the same page can be reached multiple ways. PlayOne, JouéClub, and Chez Les Petits all have this in place, while Toys R Us does not — meaning Google may split its attention across duplicate versions of the site, weakening the overall ranking power of every page."
+      "callout": "A canonical tag is like an address label that tells Google exactly which version of a website is the real, official one. PlayOne, JouéClub, and Chez Les Petits all have this in place, but Toys R Us does not. Without it, Google can get confused between multiple versions of the same site and may split its attention — quietly reducing how prominently Toys R Us ranks."
     },
     {
       "signal": "Meta Description",
       "competitorName": "Chez Les Petits",
       "competitorValue": "One of the most prestigious Toys & Baby Items retail chain and online store in Lebanon. Operated by Gebran Geahchan & Sons SAL (Since 1912).",
       "targetValue": "Missing",
-      "callout": "Chez Les Petits uses their preview text to build trust by highlighting their heritage and reputation, giving shoppers a reason to choose them before even visiting the site. Toys R Us has no such message, leaving a blank first impression that makes the brand look less credible and reduces the chance that someone searching will click on their result."
+      "callout": "Chez Les Petits uses their description to build trust by highlighting their heritage and reputation, which encourages shoppers to choose them over others in the search results. Toys R Us has no description at all, so it misses this opportunity to make a strong first impression before a customer even visits the site. In a competitive market, that missing pitch could be the difference between a click and a lost customer."
     },
     {
-      "signal": "Page Speed",
-      "competitorName": "Chez Les Petits",
-      "competitorValue": "Fast",
-      "targetValue": "Medium",
-      "callout": "Google has publicly stated that slow-loading websites rank lower, because a slow site creates a frustrating experience for shoppers. Chez Les Petits loads faster than Toys R Us, giving them a built-in advantage in search rankings — and since most shoppers browse on mobile, even a few extra seconds of loading time causes people to leave before the page fully appears."
+      "signal": "Title Tag",
+      "competitorName": "PlayOne",
+      "competitorValue": "PlayOne, Lebanon's Online Toy Store",
+      "targetValue": "Toys R Us",
+      "callout": "PlayOne's title immediately signals to both Google and shoppers that they are a toy store based in Lebanon, making them highly relevant when local customers search for toys online. Toys R Us only displays its brand name, so Google has little context about what the business does or who it serves. This means Toys R Us is far less likely to show up in searches from people who do not already know the brand."
     }
   ],
   "priorityActions": [
     {
       "rank": 1,
-      "action": "Write and add a meta description to the homepage that clearly tells customers who you are, for example: 'Toys R Us Lebanon – Shop the widest selection of toys, games, and children's products online. Safe, easy, and fun shopping delivered to your door.'",
+      "action": "Rewrite the homepage title tag from just 'Toys R Us' to something descriptive like 'Toys R Us Lebanon | Toys, Games & Children's Products – Shop Online'. This takes minutes to update in your website settings.",
       "impact": "High",
-      "why": "Right now your homepage shows nothing in Google search results where a description should appear, while your top competitor PlayOne already has a compelling description winning clicks that should be yours.",
+      "why": "Your top competitor Chez Les Petits is winning search clicks because their title clearly tells shoppers what they sell and where — your current title gives Google and customers almost no useful information, costing you visibility and clicks.",
       "effort": "Quick Win"
     },
     {
       "rank": 2,
-      "action": "Add a visible H1 headline to your homepage – this is the main title Google reads to understand what your page is about. Something like 'Lebanon's Home for Toys & Children's Products' works perfectly.",
+      "action": "Add a meta description to your homepage — a 1–2 sentence summary (under 160 characters) explaining what Toys R Us Lebanon offers, for example: 'Shop the widest range of toys, games, and children's products in Lebanon. Order online or visit us in store.' Apply the same fix to all other pages missing descriptions.",
       "impact": "High",
-      "why": "Without an H1, Google has no clear signal about what your homepage is about, which directly weakens your ranking ability for the most valuable search terms in Lebanon.",
+      "why": "Every page on your site currently shows a blank description in Google search results, which means Google writes one for you — usually poorly — reducing the likelihood that shoppers click on your listing over a competitor's.",
       "effort": "Quick Win"
     },
     {
       "rank": 3,
-      "action": "Add a canonical tag to your homepage. This is a single line of code that tells Google which version of your website is the 'official' one, preventing your own pages from competing against each other in search results.",
+      "action": "Add a clear H1 headline to your homepage — the single most prominent heading on the page — such as 'Lebanon's Home for Toys, Games & Children's Products'. Also fix the two category pages currently showing the generic H1 'All products' with specific headings like 'Arts & Crafts' and 'Children's Clothing'.",
       "impact": "High",
-      "why": "Without a canonical tag, Google may be splitting your homepage's ranking power across multiple URL versions, effectively making your site weaker in search results than it needs to be.",
+      "why": "Google uses the H1 heading as a primary signal to understand what a page is about — without it on your homepage, and with identical vague headings across category pages, Google cannot properly rank you for the specific products you sell.",
       "effort": "Quick Win"
     },
     {
       "rank": 4,
-      "action": "Fix the duplicate page titles on your category pages – right now 'Arts & Crafts' and 'Clothing' both show 'Toys R Us | All products' as their title. Each category page needs its own unique title, such as 'Arts & Crafts Toys for Kids | Toys R Us Lebanon' and 'Children's Clothing | Toys R Us Lebanon'.",
+      "action": "Add a canonical tag to your homepage and audit all 4,468 URLs in your sitemap to ensure every page points to its single preferred web address. Your sitemap also shows 0 product URLs indexed — work with your web team to ensure individual product pages are included and properly linked.",
       "impact": "High",
-      "why": "When Google sees multiple pages with identical titles, it cannot tell them apart and will rank them poorly – you are currently losing potential shoppers searching specifically for arts & crafts or clothing for children.",
+      "why": "Without canonical tags, Google may treat duplicate or similar pages as competing versions of each other, splitting your ranking power — and with no product pages in your sitemap, Google likely isn't finding or ranking your actual product listings at all.",
       "effort": "1-2 weeks"
     },
     {
       "rank": 5,
-      "action": "Investigate and fix the sitemap urgently – your sitemap lists 4,468 URLs but shows zero products indexed, meaning Google likely cannot find or rank any of your individual product pages.",
+      "action": "Create unique, keyword-rich title tags and meta descriptions for every category page — for example, change 'Toys R Us | All products' on the Arts & Crafts page to 'Arts & Crafts for Kids | Toys R Us Lebanon'. Prioritize your top 20 highest-traffic categories first.",
       "impact": "High",
-      "why": "If your products are not in the sitemap, they are essentially invisible to Google, which means you are losing every single search query from shoppers looking for specific toys you actually sell.",
+      "why": "Multiple category pages currently share the exact same title and description, which confuses Google about which page to rank and signals low-quality content — fixing this directly increases how many category pages appear in search results.",
       "effort": "1-2 weeks"
     },
     {
       "rank": 6,
-      "action": "Improve your website loading speed from its current medium rating by compressing images and enabling faster hosting options – your technical team can action this with standard optimization tools.",
+      "action": "Improve your website's page speed from its current 'medium' rating to fast, by working with your web team to compress images, reduce unnecessary code, and enable browser caching — Google's free PageSpeed Insights tool will give you a specific checklist.",
       "impact": "Medium",
-      "why": "Google rewards faster websites with better rankings, and Lebanese shoppers on mobile connections will abandon a slow-loading page, directly costing you sales.",
+      "why": "Page speed is a confirmed Google ranking factor, and slow-loading pages also cause shoppers to leave before buying — improving speed will both lift your search rankings and increase the percentage of visitors who complete a purchase.",
       "effort": "1+ month"
     },
     {
       "rank": 7,
-      "action": "Build out your structured data (schema markup) to include Product, Offer, and LocalBusiness schema across product and store pages, going beyond the basic Organization markup you currently have.",
+      "action": "Build out your brand presence on AI shopping tools (like ChatGPT, Google's AI Overviews, and Perplexity) by ensuring your product catalog, store locations, and brand details are consistently listed across Google Business Profile, Lebanese shopping directories, and structured data on your website.",
       "impact": "Medium",
-      "why": "Richer schema markup helps your products appear with star ratings, prices, and availability directly in Google results, and also boosts your visibility in AI-powered shopping tools where you currently appear in only 33% of relevant queries.",
+      "why": "Only 23% of AI-driven shopping queries in your market currently mention Toys R Us — as more Lebanese shoppers use AI assistants to find products, brands with richer and more consistent online information will be recommended far more frequently.",
       "effort": "1+ month"
     }
   ],
@@ -240,49 +240,50 @@
       "Toys R Us store Lebanon",
       "Toys R Us Beirut",
       "Toys R Us Lebanon website",
-      "Toys R Us Lebanon delivery",
       "Toys R Us Lebanon online shop",
-      "ToysRUs Beirut",
-      "Toys R Us Lebanon catalogue",
+      "Toys R Us Lebanon delivery",
       "Toys R Us Lebanon sale",
       "Toys R Us Lebanon offers",
-      "Toys R Us Lebanon branches",
-      "Toys R Us Lebanon locations",
-      "Toys R Us Lebanon contact",
-      "Toys R Us LB",
-      "TRU Lebanon",
+      "Toys R Us Lebanon new arrivals",
+      "Toys R Us Lebanon catalog",
       "Toys R Us Lebanon promo",
-      "Toys R Us Lebanon discount"
+      "ToysRUs Beirut",
+      "Toys R Us Lebanon kids",
+      "Toys R Us Lebanon baby",
+      "Toys R Us Lebanon LEGO",
+      "Toys R Us Lebanon Barbie",
+      "Toys R Us Lebanon prices",
+      "Toys R Us Lebanon branches"
     ],
     "categoryTerms": [
       "toys Lebanon",
+      "children toys Lebanon",
       "arts and crafts toys Lebanon",
       "building and construction toys Lebanon",
       "dolls and plush toys Lebanon",
       "toy guns Lebanon",
-      "remote control cars Lebanon",
-      "RC toys Lebanon",
+      "RC cars Lebanon",
+      "remote control toys Lebanon",
       "outdoor toys Lebanon",
       "sports toys Lebanon",
       "action figures Lebanon",
       "collectible figures Lebanon",
       "electronic toys Lebanon",
+      "gadgets for kids Lebanon",
       "preschool toys Lebanon",
       "puzzles Lebanon",
       "board games Lebanon",
       "educational toys Lebanon",
-      "science kits Lebanon",
+      "science toys Lebanon",
       "back to school supplies Lebanon",
-      "children's books Lebanon",
+      "children books Lebanon",
       "kids clothing Lebanon",
-      "impulse buy toys Lebanon",
-      "gadgets for kids Lebanon",
-      "toy vehicles Lebanon",
       "baby toys Lebanon",
-      "infant toys Lebanon",
-      "kids games Lebanon",
-      "STEM toys Lebanon",
-      "craft kits for kids Lebanon"
+      "impulse buy toys Lebanon",
+      "mind teasers Lebanon",
+      "toy vehicles Lebanon",
+      "plush toys Lebanon",
+      "kids gadgets Lebanon"
     ],
     "ageGroupTerms": [
       "toys for 1 year old Lebanon",
@@ -298,44 +299,43 @@
       "toys for 11 year old Lebanon",
       "toys for 12 year old Lebanon",
       "gifts for toddlers Lebanon",
-      "gifts for preschool kids Lebanon",
-      "gifts for 3 to 5 year olds Lebanon",
-      "gifts for 6 to 8 year olds Lebanon",
+      "gifts for 3 to 5 year old Lebanon",
+      "gifts for 6 to 8 year old Lebanon",
       "gifts for 8 year old boy Lebanon",
       "gifts for 8 year old girl Lebanon",
       "toys for babies Lebanon",
-      "toys for newborn Lebanon",
-      "toys for kids 10 plus Lebanon",
-      "best toys for toddlers Lebanon",
-      "educational toys for 3 year olds Lebanon",
-      "toys for young children Lebanon",
-      "gifts for children Lebanon"
+      "toys for preschoolers Lebanon",
+      "toys for kindergarteners Lebanon",
+      "toys for tweens Lebanon",
+      "best toys for boys Lebanon",
+      "best toys for girls Lebanon",
+      "age appropriate toys Lebanon",
+      "educational toys for toddlers Lebanon"
     ],
     "occasionTerms": [
       "Christmas toys Lebanon",
       "Christmas gifts for kids Lebanon",
       "birthday gifts for kids Lebanon",
-      "birthday toys Lebanon",
-      "Eid gifts for kids Lebanon",
-      "Eid toys Lebanon",
-      "Eid al-Fitr children gifts Lebanon",
-      "Eid al-Adha toys Lebanon",
+      "Eid gifts for children Lebanon",
+      "Eid al-Fitr toys Lebanon",
+      "Eid al-Adha gifts kids Lebanon",
       "back to school Lebanon",
-      "back to school supplies Beirut",
+      "back to school shopping Lebanon",
       "Valentine's Day gifts for kids Lebanon",
       "Mother's Day gifts Lebanon kids",
       "Father's Day gifts for kids Lebanon",
-      "holiday toys Lebanon",
       "New Year gifts for children Lebanon",
-      "Easter gifts for kids Lebanon",
+      "Halloween toys Lebanon",
       "baby shower gifts Lebanon",
-      "kids party gifts Lebanon",
-      "school season toys Lebanon",
+      "children's day gifts Lebanon",
+      "holiday toys Lebanon",
       "seasonal toys Lebanon",
-      "end of year school gifts Lebanon",
-      "graduation gifts for kids Lebanon",
+      "gifts for kids Lebanon",
+      "toy sale Lebanon",
       "summer toys Lebanon",
-      "winter holiday gifts Lebanon"
+      "winter gifts children Lebanon",
+      "end of year gifts kids Lebanon",
+      "school year supplies Lebanon"
     ],
     "topBrands": [
       "LEGO Lebanon",
@@ -343,117 +343,114 @@
       "Crayola Lebanon",
       "Mattel Lebanon",
       "Hot Wheels Lebanon",
+      "Nerf Lebanon",
+      "Play-Doh Lebanon",
+      "Fisher-Price Lebanon",
+      "Hasbro Lebanon",
       "Gabby's Dollhouse Lebanon",
       "Peg Perego Lebanon",
-      "Fisher-Price Lebanon",
-      "Play-Doh Lebanon",
-      "Nerf Lebanon",
-      "Marvel toys Lebanon",
       "Disney toys Lebanon",
-      "Hasbro Lebanon",
-      "Playmobil Lebanon",
-      "Mega Bloks Lebanon",
-      "Funko Pop Lebanon",
+      "Marvel toys Lebanon",
       "Melissa and Doug Lebanon",
-      "VTech toys Lebanon",
-      "LOL Surprise Lebanon",
-      "Pokémon cards Lebanon",
+      "Ravensburger Lebanon",
       "Monopoly Lebanon",
-      "UNO game Lebanon",
-      "Jenga Lebanon",
-      "Ravensburger puzzles Lebanon",
-      "Schleich figures Lebanon",
-      "Lego Technic Lebanon",
-      "Lego City Lebanon",
-      "Barbie Dreamhouse Lebanon"
+      "Funko Pop Lebanon",
+      "Playmobil Lebanon",
+      "VTech Lebanon",
+      "Barbie Dreamhouse Lebanon",
+      "LEGO City Lebanon",
+      "LEGO Technic Lebanon",
+      "LEGO Friends Lebanon",
+      "Star Wars toys Lebanon",
+      "Jurassic World toys Lebanon",
+      "Paw Patrol toys Lebanon",
+      "Cocomelon toys Lebanon"
     ],
     "localTerms": [
       "toy store Lebanon",
       "toy store Beirut",
-      "toy store near me Lebanon",
-      "best toy store in Lebanon",
+      "toy shop near me Lebanon",
       "children's store Lebanon",
-      "kids shop Lebanon",
-      "online toy store Lebanon",
+      "kids store Beirut",
+      "toy store near me Beirut",
       "buy toys online Lebanon",
-      "toy delivery Lebanon",
-      "toy delivery Beirut",
-      "same day toy delivery Lebanon",
-      "toy shop Beirut",
-      "toy shop Dbayeh",
-      "toy shop Verdun",
-      "toy shop ABC mall Lebanon",
-      "toy shop City Centre Beirut",
-      "children's products Lebanon",
-      "baby store Lebanon",
-      "kids products online Lebanon",
-      "toys online Lebanon shipping",
+      "online toy delivery Lebanon",
+      "toys delivery Beirut",
+      "toys shop Beirut",
+      "children's retail Lebanon",
+      "toy store Dbayeh",
+      "toy store Abc mall Lebanon",
+      "toy store City Centre Beirut",
+      "toy store Verdun Lebanon",
+      "toy store Hazmieh",
+      "toy store Jounieh",
+      "toy store Tripoli Lebanon",
+      "toys and games Lebanon",
+      "children products Lebanon",
       "buy LEGO Lebanon",
       "buy Barbie Lebanon",
-      "educational toys store Lebanon",
-      "children's retail Lebanon",
-      "toys and games store Beirut"
+      "kids clothing store Lebanon",
+      "baby products store Lebanon"
     ],
     "competitorGapTerms": [
       "trending toys Lebanon 2024",
       "most popular toys Lebanon",
-      "best toys for boys Lebanon",
-      "best toys for girls Lebanon",
-      "cheap toys Lebanon",
-      "affordable toys Lebanon",
-      "toy sale Lebanon",
-      "discount toys Lebanon",
+      "best toy store in Lebanon",
+      "latest toys Lebanon",
+      "new toys Lebanon",
+      "top toys for kids Lebanon",
+      "fun toys for children Lebanon",
       "makeup toys for girls Lebanon",
-      "kids makeup set Lebanon",
-      "mind teasers Lebanon",
-      "brain games for kids Lebanon",
-      "puzzle games Lebanon",
-      "building blocks Lebanon",
-      "brick building toys Lebanon",
-      "outdoor play equipment Lebanon",
-      "kids sports equipment Lebanon",
-      "RC cars Lebanon",
-      "remote control toys Lebanon",
+      "kids makeup Lebanon",
+      "outdoor fun toys Lebanon",
+      "building toys Lebanon",
+      "LEGO sets Lebanon",
       "collectible toys Lebanon",
-      "kids fashion Lebanon",
-      "children's clothing store Lebanon",
-      "school bag Lebanon",
-      "stationery Lebanon",
-      "kids gadgets Lebanon",
-      "interactive toys Lebanon",
+      "trending characters toys Lebanon",
+      "toy deals Lebanon",
+      "discounted toys Lebanon",
+      "cheap toys Lebanon",
+      "affordable children gifts Lebanon",
+      "kids subscription box Lebanon",
+      "STEM toys Lebanon",
+      "robot toys Lebanon",
+      "coding toys Lebanon",
       "sensory toys Lebanon",
-      "montessori toys Lebanon",
-      "science experiment kits Lebanon"
+      "bath toys Lebanon",
+      "wooden toys Lebanon",
+      "eco friendly toys Lebanon",
+      "interactive toys Lebanon"
     ],
     "aiDiscoveryQueries": [
-      "What are the best toy stores in Lebanon?",
-      "Where can I buy LEGO in Lebanon?",
-      "Where can I buy Barbie in Lebanon?",
-      "What toys are trending in Lebanon right now?",
-      "Where can I find educational toys in Lebanon?",
-      "What is a good birthday gift for a 6 year old in Lebanon?",
-      "What toy stores deliver online in Lebanon?",
-      "Where can I buy board games in Lebanon?",
-      "What are the best gifts for kids this Eid in Lebanon?",
-      "Where can I buy Gabby's Dollhouse toys in Lebanon?",
-      "What are the best outdoor toys for kids in Lebanon?",
-      "Where can I find arts and crafts supplies for kids in Lebanon?",
-      "What science kits are available for children in Lebanon?",
-      "Where can I buy remote control cars in Lebanon?",
-      "What are good back to school supplies for kids in Lebanon?",
-      "Which stores in Beirut sell LEGO sets?",
-      "What are the most popular toys for 5 year olds in Lebanon?",
-      "Where can I buy Nerf guns in Lebanon?",
-      "What is the best toy store in Beirut for toddlers?",
-      "Where can I buy kids puzzles and board games in Beirut?",
-      "What toys are suitable for a 3 year old in Lebanon?",
-      "Where can I find Funko Pop figures in Lebanon?",
-      "What are affordable gift ideas for children in Lebanon?",
-      "Which toy stores in Lebanon have online delivery?",
-      "Where can I buy Play-Doh in Lebanon?"
+      "what are the best toy stores in Lebanon?",
+      "where can I buy LEGO in Lebanon?",
+      "where can I buy Barbie dolls in Lebanon?",
+      "what is the best gift for a 5 year old in Lebanon?",
+      "where can I find educational toys in Lebanon?",
+      "which toy store delivers online in Lebanon?",
+      "what toys are trending for kids in Lebanon?",
+      "where to buy board games in Lebanon?",
+      "what are good Eid gifts for children in Lebanon?",
+      "where can I buy outdoor toys in Lebanon?",
+      "what are the best toys for a 3 year old in Lebanon?",
+      "is Toys R Us available in Lebanon?",
+      "does Toys R Us deliver in Beirut?",
+      "what are the most popular toy brands in Lebanon?",
+      "where can I buy arts and crafts supplies for kids in Lebanon?",
+      "what is a good birthday present for an 8 year old boy in Lebanon?",
+      "where to shop for children's clothing in Lebanon?",
+      "what are the best science toys for kids in Lebanon?",
+      "where can I find puzzles and board games in Beirut?",
+      "what toy stores are open in Lebanon?",
+      "where to buy RC cars in Lebanon?",
+      "what are good back to school supplies in Lebanon?",
+      "where can I buy baby toys in Lebanon?",
+      "which stores carry Crayola in Lebanon?",
+      "what is a good learning toy for a 4 year old?"
     ],
-    "totalCount": 203
+    "totalCount": 199
   },
+  "keywordIntelligence": null,
   "estimatedKeywordTerritory": [
     "Toys R Us Lebanon",
     "ToysRUs Lebanon",
@@ -461,43 +458,43 @@
     "Toys R Us store Lebanon",
     "Toys R Us Beirut",
     "toys Lebanon",
+    "children toys Lebanon",
     "arts and crafts toys Lebanon",
     "building and construction toys Lebanon",
     "dolls and plush toys Lebanon",
-    "toy guns Lebanon",
     "toy store Lebanon",
     "toy store Beirut",
-    "toy store near me Lebanon",
-    "best toy store in Lebanon",
-    "children's store Lebanon"
+    "toy shop near me Lebanon",
+    "children's store Lebanon",
+    "kids store Beirut"
   ],
   "geoSection": {
     "queriesTested": 30,
     "byAgent": {
       "claude": {
-        "visibilityScore": 33,
+        "visibilityScore": 23,
         "queries": [
           {
             "id": "q1",
             "category": "brand discovery",
-            "query": "Toys R Us Lebanon locations and stores",
+            "query": "Toys R Us Lebanon locations and branches",
             "agent": "claude",
             "brandMentioned": true,
             "mentionPosition": 1,
             "sentiment": "neutral",
             "competitorMentions": [],
-            "snippet": "I want to be straightforward with you - **I don't have reliable, up-to-date information** about specific Toys R Us store locations in Lebanon.\n\n## What I Can Suggest:\n\n**To find current locations:**\n- Visit the **Toys R Us official website** or their regional Middle East site\n- Check **Google Maps**"
+            "snippet": "I appreciate you reaching out, but I have to be straightforward with you:\n\n## Toys R Us Lebanon - What I Know\n\nI don't have **reliable, up-to-date information** about specific Toys R Us branch locations in Lebanon. My knowledge has limitations regarding:\n\n- Current store locations and addresses\n- Wh"
           },
           {
             "id": "q2",
             "category": "brand discovery",
-            "query": "best toy stores in Lebanon",
+            "query": "best toy store in Lebanon for kids",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Best Toy Stores in Lebanon 🇱🇧\n\nHere are some well-known toy stores in Lebanon:\n\n## Major Chains & Retailers\n\n- **Toys \"R\" Us** - Has locations in larger malls like ABC Ashrafieh and Dbayeh\n- **Hamleys** - The iconic British toy brand has a presence in some Lebanese malls\n- **Virgin Megastore** -"
+            "snippet": "# Best Toy Stores in Lebanon for Kids 🧸\n\nHere are some well-known options:\n\n## Major Stores\n\n### 🏬 **Toy R Fun / Toy Zone**\n- One of the most popular toy retailers in Lebanon\n- Wide selection of international brands\n- Located in major malls\n\n### 🏬 **Virgin Megastore** (ABC & City Centre)\n- Carrie"
           },
           {
             "id": "q3",
@@ -508,7 +505,7 @@
             "mentionPosition": 1,
             "sentiment": "neutral",
             "competitorMentions": [],
-            "snippet": "# Toys R Us Lebanon - Online Shopping Guide\n\n## 🛍️ How to Shop Online\n\n**Toys R Us Lebanon** has an online presence through several channels:\n\n### Official Website\n- **toysrus-me.com** - The Middle East regional website serves Lebanon\n- You can browse and sometimes order through this platform\n\n### "
+            "snippet": "# Toys R Us Lebanon - Online Shopping Guide\n\n## 🛒 How to Shop Online\n\n**Toys R Us Lebanon** has an online presence through several channels:\n\n### Official Website\n- **toysrus-me.com** - The Middle East regional site that serves Lebanon\n- You can browse categories, add to cart, and arrange delivery\n"
           },
           {
             "id": "q4",
@@ -519,106 +516,106 @@
             "mentionPosition": 1,
             "sentiment": "neutral",
             "competitorMentions": [],
-            "snippet": "# Toys R Us Lebanon\n\nI want to be straightforward with you:\n\n## What I Can Tell You\n\n- **Toys R Us** has had a complex history globally, with many locations closing and then some relaunching under licensing agreements\n- There **may be a Toys R Us presence in Lebanon** through a licensed/franchise op"
+            "snippet": "# Toys R Us Lebanon\n\nI want to be straightforward with you:\n\n## What I Can Tell You\n\n- **Toys R Us Lebanon** has operated as a franchise location in Lebanon (Middle East)\n- It has been associated with shopping centers in Beirut\n\n## My Limitations\n\n⚠️ **I cannot reliably provide:**\n- Their **current "
           },
           {
             "id": "q5",
             "category": "brand discovery",
-            "query": "toy shops in Beirut for kids",
+            "query": "famous children toy shops in Beirut",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Toy Shops in Beirut for Kids\n\nHere are some well-known options to check out:\n\n## Major Stores\n\n- **Toys\"R\"Us** - Has had locations in Lebanon, check their current status\n- **Hamley's** - The famous British toy store has been present in the region\n- **BabyShop** - Good for younger kids, toys and es"
+            "snippet": "# Famous Children's Toy Shops in Beirut\n\nHere are some well-known options for children's toys in Beirut:\n\n## Large Toy Retailers\n- **Toys \"R\" Us** - Had a presence in Lebanon through franchises at major malls\n- **Hamleys** - The iconic British toy store has had representation in Lebanon\n- **Early Le"
           },
           {
             "id": "q6",
             "category": "category/product search",
             "query": "LEGO sets for kids in Lebanon",
             "agent": "claude",
-            "brandMentioned": true,
-            "mentionPosition": 1,
-            "sentiment": "neutral",
+            "brandMentioned": false,
+            "mentionPosition": null,
+            "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# LEGO Sets for Kids in Lebanon\n\nHere are some great recommendations based on age and availability in the region:\n\n## Where to Buy in Lebanon\n- **Toys R Us** (ABC Ashrafieh, Dbayeh)\n- **Virgin Megastore** (various malls)\n- **Spacetoon** toy stores\n- **Online** via Amazon.ae or Noon.com (shipping to "
+            "snippet": "# LEGO Sets for Kids in Lebanon 🇱🇧\n\nHere are some great recommendations, keeping in mind **availability and budget considerations** in Lebanon:\n\n## Great Options by Age\n\n### Ages 4-6\n- **LEGO DUPLO Classic Brick Box** (~$30-40) - Perfect starter set\n- **LEGO DUPLO Town Farm** - Durable, large piec"
           },
           {
             "id": "q7",
             "category": "category/product search",
-            "query": "baby toys and newborn gifts Beirut",
+            "query": "educational toys for toddlers Beirut",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Baby Toys & Newborn Gifts in Beirut 🍼\n\n## Where to Shop\n\n### Physical Stores\n- **Mothercare** (ABC Ashrafieh, Dbayeh) - wide range of newborn essentials and toys\n- **Géant** (Dora) - baby section with toys and gifts\n- **Carrefour** - basic baby toys and gift sets\n- **BabyShop** - clothing and sta"
+            "snippet": "# Educational Toys for Toddlers in Beirut 🇱🇧\n\n## Where to Shop in Beirut\n\n### Physical Stores\n- **Mothercare** (ABC Ashrafieh, ABC Dbayeh)\n- **Toys\"R\"Us** (City Centre Beirut, Dora Mall)\n- **Virgin Megastore** (ABC, Citymall)\n- **Petit Bazar** (Verdun area)\n- **Hamra Street toy shops** - various l"
           },
           {
             "id": "q8",
             "category": "category/product search",
-            "query": "remote control cars for boys Lebanon",
+            "query": "remote control cars toy store Lebanon",
             "agent": "claude",
             "brandMentioned": true,
             "mentionPosition": 1,
-            "sentiment": "neutral",
+            "sentiment": "positive",
             "competitorMentions": [],
-            "snippet": "# Remote Control Cars for Boys in Lebanon 🇱🇧\n\n## Where to Buy in Lebanon\n\n### Physical Stores\n- **Toy stores in ABC Mall, City Mall, Dbayeh** (Hamleys, Toys R Us-style shops)\n- **Virgin Megastore** (sometimes carries RC cars)\n- **Local toy shops** in Hamra, Jounieh, Verdun\n- **BHV / Monoprix** for"
+            "snippet": "# Remote Control Cars in Lebanon 🇱🇧\n\nHere are some options for finding RC cars in Lebanon:\n\n## Popular Toy Stores to Check\n\n### Major Retailers\n- **Toys R Us** (ABC Mall, Dbayeh) - Wide selection of RC cars\n- **Hamley's** (if available at nearby malls)\n- **Spinney's toy sections** - Basic RC optio"
           },
           {
             "id": "q9",
             "category": "category/product search",
-            "query": "educational toys for toddlers Lebanon",
+            "query": "baby toys and infant products Lebanon",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Educational Toys for Toddlers in Lebanon 🇱🇧\n\n## Where to Shop in Lebanon\n\n### Physical Stores\n- **Toys\"R\"Us** (ABC Mall, Dbayeh)\n- **Virgin Megastore** (various malls)\n- **Hamley's** (City Centre Beirut)\n- **Spinneys/Carrefour** toy sections\n- **Local toy shops** in Bourj Hammoud & Hamra\n\n### On"
+            "snippet": "# Baby Toys & Infant Products in Lebanon 🇱🇧\n\n## 🛍️ Where to Shop\n\n### Physical Stores\n- **Mothercare** (ABC Mall, Dbayeh) - wide range of infant products\n- **Chicco Store** (various locations) - Italian brand, very popular in Lebanon\n- **Toys\"R\"Us** (City Centre Beirut, if still operating)\n- **Ba"
           },
           {
             "id": "q10",
             "category": "category/product search",
-            "query": "Barbie dolls and playsets available in Lebanon",
+            "query": "board games and puzzles for children Lebanon",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Barbie Dolls & Playsets Available in Lebanon\n\n## Where to Shop\n\n### Physical Stores\n- **Toys \"R\" Us** (ABC Mall, Dbayeh/Ashrafieh)\n- **Spinney's** toy sections\n- **Virgin Megastore** (some locations carry toys)\n- **Monoprix** toy sections\n- **Local toy shops** in Hamra, Verdun, Dora\n\n### Online (D"
+            "snippet": "# Board Games & Puzzles for Children in Lebanon\n\n## Where to Shop in Lebanon\n\n- **Virgin Megastore** (ABC Ashrafieh, Dbayeh, Verdun)\n- **Toys\"R\"Us** (Beirut & suburbs)\n- **Kazbar** (popular local toy retailer)\n- **Samara** toy stores\n- **Librairie Antoine** (puzzles & educational games)\n- **Online: "
           },
           {
             "id": "q11",
             "category": "occasion-based",
             "query": "birthday gift ideas for 5 year old boy Lebanon",
             "agent": "claude",
-            "brandMentioned": true,
-            "mentionPosition": 1,
-            "sentiment": "positive",
+            "brandMentioned": false,
+            "mentionPosition": null,
+            "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Birthday Gift Ideas for a 5-Year-Old Boy in Lebanon 🎁\n\n## 🧸 Toys & Play\n- **LEGO DUPLO** sets (available at Virgin Megastore, Toys R Us, or ABC Mall) - great for creativity\n- **Hot Wheels** car tracks - boys this age love them\n- **Nerf** blasters - classic fun\n- **Play-Doh** sets - always a hit\n"
+            "snippet": "# Birthday Gift Ideas for a 5-Year-Old Boy in Lebanon 🎉\n\n## 🧸 Toys & Play\n- **LEGO DUPLO** sets (widely available at Toys4U or Virgin Megastore in Lebanon)\n- **Hot Wheels** car tracks and sets\n- **Playmobil** playsets (police, construction, farm themes)\n- **Nerf** foam blasters (age-appropriate sm"
           },
           {
             "id": "q12",
             "category": "occasion-based",
-            "query": "Christmas toys for kids shopping Lebanon",
+            "query": "Christmas toys for kids shopping Lebanon 2024",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Christmas Toys for Kids in Lebanon 🎄\n\n## Where to Shop in Lebanon\n\n### Major Retailers\n- **Toy Store** (ABC Mall, City Centre, Dunes)\n- **Spinney's** - has a toy section\n- **Monoprix** - good selection\n- **Virgin Megastore** - games & electronics\n- **Carrefour** (City Centre Beirut)\n- **Hamra & A"
+            "snippet": "# Christmas Toys for Kids in Lebanon 2024 🎄\n\n## Where to Shop in Lebanon\n- **Toys\"R\"Us** (ABC, Dbayeh)\n- **Spinney's** toy sections\n- **Virgin Megastore** (ABC, City Centre)\n- **Librairie Antoine**\n- **Hamra/Jounieh local toy shops**\n- **Online: OpenSooq, Zbooni, Instagram shops**\n\n---\n\n## Top Toy "
           },
           {
             "id": "q13",
             "category": "occasion-based",
-            "query": "Eid gifts for children toy store Lebanon",
+            "query": "Eid gifts for children toy store Beirut",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Eid Gift Ideas for Children - Lebanon Toy Stores 🌙⭐\n\n## Where to Shop in Lebanon\n\n### Major Toy Retailers\n- **Toys \"R\" Us** (ABC Mall, City Centre)\n- **Kazafou** - popular Lebanese toy store\n- **Hamley's** (if available at your mall)\n- **Virgin Megastore** (games/educational toys)\n- **Spinney's /"
+            "snippet": "# Eid Gift Ideas for Children - Beirut Toy Stores 🎉\n\n## Where to Shop in Beirut\n\n### Major Toy Stores\n- **Toy R Us** (ABC Mall, Dbayeh & Ashrafieh) - wide selection\n- **Early Learning Centre (ELC)** - great for younger kids\n- **Lego Store** - City Centre Beirut / ABC Mall\n- **Hamley's** - if availa"
           },
           {
             "id": "q14",
@@ -629,190 +626,190 @@
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Back to School Supplies & Toys in Lebanon 🇱🇧\n\n## 📚 School Supplies\n\n### Where to Shop\n- **Virgin Megastore** (ABC Ashrafieh, Dbayeh) - notebooks, stationery, backpacks\n- **Librairie Antoine** (multiple branches) - books, notebooks, art supplies\n- **Paper Moon** - quality stationery and school s"
+            "snippet": "# Back to School Supplies & Toys in Lebanon 🇱🇧\n\n## 📚 School Supplies\n\n### Where to Shop\n- **Virgin Megastore** (ABC Ashrafieh, Dbayeh Mall) - wide selection of stationery\n- **Librairie Antoine** - notebooks, pens, art supplies\n- **Paper Plus** - stationery and office supplies\n- **Spinney's / Carr"
           },
           {
             "id": "q15",
             "category": "occasion-based",
-            "query": "baby shower gift toys and sets Beirut",
+            "query": "baby shower gift toys Lebanon",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Baby Shower Gift Ideas in Beirut 🇱🇧\n\n## Where to Shop\n\n**Physical Stores:**\n- **Mothercare** (ABC Mall, City Centre)\n- **Toys\"R\"Us / Babies\"R\"Us** (if still operating)\n- **Virgin Megastore** (baby/toy sections)\n- **Hamra & Verdun** local baby boutiques\n- **TSC (The Sporting Club)** supermarkets "
+            "snippet": "# Baby Shower Gift Ideas - Lebanon 🇱🇧\n\n## Where to Shop in Lebanon\n\n### Physical Stores\n- **Mothercare** (ABC Mall, City Centre) - reliable for quality toys\n- **Toys\"R\"Us** (various locations)\n- **Hamley's** (if available near you)\n- **Virgin Megastore** - sometimes carries baby items\n- **Local ph"
           },
           {
             "id": "q16",
             "category": "comparison/alternatives",
-            "query": "Toys R Us Lebanon vs Virgin Megastore toys",
+            "query": "Toys R Us vs other toy stores in Lebanon prices",
             "agent": "claude",
             "brandMentioned": true,
             "mentionPosition": 1,
             "sentiment": "neutral",
             "competitorMentions": [],
-            "snippet": "# Toys R Us Lebanon vs Virgin Megastore - Toy Shopping Comparison\n\n## Toys R Us Lebanon\n\n**Strengths:**\n- **Dedicated toy retailer** - much wider selection\n- Better stock of major brands like **LEGO, Barbie, Hot Wheels, Nerf, Play-Doh**\n- More competitive pricing on toys specifically\n- Staff more kn"
+            "snippet": "# Toy Stores in Lebanon - Price Comparison\n\n## Important Context First\nToys R Us **closed all its US stores in 2018**, but **franchise locations still operate in some countries**, including Lebanon (operated through regional franchise partners).\n\n---\n\n## Toy Retail Options in Lebanon\n\n### Major Play"
           },
           {
             "id": "q17",
             "category": "comparison/alternatives",
-            "query": "alternatives to Toys R Us in Lebanon",
+            "query": "cheapest toy stores in Beirut Lebanon",
             "agent": "claude",
-            "brandMentioned": true,
-            "mentionPosition": 1,
-            "sentiment": "neutral",
+            "brandMentioned": false,
+            "mentionPosition": null,
+            "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Toy Stores & Alternatives to Toys R Us in Lebanon\n\nHere are some good options for buying toys in Lebanon:\n\n## Dedicated Toy Stores\n- **Hamleys** - Available in some Lebanese malls (check ABC or City Centre)\n- **Early Learning Centre (ELC)** - Good for educational toys for younger children\n- **Spin"
+            "snippet": "# Cheap Toy Stores in Beirut, Lebanon\n\nHere are some good options for affordable toys in Beirut:\n\n## Budget-Friendly Stores\n\n### 🏪 Large Retailers\n- **Spinney's** - Has a toy section with decent prices\n- **Carrefour** (City Centre Beirut, Dora) - Good range at competitive prices\n- **TSC (The Sports"
           },
           {
             "id": "q18",
             "category": "comparison/alternatives",
-            "query": "cheapest place to buy toys in Beirut",
+            "query": "alternatives to Toys R Us Lebanon online",
             "agent": "claude",
-            "brandMentioned": false,
-            "mentionPosition": null,
-            "sentiment": "not_mentioned",
+            "brandMentioned": true,
+            "mentionPosition": 1,
+            "sentiment": "neutral",
             "competitorMentions": [],
-            "snippet": "# Cheapest Places to Buy Toys in Beirut\n\nHere are some good options for affordable toys:\n\n## Budget-Friendly Stores\n\n- **Miniso** - Has branches in several malls, offers decent quality toys at low prices\n- **Daiso** (if available near you) - Japanese variety store with cheap options\n- **Spinney's / "
+            "snippet": "# Online Toy Shopping Alternatives in Lebanon\n\nSince Toys R Us Lebanon has had availability issues, here are some solid alternatives:\n\n## Lebanese/Regional Online Stores\n\n- **Spinney's Online** - carries some toys and kids' products\n- **Carrefour Lebanon** (carrefour-lebanon.com) - good toy selectio"
           },
           {
             "id": "q19",
             "category": "comparison/alternatives",
-            "query": "toy stores in Lebanon with home delivery",
+            "query": "best place to buy kids toys Lebanon affordable",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Toy Stores in Lebanon with Home Delivery\n\nHere are some well-known options in Lebanon that offer home delivery:\n\n## 🏪 Physical Stores with Delivery Services\n\n### **Toy Kingdom**\n- One of the largest toy retailers in Lebanon\n- Wide selection of branded toys\n- Available in major malls (ABC, City Ma"
+            "snippet": "# Best Places to Buy Affordable Kids Toys in Lebanon 🇱🇧\n\n## Physical Stores\n\n### Budget-Friendly Options\n- **Spinney's** - Good toy section, reasonable prices\n- **Carrefour** (City Mall, Dora, ABC) - Wide selection, frequent promotions\n- **TSC (The Shopping Center)** - Decent toy variety\n- **Toy S"
           },
           {
             "id": "q20",
             "category": "local market",
-            "query": "toy stores open now in Dbayeh or ABC mall Lebanon",
+            "query": "toy stores open near me in Beirut",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "I want to be straightforward with you rather than guess:\n\n**I can't provide real-time store hours or confirm which specific toy stores are open right now**, as I don't have:\n- Live data on current Lebanese mall hours\n- Real-time store status\n- Knowledge of current conditions in Lebanon affecting bus"
+            "snippet": "I'd love to help, but I **don't have access to your real-time location or live business data**, so I can't show you which specific stores are open right now.\n\nHere's how to find toy stores near you in Beirut quickly:\n\n## Best Ways to Search\n\n- **Google Maps** → search \"toy stores Beirut\" and filter "
           },
           {
             "id": "ai0",
             "category": "ai discovery",
-            "query": "What are the best toy stores in Lebanon?",
+            "query": "what are the best toy stores in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "Here are some well-known toy stores in Lebanon:\n\n## Major Toy Retailers\n\n- **Toys \"R\" Us** - Has had locations in Lebanon (check current status as availability may have changed)\n- **Virgin Megastore** - Carries toys and games alongside electronics and entertainment\n- **Lalaland** - Popular Lebanese "
+            "snippet": "# Best Toy Stores in Lebanon\n\nHere are some well-known toy stores in Lebanon:\n\n## Major Chains & Department Stores\n- **Toys\"R\"Us** - Has locations in major malls like ABC and City Centre\n- **Hamley's** - The famous British toy store has a presence in Lebanese malls\n- **Virgin Megastore** - Carries t"
           },
           {
             "id": "ai1",
             "category": "ai discovery",
-            "query": "Where can I buy LEGO in Lebanon?",
+            "query": "where can I buy LEGO in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Buying LEGO in Lebanon\n\nHere are some options for finding LEGO in Lebanon:\n\n## Physical Stores\n\n- **Toys \"R\" Us** - has had presence in Lebanon (check current locations in major malls)\n- **Virgin Megastore** - sometimes carries LEGO sets\n- **Spinney's** - larger branches occasionally stock LEGO\n- "
+            "snippet": "# Buying LEGO in Lebanon\n\nHere are some good options to find LEGO in Lebanon:\n\n## Physical Stores\n\n- **Toy stores in major malls** - Check stores in **ABC Mall** (Achrafieh & Dbayeh), **City Mall** (Dora), and **Verdun 730**\n- **Librairie Antoine** - Has toy sections in several branches\n- **Virgin M"
           },
           {
             "id": "ai2",
             "category": "ai discovery",
-            "query": "Where can I buy Barbie in Lebanon?",
+            "query": "where can I buy Barbie dolls in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Buying Barbie in Lebanon\n\nHere are some good options to find Barbie dolls in Lebanon:\n\n## Physical Stores\n\n- **Toys\"R\"Us** - if there's a location near you (check Beirut area malls)\n- **Virgin Megastore** - sometimes carries toys in their lifestyle sections\n- **Spinneys / Carrefour** - larger supe"
+            "snippet": "# Where to Buy Barbie Dolls in Lebanon 🇱🇧\n\nHere are some good options:\n\n## Physical Stores\n\n- **Toys\"R\"Us** - has locations in Lebanon (check Beirut area malls)\n- **Virgin Megastore** - carries toys including Barbie\n- **Spinneys / Carrefour** - major supermarkets often stock Barbie dolls\n- **ABC M"
           },
           {
             "id": "ai3",
             "category": "ai discovery",
-            "query": "What toys are trending in Lebanon right now?",
+            "query": "what is the best gift for a 5 year old in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "I want to be straightforward with you - I don't have real-time data on what's specifically trending in Lebanese toy markets right now, and I don't want to guess incorrectly.\n\n**What I can honestly tell you:**\n\n- My knowledge has a cutoff date, so I can't speak to current local trends\n- Toy trends in"
+            "snippet": "# Great Gift Ideas for a 5-Year-Old in Lebanon 🎁\n\nHere are some practical and fun recommendations considering **availability and budget in Lebanon**:\n\n## 🧸 Toys & Play\n- **LEGO DUPLO** sets - widely available at Virgin Megastore or toy shops in ABC/City Centre malls\n- **Play-Doh** sets - affordabl"
           },
           {
             "id": "ai4",
             "category": "ai discovery",
-            "query": "Where can I find educational toys in Lebanon?",
+            "query": "where can I find educational toys in Lebanon?",
             "agent": "claude",
-            "brandMentioned": true,
-            "mentionPosition": 1,
-            "sentiment": "neutral",
+            "brandMentioned": false,
+            "mentionPosition": null,
+            "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Educational Toys in Lebanon\n\nHere are some good options for finding educational toys in Lebanon:\n\n## Physical Stores\n\n- **Toys R Us** - Located in several malls including ABC Ashrafieh and ABC Dbayeh\n- **Virgin Megastore** - Carries some educational games and STEM toys\n- **Librairie Antoine** - Gr"
+            "snippet": "# Educational Toys in Lebanon 🇱🇧\n\nHere are some good options to find educational toys in Lebanon:\n\n## Physical Stores\n\n**Toy Stores**\n- **Toys \"R\" Us** - located in major malls like ABC Ashrafieh and Dbayeh\n- **Hamley's** - available in some Lebanese malls\n- **Kidzink** - local store with educatio"
           },
           {
             "id": "ai5",
             "category": "ai discovery",
-            "query": "What is a good birthday gift for a 6 year old in Lebanon?",
+            "query": "which toy store delivers online in Lebanon?",
             "agent": "claude",
             "brandMentioned": true,
             "mentionPosition": 1,
             "sentiment": "neutral",
             "competitorMentions": [],
-            "snippet": "# Birthday Gift Ideas for a 6-Year-Old in Lebanon\n\nHere are some practical and fun suggestions, keeping in mind local availability and the current economic situation:\n\n## Toys & Games\n- **LEGO Duplo or Classic sets** - available at Toys R Us or Virgin Megastore in Lebanon\n- **Play-Doh sets** - widel"
+            "snippet": "Here are some toy stores that deliver online in Lebanon:\n\n## Online Toy Delivery in Lebanon 🇱🇧\n\n### Major Options:\n- **Toys R Us Lebanon** - Has an online presence and delivers locally\n- **Spinneys / Spinney's Online** - Carries toys and offers delivery\n- **Carrefour Lebanon** - Online shopping wi"
           },
           {
             "id": "ai6",
             "category": "ai discovery",
-            "query": "What toy stores deliver online in Lebanon?",
+            "query": "what toys are trending for kids in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "Here are some toy stores that deliver online in Lebanon:\n\n## Lebanese-Based Online Toy Stores\n\n- **Toy Store Lebanon** (toystore.com.lb) - one of the more established local options\n- **Babyshop Lebanon** - carries toys alongside baby products\n- **Mumzworld** - popular regional platform delivering to"
+            "snippet": "# Trending Kids' Toys in Lebanon 🇱🇧\n\nBased on general Middle East/Lebanon market trends, here are popular toy categories and brands you're likely to find:\n\n## Currently Popular\n\n### Construction & Building\n- **LEGO** - consistently top-selling, especially Technic and City sets\n- **Mega Bloks** - m"
           },
           {
             "id": "ai7",
             "category": "ai discovery",
-            "query": "Where can I buy board games in Lebanon?",
+            "query": "where to buy board games in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Board Games in Lebanon\n\nHere are some good options for buying board games in Lebanon:\n\n## Physical Stores\n\n- **Virgin Megastore** - Located in ABC Achrafieh and other malls, usually carries popular titles\n- **Librairie Antoine** - Multiple branches across Lebanon, good selection of family and clas"
+            "snippet": "# Where to Buy Board Games in Lebanon 🎲\n\n## Physical Stores\n\n**Beirut & Mount Lebanon:**\n- **Virgin Megastore** - ABC Achrafieh, ABC Dbayeh, and other locations - good selection of popular titles\n- **Toy Town** - various mall locations\n- **Hamleys** - City Centre Beirut\n- **Choueri Group** stores\n-"
           },
           {
             "id": "ai8",
             "category": "ai discovery",
-            "query": "What are the best gifts for kids this Eid in Lebanon?",
+            "query": "what are good Eid gifts for children in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "# Best Eid Gifts for Kids in Lebanon 🌙\n\n## Toys & Games\n- **LEGO sets** - Available at Virgin Megastore or Toys\"R\"Us in major malls\n- **Hot Wheels tracks** - Popular and affordable\n- **Playmobil sets** - Great for younger kids\n- **Board games** like Monopoly, Jenga, or local Arabic versions\n\n## Tec"
+            "snippet": "# Eid Gift Ideas for Children in Lebanon\n\nHere are practical and thoughtful suggestions given Lebanon's current context:\n\n## Toys & Games\n- **LEGO sets** - available at Toy Town or Virgin Megastore\n- **Board games** - Monopoly, Jenga, or locally themed games\n- **Stuffed animals** from Hamley's or si"
           },
           {
             "id": "ai9",
             "category": "ai discovery",
-            "query": "Where can I buy Gabby's Dollhouse toys in Lebanon?",
+            "query": "where can I buy outdoor toys in Lebanon?",
             "agent": "claude",
             "brandMentioned": false,
             "mentionPosition": null,
             "sentiment": "not_mentioned",
             "competitorMentions": [],
-            "snippet": "I want to be straightforward with you rather than guess:\n\n**I don't have specific, reliable information** about which stores in Lebanon currently carry Gabby's Dollhouse toys (by Spin Master).\n\n## What I'd suggest trying:\n\n**Physical Stores**\n- **Virgin Megastore** (if still operating in Lebanon) - "
+            "snippet": "# Outdoor Toys in Lebanon 🇱🇧\n\nHere are some good options for buying outdoor toys in Lebanon:\n\n## Physical Stores\n\n### Toy Stores\n- **Toys\"R\"Us** - Located in major malls like ABC Achrafieh and Dbayeh\n- **Virgin Megastore** - Has a toys section in some locations\n- **Hamley's** - Available in some L"
           }
         ]
       }
     },
-    "combinedScore": 33,
+    "combinedScore": 23,
     "gapRecommendations": [
-      "Brand is visible in 33% of AI shopping queries — below average GEO visibility",
+      "Brand is visible in 23% of AI shopping queries — critically low GEO visibility",
       "Improve visibility for \"brand discovery\" queries with targeted content",
       "Improve visibility for \"category/product search\" queries with targeted content",
       "Improve visibility for \"occasion-based\" queries with targeted content",
@@ -823,24 +820,24 @@
       {
         "id": "q1",
         "category": "brand discovery",
-        "query": "Toys R Us Lebanon locations and stores",
+        "query": "Toys R Us Lebanon locations and branches",
         "agent": "claude",
         "brandMentioned": true,
         "mentionPosition": 1,
         "sentiment": "neutral",
         "competitorMentions": [],
-        "snippet": "I want to be straightforward with you - **I don't have reliable, up-to-date information** about specific Toys R Us store locations in Lebanon.\n\n## What I Can Suggest:\n\n**To find current locations:**\n- Visit the **Toys R Us official website** or their regional Middle East site\n- Check **Google Maps**"
+        "snippet": "I appreciate you reaching out, but I have to be straightforward with you:\n\n## Toys R Us Lebanon - What I Know\n\nI don't have **reliable, up-to-date information** about specific Toys R Us branch locations in Lebanon. My knowledge has limitations regarding:\n\n- Current store locations and addresses\n- Wh"
       },
       {
         "id": "q2",
         "category": "brand discovery",
-        "query": "best toy stores in Lebanon",
+        "query": "best toy store in Lebanon for kids",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Best Toy Stores in Lebanon 🇱🇧\n\nHere are some well-known toy stores in Lebanon:\n\n## Major Chains & Retailers\n\n- **Toys \"R\" Us** - Has locations in larger malls like ABC Ashrafieh and Dbayeh\n- **Hamleys** - The iconic British toy brand has a presence in some Lebanese malls\n- **Virgin Megastore** -"
+        "snippet": "# Best Toy Stores in Lebanon for Kids 🧸\n\nHere are some well-known options:\n\n## Major Stores\n\n### 🏬 **Toy R Fun / Toy Zone**\n- One of the most popular toy retailers in Lebanon\n- Wide selection of international brands\n- Located in major malls\n\n### 🏬 **Virgin Megastore** (ABC & City Centre)\n- Carrie"
       },
       {
         "id": "q3",
@@ -851,7 +848,7 @@
         "mentionPosition": 1,
         "sentiment": "neutral",
         "competitorMentions": [],
-        "snippet": "# Toys R Us Lebanon - Online Shopping Guide\n\n## 🛍️ How to Shop Online\n\n**Toys R Us Lebanon** has an online presence through several channels:\n\n### Official Website\n- **toysrus-me.com** - The Middle East regional website serves Lebanon\n- You can browse and sometimes order through this platform\n\n### "
+        "snippet": "# Toys R Us Lebanon - Online Shopping Guide\n\n## 🛒 How to Shop Online\n\n**Toys R Us Lebanon** has an online presence through several channels:\n\n### Official Website\n- **toysrus-me.com** - The Middle East regional site that serves Lebanon\n- You can browse categories, add to cart, and arrange delivery\n"
       },
       {
         "id": "q4",
@@ -862,106 +859,106 @@
         "mentionPosition": 1,
         "sentiment": "neutral",
         "competitorMentions": [],
-        "snippet": "# Toys R Us Lebanon\n\nI want to be straightforward with you:\n\n## What I Can Tell You\n\n- **Toys R Us** has had a complex history globally, with many locations closing and then some relaunching under licensing agreements\n- There **may be a Toys R Us presence in Lebanon** through a licensed/franchise op"
+        "snippet": "# Toys R Us Lebanon\n\nI want to be straightforward with you:\n\n## What I Can Tell You\n\n- **Toys R Us Lebanon** has operated as a franchise location in Lebanon (Middle East)\n- It has been associated with shopping centers in Beirut\n\n## My Limitations\n\n⚠️ **I cannot reliably provide:**\n- Their **current "
       },
       {
         "id": "q5",
         "category": "brand discovery",
-        "query": "toy shops in Beirut for kids",
+        "query": "famous children toy shops in Beirut",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Toy Shops in Beirut for Kids\n\nHere are some well-known options to check out:\n\n## Major Stores\n\n- **Toys\"R\"Us** - Has had locations in Lebanon, check their current status\n- **Hamley's** - The famous British toy store has been present in the region\n- **BabyShop** - Good for younger kids, toys and es"
+        "snippet": "# Famous Children's Toy Shops in Beirut\n\nHere are some well-known options for children's toys in Beirut:\n\n## Large Toy Retailers\n- **Toys \"R\" Us** - Had a presence in Lebanon through franchises at major malls\n- **Hamleys** - The iconic British toy store has had representation in Lebanon\n- **Early Le"
       },
       {
         "id": "q6",
         "category": "category/product search",
         "query": "LEGO sets for kids in Lebanon",
         "agent": "claude",
-        "brandMentioned": true,
-        "mentionPosition": 1,
-        "sentiment": "neutral",
+        "brandMentioned": false,
+        "mentionPosition": null,
+        "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# LEGO Sets for Kids in Lebanon\n\nHere are some great recommendations based on age and availability in the region:\n\n## Where to Buy in Lebanon\n- **Toys R Us** (ABC Ashrafieh, Dbayeh)\n- **Virgin Megastore** (various malls)\n- **Spacetoon** toy stores\n- **Online** via Amazon.ae or Noon.com (shipping to "
+        "snippet": "# LEGO Sets for Kids in Lebanon 🇱🇧\n\nHere are some great recommendations, keeping in mind **availability and budget considerations** in Lebanon:\n\n## Great Options by Age\n\n### Ages 4-6\n- **LEGO DUPLO Classic Brick Box** (~$30-40) - Perfect starter set\n- **LEGO DUPLO Town Farm** - Durable, large piec"
       },
       {
         "id": "q7",
         "category": "category/product search",
-        "query": "baby toys and newborn gifts Beirut",
+        "query": "educational toys for toddlers Beirut",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Baby Toys & Newborn Gifts in Beirut 🍼\n\n## Where to Shop\n\n### Physical Stores\n- **Mothercare** (ABC Ashrafieh, Dbayeh) - wide range of newborn essentials and toys\n- **Géant** (Dora) - baby section with toys and gifts\n- **Carrefour** - basic baby toys and gift sets\n- **BabyShop** - clothing and sta"
+        "snippet": "# Educational Toys for Toddlers in Beirut 🇱🇧\n\n## Where to Shop in Beirut\n\n### Physical Stores\n- **Mothercare** (ABC Ashrafieh, ABC Dbayeh)\n- **Toys\"R\"Us** (City Centre Beirut, Dora Mall)\n- **Virgin Megastore** (ABC, Citymall)\n- **Petit Bazar** (Verdun area)\n- **Hamra Street toy shops** - various l"
       },
       {
         "id": "q8",
         "category": "category/product search",
-        "query": "remote control cars for boys Lebanon",
+        "query": "remote control cars toy store Lebanon",
         "agent": "claude",
         "brandMentioned": true,
         "mentionPosition": 1,
-        "sentiment": "neutral",
+        "sentiment": "positive",
         "competitorMentions": [],
-        "snippet": "# Remote Control Cars for Boys in Lebanon 🇱🇧\n\n## Where to Buy in Lebanon\n\n### Physical Stores\n- **Toy stores in ABC Mall, City Mall, Dbayeh** (Hamleys, Toys R Us-style shops)\n- **Virgin Megastore** (sometimes carries RC cars)\n- **Local toy shops** in Hamra, Jounieh, Verdun\n- **BHV / Monoprix** for"
+        "snippet": "# Remote Control Cars in Lebanon 🇱🇧\n\nHere are some options for finding RC cars in Lebanon:\n\n## Popular Toy Stores to Check\n\n### Major Retailers\n- **Toys R Us** (ABC Mall, Dbayeh) - Wide selection of RC cars\n- **Hamley's** (if available at nearby malls)\n- **Spinney's toy sections** - Basic RC optio"
       },
       {
         "id": "q9",
         "category": "category/product search",
-        "query": "educational toys for toddlers Lebanon",
+        "query": "baby toys and infant products Lebanon",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Educational Toys for Toddlers in Lebanon 🇱🇧\n\n## Where to Shop in Lebanon\n\n### Physical Stores\n- **Toys\"R\"Us** (ABC Mall, Dbayeh)\n- **Virgin Megastore** (various malls)\n- **Hamley's** (City Centre Beirut)\n- **Spinneys/Carrefour** toy sections\n- **Local toy shops** in Bourj Hammoud & Hamra\n\n### On"
+        "snippet": "# Baby Toys & Infant Products in Lebanon 🇱🇧\n\n## 🛍️ Where to Shop\n\n### Physical Stores\n- **Mothercare** (ABC Mall, Dbayeh) - wide range of infant products\n- **Chicco Store** (various locations) - Italian brand, very popular in Lebanon\n- **Toys\"R\"Us** (City Centre Beirut, if still operating)\n- **Ba"
       },
       {
         "id": "q10",
         "category": "category/product search",
-        "query": "Barbie dolls and playsets available in Lebanon",
+        "query": "board games and puzzles for children Lebanon",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Barbie Dolls & Playsets Available in Lebanon\n\n## Where to Shop\n\n### Physical Stores\n- **Toys \"R\" Us** (ABC Mall, Dbayeh/Ashrafieh)\n- **Spinney's** toy sections\n- **Virgin Megastore** (some locations carry toys)\n- **Monoprix** toy sections\n- **Local toy shops** in Hamra, Verdun, Dora\n\n### Online (D"
+        "snippet": "# Board Games & Puzzles for Children in Lebanon\n\n## Where to Shop in Lebanon\n\n- **Virgin Megastore** (ABC Ashrafieh, Dbayeh, Verdun)\n- **Toys\"R\"Us** (Beirut & suburbs)\n- **Kazbar** (popular local toy retailer)\n- **Samara** toy stores\n- **Librairie Antoine** (puzzles & educational games)\n- **Online: "
       },
       {
         "id": "q11",
         "category": "occasion-based",
         "query": "birthday gift ideas for 5 year old boy Lebanon",
         "agent": "claude",
-        "brandMentioned": true,
-        "mentionPosition": 1,
-        "sentiment": "positive",
+        "brandMentioned": false,
+        "mentionPosition": null,
+        "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Birthday Gift Ideas for a 5-Year-Old Boy in Lebanon 🎁\n\n## 🧸 Toys & Play\n- **LEGO DUPLO** sets (available at Virgin Megastore, Toys R Us, or ABC Mall) - great for creativity\n- **Hot Wheels** car tracks - boys this age love them\n- **Nerf** blasters - classic fun\n- **Play-Doh** sets - always a hit\n"
+        "snippet": "# Birthday Gift Ideas for a 5-Year-Old Boy in Lebanon 🎉\n\n## 🧸 Toys & Play\n- **LEGO DUPLO** sets (widely available at Toys4U or Virgin Megastore in Lebanon)\n- **Hot Wheels** car tracks and sets\n- **Playmobil** playsets (police, construction, farm themes)\n- **Nerf** foam blasters (age-appropriate sm"
       },
       {
         "id": "q12",
         "category": "occasion-based",
-        "query": "Christmas toys for kids shopping Lebanon",
+        "query": "Christmas toys for kids shopping Lebanon 2024",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Christmas Toys for Kids in Lebanon 🎄\n\n## Where to Shop in Lebanon\n\n### Major Retailers\n- **Toy Store** (ABC Mall, City Centre, Dunes)\n- **Spinney's** - has a toy section\n- **Monoprix** - good selection\n- **Virgin Megastore** - games & electronics\n- **Carrefour** (City Centre Beirut)\n- **Hamra & A"
+        "snippet": "# Christmas Toys for Kids in Lebanon 2024 🎄\n\n## Where to Shop in Lebanon\n- **Toys\"R\"Us** (ABC, Dbayeh)\n- **Spinney's** toy sections\n- **Virgin Megastore** (ABC, City Centre)\n- **Librairie Antoine**\n- **Hamra/Jounieh local toy shops**\n- **Online: OpenSooq, Zbooni, Instagram shops**\n\n---\n\n## Top Toy "
       },
       {
         "id": "q13",
         "category": "occasion-based",
-        "query": "Eid gifts for children toy store Lebanon",
+        "query": "Eid gifts for children toy store Beirut",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Eid Gift Ideas for Children - Lebanon Toy Stores 🌙⭐\n\n## Where to Shop in Lebanon\n\n### Major Toy Retailers\n- **Toys \"R\" Us** (ABC Mall, City Centre)\n- **Kazafou** - popular Lebanese toy store\n- **Hamley's** (if available at your mall)\n- **Virgin Megastore** (games/educational toys)\n- **Spinney's /"
+        "snippet": "# Eid Gift Ideas for Children - Beirut Toy Stores 🎉\n\n## Where to Shop in Beirut\n\n### Major Toy Stores\n- **Toy R Us** (ABC Mall, Dbayeh & Ashrafieh) - wide selection\n- **Early Learning Centre (ELC)** - great for younger kids\n- **Lego Store** - City Centre Beirut / ABC Mall\n- **Hamley's** - if availa"
       },
       {
         "id": "q14",
@@ -972,185 +969,185 @@
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Back to School Supplies & Toys in Lebanon 🇱🇧\n\n## 📚 School Supplies\n\n### Where to Shop\n- **Virgin Megastore** (ABC Ashrafieh, Dbayeh) - notebooks, stationery, backpacks\n- **Librairie Antoine** (multiple branches) - books, notebooks, art supplies\n- **Paper Moon** - quality stationery and school s"
+        "snippet": "# Back to School Supplies & Toys in Lebanon 🇱🇧\n\n## 📚 School Supplies\n\n### Where to Shop\n- **Virgin Megastore** (ABC Ashrafieh, Dbayeh Mall) - wide selection of stationery\n- **Librairie Antoine** - notebooks, pens, art supplies\n- **Paper Plus** - stationery and office supplies\n- **Spinney's / Carr"
       },
       {
         "id": "q15",
         "category": "occasion-based",
-        "query": "baby shower gift toys and sets Beirut",
+        "query": "baby shower gift toys Lebanon",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Baby Shower Gift Ideas in Beirut 🇱🇧\n\n## Where to Shop\n\n**Physical Stores:**\n- **Mothercare** (ABC Mall, City Centre)\n- **Toys\"R\"Us / Babies\"R\"Us** (if still operating)\n- **Virgin Megastore** (baby/toy sections)\n- **Hamra & Verdun** local baby boutiques\n- **TSC (The Sporting Club)** supermarkets "
+        "snippet": "# Baby Shower Gift Ideas - Lebanon 🇱🇧\n\n## Where to Shop in Lebanon\n\n### Physical Stores\n- **Mothercare** (ABC Mall, City Centre) - reliable for quality toys\n- **Toys\"R\"Us** (various locations)\n- **Hamley's** (if available near you)\n- **Virgin Megastore** - sometimes carries baby items\n- **Local ph"
       },
       {
         "id": "q16",
         "category": "comparison/alternatives",
-        "query": "Toys R Us Lebanon vs Virgin Megastore toys",
+        "query": "Toys R Us vs other toy stores in Lebanon prices",
         "agent": "claude",
         "brandMentioned": true,
         "mentionPosition": 1,
         "sentiment": "neutral",
         "competitorMentions": [],
-        "snippet": "# Toys R Us Lebanon vs Virgin Megastore - Toy Shopping Comparison\n\n## Toys R Us Lebanon\n\n**Strengths:**\n- **Dedicated toy retailer** - much wider selection\n- Better stock of major brands like **LEGO, Barbie, Hot Wheels, Nerf, Play-Doh**\n- More competitive pricing on toys specifically\n- Staff more kn"
+        "snippet": "# Toy Stores in Lebanon - Price Comparison\n\n## Important Context First\nToys R Us **closed all its US stores in 2018**, but **franchise locations still operate in some countries**, including Lebanon (operated through regional franchise partners).\n\n---\n\n## Toy Retail Options in Lebanon\n\n### Major Play"
       },
       {
         "id": "q17",
         "category": "comparison/alternatives",
-        "query": "alternatives to Toys R Us in Lebanon",
+        "query": "cheapest toy stores in Beirut Lebanon",
         "agent": "claude",
-        "brandMentioned": true,
-        "mentionPosition": 1,
-        "sentiment": "neutral",
+        "brandMentioned": false,
+        "mentionPosition": null,
+        "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Toy Stores & Alternatives to Toys R Us in Lebanon\n\nHere are some good options for buying toys in Lebanon:\n\n## Dedicated Toy Stores\n- **Hamleys** - Available in some Lebanese malls (check ABC or City Centre)\n- **Early Learning Centre (ELC)** - Good for educational toys for younger children\n- **Spin"
+        "snippet": "# Cheap Toy Stores in Beirut, Lebanon\n\nHere are some good options for affordable toys in Beirut:\n\n## Budget-Friendly Stores\n\n### 🏪 Large Retailers\n- **Spinney's** - Has a toy section with decent prices\n- **Carrefour** (City Centre Beirut, Dora) - Good range at competitive prices\n- **TSC (The Sports"
       },
       {
         "id": "q18",
         "category": "comparison/alternatives",
-        "query": "cheapest place to buy toys in Beirut",
+        "query": "alternatives to Toys R Us Lebanon online",
         "agent": "claude",
-        "brandMentioned": false,
-        "mentionPosition": null,
-        "sentiment": "not_mentioned",
+        "brandMentioned": true,
+        "mentionPosition": 1,
+        "sentiment": "neutral",
         "competitorMentions": [],
-        "snippet": "# Cheapest Places to Buy Toys in Beirut\n\nHere are some good options for affordable toys:\n\n## Budget-Friendly Stores\n\n- **Miniso** - Has branches in several malls, offers decent quality toys at low prices\n- **Daiso** (if available near you) - Japanese variety store with cheap options\n- **Spinney's / "
+        "snippet": "# Online Toy Shopping Alternatives in Lebanon\n\nSince Toys R Us Lebanon has had availability issues, here are some solid alternatives:\n\n## Lebanese/Regional Online Stores\n\n- **Spinney's Online** - carries some toys and kids' products\n- **Carrefour Lebanon** (carrefour-lebanon.com) - good toy selectio"
       },
       {
         "id": "q19",
         "category": "comparison/alternatives",
-        "query": "toy stores in Lebanon with home delivery",
+        "query": "best place to buy kids toys Lebanon affordable",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Toy Stores in Lebanon with Home Delivery\n\nHere are some well-known options in Lebanon that offer home delivery:\n\n## 🏪 Physical Stores with Delivery Services\n\n### **Toy Kingdom**\n- One of the largest toy retailers in Lebanon\n- Wide selection of branded toys\n- Available in major malls (ABC, City Ma"
+        "snippet": "# Best Places to Buy Affordable Kids Toys in Lebanon 🇱🇧\n\n## Physical Stores\n\n### Budget-Friendly Options\n- **Spinney's** - Good toy section, reasonable prices\n- **Carrefour** (City Mall, Dora, ABC) - Wide selection, frequent promotions\n- **TSC (The Shopping Center)** - Decent toy variety\n- **Toy S"
       },
       {
         "id": "q20",
         "category": "local market",
-        "query": "toy stores open now in Dbayeh or ABC mall Lebanon",
+        "query": "toy stores open near me in Beirut",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "I want to be straightforward with you rather than guess:\n\n**I can't provide real-time store hours or confirm which specific toy stores are open right now**, as I don't have:\n- Live data on current Lebanese mall hours\n- Real-time store status\n- Knowledge of current conditions in Lebanon affecting bus"
+        "snippet": "I'd love to help, but I **don't have access to your real-time location or live business data**, so I can't show you which specific stores are open right now.\n\nHere's how to find toy stores near you in Beirut quickly:\n\n## Best Ways to Search\n\n- **Google Maps** → search \"toy stores Beirut\" and filter "
       },
       {
         "id": "ai0",
         "category": "ai discovery",
-        "query": "What are the best toy stores in Lebanon?",
+        "query": "what are the best toy stores in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "Here are some well-known toy stores in Lebanon:\n\n## Major Toy Retailers\n\n- **Toys \"R\" Us** - Has had locations in Lebanon (check current status as availability may have changed)\n- **Virgin Megastore** - Carries toys and games alongside electronics and entertainment\n- **Lalaland** - Popular Lebanese "
+        "snippet": "# Best Toy Stores in Lebanon\n\nHere are some well-known toy stores in Lebanon:\n\n## Major Chains & Department Stores\n- **Toys\"R\"Us** - Has locations in major malls like ABC and City Centre\n- **Hamley's** - The famous British toy store has a presence in Lebanese malls\n- **Virgin Megastore** - Carries t"
       },
       {
         "id": "ai1",
         "category": "ai discovery",
-        "query": "Where can I buy LEGO in Lebanon?",
+        "query": "where can I buy LEGO in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Buying LEGO in Lebanon\n\nHere are some options for finding LEGO in Lebanon:\n\n## Physical Stores\n\n- **Toys \"R\" Us** - has had presence in Lebanon (check current locations in major malls)\n- **Virgin Megastore** - sometimes carries LEGO sets\n- **Spinney's** - larger branches occasionally stock LEGO\n- "
+        "snippet": "# Buying LEGO in Lebanon\n\nHere are some good options to find LEGO in Lebanon:\n\n## Physical Stores\n\n- **Toy stores in major malls** - Check stores in **ABC Mall** (Achrafieh & Dbayeh), **City Mall** (Dora), and **Verdun 730**\n- **Librairie Antoine** - Has toy sections in several branches\n- **Virgin M"
       },
       {
         "id": "ai2",
         "category": "ai discovery",
-        "query": "Where can I buy Barbie in Lebanon?",
+        "query": "where can I buy Barbie dolls in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Buying Barbie in Lebanon\n\nHere are some good options to find Barbie dolls in Lebanon:\n\n## Physical Stores\n\n- **Toys\"R\"Us** - if there's a location near you (check Beirut area malls)\n- **Virgin Megastore** - sometimes carries toys in their lifestyle sections\n- **Spinneys / Carrefour** - larger supe"
+        "snippet": "# Where to Buy Barbie Dolls in Lebanon 🇱🇧\n\nHere are some good options:\n\n## Physical Stores\n\n- **Toys\"R\"Us** - has locations in Lebanon (check Beirut area malls)\n- **Virgin Megastore** - carries toys including Barbie\n- **Spinneys / Carrefour** - major supermarkets often stock Barbie dolls\n- **ABC M"
       },
       {
         "id": "ai3",
         "category": "ai discovery",
-        "query": "What toys are trending in Lebanon right now?",
+        "query": "what is the best gift for a 5 year old in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "I want to be straightforward with you - I don't have real-time data on what's specifically trending in Lebanese toy markets right now, and I don't want to guess incorrectly.\n\n**What I can honestly tell you:**\n\n- My knowledge has a cutoff date, so I can't speak to current local trends\n- Toy trends in"
+        "snippet": "# Great Gift Ideas for a 5-Year-Old in Lebanon 🎁\n\nHere are some practical and fun recommendations considering **availability and budget in Lebanon**:\n\n## 🧸 Toys & Play\n- **LEGO DUPLO** sets - widely available at Virgin Megastore or toy shops in ABC/City Centre malls\n- **Play-Doh** sets - affordabl"
       },
       {
         "id": "ai4",
         "category": "ai discovery",
-        "query": "Where can I find educational toys in Lebanon?",
+        "query": "where can I find educational toys in Lebanon?",
         "agent": "claude",
-        "brandMentioned": true,
-        "mentionPosition": 1,
-        "sentiment": "neutral",
+        "brandMentioned": false,
+        "mentionPosition": null,
+        "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Educational Toys in Lebanon\n\nHere are some good options for finding educational toys in Lebanon:\n\n## Physical Stores\n\n- **Toys R Us** - Located in several malls including ABC Ashrafieh and ABC Dbayeh\n- **Virgin Megastore** - Carries some educational games and STEM toys\n- **Librairie Antoine** - Gr"
+        "snippet": "# Educational Toys in Lebanon 🇱🇧\n\nHere are some good options to find educational toys in Lebanon:\n\n## Physical Stores\n\n**Toy Stores**\n- **Toys \"R\" Us** - located in major malls like ABC Ashrafieh and Dbayeh\n- **Hamley's** - available in some Lebanese malls\n- **Kidzink** - local store with educatio"
       },
       {
         "id": "ai5",
         "category": "ai discovery",
-        "query": "What is a good birthday gift for a 6 year old in Lebanon?",
+        "query": "which toy store delivers online in Lebanon?",
         "agent": "claude",
         "brandMentioned": true,
         "mentionPosition": 1,
         "sentiment": "neutral",
         "competitorMentions": [],
-        "snippet": "# Birthday Gift Ideas for a 6-Year-Old in Lebanon\n\nHere are some practical and fun suggestions, keeping in mind local availability and the current economic situation:\n\n## Toys & Games\n- **LEGO Duplo or Classic sets** - available at Toys R Us or Virgin Megastore in Lebanon\n- **Play-Doh sets** - widel"
+        "snippet": "Here are some toy stores that deliver online in Lebanon:\n\n## Online Toy Delivery in Lebanon 🇱🇧\n\n### Major Options:\n- **Toys R Us Lebanon** - Has an online presence and delivers locally\n- **Spinneys / Spinney's Online** - Carries toys and offers delivery\n- **Carrefour Lebanon** - Online shopping wi"
       },
       {
         "id": "ai6",
         "category": "ai discovery",
-        "query": "What toy stores deliver online in Lebanon?",
+        "query": "what toys are trending for kids in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "Here are some toy stores that deliver online in Lebanon:\n\n## Lebanese-Based Online Toy Stores\n\n- **Toy Store Lebanon** (toystore.com.lb) - one of the more established local options\n- **Babyshop Lebanon** - carries toys alongside baby products\n- **Mumzworld** - popular regional platform delivering to"
+        "snippet": "# Trending Kids' Toys in Lebanon 🇱🇧\n\nBased on general Middle East/Lebanon market trends, here are popular toy categories and brands you're likely to find:\n\n## Currently Popular\n\n### Construction & Building\n- **LEGO** - consistently top-selling, especially Technic and City sets\n- **Mega Bloks** - m"
       },
       {
         "id": "ai7",
         "category": "ai discovery",
-        "query": "Where can I buy board games in Lebanon?",
+        "query": "where to buy board games in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Board Games in Lebanon\n\nHere are some good options for buying board games in Lebanon:\n\n## Physical Stores\n\n- **Virgin Megastore** - Located in ABC Achrafieh and other malls, usually carries popular titles\n- **Librairie Antoine** - Multiple branches across Lebanon, good selection of family and clas"
+        "snippet": "# Where to Buy Board Games in Lebanon 🎲\n\n## Physical Stores\n\n**Beirut & Mount Lebanon:**\n- **Virgin Megastore** - ABC Achrafieh, ABC Dbayeh, and other locations - good selection of popular titles\n- **Toy Town** - various mall locations\n- **Hamleys** - City Centre Beirut\n- **Choueri Group** stores\n-"
       },
       {
         "id": "ai8",
         "category": "ai discovery",
-        "query": "What are the best gifts for kids this Eid in Lebanon?",
+        "query": "what are good Eid gifts for children in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "# Best Eid Gifts for Kids in Lebanon 🌙\n\n## Toys & Games\n- **LEGO sets** - Available at Virgin Megastore or Toys\"R\"Us in major malls\n- **Hot Wheels tracks** - Popular and affordable\n- **Playmobil sets** - Great for younger kids\n- **Board games** like Monopoly, Jenga, or local Arabic versions\n\n## Tec"
+        "snippet": "# Eid Gift Ideas for Children in Lebanon\n\nHere are practical and thoughtful suggestions given Lebanon's current context:\n\n## Toys & Games\n- **LEGO sets** - available at Toy Town or Virgin Megastore\n- **Board games** - Monopoly, Jenga, or locally themed games\n- **Stuffed animals** from Hamley's or si"
       },
       {
         "id": "ai9",
         "category": "ai discovery",
-        "query": "Where can I buy Gabby's Dollhouse toys in Lebanon?",
+        "query": "where can I buy outdoor toys in Lebanon?",
         "agent": "claude",
         "brandMentioned": false,
         "mentionPosition": null,
         "sentiment": "not_mentioned",
         "competitorMentions": [],
-        "snippet": "I want to be straightforward with you rather than guess:\n\n**I don't have specific, reliable information** about which stores in Lebanon currently carry Gabby's Dollhouse toys (by Spin Master).\n\n## What I'd suggest trying:\n\n**Physical Stores**\n- **Virgin Megastore** (if still operating in Lebanon) - "
+        "snippet": "# Outdoor Toys in Lebanon 🇱🇧\n\nHere are some good options for buying outdoor toys in Lebanon:\n\n## Physical Stores\n\n### Toy Stores\n- **Toys\"R\"Us** - Located in major malls like ABC Achrafieh and Dbayeh\n- **Virgin Megastore** - Has a toys section in some locations\n- **Hamley's** - Available in some L"
       }
     ],
-    "visibilityScore": 33
+    "visibilityScore": 23
   }
 }

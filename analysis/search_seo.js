@@ -328,6 +328,102 @@ Each category should have 15-30 terms. Prioritize local/market-specific terms wh
   return { brandTerms: [], categoryTerms: [], ageGroupTerms: [], occasionTerms: [], topBrands: [], localTerms: [], competitorGapTerms: [], aiDiscoveryQueries: [], totalCount: 0 };
 }
 
+// ─── Keyword Intelligence ─────────────────────────────────────────────────────
+
+async function generateKeywordIntelligence(anthropic, profile, keywordUniverse, siteIntel) {
+  // Extract nav slugs from site_intelligence.json for the target brand
+  const targetEntry = (siteIntel?.brands || []).find(b => b.role === 'target') || {};
+  const navHrefs = (targetEntry.navigation || []).map(n => n.href).filter(Boolean);
+  const targetHostname = (() => { try { return new URL(profile.url).hostname; } catch { return ''; } })();
+  const categoryNavSlugs = navHrefs
+    .filter(h => { try { return new URL(h).hostname === targetHostname && h.includes('/products/all/'); } catch { return false; } })
+    .map(h => h.split('/products/all/')[1]?.split('?')[0])
+    .filter(Boolean);
+
+  // Cap each category to 20 terms to keep input tokens manageable
+  const cap = (arr) => (arr || []).slice(0, 20);
+  const kwJson = JSON.stringify({
+    brandTerms: cap(keywordUniverse.brandTerms),
+    categoryTerms: cap(keywordUniverse.categoryTerms),
+    ageGroupTerms: cap(keywordUniverse.ageGroupTerms),
+    occasionTerms: cap(keywordUniverse.occasionTerms),
+    topBrands: cap(keywordUniverse.topBrands),
+    localTerms: cap(keywordUniverse.localTerms),
+    competitorGapTerms: cap(keywordUniverse.competitorGapTerms),
+    aiDiscoveryQueries: cap(keywordUniverse.aiDiscoveryQueries),
+  });
+
+  const prompt = `You are an expert SEO strategist analyzing keyword opportunities for ${profile.name} (${profile.url}), a ${profile.industry} brand in ${profile.market || 'the local market'}.
+
+EXISTING SITE NAVIGATION (categories already covered on the site):
+${categoryNavSlugs.length ? categoryNavSlugs.map(s => `- /products/all/${s}`).join('\n') : '- No structured category navigation detected'}
+
+KEYWORD UNIVERSE (${keywordUniverse.totalCount || 0} total terms):
+${kwJson}
+
+Your job: analyze this keyword universe and produce a structured intelligence report.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "opportunitySummary": {
+    "quickWins": <number of clusters that are quick wins>,
+    "contentToCreate": <number of clusters needing new content>,
+    "contentGaps": <number of high-value gaps with no existing page>,
+    "totalOpportunities": <total number of meaningful keyword clusters>
+  },
+  "clusters": [
+    {
+      "id": "cluster-1",
+      "name": "<descriptive cluster name, 2-5 words>",
+      "intent": "transactional|commercial|informational|navigational",
+      "competition": "low|medium|high",
+      "opportunity": "high|medium|low",
+      "hasExistingPage": true|false,
+      "contentGap": "<plain English description of what's missing or weak, 1-2 sentences>",
+      "contentType": "category-page|blog-post|landing-page|faq-page|product-page",
+      "recommendation": "<specific, executive-friendly action. What to create/fix and why it matters to the business. 2-3 sentences max.>",
+      "estimatedMonthlySearches": "<e.g. 500-2000 or 'Low' or 'Medium'>",
+      "isQuickWin": true|false,
+      "keywords": ["<up to 8 representative keywords from the universe for this cluster>"]
+    }
+  ],
+  "topContentGaps": [
+    {
+      "title": "<gap title>",
+      "description": "<plain English: what searches exist that the site is missing, and why it matters>",
+      "estimatedMonthlySearches": "<volume estimate>",
+      "recommendedContentType": "category-page|blog-post|landing-page|faq-page|product-page",
+      "exampleKeywords": ["<3-5 keywords>"]
+    }
+  ]
+}
+
+Rules:
+- Create 10-15 clusters covering the full keyword universe
+- Mark isQuickWin=true only for clusters where: (a) the page already exists but needs optimization, OR (b) it's a high-intent term with low competition
+- topContentGaps: list the 4-5 biggest missed opportunities where the brand has no page
+- hasExistingPage: true only if a matching /products/all/ slug exists in the navigation list above
+- Keep all text executive-friendly — no technical jargon
+- Estimates don't need to be precise — relative ranges (200-500, 1000-3000) are fine for a ${profile.market || 'local'} market`;
+
+  try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 7000,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = msg.content[0].text;
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start !== -1 && end !== -1) {
+      const parsed = JSON.parse(raw.slice(start, end + 1));
+      log(`Keyword intelligence: ${parsed.clusters?.length || 0} clusters, ${parsed.topContentGaps?.length || 0} content gaps`);
+      return parsed;
+    }
+  } catch (err) { log(`Keyword intelligence error: ${err.message}`); }
+  return null;
+}
+
 // ─── GEO analysis ─────────────────────────────────────────────────────────────
 
 async function queryPerplexity(query) {
@@ -681,7 +777,15 @@ async function run() {
   log('Generating keyword universe...');
   const keywordUniverse = await generateKeywordUniverse(anthropic, profile, onPageSeo, competitorSeos).catch(() => ({ totalCount: 0 }));
 
-  // 7. GEO analysis
+  // 7. Keyword intelligence
+  log('Generating keyword intelligence...');
+  const siteIntel = loadBrandData(slug, 'site_intelligence.json') || {};
+  const keywordIntelligence = await generateKeywordIntelligence(anthropic, profile, keywordUniverse, siteIntel).catch(err => {
+    log(`Keyword intelligence error: ${err.message}`);
+    return null;
+  });
+
+  // 8. GEO analysis
   log('Running GEO (Generative Engine Optimization) analysis...');
   const geoSection = await runGeoAnalysis(anthropic, profile, keywordUniverse).catch(err => {
     log(`GEO error: ${err.message}`);
@@ -716,6 +820,7 @@ async function run() {
     competitorBenchmarks,
     priorityActions,
     keywordUniverse,
+    keywordIntelligence,
     estimatedKeywordTerritory: [
       ...(keywordUniverse.brandTerms || []).slice(0, 5),
       ...(keywordUniverse.categoryTerms || []).slice(0, 5),
