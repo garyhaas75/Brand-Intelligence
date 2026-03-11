@@ -316,13 +316,14 @@ function resolveToGid(cache, fieldKey, displayValue) {
 
 /**
  * Get the correct Shopify metafield type for a cache field.
- * - 'metaobject' source → 'list.metaobject_reference'
- * - 'taxonomy' source   → 'list.product_taxonomy_value_reference'
- *   (TaxonomyValue GIDs are gid://shopify/TaxonomyValue/X — referenced via product_taxonomy_value_reference)
+ * All shopify.* category metafields use list.metaobject_reference — both merchant metaobjects
+ * (age-group, target-gender, material) and taxonomy attributes (fabric, neckline, etc.).
+ * Taxonomy attribute values (TaxonomyValue GIDs) must be wrapped in Metaobject entries
+ * (shopify--fabric, shopify--neckline, etc.) before pushing. The metafield type is always
+ * list.metaobject_reference regardless of the source.
  */
 function getMetafieldType(cache, fieldKey) {
-  const source = cache?.[fieldKey]?.source;
-  return source === 'taxonomy' ? 'list.product_taxonomy_value_reference' : 'list.metaobject_reference';
+  return 'list.metaobject_reference';
 }
 
 module.exports = { buildCache, buildTaxonomyAttributeCache, buildFullCache, getValidValues, resolveToGid, getMetafieldType };

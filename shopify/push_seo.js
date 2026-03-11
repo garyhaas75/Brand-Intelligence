@@ -436,10 +436,86 @@ const CATEGORY_FIELD_MAPS = {
 // product's analyzed value exists in the metaobject cache — others are silently skipped.
 const CLOTHING_CATEGORY_GROUPS = new Set(['clothing', 'shoes', 'jewelry', 'handbags']);
 
+// Per-run cache of loaded metaobject entries: { [shopify--type]: { [taxonomyValueGid]: metaobjectGid } }
+// Initialized lazily on first use per type — avoids redundant API calls across products.
+const metaobjectEntryCache = {};
+
+// Look up (or create) a Shopify metaobject entry for a taxonomy attribute value.
+// All shopify.* category metafields use list.metaobject_reference — even taxonomy attributes
+// like fabric/neckline. TaxonomyValue GIDs must be wrapped in a store-specific Metaobject entry
+// (type: "shopify--fabric", fields: name + taxonomy_reference) before they can be referenced.
+// This implements the 5-layer chain: TaxonomyValue → Metaobject entry → Metafield.
+async function getMetaobjectGidForValue(shopifyKey, displayName, taxonomyValueGid) {
+  const metaobjectType = `shopify--${shopifyKey}`;
+
+  // Lazy-load all existing entries for this type on first access
+  if (!metaobjectEntryCache[metaobjectType]) {
+    try {
+      const data = await shopifyGraphQL(`
+        query GetEntries($type: String!) {
+          metaobjects(type: $type, first: 250) {
+            edges { node { id fields { key value } } }
+          }
+        }
+      `, { type: metaobjectType });
+      const byTaxonomyGid = {};
+      for (const edge of data?.metaobjects?.edges || []) {
+        const taxRef = edge.node.fields?.find(f => f.key === 'taxonomy_reference')?.value;
+        if (taxRef) byTaxonomyGid[taxRef] = edge.node.id;
+      }
+      metaobjectEntryCache[metaobjectType] = byTaxonomyGid;
+      log(`    metaobject cache: ${metaobjectType} — ${Object.keys(byTaxonomyGid).length} existing entries`);
+    } catch (err) {
+      log(`    WARN: could not load ${metaobjectType} entries: ${err.message}`);
+      metaobjectEntryCache[metaobjectType] = {};
+    }
+  }
+
+  // Return existing entry if found
+  if (metaobjectEntryCache[metaobjectType][taxonomyValueGid]) {
+    return metaobjectEntryCache[metaobjectType][taxonomyValueGid];
+  }
+
+  // Entry doesn't exist — create it
+  try {
+    const data = await shopifyGraphQL(`
+      mutation CreateMetaobjectEntry($metaobject: MetaobjectCreateInput!) {
+        metaobjectCreate(metaobject: $metaobject) {
+          metaobject { id }
+          userErrors { field message }
+        }
+      }
+    `, {
+      metaobject: {
+        type: metaobjectType,
+        fields: [
+          { key: 'name', value: displayName },
+          { key: 'taxonomy_reference', value: taxonomyValueGid },
+        ],
+      },
+    });
+    const errors = data?.metaobjectCreate?.userErrors || [];
+    if (errors.length) {
+      log(`    WARN: could not create ${metaobjectType}/${displayName}: ${errors.map(e => e.message).join('; ')}`);
+      return null;
+    }
+    const gid = data?.metaobjectCreate?.metaobject?.id;
+    if (gid) {
+      metaobjectEntryCache[metaobjectType][taxonomyValueGid] = gid;
+      log(`    created metaobject entry: ${metaobjectType}/${displayName} → ${gid}`);
+      return gid;
+    }
+  } catch (err) {
+    log(`    WARN: metaobjectCreate ${metaobjectType}/${displayName}: ${err.message}`);
+  }
+  return null;
+}
+
 // Push Shopify-namespace category metafields (appear in "Category metafields" section in Shopify admin).
-// Metafield type depends on the GID source:
-//   - Merchant metaobjects (age-group, target-gender, material, closure-type): list.metaobject_reference
-//   - Taxonomy attributes (fabric, neckline, sleeve-length-type, care-instructions): list.product_taxonomy_value_reference
+// ALL shopify.* category metafields use type list.metaobject_reference.
+// For taxonomy attributes (fabric, neckline, etc.), TaxonomyValue GIDs from the taxonomy cache
+// are first converted to Metaobject entry GIDs via getMetaobjectGidForValue.
+// For merchant metaobjects (age-group, target-gender, material), the cache already has Metaobject GIDs.
 //
 // Confirmed actual values from live store diagnostic:
 //   age-group: "Adults" (NOT "Adult")
@@ -456,8 +532,8 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache, categ
   // IMPORTANT: store values are "Adults" and "Female" — confirmed via diagnostic.
   const ageGid    = resolveToGid(cache, 'age-group', 'Adults');
   const genderGid = resolveToGid(cache, 'target-gender', 'Female');
-  if (ageGid)    metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'age-group',     type: getMetafieldType(cache, 'age-group'),     value: JSON.stringify([ageGid]) });
-  if (genderGid) metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'target-gender', type: getMetafieldType(cache, 'target-gender'), value: JSON.stringify([genderGid]) });
+  if (ageGid)    metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'age-group',     type: 'list.metaobject_reference', value: JSON.stringify([ageGid]) });
+  if (genderGid) metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'target-gender', type: 'list.metaobject_reference', value: JSON.stringify([genderGid]) });
 
   if (!ageGid)    log('    WARN: no GID for age-group="Adults" — check metaobject cache');
   if (!genderGid) log('    WARN: no GID for target-gender="Female" — check metaobject cache');
@@ -467,14 +543,32 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache, categ
   const fieldMap = CATEGORY_FIELD_MAPS[categoryGroup] || {};
   log(`    using field map for category group: ${categoryGroup || 'unknown'} (${Object.keys(fieldMap).length} field(s))`);
 
+  // Helper: resolve display value → Metaobject GID (handles both metaobject and taxonomy sources).
+  // For metaobject source: cache already holds Metaobject GIDs — return directly.
+  // For taxonomy source: cache holds TaxonomyValue GIDs — must get/create Metaobject entry first.
+  async function resolveToMetaobjectGid(shopifyKey, displayValue) {
+    const taxonomyOrMetaobjectGid = resolveToGid(cache, shopifyKey, displayValue);
+    if (!taxonomyOrMetaobjectGid) return null;
+    const source = cache?.[shopifyKey]?.source;
+    if (source === 'taxonomy') {
+      // TaxonomyValue GID → find or create Metaobject entry → return Metaobject GID
+      return await getMetaobjectGidForValue(shopifyKey, displayValue, taxonomyOrMetaobjectGid);
+    }
+    // Already a Metaobject GID
+    return taxonomyOrMetaobjectGid;
+  }
+
   // Clothing: material is not in the field map (no shopify.material for clothing).
-  // Instead, try to push the analyzed material value via the taxonomy 'fabric' cache.
+  // Push via taxonomy 'fabric' cache: TaxonomyValue GID → Metaobject entry → shopify.fabric.
   if (categoryGroup === 'clothing' && suggested.material && cache['fabric']) {
-    const fabricGid = resolveToGid(cache, 'fabric', String(suggested.material).trim());
-    if (fabricGid) {
-      const type = getMetafieldType(cache, 'fabric');
-      metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'fabric', type, value: JSON.stringify([fabricGid]) });
-      log(`    clothing material "${suggested.material}" → shopify.fabric (${fabricGid})`);
+    const displayVal = String(suggested.material).trim();
+    const taxonomyGid = resolveToGid(cache, 'fabric', displayVal);
+    if (taxonomyGid) {
+      const metaobjectGid = await getMetaobjectGidForValue('fabric', displayVal, taxonomyGid);
+      if (metaobjectGid) {
+        metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'fabric', type: 'list.metaobject_reference', value: JSON.stringify([metaobjectGid]) });
+        log(`    clothing material "${displayVal}" → shopify.fabric (${metaobjectGid})`);
+      }
     } else {
       log(`    WARN: material "${suggested.material}" not found in fabric taxonomy cache — skipped`);
     }
@@ -484,25 +578,26 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache, categ
     const val = suggested[ourKey];
     if (!val || typeof val !== 'string' || !val.trim()) continue;
 
-    let gid = resolveToGid(cache, shopifyKey, val.trim());
+    let metaobjectGid = await resolveToMetaobjectGid(shopifyKey, val.trim());
     let resolvedKey = shopifyKey;
 
-    // Special case: 'material' in analyzed data maps to a merchant metaobject key (footwear-material,
-    // jewelry-material, or material). If the value isn't in the merchant cache, fall back to the
-    // taxonomy 'fabric' cache which has 48 exact fabric values (Wool, Cashmere, Silk, etc.).
-    if (!gid && ourKey === 'material' && cache['fabric']) {
-      gid = resolveToGid(cache, 'fabric', val.trim());
-      if (gid) {
-        resolvedKey = 'fabric';
-        log(`    material "${val}" not in merchant cache → resolved via taxonomy fabric`);
+    // Fallback: if 'material' value not found in its category-specific key (footwear-material,
+    // jewelry-material), try the fabric taxonomy cache (48 exact values: Wool, Cashmere, Silk, etc.).
+    if (!metaobjectGid && ourKey === 'material' && cache['fabric']) {
+      const taxonomyGid = resolveToGid(cache, 'fabric', val.trim());
+      if (taxonomyGid) {
+        metaobjectGid = await getMetaobjectGidForValue('fabric', val.trim(), taxonomyGid);
+        if (metaobjectGid) {
+          resolvedKey = 'fabric';
+          log(`    material "${val}" not in merchant cache → resolved via taxonomy fabric`);
+        }
       }
     }
 
-    if (gid) {
-      const type = getMetafieldType(cache, resolvedKey);
-      metafields.push({ ownerId: productGid, namespace: 'shopify', key: resolvedKey, type, value: JSON.stringify([gid]) });
+    if (metaobjectGid) {
+      metafields.push({ ownerId: productGid, namespace: 'shopify', key: resolvedKey, type: 'list.metaobject_reference', value: JSON.stringify([metaobjectGid]) });
     } else {
-      log(`    WARN: no GID for ${shopifyKey}="${val}" — value not in cache, skipped`);
+      log(`    WARN: no Metaobject GID for ${shopifyKey}="${val}" — value not in cache, skipped`);
     }
   }
 
