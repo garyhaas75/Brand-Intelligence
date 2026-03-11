@@ -244,7 +244,16 @@ async function activateProductCategory(productGid, categoryGid) {
 // The API equivalent of clicking "+ Fabric", "+ Neckline" etc. in Shopify Admin.
 // Age-group and target-gender are NOT listed here — they are merchant metaobjects
 // (list.metaobject_reference) and are already defined.
-const TAXONOMY_SHOPIFY_KEYS = ['fabric', 'neckline', 'sleeve-length-type', 'care-instructions'];
+// Covers all AK product categories: clothing, shoes, jewelry, handbags
+const TAXONOMY_SHOPIFY_KEYS = [
+  'fabric',           // clothing
+  'neckline',         // clothing
+  'sleeve-length-type', // clothing
+  'care-instructions',  // clothing
+  'heel-style',       // shoes
+  'stone-type',       // jewelry (Shopify key for gemstone/stone)
+  'clasp-type',       // jewelry
+];
 
 // Enable store-level standard metafield definitions for Shopify taxonomy attribute keys.
 // Must be called once per run (before attempting to write values). Calling on an already-
