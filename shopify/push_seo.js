@@ -239,6 +239,56 @@ async function activateProductCategory(productGid, categoryGid) {
   }
 }
 
+// Taxonomy attribute metafield keys in the shopify.* namespace that require
+// store-level definition activation before values can be written via metafieldsSet.
+// The API equivalent of clicking "+ Fabric", "+ Neckline" etc. in Shopify Admin.
+// Age-group and target-gender are NOT listed here — they are merchant metaobjects
+// (list.metaobject_reference) and are already defined.
+const TAXONOMY_SHOPIFY_KEYS = ['fabric', 'neckline', 'sleeve-length-type', 'care-instructions'];
+
+// Enable store-level standard metafield definitions for Shopify taxonomy attribute keys.
+// Must be called once per run (before attempting to write values). Calling on an already-
+// enabled definition is a no-op (Shopify returns ALREADY_ENABLED or empty createdDefinition).
+// This is the API equivalent of clicking "+ Fabric", "+ Neckline", "+ Sleeve length type",
+// "+ Care instructions" in Shopify Admin → Category metafields section.
+async function ensureTaxonomyDefinitionsEnabled() {
+  for (const key of TAXONOMY_SHOPIFY_KEYS) {
+    try {
+      const data = await shopifyGraphQL(`
+        mutation enableDef($key: String!, $namespace: String!) {
+          standardMetafieldDefinitionEnable(
+            key: $key
+            namespace: $namespace
+            ownerType: PRODUCT
+            pin: true
+          ) {
+            createdDefinition { id name key namespace }
+            userErrors { field message code }
+          }
+        }
+      `, { key, namespace: 'shopify' });
+
+      const errors = data?.standardMetafieldDefinitionEnable?.userErrors || [];
+      const def = data?.standardMetafieldDefinitionEnable?.createdDefinition;
+      const alreadyEnabled = errors.some(e =>
+        e.code === 'ALREADY_ENABLED' ||
+        e.message?.toLowerCase().includes('already') ||
+        e.message?.toLowerCase().includes('exists')
+      );
+
+      if (def) {
+        log(`    Taxonomy definition enabled: shopify.${key}`);
+      } else if (alreadyEnabled || !errors.length) {
+        // Already enabled or silently succeeded — fine
+      } else {
+        log(`    WARN enabling shopify.${key}: ${errors.map(e => `[${e.code}] ${e.message}`).join('; ')}`);
+      }
+    } catch (err) {
+      log(`    WARN: could not enable shopify.${key}: ${err.message}`);
+    }
+  }
+}
+
 // Update image alt text via fileUpdate (replaces deprecated productUpdateMedia).
 // The media node ID from product.media is a valid File GID for fileUpdate.
 async function pushAltText(mediaId, altText) {
@@ -318,10 +368,24 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
   for (const [ourKey, shopifyKey] of Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)) {
     const val = suggested[ourKey];
     if (!val || typeof val !== 'string' || !val.trim()) continue;
-    const gid = resolveToGid(cache, shopifyKey, val.trim());
+
+    let gid = resolveToGid(cache, shopifyKey, val.trim());
+    let resolvedKey = shopifyKey;
+
+    // Special case: 'material' in analyzed data maps to shopify 'material' (merchant metaobject).
+    // If the value isn't in the merchant metaobject cache (e.g. "Wool", "Cashmere" aren't merchant
+    // metaobjects), fall back to the taxonomy 'fabric' cache which has 48 fabric values.
+    if (!gid && ourKey === 'material' && cache['fabric']) {
+      gid = resolveToGid(cache, 'fabric', val.trim());
+      if (gid) {
+        resolvedKey = 'fabric';
+        log(`    material "${val}" not in merchant cache → resolved via taxonomy fabric`);
+      }
+    }
+
     if (gid) {
-      const type = getMetafieldType(cache, shopifyKey);
-      metafields.push({ ownerId: productGid, namespace: 'shopify', key: shopifyKey, type, value: JSON.stringify([gid]) });
+      const type = getMetafieldType(cache, resolvedKey);
+      metafields.push({ ownerId: productGid, namespace: 'shopify', key: resolvedKey, type, value: JSON.stringify([gid]) });
     } else {
       log(`    WARN: no GID for ${shopifyKey}="${val}" — value not in cache, skipped`);
     }
@@ -404,11 +468,14 @@ async function pushGeoMetafields(productGid, suggested) {
   const metafields = [];
   for (const key of GEO_FIELD_KEYS) {
     const val = suggested[key];
-    if (val === null || val === undefined) continue;
+    if (val === null || val === undefined) { log(`    GEO skip ${key}: null/undefined`); continue; }
     // Skip empty strings, empty objects {}, and empty arrays [] — means Claude returned nothing useful
-    if (typeof val === 'string' && !val.trim()) continue;
-    if (typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length === 0) continue;
-    if (Array.isArray(val) && val.length === 0) continue;
+    if (typeof val === 'string' && !val.trim()) { log(`    GEO skip ${key}: empty string`); continue; }
+    if (typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length === 0) { log(`    GEO skip ${key}: empty object {}`); continue; }
+    if (Array.isArray(val) && val.length === 0) { log(`    GEO skip ${key}: empty array []`); continue; }
+    // Log the actual value being pushed (truncated) for diagnostics
+    const preview = JSON.stringify(val).slice(0, 120);
+    log(`    GEO push ${key}: ${preview}${preview.length >= 120 ? '…' : ''}`);
     metafields.push({
       ownerId: productGid,
       namespace: 'custom',
@@ -552,6 +619,14 @@ async function run() {
     } else {
       log('Metaobject cache: empty — taxonomy metafields will be skipped');
     }
+  }
+
+  // Ensure Shopify taxonomy attribute metafield definitions are enabled store-wide.
+  // This is the API equivalent of clicking "+ Fabric", "+ Neckline" etc. in Admin.
+  // Must succeed before metafieldsSet can write to shopify.fabric, shopify.neckline, etc.
+  if (!DRY_RUN) {
+    log('Enabling Shopify taxonomy metafield definitions…');
+    await ensureTaxonomyDefinitionsEnabled();
   }
 
   // Per-category taxonomy caches — memoized by category GID to avoid redundant API calls.
