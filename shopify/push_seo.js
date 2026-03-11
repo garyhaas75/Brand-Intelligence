@@ -239,20 +239,18 @@ async function activateProductCategory(productGid, categoryGid) {
   }
 }
 
-// Taxonomy attribute metafield keys in the shopify.* namespace that require
-// store-level definition activation before values can be written via metafieldsSet.
-// The API equivalent of clicking "+ Fabric", "+ Neckline" etc. in Shopify Admin.
-// Age-group and target-gender are NOT listed here — they are merchant metaobjects
-// (list.metaobject_reference) and are already defined.
-// Covers all AK product categories: clothing, shoes, jewelry, handbags
+// Taxonomy attribute metafield keys that CAN be enabled via standardMetafieldDefinitionEnable.
+// IMPORTANT: fabric, neckline, sleeve-length-type, care-instructions are NOT in this list.
+// standardMetafieldDefinitionEnable creates list.metaobject_reference definitions for those
+// keys (the old metaobject system), but our push uses TaxonomyValue GIDs which require
+// list.product_taxonomy_value_reference definitions (the new taxonomy system).
+// Those 4 definitions must be created by clicking "+ Fabric" etc. in Shopify Admin:
+//   Product → Category metafields → click the + button for each field.
+// Age-group and target-gender are NOT listed here — already defined as merchant metaobjects.
 const TAXONOMY_SHOPIFY_KEYS = [
-  'fabric',           // clothing
-  'neckline',         // clothing
-  'sleeve-length-type', // clothing
-  'care-instructions',  // clothing
-  'heel-style',       // shoes
-  'stone-type',       // jewelry (Shopify key for gemstone/stone)
-  'clasp-type',       // jewelry
+  'heel-style',  // shoes — uses metaobject system, safe to enable via API
+  'stone-type',  // jewelry — uses metaobject system, safe to enable via API
+  'clasp-type',  // jewelry — uses metaobject system, safe to enable via API
 ];
 
 // Template IDs: TaxonomyAttribute GID numeric + 10000 (community-verified formula).
