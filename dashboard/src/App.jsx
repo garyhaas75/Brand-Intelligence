@@ -3931,36 +3931,43 @@ function SeoProductTab() {
       {/* Shopify connection status banner */}
       {shopifyConfig && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderRadius: 8, marginBottom: 14,
-          background: shopifyConfig.configured ? '#f0fdf4' : '#fefce8',
-          border: `1px solid ${shopifyConfig.configured ? '#bbf7d0' : '#fde68a'}` }}>
+          background: shopifyConfig.configured ? '#dcfce7' : '#fefce8',
+          border: `1px solid ${shopifyConfig.configured ? '#86efac' : '#fde68a'}`,
+          color: shopifyConfig.configured ? '#14532d' : '#713f12' }}>
           <span style={{ fontSize: 16 }}>{shopifyConfig.configured ? '🟢' : '🔑'}</span>
           <div style={{ flex: 1, fontSize: 12 }}>
             {shopifyConfig.configured
               ? <><strong>Shopify connected</strong> — {shopifyConfig.domain} · API {shopifyConfig.apiVersion}</>
-              : <><strong>Shopify not connected</strong> — Add <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3 }}>SHOPIFY_STORE_DOMAIN</code> and <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3 }}>SHOPIFY_ADMIN_API_TOKEN</code> to your .env to enable pushing</>}
+              : <><strong>Shopify not connected</strong> — Add <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3, color: '#713f12' }}>SHOPIFY_STORE_DOMAIN</code> and <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3, color: '#713f12' }}>SHOPIFY_ADMIN_API_TOKEN</code> to your .env to enable pushing</>}
           </div>
         </div>
       )}
 
       {/* Run log */}
       {runLog && (
-        <div style={{ background: runLog.ok ? '#f0fdf4' : '#fef2f2', border: `1px solid ${runLog.ok ? '#bbf7d0' : '#fecaca'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
-          <div style={{ fontWeight: 700, marginBottom: 4, color: runLog.ok ? '#059669' : '#dc2626' }}>
+        <div style={{ background: runLog.ok ? '#dcfce7' : '#fee2e2', border: `1px solid ${runLog.ok ? '#86efac' : '#fca5a5'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
+          <div style={{ fontWeight: 700, marginBottom: 4, color: runLog.ok ? '#14532d' : '#991b1b' }}>
             {runLog.ok ? `✓ Batch complete — ${runLog.totalAnalyzed} of ${runLog.totalProducts} products analyzed` : '✗ Analysis encountered errors'}
           </div>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: T.textSub }}>{runLog.output}</pre>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 160, overflowY: 'auto', color: '#1e293b' }}>{runLog.output}</pre>
         </div>
       )}
 
       {/* Push log */}
       {pushLog && (
-        <div style={{ background: pushLog.ok ? '#f0fdf4' : '#fef2f2', border: `1px solid ${pushLog.ok ? '#bbf7d0' : '#fecaca'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
-          <div style={{ fontWeight: 700, marginBottom: 4, color: pushLog.ok ? '#059669' : '#dc2626' }}>
-            {pushLog.ok
-              ? `✓ Push complete — ${pushLog.pushed} pushed to Shopify${pushLog.errors ? `, ${pushLog.errors} errors` : ''}`
-              : `✗ Push failed — ${pushLog.errors} errors`}
+        <div style={{ background: pushLog.ok ? '#dcfce7' : '#fee2e2', border: `1px solid ${pushLog.ok ? '#86efac' : '#fca5a5'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <div style={{ fontWeight: 700, color: pushLog.ok ? '#14532d' : '#991b1b' }}>
+              {pushLog.ok
+                ? `✓ Push complete — ${pushLog.pushed} pushed to Shopify${pushLog.errors ? `, ${pushLog.errors} errors` : ''}`
+                : `✗ Push failed — ${pushLog.errors} errors`}
+            </div>
+            <button onClick={() => navigator.clipboard.writeText(pushLog.output || '')}
+              style={{ padding: '2px 10px', borderRadius: 5, border: '1px solid #86efac', background: '#f0fdf4', color: '#166534', fontSize: 11, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Copy log
+            </button>
           </div>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflowY: 'auto', color: T.textSub }}>{pushLog.output}</pre>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 200, overflowY: 'auto', color: '#1e293b' }}>{pushLog.output}</pre>
         </div>
       )}
 
