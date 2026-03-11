@@ -1,0 +1,301 @@
+{
+  "generatedAt": "2026-03-11T20:41:15.012Z",
+  "brandSlug": "toysrus-com-lb",
+  "brands": [
+    {
+      "id": "toysrus-com-lb",
+      "name": "Toys R Us",
+      "role": "target",
+      "handle": "toysruslb",
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:38:11.758Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0,
+        "estimatedPostCount": null
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [
+        "ZERO PRESENCE GAP: Toys R Us posts 0 times/week versus active competitors maintaining consistent weekly cadence — Immediately establish a minimum 3-5 posts/week schedule to rebuild algorithmic visibility and audience trust, starting with high-impact Product Showcase content featuring trending and seasonal toys to signal relevance fast",
+        "PRODUCT SHOWCASE VOID: Competitors are actively driving purchase intent through structured product reveal content while Toys R Us has no equivalent — Launch a weekly 'Toy Spotlight' series using Reels and carousel formats highlighting new arrivals, age-based gift guides, and demo videos, which historically drive 3x higher saves and shares in the toy retail category",
+        "SEASONAL & PROMOTIONAL BLACKOUT: Competitors are capitalizing on Christmas, Back-to-School, and Birthday season spikes while Toys R Us generates zero seasonal engagement — Build a quarterly content calendar anchored to key retail moments with countdowns, exclusive deals, and themed campaigns to capture high-intent shoppers during peak buying windows",
+        "USER GENERATED CONTENT ABSENCE: Competitors are leveraging authentic customer content to build social proof and community trust at zero production cost while Toys R Us has no UGC pipeline — Create a branded hashtag campaign encouraging parents and kids to share unboxing and play moments, then repost weekly to build community loyalty and reduce content production burden",
+        "BRAND STORY & NOSTALGIA GAP: Toys R Us owns one of retail's most powerful nostalgic brand identities yet is not activating it while competitors dominate Lifestyle and Brand Story formats — Develop a 'We're Back' storytelling series tapping into generational nostalgia with throwback content, Geoffrey the Giraffe reintroduction, and emotional parent-child narrative posts to rapidly differentiate from generic toy retailers and drive viral shareability"
+      ],
+      "error": "Post data unavailable (account may be private or scraper blocked) — profile stats only",
+      "partialData": true
+    },
+    {
+      "id": "toys-r-us-middle-east",
+      "name": "Toys R Us Middle East",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:38:46.584Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    },
+    {
+      "id": "mumzworld",
+      "name": "Mumzworld",
+      "role": "competitor",
+      "handle": "mumzworldcom",
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:38:46.908Z",
+      "summary": {
+        "postCount": 50,
+        "avgEngagement": 192,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 4.4
+      },
+      "contentThemes": [
+        {
+          "theme": "Product Showcase",
+          "count": 33
+        },
+        {
+          "theme": "Promotional",
+          "count": 11
+        },
+        {
+          "theme": "Lifestyle",
+          "count": 7
+        },
+        {
+          "theme": "Behind the Scenes",
+          "count": 4
+        },
+        {
+          "theme": "Seasonal",
+          "count": 3
+        },
+        {
+          "theme": "Brand Story",
+          "count": 2
+        },
+        {
+          "theme": "User Generated",
+          "count": 1
+        }
+      ],
+      "topHashtags": [
+        {
+          "tag": "#mumzworld",
+          "count": 34
+        },
+        {
+          "tag": "#itsamumzworld",
+          "count": 28
+        },
+        {
+          "tag": "#Mumzworld",
+          "count": 6
+        },
+        {
+          "tag": "#mumzworldcom",
+          "count": 3
+        },
+        {
+          "tag": "#mumzservices",
+          "count": 2
+        },
+        {
+          "tag": "#womansday",
+          "count": 1
+        },
+        {
+          "tag": "#pottytraining",
+          "count": 1
+        },
+        {
+          "tag": "#RamadanMoments",
+          "count": 1
+        },
+        {
+          "tag": "#CherishEveryMoment",
+          "count": 1
+        },
+        {
+          "tag": "#YallaCompare",
+          "count": 1
+        },
+        {
+          "tag": "#UAEInsurance",
+          "count": 1
+        },
+        {
+          "tag": "#voucher",
+          "count": 1
+        },
+        {
+          "tag": "#comin",
+          "count": 1
+        },
+        {
+          "tag": "#dubaimom",
+          "count": 1
+        },
+        {
+          "tag": "#babyessentials",
+          "count": 1
+        },
+        {
+          "tag": "#giveaway",
+          "count": 1
+        },
+        {
+          "tag": "#ramadan",
+          "count": 1
+        },
+        {
+          "tag": "#valentines",
+          "count": 1
+        },
+        {
+          "tag": "#mompush",
+          "count": 1
+        },
+        {
+          "tag": "#bumbleandbird",
+          "count": 1
+        }
+      ],
+      "recentPosts": [
+        {
+          "caption": "Every order that reaches a Mum starts with people who care.\n\nFrom the teams packing each box in the warehouse, to the riders on the road delivering it",
+          "likes": 44,
+          "comments": 5,
+          "timestamp": "2026-03-10T19:00:00.000Z"
+        },
+        {
+          "caption": "The love, laughter, and the warmth, it all begins with you, Mumz ✨🩷\n\nHappy Woman’s Day,\nMumzworld Family🌸💌\n\n#mumzworld #womansday",
+          "likes": 25,
+          "comments": 5,
+          "timestamp": "2026-03-08T05:59:08.000Z"
+        },
+        {
+          "caption": "Right now, many children may hear things they don’t fully understand. They look to us for calm.\n\nYou don’t need perfect words. You just need presence.",
+          "likes": 34,
+          "comments": 7,
+          "timestamp": "2026-03-01T18:00:00.000Z"
+        },
+        {
+          "caption": "Potty training can feel like a big step, for both toddlers and parents\n\nThe truth is, there’s no perfect timeline. Every child learns at their own pac",
+          "likes": 39,
+          "comments": 1,
+          "timestamp": "2026-03-10T16:00:00.000Z"
+        },
+        {
+          "caption": "Pregnancy can change your skin in unexpected ways, including acne you’ve never dealt with before.\n\nHormonal shifts during pregnancy can increase oil p",
+          "likes": 20,
+          "comments": 8,
+          "timestamp": "2026-02-25T15:07:19.000Z"
+        }
+      ],
+      "monthlyTrend": [
+        {
+          "month": "2025-12",
+          "avgEngagement": 52,
+          "postCount": 8
+        },
+        {
+          "month": "2026-01",
+          "avgEngagement": 278,
+          "postCount": 21
+        },
+        {
+          "month": "2026-02",
+          "avgEngagement": 274,
+          "postCount": 10
+        },
+        {
+          "month": "2026-03",
+          "avgEngagement": 55,
+          "postCount": 11
+        }
+      ],
+      "contentGaps": [],
+      "error": null,
+      "partialData": false
+    },
+    {
+      "id": "firstcry-lebanon",
+      "name": "FirstCry Lebanon",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:39:53.506Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    },
+    {
+      "id": "fantasia-lebanon",
+      "name": "Fantasia Lebanon",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:39:54.021Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    },
+    {
+      "id": "virgin-megastore-lebanon",
+      "name": "Virgin Megastore Lebanon",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:39:54.154Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    }
+  ]
+}

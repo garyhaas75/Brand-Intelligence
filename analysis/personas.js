@@ -1,37 +1,39 @@
 /**
- * Customer Personas Generator — Module 8
- * Uses all available intel to build rich customer personas for Anne Klein.
+ * Customer Personas Generator — slug-aware, external brand only.
+ * Uses competitive intelligence, social, and site data to build 3-5 personas.
  *
- * Inputs: site_analysis.json, product_catalog.json, social_intelligence.json,
- *         email_analysis.json, gsc_keywords.json, content_recommendations.json
- * Output: /data/personas.json
+ * Usage: node analysis/personas.js --slug=<brand-slug>
  */
 
 require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
-const { archive } = require('../utils/archive');
 const { getBrandContext } = require('../utils/brand_context');
 
-const LOG_FILE    = path.join(__dirname, '../logs/personas.log');
-const OUTPUT_FILE = path.join(__dirname, '../data/personas.json');
-const DATA_DIR    = path.join(__dirname, '../data');
+const DATA_DIR = path.join(__dirname, '../data');
 
-function log(msg) {
-  const line = `[${new Date().toISOString()}] ${msg}`;
-  console.log(line);
-  try { fs.appendFileSync(LOG_FILE, line + '\n'); } catch {}
-}
+function log(msg) { console.log(`[personas] [${new Date().toISOString()}] ${msg}`); }
+function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
 
-function loadJson(filename) {
-  const fp = path.join(DATA_DIR, filename);
-  if (!fs.existsSync(fp)) return null;
+function loadBrandData(slug, filename) {
+  const fp = path.join(DATA_DIR, 'brands', slug, filename);
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return null; }
 }
 
+function saveBrandData(slug, filename, data) {
+  ensureDir(path.join(DATA_DIR, 'brands', slug));
+  fs.writeFileSync(path.join(DATA_DIR, 'brands', slug, filename), JSON.stringify(data, null, 2));
+}
+
+function archiveData(slug, module, data) {
+  const histDir = path.join(DATA_DIR, 'brands', slug, 'history');
+  ensureDir(histDir);
+  const ts = new Date().toISOString().slice(0, 10);
+  fs.writeFileSync(path.join(histDir, `${module}_${ts}.json`), JSON.stringify(data, null, 2));
+}
+
 function extractBraces(text) {
-  // Strip markdown code fences if present
   const stripped = text.replace(/^```(?:json)?\s*/m, '').replace(/\s*```\s*$/m, '');
   const start = stripped.indexOf('{');
   if (start === -1) return null;
@@ -44,99 +46,102 @@ function extractBraces(text) {
 }
 
 async function run() {
-  const logsDir = path.join(__dirname, '../logs');
-  if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+  const args = process.argv.slice(2);
+  const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
+  if (!slug) { log('ERROR: --slug= required'); process.exit(1); }
 
-  log('=== Personas Generator Started ===');
+  const profile = loadBrandData(slug, 'profile.json');
+  if (!profile) { log('ERROR: profile.json not found'); process.exit(1); }
 
-  if (fs.existsSync(OUTPUT_FILE)) {
-    const dest = archive(OUTPUT_FILE);
-    if (dest) log(`  Archived previous output`);
+  log(`Generating personas for: ${profile.name}`);
+
+  // Load all available intel for this brand
+  const competitive = loadBrandData(slug, 'competitive_analysis.json');
+  const socialIntel = loadBrandData(slug, 'social_intelligence.json');
+  const siteIntel = loadBrandData(slug, 'site_intelligence.json');
+  const searchSeo = loadBrandData(slug, 'search_seo.json');
+
+  const brandContext = getBrandContext(slug);
+
+  // Build intel summary from available data
+  const intelParts = [];
+
+  if (competitive?.competitors?.length) {
+    const compSummary = competitive.competitors.slice(0, 4).map(c =>
+      `${c.name} (${c.pricingTier}): ${c.positioningStatement}`
+    ).join('\n');
+    intelParts.push(`COMPETITIVE LANDSCAPE:\n${compSummary}`);
+    if (competitive.topAssortmentGaps?.length) {
+      intelParts.push(`ASSORTMENT GAPS: ${competitive.topAssortmentGaps.slice(0, 5).join(', ')}`);
+    }
   }
 
-  // Load all available intel
-  const siteAnalysis   = loadJson('site_analysis.json');
-  const productCatalog = loadJson('product_catalog.json');
-  const socialIntel    = loadJson('social_intelligence.json');
-  const emailAnalysis  = loadJson('email_analysis.json');
-  const gscKeywords    = loadJson('gsc_keywords.json');
-  const contentRecs    = loadJson('content_recommendations.json');
-  const priceIntel     = loadJson('price_intelligence.json');
-
-  // Build intel summary
-  const intelSummary = [];
-
-  if (siteAnalysis?.messagingAnalysis) {
-    intelSummary.push(`COMPETITIVE MESSAGING:\n${JSON.stringify(siteAnalysis.messagingAnalysis, null, 2)}`);
+  if (socialIntel?.brands?.length) {
+    const targetSocial = socialIntel.brands.find(b => b.role === 'target');
+    if (targetSocial?.contentThemes?.length) {
+      intelParts.push(`SOCIAL CONTENT THEMES: ${targetSocial.contentThemes.slice(0, 6).map(t => t.theme).join(', ')}`);
+    }
+    const allHashtags = socialIntel.brands.flatMap(b => (b.topHashtags || []).slice(0, 5).map(h => h.tag));
+    if (allHashtags.length) intelParts.push(`TOP HASHTAGS: ${[...new Set(allHashtags)].slice(0, 15).join(', ')}`);
   }
 
-  if (productCatalog) {
-    const cats = productCatalog.categoryCounts || {};
-    const topCats = Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>`${k}: ${v}`);
-    intelSummary.push(`PRODUCT CATALOG: ${productCatalog.totalProducts || 0} total products\nTop categories: ${topCats.join(', ')}`);
+  if (siteIntel?.brands?.length) {
+    const targetSite = siteIntel.brands.find(b => b.role === 'target');
+    if (targetSite?.featuredCategories?.length) {
+      intelParts.push(`PRODUCT CATEGORIES: ${targetSite.featuredCategories.slice(0, 15).join(', ')}`);
+    }
+    if (siteIntel.navGaps?.length) {
+      intelParts.push(`NAVIGATION GAPS VS COMPETITORS: ${(Array.isArray(siteIntel.navGaps) ? siteIntel.navGaps.slice(0, 5).map(g => g.category || g) : []).join(', ')}`);
+    }
   }
 
-  if (socialIntel?.brands) {
-    const themes = socialIntel.brands.flatMap(b => b.contentThemes || []).filter(Boolean);
-    if (themes.length) intelSummary.push(`SOCIAL CONTENT THEMES:\n${themes.slice(0,20).join('\n')}`);
+  if (searchSeo?.estimatedKeywordTerritory?.length) {
+    intelParts.push(`ESTIMATED SEARCH KEYWORDS: ${searchSeo.estimatedKeywordTerritory.slice(0, 15).join(', ')}`);
   }
 
-  if (emailAnalysis?.brands) {
-    const subjects = emailAnalysis.brands.flatMap(b => (b.recentEmails || []).map(e => e.subject)).filter(Boolean);
-    if (subjects.length) intelSummary.push(`EMAIL SUBJECTS (competitor + AK):\n${subjects.slice(0,20).join('\n')}`);
+  if (searchSeo?.geoSection?.queries?.length) {
+    const geoQueries = searchSeo.geoSection.queries.map(q => q.query).slice(0, 8);
+    intelParts.push(`AI SHOPPING QUERY TYPES: ${geoQueries.join(' | ')}`);
   }
 
-  if (gscKeywords?.keywords) {
-    const topKw = (gscKeywords.keywords || []).slice(0,30).map(k=>k.query||k.keyword||k).filter(Boolean);
-    intelSummary.push(`TOP GSC KEYWORDS: ${topKw.join(', ')}`);
-  }
+  const combinedIntel = intelParts.join('\n\n---\n\n');
 
-  if (contentRecs?.recommendations) {
-    intelSummary.push(`CONTENT RECOMMENDATIONS:\n${JSON.stringify(contentRecs.recommendations?.slice(0,5), null, 2)}`);
-  }
+  const prompt = `You are a consumer insights researcher. Based on all the intelligence data below about ${profile.name} and its competitive landscape, build 3-4 detailed customer personas for ${profile.name}'s target customers.
 
-  if (priceIntel) {
-    intelSummary.push(`PRICING: ${priceIntel.akSaleRate}% of products currently on sale, avg ${priceIntel.akAvgSaleDepth}% off`);
-  }
-
-  const combinedIntel = intelSummary.join('\n\n---\n\n');
-
-  const brandContext = getBrandContext();
-  const prompt = `You are a consumer insights researcher specializing in women's fashion. Based on all the intelligence data below about Anne Klein and its competitive landscape, build 4 detailed customer personas for Anne Klein shoppers.
-
-ANNE KLEIN BRAND GUIDELINES:
+BRAND CONTEXT:
 ${brandContext}
 
 ---
 COMPETITIVE INTELLIGENCE DATA:
-${combinedIntel}
+${combinedIntel || 'Limited data available — base personas on brand positioning and industry context.'}
 
-Create exactly 4 personas. For each persona include:
+Create exactly ${combinedIntel.length > 200 ? '4' : '3'} personas. For each persona include:
 - name (evocative label, e.g. "The Executive Achiever")
-- age range
+- ageRange
 - income (household, e.g. "$85k-$140k")
-- occupation (2-3 examples)
+- occupation (array of 2-3 examples)
 - location (e.g. "Metro areas, Northeast and Midwest")
-- lifestyle (3-4 bullet points about daily life and habits)
-- values (4-5 core values)
-- fashionGoals (what she wants from clothing — 3-4 points)
-- shoppingBehaviors (how she shops — price sensitivity, channels, frequency — 3-4 points)
-- painPoints (frustrations with current market — 3-4 points)
-- motivators (what drives a purchase decision — 3-4 points)
-- contentTopics (what content/messaging resonates — 4-5 topics)
-- preferredChannels (social, email, in-store, online — ranked)
-- annKleinFit (why AK is relevant to this persona — 2-3 sentences)
-- quoteExample (one realistic quote this persona might say about fashion)
+- lifestyle (array of 3-4 bullet points)
+- values (array of 4-5 core values)
+- fashionGoals (array of 3-4 points)
+- shoppingBehaviors (array of 3-4 points)
+- painPoints (array of 3-4 frustrations)
+- motivators (array of 3-4 purchase drivers)
+- contentTopics (array of 4-5 topics)
+- preferredChannels (array, ranked)
+- brandFit (why ${profile.name} is relevant to this persona — 2-3 sentences)
+- quoteExample (one realistic quote this persona might say)
 
-Return ONLY valid JSON with this shape:
+Return ONLY valid JSON:
 {
-  "generatedAt": "<ISO timestamp>",
-  "totalPersonas": 4,
-  "personas": [ /* array of 4 persona objects as described above */ ],
-  "summaryInsights": [ /* 4-5 cross-persona insights for AK marketing strategy */ ]
+  "generatedAt": "${new Date().toISOString()}",
+  "brandSlug": "${slug}",
+  "totalPersonas": 3,
+  "personas": [],
+  "summaryInsights": ["4-5 cross-persona insights for marketing strategy"]
 }`;
 
-  log('Calling Claude to generate personas...');
+  log('Calling Claude opus to generate personas...');
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const msg = await anthropic.messages.create({
@@ -147,34 +152,20 @@ Return ONLY valid JSON with this shape:
 
   const raw = msg.content[0].text;
   const jsonStr = extractBraces(raw);
-  if (!jsonStr) {
-    log('ERROR: Could not extract JSON from Claude response');
-    log(raw.slice(0, 500));
-    process.exit(1);
-  }
+  if (!jsonStr) { log('ERROR: Could not extract JSON from Claude response'); process.exit(1); }
 
   const output = JSON.parse(jsonStr);
   output.generatedAt = new Date().toISOString();
+  output.brandSlug = slug;
+  output.totalPersonas = output.personas?.length || 0;
 
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
+  log(`Generated ${output.totalPersonas} personas`);
+  output.personas?.forEach((p, i) => log(`  ${i + 1}. ${p.name} (${p.ageRange})`));
 
-  console.log('\n========================================');
-  console.log('PERSONAS COMPLETE');
-  console.log('========================================');
-  output.personas.forEach((p, i) => {
-    console.log(`\n${i+1}. ${p.name} (${p.ageRange || p.age})`);
-    console.log(`   ${p.occupation}`);
-    console.log(`   ${p.annKleinFit?.slice(0, 100)}...`);
-  });
-  if (output.summaryInsights?.length) {
-    console.log('\nKey Insights:');
-    output.summaryInsights.forEach(s => console.log(`  • ${s}`));
-  }
-
-  log(`=== Done — ${output.personas?.length || 0} personas written ===`);
+  const existing = loadBrandData(slug, 'personas.json');
+  if (existing) archiveData(slug, 'personas', existing);
+  saveBrandData(slug, 'personas.json', output);
+  log('Done.');
 }
 
-run().catch(err => {
-  log(`FATAL: ${err.message}`);
-  process.exit(1);
-});
+run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });

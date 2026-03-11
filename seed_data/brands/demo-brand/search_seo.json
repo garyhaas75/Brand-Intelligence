@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "brandSlug": "demo-brand",
+  "serpApiEnabled": false,
+  "onPageSeo": {
+    "url": "https://www.example.com",
+    "titleTag": "",
+    "metaDescription": "",
+    "h1": "",
+    "h2s": [],
+    "schemaMarkup": [],
+    "canonicalTag": null,
+    "pageSpeedSignal": "unknown"
+  },
+  "competitors": [],
+  "estimatedKeywordTerritory": [],
+  "geoSection": {
+    "queries": [],
+    "visibilityScore": 0,
+    "gapRecommendations": ["Run the Search & SEO module to generate GEO analysis and keyword territory estimates."]
+  }
+}

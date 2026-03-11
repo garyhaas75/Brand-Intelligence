@@ -1,4923 +1,1685 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
-import './responsive.css'
 
 const API = '/api'
 
+// ─── Theme ─────────────────────────────────────────────────────────────────────
 const LIGHT_T = {
-  bg:          '#f9fafb',
-  surface:     '#ffffff',
-  surfaceAlt:  '#f3f4f6',
-  border:      '#e5e7eb',
-  borderAlt:   '#f3f4f6',
-  text:        '#111827',
-  textSub:     '#374151',
-  textMuted:   '#6b7280',
-  textFaint:   '#9ca3af',
-  accent:      '#6366f1',
-  accentText:  '#ffffff',
-  navBg:       '#111827',
-  navText:     '#ffffff',
-  tabBg:       '#ffffff',
-  tabBorder:   '#e5e7eb',
-  inputBg:     '#ffffff',
-  inputBorder: '#d1d5db',
-  codeBg:      '#f3f4f6',
-  stripeBg:    '#fafafa',
+  bg: '#f9fafb', surface: '#ffffff', surfaceAlt: '#f3f4f6', border: '#e5e7eb',
+  borderAlt: '#f3f4f6', text: '#111827', textSub: '#374151', textMuted: '#6b7280',
+  textFaint: '#9ca3af', accent: '#6366f1', accentText: '#ffffff', navBg: '#111827',
+  navText: '#ffffff', tabBg: '#ffffff', tabBorder: '#e5e7eb', inputBg: '#ffffff',
+  inputBorder: '#d1d5db', codeBg: '#f3f4f6', stripeBg: '#fafafa',
 }
-
 const DARK_T = {
-  bg:          '#0f172a',
-  surface:     '#1e293b',
-  surfaceAlt:  '#0f172a',
-  border:      '#334155',
-  borderAlt:   '#1e293b',
-  text:        '#f1f5f9',
-  textSub:     '#cbd5e1',
-  textMuted:   '#94a3b8',
-  textFaint:   '#64748b',
-  accent:      '#818cf8',
-  accentText:  '#ffffff',
-  navBg:       '#020617',
-  navText:     '#f1f5f9',
-  tabBg:       '#1e293b',
-  tabBorder:   '#334155',
-  inputBg:     '#1e293b',
-  inputBorder: '#475569',
-  codeBg:      '#111827',
-  stripeBg:    '#0f172a',
+  bg: '#0f172a', surface: '#1e293b', surfaceAlt: '#0f172a', border: '#334155',
+  borderAlt: '#1e293b', text: '#f1f5f9', textSub: '#cbd5e1', textMuted: '#94a3b8',
+  textFaint: '#64748b', accent: '#818cf8', accentText: '#ffffff', navBg: '#020617',
+  navText: '#f1f5f9', tabBg: '#1e293b', tabBorder: '#334155', inputBg: '#1e293b',
+  inputBorder: '#475569', codeBg: '#111827', stripeBg: '#0f172a',
 }
-
 const ThemeContext = React.createContext(LIGHT_T)
 const useT = () => React.useContext(ThemeContext)
 
-// Human-readable labels for Shopify taxonomy GIDs used by Anne Klein products.
-const TAXONOMY_LABELS = {
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-1': 'Bolero Jackets',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-2': 'Bomber Jackets',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-3': 'Capes',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-5': 'Overcoats',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-6': 'Parkas',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-7': 'Pea Coats',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-9': 'Puffer Jackets',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-11': 'Sport Jackets / Blazers',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-13': 'Trench Coats',
-  'gid://shopify/TaxonomyCategory/aa-1-10-2-17': 'Wrap Coats',
-  'gid://shopify/TaxonomyCategory/aa-1-10-6': 'Vests',
-  'gid://shopify/TaxonomyCategory/aa-1-13-1': 'Blouses',
-  'gid://shopify/TaxonomyCategory/aa-1-13-2': 'Bodysuits',
-  'gid://shopify/TaxonomyCategory/aa-1-13-3': 'Cardigans',
-  'gid://shopify/TaxonomyCategory/aa-1-13-5': 'Overshirts',
-  'gid://shopify/TaxonomyCategory/aa-1-13-7': 'Shirts',
-  'gid://shopify/TaxonomyCategory/aa-1-13-12': 'Sweaters',
-  'gid://shopify/TaxonomyCategory/aa-1-13-9': 'Tank Tops',
-  'gid://shopify/TaxonomyCategory/aa-1-13-11': 'Tunics',
-  'gid://shopify/TaxonomyCategory/aa-1-12-3': 'Chinos',
-  'gid://shopify/TaxonomyCategory/aa-1-12-4': 'Jeans',
-  'gid://shopify/TaxonomyCategory/aa-1-12-8': 'Leggings',
-  'gid://shopify/TaxonomyCategory/aa-1-12-11': 'Trousers / Dress Pants',
-  'gid://shopify/TaxonomyCategory/aa-1-19-1': 'Pant Suits',
-  'gid://shopify/TaxonomyCategory/aa-1-19-2': 'Skirt Suits',
-  'gid://shopify/TaxonomyCategory/aa-1-4': 'Dresses',
-  'gid://shopify/TaxonomyCategory/aa-1-11': 'Outfit Sets',
-  'gid://shopify/TaxonomyCategory/aa-1-15': 'Skirts',
-  'gid://shopify/TaxonomyCategory/aa-8-1': 'Athletic Shoes',
-  'gid://shopify/TaxonomyCategory/aa-8-3': 'Boots',
-  'gid://shopify/TaxonomyCategory/aa-8-9': 'Flats',
-  'gid://shopify/TaxonomyCategory/aa-8-10': 'Heels / Pumps',
-  'gid://shopify/TaxonomyCategory/aa-8-6': 'Sandals',
-  'gid://shopify/TaxonomyCategory/aa-8-8': 'Sneakers',
-  'gid://shopify/TaxonomyCategory/aa-6-3': 'Bracelets',
-  'gid://shopify/TaxonomyCategory/aa-6-4': 'Brooches & Lapel Pins',
-  'gid://shopify/TaxonomyCategory/aa-6-5': 'Charms & Pendants',
-  'gid://shopify/TaxonomyCategory/aa-6-6': 'Earrings',
-  'gid://shopify/TaxonomyCategory/aa-6-7': 'Jewelry Sets',
-  'gid://shopify/TaxonomyCategory/aa-6-8': 'Necklaces',
-  'gid://shopify/TaxonomyCategory/aa-6-9': 'Rings',
-  'gid://shopify/TaxonomyCategory/aa-6-11': 'Watches',
-  'gid://shopify/TaxonomyCategory/aa-5-4-5': 'Clutch Bags',
-  'gid://shopify/TaxonomyCategory/aa-5-4-7': 'Cross Body Bags',
-  'gid://shopify/TaxonomyCategory/aa-5-4-9': 'Envelope Clutches',
-  'gid://shopify/TaxonomyCategory/aa-5-4-12': 'Hobo Bags',
-  'gid://shopify/TaxonomyCategory/aa-5-4-16': 'Satchel Bags',
-  'gid://shopify/TaxonomyCategory/aa-5-4-18': 'Shopper / Tote Bags',
-  'gid://shopify/TaxonomyCategory/aa-5-4-19': 'Shoulder Bags',
-  'gid://shopify/TaxonomyCategory/aa-5-5-7': 'Wallets',
-}
+const TABS = [
+  { id: 'portfolio', label: 'Portfolio' },
+  { id: 'profile', label: 'Brand Profile' },
+  { id: 'competitive', label: 'Competitive Analysis' },
+  { id: 'personas', label: 'Personas' },
+  { id: 'social', label: 'Social Audit' },
+  { id: 'website', label: 'Website Audit' },
+  { id: 'search', label: 'Search & SEO / GEO' },
+  { id: 'action', label: 'Action Plan' },
+]
 
-// Metafield slots per specific product type — used in SEO Product Intelligence UI.
-const SPECIFIC_TYPE_FIELDS = {
-  // Clothing
-  blazer:       [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type'],['lining','Lining'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
-  coat:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['closure_type','Closure Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
-  dress:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
-  pants:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['rise','Rise']],
-  skirt:        [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['length','Length']],
-  suit:         [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['lining','Lining'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
-  sweater:      [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
-  top:          [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type'],['neckline','Neckline'],['sleeve_length','Sleeve Length']],
-  // Shoes
-  heels:        [['heel_height','Heel Height'],['heel_style','Heel Style'],['toe_shape','Toe Shape'],['closure_type','Closure Type']],
-  boots:        [['heel_height','Heel Height'],['shaft_height','Shaft Height'],['closure_type','Closure Type']],
-  sandals:      [['heel_style','Heel Style'],['strap_style','Strap Style'],['closure_type','Closure Type']],
-  flats:        [['toe_shape','Toe Shape'],['closure_type','Closure Type']],
-  sneakers:     [['closure_type','Closure Type']],
-  // Jewelry
-  earrings:     [['metal_finish','Metal Finish'],['stone_type','Stone Type'],['earring_back','Earring Back']],
-  necklaces:    [['metal_finish','Metal Finish'],['stone_type','Stone Type'],['chain_length','Chain Length'],['clasp_type','Clasp Type']],
-  bracelets:    [['metal_finish','Metal Finish'],['stone_type','Stone Type'],['clasp_type','Clasp Type']],
-  rings:        [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
-  watches:      [['metal_finish','Metal Finish'],['band_material','Band Material'],['case_diameter','Case Diameter']],
-  brooches:     [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
-  jewelry_sets: [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
-  // Handbags
-  clutch:        [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-  crossbody:     [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-  tote:          [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-  satchel:       [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-  shoulder_bag:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-  handbag_generic:[['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-  wallet:        [['exterior_material','Exterior Material'],['closure_type','Closure Type']],
-  // Category group fallbacks
-  clothing:  [['material','Material'],['care_instructions','Care Instructions'],['fit_type','Fit Type']],
-  shoes:     [['heel_style','Heel Style'],['closure_type','Closure Type']],
-  jewelry:   [['metal_finish','Metal Finish'],['stone_type','Stone Type']],
-  handbags:  [['exterior_material','Exterior Material'],['closure_type','Closure Type'],['strap_type','Strap / Carry Options']],
-}
-
-async function fetchEndpoint(path) {
-  try {
-    const res = await fetch(`${API}${path}`)
-    if (!res.ok) return null
-    const data = await res.json()
-    return Object.keys(data).length ? data : null
-  } catch {
-    return null
-  }
-}
-
-function Badge({ color, children }) {
+// ─── Shared components ─────────────────────────────────────────────────────────
+function Card({ children, style }) {
   const T = useT()
+  return <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: 24, ...style }}>{children}</div>
+}
+
+function Badge({ label, color = 'gray' }) {
   const colors = {
-    green:  { bg: '#d1fae5', text: '#065f46' },
-    red:    { bg: '#fee2e2', text: '#991b1b' },
-    yellow: { bg: '#fef3c7', text: '#92400e' },
-    blue:   { bg: '#dbeafe', text: '#1e40af' },
-    purple: { bg: '#ede9fe', text: '#5b21b6' },
-    gray:   { bg: T.surfaceAlt, text: T.textSub },
+    green: { bg: '#d1fae5', text: '#065f46' }, yellow: { bg: '#fef3c7', text: '#92400e' },
+    red: { bg: '#fee2e2', text: '#991b1b' }, blue: { bg: '#dbeafe', text: '#1e40af' },
+    purple: { bg: '#ede9fe', text: '#5b21b6' }, gray: { bg: '#f3f4f6', text: '#374151' },
   }
   const c = colors[color] || colors.gray
+  return <span style={{ display: 'inline-block', background: c.bg, color: c.text, fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+}
+
+function HealthBadge({ status }) {
+  const map = { fresh: ['Fresh', 'green'], stale: ['Stale', 'yellow'], needs_refresh: ['Needs Refresh', 'red'], never_run: ['Never Run', 'gray'] }
+  const [label, color] = map[status] || map.never_run
+  return <Badge label={label} color={color} />
+}
+
+function ImpactBadge({ impact }) {
+  const map = { high: 'red', medium: 'yellow', low: 'green' }
+  return <Badge label={impact || 'medium'} color={map[impact] || 'gray'} />
+}
+
+function Section({ title, children, action }) {
+  const T = useT()
   return (
-    <span style={{ background: c.bg, color: c.text, padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{title}</h2>
+        {action}
+      </div>
       {children}
-    </span>
+    </div>
   )
 }
 
-function Card({ title, subtitle, children, accent }) {
+function EmptyState({ message, cta, onCta }) {
   const T = useT()
   return (
-    <div className="ak-card" style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '20px 24px', marginBottom: 20, borderLeft: accent ? `4px solid ${accent}` : undefined }}>
-      {title && <div style={{ fontWeight: 700, fontSize: 16, marginBottom: subtitle ? 2 : 12, color: T.text }}>{title}</div>}
-      {subtitle && <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 12 }}>{subtitle}</div>}
-      {children}
+    <div style={{ textAlign: 'center', padding: '60px 24px', color: T.textMuted }}>
+      <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
+      <p style={{ fontSize: 15, marginBottom: 16 }}>{message}</p>
+      {cta && <button onClick={onCta} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>{cta}</button>}
     </div>
   )
 }
 
-function Stat({ label, value, sub, color }) {
+function Spinner() {
+  return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}><div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /></div>
+}
+
+function RefreshButton({ onClick, loading, label = 'Refresh' }) {
   const T = useT()
   return (
-    <div className="ak-stat-box" style={{ textAlign: 'center', padding: '16px 20px', background: T.surfaceAlt, borderRadius: 10, flex: 1, minWidth: 100 }}>
-      <div className="ak-stat-value" style={{ fontSize: 28, fontWeight: 800, color: color || T.text, lineHeight: 1 }}>{value ?? '—'}</div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub, marginTop: 4 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{sub}</div>}
-    </div>
+    <button onClick={onClick} disabled={loading} style={{ background: loading ? '#dbeafe' : 'none', border: `1px solid ${loading ? '#93c5fd' : T.border}`, borderRadius: 8, padding: '6px 14px', fontSize: 13, color: loading ? '#1e40af' : T.textSub, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+      <span style={{ display: 'inline-block', animation: loading ? 'spin 1s linear infinite' : 'none' }}>↻</span>
+      {loading ? 'Running...' : label}
+    </button>
   )
 }
 
-function SectionHeader({ children }) {
-  const T = useT()
-  return <h2 className="ak-section-header" style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: '32px 0 16px', borderBottom: `2px solid ${T.borderAlt}`, paddingBottom: 10 }}>{children}</h2>
-}
-
-function OverviewTab({ catalog, siteIntel, siteAnalysis, emailIntel, socialIntel, content, apifyUsage }) {
-  const T = useT()
-  const brandStatus = (siteIntel?.brands || []).map(b => ({
-    name: b.name,
-    navCount: b.navigation?.length || 0,
-    botBlocked: b.botBlocked,
-    error: !!b.error,
-  }))
-
-  const emailSubmitted = (emailIntel?.signups || []).filter(s => s.status === 'submitted').length
-  const ckEngagement = socialIntel?.brands?.find(b => b.id === 'calvin_klein')?.summary?.avgEngagement
-  const akEngagement = socialIntel?.brands?.find(b => b.id === 'anne_klein')?.summary?.avgEngagement
-
+function RunningBanner({ moduleLabel, detail }) {
   return (
-    <div>
-      <SectionHeader>Platform Status</SectionHeader>
-      <div className="ak-competitor-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 24 }}>
-        <Stat label="Products Scraped" value={catalog?.totalProducts?.toLocaleString()} sub="AK catalog" color="#6366f1" />
-        <Stat label="Category Gaps" value={siteIntel?.categoryGapAnalysis?.gaps?.length} sub="vs competitors" color="#f59e0b" />
-        <Stat label="Email Signups" value={`${emailSubmitted}/5`} sub="competitors" color="#10b981" />
-        <Stat label="CK Engagement" value={ckEngagement ? (ckEngagement / 1000).toFixed(0) + 'K' : '—'} sub="avg/post" color="#ef4444" />
-        <Stat label="AK Engagement" value={akEngagement || 0} sub="avg/post" color="#6b7280" />
-        <Stat label="Content Assets" value={
-          (content?.content?.emailCampaigns?.emailCampaigns?.length || 0) +
-          (content?.content?.heroHeadlines?.heroHeadlines?.length || 0) +
-          (content?.content?.instagramCaptions?.instagramCaptions?.length || 0)
-        } sub="generated" color="#8b5cf6" />
-      </div>
-
-      <SectionHeader>Competitor Scrape Status</SectionHeader>
-      <Card>
-        {brandStatus.map(b => (
-          <div key={b.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-            <span style={{ fontWeight: 600, fontSize: 14 }}>{b.name}</span>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: 13, color: T.textMuted }}>{b.navCount} nav items</span>
-              {b.botBlocked && <Badge color="red">Bot-blocked</Badge>}
-              {b.error && !b.botBlocked && <Badge color="yellow">Error</Badge>}
-              {!b.botBlocked && !b.error && b.navCount > 0 && <Badge color="green">✓ Scraped</Badge>}
-            </div>
-          </div>
-        ))}
-      </Card>
-
-      {apifyUsage && (
-        <>
-          <SectionHeader>Apify Usage</SectionHeader>
-          <Card>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 14 }}>
-              <Stat label="Plan" value={apifyUsage.planId?.toUpperCase()} color="#6366f1" />
-              {apifyUsage.monthlyUsageCreditsCents != null && apifyUsage.monthlyBasePriceCents != null && (
-                <>
-                  <Stat
-                    label="Credits Used"
-                    value={`$${(apifyUsage.monthlyUsageCreditsCents / 100).toFixed(2)}`}
-                    sub={`of $${(apifyUsage.monthlyBasePriceCents / 100).toFixed(0)}/mo`}
-                    color={apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents > 0.8 ? '#ef4444' : apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents > 0.5 ? '#f59e0b' : '#10b981'}
-                  />
-                  <Stat label="Remaining" value={`$${Math.max(0, (apifyUsage.monthlyBasePriceCents - apifyUsage.monthlyUsageCreditsCents) / 100).toFixed(2)}`} sub="this month" color="#6b7280" />
-                </>
-              )}
-            </div>
-            {apifyUsage.monthlyUsageCreditsCents != null && apifyUsage.monthlyBasePriceCents != null && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: T.textMuted, marginBottom: 4 }}>
-                  <span>Monthly usage</span>
-                  <span>{Math.round(apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents * 100)}%</span>
-                </div>
-                <div style={{ background: T.surfaceAlt, borderRadius: 6, height: 10, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', borderRadius: 6,
-                    width: `${Math.min(100, apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents * 100)}%`,
-                    background: apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents > 0.8 ? '#ef4444' : apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents > 0.5 ? '#f59e0b' : '#10b981',
-                  }} />
-                </div>
-                {apifyUsage.monthlyUsageCreditsCents / apifyUsage.monthlyBasePriceCents > 0.8 && (
-                  <div style={{ fontSize: 12, color: '#dc2626', marginTop: 6, fontWeight: 600 }}>Warning: over 80% of monthly credits used. Consider upgrading your plan.</div>
-                )}
-              </div>
-            )}
-          </Card>
-        </>
-      )}
-
-      <SectionHeader>Top Positioning Opportunity</SectionHeader>
-      {siteAnalysis?.messagingAnalysis?.positioningOpportunity && (
-        <Card accent="#6366f1">
-          <p style={{ fontSize: 14, lineHeight: 1.7, color: T.textSub, margin: 0 }}>
-            {siteAnalysis.messagingAnalysis.positioningOpportunity}
-          </p>
-        </Card>
-      )}
-
-      <SectionHeader>Catalog Health Warning</SectionHeader>
-      {siteAnalysis?.catalogAnalysis?.catalogHealth && (
-        <Card accent="#f59e0b">
-          <p style={{ fontSize: 14, lineHeight: 1.7, color: T.textSub, margin: 0 }}>
-            {siteAnalysis.catalogAnalysis.catalogHealth}
-          </p>
-        </Card>
-      )}
-    </div>
-  )
-}
-
-function CatalogTab({ catalog, onRefreshComplete }) {
-  const T = useT()
-  const [search, setSearch] = useState('')
-  const [filterCat, setFilterCat] = useState('All')
-  const [refreshing, setRefreshing] = useState(false)
-  const [refreshResult, setRefreshResult] = useState(null)
-
-  async function refreshCatalog() {
-    setRefreshing(true)
-    setRefreshResult(null)
-    try {
-      const d = await fetch('/api/shopify/catalog/refresh', { method: 'POST' }).then(r => r.json())
-      if (d.ok) {
-        const freshCatalog = await fetch('/api/shopify/products').then(r => r.json())
-        onRefreshComplete?.(freshCatalog)
-        setRefreshResult(`Refreshed — ${d.count} products`)
-      } else {
-        setRefreshResult(d.error || 'Error')
-      }
-    } catch (e) {
-      setRefreshResult('Error: ' + e.message)
-    } finally {
-      setRefreshing(false)
-      setTimeout(() => setRefreshResult(null), 4000)
-    }
-  }
-
-  if (!catalog?.products) return <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No catalog data. Run npm run scrape:products</div>
-
-  const newArrivalCount = catalog.products.filter(p => p.isNewArrival).length
-  const categories = ['All', `New Arrivals (${newArrivalCount})`, ...Object.keys(catalog.categoryCounts || {}).sort((a, b) => catalog.categoryCounts[b] - catalog.categoryCounts[a])]
-  const filtered = catalog.products.filter(p => {
-    if (filterCat === 'All') return true
-    if (filterCat.startsWith('New Arrivals')) return p.isNewArrival
-    return p.category === filterCat
-  }).filter(p =>
-    !search || p.name.toLowerCase().includes(search.toLowerCase())
-  ).slice(0, 200)
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <SectionHeader>Product Catalog</SectionHeader>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {refreshResult && <span style={{ fontSize: 13, color: refreshResult.startsWith('Error') ? '#ef4444' : '#10b981', fontWeight: 600 }}>{refreshResult}</span>}
-          <button onClick={refreshCatalog} disabled={refreshing}
-            style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, fontSize: 13, cursor: 'pointer', opacity: refreshing ? 0.6 : 1 }}>
-            {refreshing ? 'Refreshing…' : '↻ Refresh Catalog'}
-          </button>
-        </div>
-      </div>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-        <Stat label="Total Products" value={catalog.totalProducts?.toLocaleString()} color="#6366f1" />
-        <Stat label="Min Price" value={catalog.priceStats?.min} color="#10b981" />
-        <Stat label="Max Price" value={catalog.priceStats?.max} color="#ef4444" />
-        <Stat label="Avg Price" value={catalog.priceStats?.avg} color="#f59e0b" />
-      </div>
-
-      <Card title="Category Breakdown">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {Object.entries(catalog.categoryCounts || {}).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
-            <div key={cat} onClick={() => setFilterCat(cat === filterCat ? 'All' : cat)}
-              style={{ background: filterCat === cat ? '#6366f1' : T.surfaceAlt, color: filterCat === cat ? '#fff' : T.textSub, padding: '4px 12px', borderRadius: 20, fontSize: 13, cursor: 'pointer', userSelect: 'none' }}>
-              {cat} <strong>({count})</strong>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search products..." style={{ flex: '1 1 180px', minWidth: 0, padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }} />
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-          style={{ flex: '0 1 auto', padding: '8px 14px', border: `1px solid ${T.inputBorder}`, borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text }}>
-          {categories.map(c => <option key={c}>{c}</option>)}
-        </select>
-      </div>
-
-      <div style={{ fontSize: 12, color: T.textFaint, marginBottom: 12 }}>Showing {filtered.length} of {catalog.products.filter(p => filterCat === 'All' || p.category === filterCat).length} products</div>
-
-      <div className="ak-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
-        {filtered.map(p => (
-          <div key={p.id} style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 10, padding: 14 }}>
-            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 4, lineHeight: 1.4, color: T.text }}>{p.name}</div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
-              <Badge color="blue">{p.category}</Badge>
-              {p.isNewArrival && <Badge color="green">New</Badge>}
-              {p.onSale && <Badge color="red">Sale</Badge>}
-            </div>
-            <div style={{ fontSize: 13, color: T.textSub }}>
-              <strong>{p.price}</strong>
-              {p.originalPrice && <span style={{ color: T.textFaint, textDecoration: 'line-through', marginLeft: 6 }}>{p.originalPrice}</span>}
-            </div>
-            {p.colors.length > 0 && <div style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Colors: {p.colors.slice(0, 3).join(', ')}{p.colors.length > 3 ? ` +${p.colors.length - 3}` : ''}</div>}
-          </div>
-        ))}
+    <div style={{ background: '#dbeafe', border: '1px solid #93c5fd', borderRadius: 10, padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+      <span style={{ fontSize: 22, display: 'inline-block', animation: 'spin 1.2s linear infinite', flexShrink: 0 }}>⟳</span>
+      <div>
+        <p style={{ color: '#1e40af', fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{moduleLabel} — Running</p>
+        <p style={{ color: '#1e3a8a', fontSize: 13 }}>{detail || 'This typically takes 2–5 minutes. Results will load automatically when complete.'}</p>
       </div>
     </div>
   )
 }
 
-function SiteIntelTab({ siteIntel, siteAnalysis }) {
-  const T = useT()
-  if (!siteIntel) return <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No site intelligence data. Run npm run scrape:sites</div>
-
-  const realGaps = (siteIntel.categoryGapAnalysis?.gaps || []).filter(g =>
-    !g.category.includes('{') && !g.category.includes('.cls') && g.category.length < 50 && g.category !== 'SHOP NOW' && !/^United States/.test(g.category)
-  )
-
-  return (
-    <div>
-      <SectionHeader>Competitor Navigation</SectionHeader>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 0 }}>
-      {(siteIntel.brands || []).map(brand => (
-        <Card key={brand.id} title={brand.name} subtitle={brand.url}
-          accent={brand.id === 'anne_klein' ? '#6366f1' : brand.botBlocked ? '#ef4444' : '#10b981'}>
-          {brand.botBlocked && <Badge color="red">Bot-blocked — use Apify</Badge>}
-          {brand.error && !brand.botBlocked && <div style={{ color: '#dc2626', fontSize: 13, marginBottom: 8 }}>⚠ {brand.error.substring(0, 120)}</div>}
-          {brand.heroContent?.headline && (
-            <div style={{ fontSize: 13, fontStyle: 'italic', color: T.textSub, marginBottom: 8, padding: '8px 12px', background: T.bg, borderRadius: 6 }}>
-              Hero: "{brand.heroContent.headline}"
-            </div>
-          )}
-          {brand.featuredCategories?.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-              {brand.featuredCategories.slice(0, 30).map((c, i) => (
-                <span key={i} style={{ background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 12, fontSize: 12 }}>{c}</span>
-              ))}
-            </div>
-          )}
-          {brand.promoBanners?.length > 0 && (
-            <div style={{ marginTop: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 4 }}>PROMO BANNERS</div>
-              {brand.promoBanners.slice(0, 3).map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.textSub, padding: '3px 0', borderBottom: `1px solid ${T.borderAlt}` }}>"{p}"</div>
-              ))}
-            </div>
-          )}
-        </Card>
-      ))}
-      </div>
-
-      <SectionHeader>Category Gaps ({realGaps.length} found)</SectionHeader>
-      <Card subtitle="Categories on competitor sites not present on anneklein.com">
-        {realGaps.map((g, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: `1px solid ${T.stripeBg}`, gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{g.category}</span>
-            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>{g.seenAt.map(b => <Badge key={b} color="blue">{b}</Badge>)}</div>
-          </div>
-        ))}
-      </Card>
-
-      <SectionHeader>Claude's Nav Recommendations</SectionHeader>
-      {(siteAnalysis?.navigationAnalysis?.navigationRecommendations || []).map((rec, i) => (
-        <Card key={i} accent="#6366f1">
-          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-            <div style={{ background: '#6366f1', color: '#fff', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: T.textSub }}>{rec}</p>
-          </div>
-        </Card>
-      ))}
-
-      <SectionHeader>Top Missing Categories (Claude Analysis)</SectionHeader>
-      {(siteAnalysis?.navigationAnalysis?.missingCategories || []).map((cat, i) => (
-        <Card key={i} accent="#f59e0b" title={typeof cat === 'string' ? cat : cat.category}>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: T.textSub }}>
-            {typeof cat === 'object' ? cat.rationale : ''}
-          </p>
-        </Card>
-      ))}
-    </div>
-  )
-}
-
-function EmailTab({ inboxData, emailAnalysis, loadData }) {
-  const T = useT()
-  const [refreshing, setRefreshing] = useState(false)
-  const inboxBrands = inboxData?.brands || []
-  const analysis = emailAnalysis?.analysis || {}
-  const totalReceived = inboxBrands.reduce((s, b) => s + (b.summary?.count || 0), 0)
-  const brandsActive = inboxBrands.filter(b => b.emails?.length > 0).length
-
-  async function refreshAnalysis() {
-    setRefreshing(true)
-    try {
-      await fetch('/api/email-analysis/refresh', { method: 'POST' })
-      if (loadData) await loadData()
-    } finally {
-      setRefreshing(false)
-    }
-  }
-
-  const gradeColor = g => g === 'A' ? '#10b981' : g === 'B' ? '#f59e0b' : g === 'C' ? '#ef4444' : '#9ca3af'
-  const categoryColor = c => {
-    if (c === 'Welcome') return '#6366f1'
-    if (c === 'Rewards') return '#f59e0b'
-    if (c === 'Promotion') return '#10b981'
-    if (c === 'Product Launch') return '#3b82f6'
-    if (c === 'Urgency') return '#ef4444'
-    if (c === 'Editorial') return '#8b5cf6'
-    return '#9ca3af'
-  }
-
-  if (!inboxBrands.length) return (
-    <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>
-      No inbox data. Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run check:inbox</code>
-    </div>
-  )
-
-  const welcomeBenchmark = analysis.emailTypeAnalysis?.welcome?.benchmark || []
-
-  return (
-    <div>
-      {/* AK Strategy — top of page */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0, flexWrap: 'wrap', gap: 8 }}>
-        <SectionHeader style={{ marginBottom: 0 }}>AK Email Strategy</SectionHeader>
-        <button
-          onClick={refreshAnalysis}
-          disabled={refreshing}
-          style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: refreshing ? 'not-allowed' : 'pointer', opacity: refreshing ? 0.7 : 1 }}
-        >
-          {refreshing ? 'Refreshing...' : 'Refresh Analysis'}
-        </button>
-      </div>
-      {analysis.akEmailStrategy && (
-        <>
-          <div style={{ height: 0 }} />
-          <Card accent="#6366f1">
-            {analysis.akEmailStrategy.programGaps?.length > 0 && (
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>PROGRAM GAPS</div>
-                {analysis.akEmailStrategy.programGaps.map((g, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
-                    <span style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>✕</span>
-                    <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.5 }}>{g}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            {analysis.akEmailStrategy.emailCalendarSuggestion && (
-              <div style={{ marginBottom: 14, background: '#f0fdf4', borderRadius: 8, padding: '10px 14px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>RECOMMENDED EMAIL CADENCE</div>
-                <p style={{ margin: 0, fontSize: 14, color: '#065f46', lineHeight: 1.6 }}>{analysis.akEmailStrategy.emailCalendarSuggestion}</p>
-              </div>
-            )}
-            {analysis.akEmailStrategy.priorityActions?.length > 0 && (
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>PRIORITY ACTIONS</div>
-                {analysis.akEmailStrategy.priorityActions.map((a, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
-                    <div style={{ background: '#6366f1', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-                    <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{a}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        </>
-      )}
-
-      {/* Email type analysis — welcome benchmark */}
-      {welcomeBenchmark.length > 0 && (
-        <>
-          <SectionHeader>Welcome Email Benchmark</SectionHeader>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 0 }}>
-          {welcomeBenchmark.map((b, i) => (
-            <Card key={i} accent={gradeColor(b.grade)}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <div>
-                  <span style={{ fontWeight: 700, fontSize: 14 }}>{b.brand}</span>
-                  {b.subjectLine && <div style={{ fontSize: 13, fontStyle: 'italic', color: T.textSub, marginTop: 2 }}>"{b.subjectLine}"</div>}
-                </div>
-                {b.grade && (
-                  <span style={{ background: gradeColor(b.grade), color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{b.grade}</span>
-                )}
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: b.tactic ? 8 : 0 }}>
-                {b.offer && b.offer !== 'none' && b.offer !== 'None' && <Badge color="green">{b.offer}</Badge>}
-                {b.loyaltyPush && !['no', 'none', 'not detected'].includes(b.loyaltyPush?.toLowerCase()) && <Badge color="purple">Loyalty push</Badge>}
-              </div>
-              {b.tactic && <div style={{ fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>{b.tactic}</div>}
-            </Card>
-          ))}
-          </div>
-          {analysis.emailTypeAnalysis?.welcome?.akRecommendation && (
-            <Card accent="#10b981">
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>AK WELCOME RECOMMENDATION</div>
-              <p style={{ margin: 0, fontSize: 14, color: '#065f46', lineHeight: 1.6 }}>{analysis.emailTypeAnalysis.welcome.akRecommendation}</p>
-            </Card>
-          )}
-        </>
-      )}
-
-      {/* Per-brand inbox cards */}
-      <SectionHeader>Competitor Email Intelligence</SectionHeader>
-      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>
-        Monitoring {inboxBrands.length} brands · {totalReceived} emails received · {brandsActive} active
-        {!analysis.akEmailStrategy && <span> · Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run analyze:inbox</code> for strategy</span>}
-      </div>
-
-      {inboxBrands.map(brand => {
-        const emailCount = brand.emails?.length || 0
-        const hasEmail = emailCount > 0
-        const voiceEntry = (analysis.brandVoiceNotes || []).find(b => b.brand === brand.name)
-        const accentColor = hasEmail ? '#6366f1' : '#e5e7eb'
-
-        return (
-          <Card key={brand.name} accent={accentColor}>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: T.text }}>{brand.name}</div>
-                {brand.url && <div style={{ fontSize: 12, color: T.textFaint, marginTop: 2 }}>{brand.url}</div>}
-              </div>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
-                <Badge color={hasEmail ? 'green' : 'gray'}>{hasEmail ? `${emailCount} email${emailCount > 1 ? 's' : ''} received` : 'No emails yet'}</Badge>
-              </div>
-            </div>
-
-            {hasEmail ? (
-              <>
-                {/* Category type breakdown */}
-                {brand.summary?.categories && Object.keys(brand.summary.categories).length > 0 && (
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-                    {Object.entries(brand.summary.categories).map(([cat, count]) => (
-                      <span key={cat} style={{ background: categoryColor(cat) + '22', color: categoryColor(cat), border: `1px solid ${categoryColor(cat)}44`, borderRadius: 10, padding: '2px 10px', fontSize: 12, fontWeight: 600 }}>
-                        {cat} ({count})
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* All emails list */}
-                <div>
-                  {brand.emails.map((e, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: i < brand.emails.length - 1 ? `1px solid ${T.borderAlt}` : 'none', gap: 10 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                          {e.category && (
-                            <span style={{ background: categoryColor(e.category) + '22', color: categoryColor(e.category), borderRadius: 8, padding: '1px 7px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
-                              {e.category}
-                            </span>
-                          )}
-                          <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{e.subject}</span>
-                        </div>
-                        {e.snippet && (
-                          <div style={{ fontSize: 12, color: T.textFaint, lineHeight: 1.4 }}>
-                            {e.snippet.replace(/\s*͏\s*/g, ' ').replace(/&#39;/g, "'").trim().substring(0, 140)}
-                          </div>
-                        )}
-                      </div>
-                      {e.offer && <Badge color="green" style={{ flexShrink: 0 }}>{e.offer}</Badge>}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Brand voice */}
-                {voiceEntry && (
-                  <div style={{ background: '#ede9fe', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#5b21b6', marginTop: 10 }}>
-                    <strong>Voice ({voiceEntry.tone}):</strong> {voiceEntry.observation}
-                    {voiceEntry.vsAK && <div style={{ marginTop: 4, fontSize: 12, color: '#7c3aed' }}><strong>vs AK:</strong> {voiceEntry.vsAK}</div>}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div style={{ fontSize: 13, color: T.textFaint, padding: '4px 0' }}>No emails received yet.</div>
-            )}
-          </Card>
-        )
-      })}
-
-      {/* Subject line tactics */}
-      {analysis.subjectLineTactics?.length > 0 && (
-        <>
-          <SectionHeader>Subject Line Tactics</SectionHeader>
-          {analysis.subjectLineTactics.map((t, i) => (
-            <Card key={i} accent={t.useForAK?.toLowerCase().startsWith('yes') ? '#10b981' : '#e5e7eb'}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <span style={{ fontWeight: 700, fontSize: 14 }}>{t.tactic}</span>
-                  {t.emailType && (
-                    <span style={{ background: categoryColor(t.emailType) + '22', color: categoryColor(t.emailType), borderRadius: 8, padding: '1px 7px', fontSize: 11, fontWeight: 700 }}>
-                      {t.emailType}
-                    </span>
-                  )}
-                </div>
-                <Badge color={t.useForAK?.toLowerCase().startsWith('yes') ? 'green' : 'gray'}>
-                  {t.useForAK?.toLowerCase().startsWith('yes') ? 'Use for AK' : 'Skip'}
-                </Badge>
-              </div>
-              <div style={{ fontSize: 13, fontStyle: 'italic', color: T.textSub, marginBottom: 4 }}>
-                "{t.example}" <span style={{ fontSize: 12, color: T.textFaint }}>— {t.brand}</span>
-              </div>
-              <div style={{ fontSize: 13, color: T.textMuted }}>{t.useForAK}</div>
-            </Card>
-          ))}
-        </>
-      )}
-    </div>
-  )
-}
-
-function SocialTab({ socialIntel }) {
-  const T = useT()
-  if (!socialIntel?.brands) return <div style={{ padding: 40, color: T.textMuted, textAlign: 'center' }}>No social data. Run npm run module2</div>
-
-  const intel = socialIntel.competitiveIntel || {}
-
-  return (
-    <div>
-      <SectionHeader>Instagram Intelligence</SectionHeader>
-      <div className="ak-social-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-        <Stat label="AK Avg Engagement" value={intel.akAvgEngagement || 0} color={intel.akAvgEngagement ? '#10b981' : '#ef4444'} />
-        <Stat label="Competitor Avg" value={intel.competitorAvgEngagement?.toLocaleString()} color="#6366f1" />
-        <Stat label="Engagement Gap" value={intel.engagementGap?.toLocaleString()} color="#f59e0b" sub="competitors ahead" />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 0 }}>
-      {(socialIntel.brands || []).map(b => (
-        <Card key={b.id} title={`${b.name} (@${b.handle})`}
-          accent={b.id === 'anne_klein' ? '#6366f1' : '#e5e7eb'}>
-          {b.error && <div style={{ color: '#dc2626', fontSize: 13, marginBottom: 8 }}>Error: {b.error.substring(0, 100)}</div>}
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-            <Stat label="Posts" value={b.summary?.postCount || 0} />
-            <Stat label="Avg Engagement" value={b.summary?.avgEngagement?.toLocaleString() || 0} color="#6366f1" />
-          </div>
-
-          {b.summary?.themes?.length > 0 && (
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>CONTENT THEMES</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {b.summary.themes.map((t, i) => (
-                  <span key={i} style={{ background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
-                    {t.theme} <strong>({t.count})</strong>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {b.summary?.topHashtags?.length > 0 && (
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>TOP HASHTAGS</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {b.summary.topHashtags.slice(0, 10).map((h, i) => (
-                  <Badge key={i} color="blue">#{h.tag}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {b.summary?.recentCaptions?.filter(c => c.caption).length > 0 && (
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>RECENT POSTS</div>
-              {b.summary.recentCaptions.filter(c => c.caption).slice(0, 3).map((c, i) => (
-                <div key={i} style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 6 }}>
-                  <div style={{ fontSize: 12, color: T.textSub, lineHeight: 1.6 }}>"{c.caption.substring(0, 140)}{c.caption.length > 140 ? '…' : ''}"</div>
-                  <div style={{ fontSize: 11, color: T.textFaint, marginTop: 4 }}>❤️ {c.likes?.toLocaleString()} · 💬 {c.comments}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      ))}
-      </div>
-
-      {intel.competitorHashtagsNotUsedByAK?.length > 0 && (
-        <>
-          <SectionHeader>Hashtags Competitors Use That AK Doesn't</SectionHeader>
-          <Card>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {intel.competitorHashtagsNotUsedByAK.slice(0, 20).map((h, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Badge color="purple">#{h.tag}</Badge>
-                  <span style={{ fontSize: 11, color: T.textFaint }}>{h.brand}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </>
-      )}
-    </div>
-  )
-}
-
-function SEOTab({ seoIntel, content }) {
-  const T = useT()
-  if (!seoIntel?.queryAnalysis?.totalQueries) {
-    return (
-      <div style={{ padding: 40, textAlign: 'center' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🔑</div>
-        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>GSC Data Not Available</div>
-        <div style={{ color: T.textMuted, fontSize: 14, lineHeight: 1.7, maxWidth: 480, margin: '0 auto' }}>
-          The Google Search Console credentials don't have permission for anneklein.com yet.<br /><br />
-          <strong>Fix:</strong> Add <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>garyclaudeai@gmail.com</code> as a verified user in GSC (Settings → Users & permissions), then run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run module4</code>.
-        </div>
-      </div>
-    )
-  }
-
-  const qa = seoIntel.queryAnalysis
-
-  return (
-    <div>
-      <SectionHeader>Search Performance</SectionHeader>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-        <Stat label="Total Clicks" value={qa.totalClicks?.toLocaleString()} color="#10b981" />
-        <Stat label="Impressions" value={qa.totalImpressions?.toLocaleString()} color="#6366f1" />
-        <Stat label="Avg CTR" value={qa.avgCTR + '%'} color="#f59e0b" />
-        <Stat label="Branded Clicks" value={qa.brandedClickShare + '%'} color="#8b5cf6" />
-        <Stat label="Quick Wins" value={qa.quickWins?.length} sub="pos 4–15" color="#ef4444" />
-        <Stat label="CTR Opps" value={qa.ctrOpportunities?.length} sub="low CTR" color="#f59e0b" />
-      </div>
-
-      <div className="ak-seo-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24 }}>
-        {/* LEFT: Top Queries table */}
-        <div>
-          {qa.top50Queries?.length > 0 && (
-            <>
-              <SectionHeader>Top Queries</SectionHeader>
-              <Card>
-                <div className="ak-table-scroll" style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                  <thead>
-                    <tr style={{ borderBottom: `2px solid ${T.border}` }}>
-                      {['Query', 'Clicks', 'Impressions', 'CTR', 'Position', 'Type'].map(h => (
-                        <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: T.textMuted, fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {qa.top50Queries.slice(0, 25).map((q, i) => (
-                      <tr key={i} style={{ borderBottom: `1px solid ${T.borderAlt}` }}>
-                        <td style={{ padding: '7px 8px', fontWeight: 500, color: T.text }}>{q.query}</td>
-                        <td style={{ padding: '7px 8px', color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>{q.clicks}</td>
-                        <td style={{ padding: '7px 8px', color: T.textMuted, whiteSpace: 'nowrap' }}>{q.impressions?.toLocaleString()}</td>
-                        <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.ctr}%</td>
-                        <td style={{ padding: '7px 8px', whiteSpace: 'nowrap' }}>{q.position}</td>
-                        <td style={{ padding: '7px 8px' }}><Badge color={q.type === 'branded' ? 'purple' : q.type === 'transactional' ? 'green' : 'gray'}>{q.type}</Badge></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                </div>
-              </Card>
-            </>
-          )}
-        </div>
-
-        {/* RIGHT: Quick Wins + CTR Opps + Claude's SEO Action Plan */}
-        <div>
-          {qa.quickWins?.length > 0 && (
-            <>
-              <SectionHeader>Quick Wins (Position 4–15)</SectionHeader>
-              <Card subtitle="High impressions, achievable ranking — small content changes could move these to page 1">
-                {qa.quickWins.slice(0, 15).map((q, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: `1px solid ${T.borderAlt}`, gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 500, fontSize: 14, color: T.text, flex: '1 1 140px' }}>{q.query}</span>
-                    <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textMuted, flexShrink: 0 }}>
-                      <span>pos <strong>{q.position}</strong></span>
-                      <span>{q.impressions?.toLocaleString()} impr</span>
-                      <span>{q.ctr}% CTR</span>
-                    </div>
-                  </div>
-                ))}
-              </Card>
-            </>
-          )}
-
-          {content?.content?.seoQuickWins?.seoQuickWins?.length > 0 && (
-            <>
-              <SectionHeader>Claude's SEO Action Plan</SectionHeader>
-              {content.content.seoQuickWins.seoQuickWins.map((w, i) => (
-                <Card key={i} title={w.keyword} accent="#10b981">
-                  <div style={{ marginBottom: 8 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>PAGE TO OPTIMIZE: </span>
-                    <span style={{ fontSize: 13 }}>{w.currentPage}</span>
-                  </div>
-                  <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>TITLE TAG</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{w.titleTag}</div>
-                  </div>
-                  <div style={{ background: T.bg, borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 2 }}>META DESCRIPTION</div>
-                    <div style={{ fontSize: 13, color: T.textSub }}>{w.metaDescription}</div>
-                  </div>
-                  {w.contentAdditions?.length > 0 && (
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6 }}>ON-PAGE ADDITIONS</div>
-                      {w.contentAdditions.map((a, j) => (
-                        <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '3px 0 3px 12px', borderLeft: '3px solid #10b981', marginBottom: 4 }}>{a}</div>
-                      ))}
-                    </div>
-                  )}
-                </Card>
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const CATEGORY_KEYWORDS = [
-  { keywords: ['blazer', 'jacket', 'suit'], category: 'Blazers & Jackets' },
-  { keywords: ['dress', 'jumpsuit'], category: 'Dresses & Jumpsuits' },
-  { keywords: ['heel', 'pump'], category: 'Heels' },
-  { keywords: ['boot'], category: 'Boots' },
-  { keywords: ['flat', 'loafer'], category: 'Flats & Loafers' },
-  { keywords: ['sandal', 'slide'], category: 'Sandals & Slides' },
-  { keywords: ['shoe', 'footwear'], category: 'Shoes' },
-  { keywords: ['jewelry', 'necklace', 'earring', 'bracelet', 'watch'], category: 'Jewelry' },
-  { keywords: ['bag', 'handbag', 'tote', 'purse'], category: 'Handbags' },
-  { keywords: ['top', 'blouse', 'shirt'], category: 'Tops' },
-  { keywords: ['pant', 'trouser', 'bottom', 'skirt'], category: 'Clothing' },
-  { keywords: ['sweater', 'knit'], category: 'Sweaters' },
-  { keywords: ['coat', 'outerwear'], category: 'Outerwear' },
+// ─── Add Brand Modal ────────────────────────────────────────────────────────────
+const PIPELINE_STEPS = [
+  { key: 'discovery',            label: 'Brand Discovery',      file: null },
+  { key: 'competitive_analysis', label: 'Competitive Analysis', file: 'competitive_analysis' },
+  { key: 'site_intelligence',    label: 'Website Audit',        file: 'site_intelligence' },
+  { key: 'social_intelligence',  label: 'Social Audit',         file: 'social_intelligence' },
+  { key: 'search_seo',           label: 'Search & SEO / GEO',   file: 'search_seo' },
+  { key: 'personas',             label: 'Personas',             file: 'personas' },
+  { key: 'action_plan',          label: 'Action Plan',          file: 'action_plan' },
 ]
 
-function getProductsForCampaign(theme, brief, catalog, count = 4) {
-  if (!catalog?.products) return []
-  const text = ((theme || '') + ' ' + (brief || '')).toLowerCase()
-  let targetCategory = null
-  for (const { keywords, category } of CATEGORY_KEYWORDS) {
-    if (keywords.some(kw => text.includes(kw))) { targetCategory = category; break }
-  }
-  const pool = catalog.products.filter(p =>
-    p.image && (targetCategory ? (p.category === targetCategory || p.allCategories?.includes(targetCategory)) : true)
-  )
-  return pool.slice(0, count)
-}
-
-function ProductCard({ product }) {
+function AddBrandModal({ onClose, onAdded }) {
   const T = useT()
-  return (
-    <a href={product.href} target="_blank" rel="noreferrer"
-      style={{ textDecoration: 'none', color: 'inherit', display: 'block', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden', transition: 'box-shadow 0.15s' }}>
-      <img src={product.image} alt={product.name}
-        style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block', background: T.bg }}
-        onError={e => { e.target.style.display = 'none' }} />
-      <div style={{ padding: '10px 12px' }}>
-        <div style={{ fontSize: 12, fontWeight: 600, lineHeight: 1.4, marginBottom: 4, color: T.text }}>{product.name}</div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#6366f1' }}>{product.price}</div>
-        {product.onSale && <Badge color="red">Sale</Badge>}
-      </div>
-    </a>
-  )
-}
-
-function ContentGeneratorPanel() {
-  const T = useT()
-  const CONTENT_TYPES = [
-    'Email campaign',
-    'Instagram caption',
-    'Hero headline',
-    'Product description',
-    'Blog post outline',
-    'Promotional banner copy',
-    'SMS/text message',
-    'Ad copy',
-  ]
-  const [contentType, setContentType] = useState(CONTENT_TYPES[0])
-  const [prompt, setPrompt] = useState('')
-  const [result, setResult] = useState(null)
+  const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-
-  async function generate() {
-    if (!prompt.trim()) return
-    setLoading(true)
-    setError(null)
-    setResult(null)
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contentType, prompt }),
-      })
-      const data = await res.json()
-      if (data.error) setError(data.error)
-      else setResult(data.content)
-    } catch (e) {
-      setError(e.message)
-    }
-    setLoading(false)
-  }
-
-  return (
-    <div style={{ background: '#f0f0ff', border: '2px solid #6366f1', borderRadius: 12, padding: '20px 24px', marginBottom: 28 }}>
-      <div style={{ fontWeight: 700, fontSize: 16, color: '#4338ca', marginBottom: 4 }}>On-Demand Content Generator</div>
-      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>Claude generates content grounded in AK brand intel and competitive landscape.</div>
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
-        <select value={contentType} onChange={e => setContentType(e.target.value)}
-          style={{ padding: '8px 14px', border: '1px solid #c4b5fd', borderRadius: 8, fontSize: 14, background: T.inputBg, color: T.text, minWidth: 200 }}>
-          {CONTENT_TYPES.map(t => <option key={t}>{t}</option>)}
-        </select>
-      </div>
-
-      <textarea value={prompt} onChange={e => setPrompt(e.target.value)}
-        placeholder="Describe what you need… e.g. 'Write a welcome email for new subscribers with a 15% off offer, focusing on professional workwear'"
-        rows={3}
-        style={{ width: '100%', padding: '10px 14px', border: '1px solid #c4b5fd', borderRadius: 8, fontSize: 14, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 12, background: T.inputBg, color: T.text }} />
-
-      <button onClick={generate} disabled={loading || !prompt.trim()}
-        style={{ padding: '10px 24px', background: loading || !prompt.trim() ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading || !prompt.trim() ? 'not-allowed' : 'pointer' }}>
-        {loading ? 'Generating…' : 'Generate with Claude'}
-      </button>
-
-      {error && (
-        <div style={{ marginTop: 16, background: '#fee2e2', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#991b1b' }}>
-          Error: {error}
-        </div>
-      )}
-
-      {result && (
-        <div style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>GENERATED {contentType.toUpperCase()}</div>
-          <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px 18px', fontSize: 14, lineHeight: 1.7, color: T.text, whiteSpace: 'pre-wrap' }}>
-            {result}
-          </div>
-          <button onClick={() => { navigator.clipboard?.writeText(result) }}
-            style={{ marginTop: 8, padding: '6px 14px', background: T.surfaceAlt, border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: T.textSub }}>
-            Copy to clipboard
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function getMonday(dateStr) {
-  const d = new Date(dateStr)
-  const day = d.getDay() // 0=Sun, 1=Mon
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
-}
-
-function formatWeekRange(weekStart) {
-  const start = new Date(weekStart)
-  const end = new Date(weekStart)
-  end.setDate(end.getDate() + 6)
-  const opts = { month: 'short', day: 'numeric' }
-  const startStr = start.toLocaleDateString('en-US', opts)
-  const endStr = end.getDate()
-  const year = end.getFullYear()
-  return `${startStr}–${endStr}, ${year}`
-}
-
-function ContentTab({ content, catalog, campaigns, loadData, setCalItems }) {
-  const T = useT()
-  const today = new Date().toISOString().split('T')[0]
-  const [subTab, setSubTab] = useState('planner')
-
-  // Planner state
-  const [weekStart, setWeekStart] = useState(() => getMonday(today))
-  const [planItems, setPlanItems] = useState([])
-  const [ownableEvents, setOwnableEvents] = useState([])
-  const [generating, setGenerating] = useState(false)
-  const [channelFilter, setChannelFilter] = useState('all')
-  const [itemDates, setItemDates] = useState({})
-  const [addingToCalendar, setAddingToCalendar] = useState({})
-  const [plannerToast, setPlannerToast] = useState(null)
-  const [volumes, setVolumes] = useState({ email: 2, instagram: 3, hero: 1 })
-  const [loadingPlan, setLoadingPlan] = useState(false)
-  const [extraVolumes, setExtraVolumes] = useState({ email: 0, instagram: 0, hero: 0 })
-  const [generatingMore, setGeneratingMore] = useState(false)
-  const [showGenerateMore, setShowGenerateMore] = useState(false)
-  // Product selector state: itemId → selected products array
-  const [itemProducts, setItemProducts] = useState({})
-  // Stock status state: handle → { name, qty, status }
-  const [stockStatus, setStockStatus] = useState({})
-  const [checkingStock, setCheckingStock] = useState({})
-  const [browseProducts, setBrowseProducts] = useState([])
-  // Content strategy state
-  const [strategy, setStrategy] = useState(null)
-  const [strategyLoading, setStrategyLoading] = useState(false)
-  const [strategySaving, setStrategySaving] = useState(false)
-  const [strategyToast, setStrategyToast] = useState(null)
-
-  async function loadStrategy() {
-    setStrategyLoading(true)
-    try {
-      const d = await fetch('/api/content-strategy').then(r => r.json())
-      if (d.ok && d.strategy) setStrategy(d.strategy)
-    } finally {
-      setStrategyLoading(false)
-    }
-  }
-
-  async function saveStrategy() {
-    if (!strategy) return
-    setStrategySaving(true)
-    try {
-      const d = await fetch('/api/content-strategy', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ strategy }),
-      }).then(r => r.json())
-      if (d.ok) {
-        setStrategyToast('Strategy saved')
-        setTimeout(() => setStrategyToast(null), 3000)
-      }
-    } finally {
-      setStrategySaving(false)
-    }
-  }
-
-  const [browseFilter, setBrowseFilter] = useState('')
-  const [emailPreviewItem, setEmailPreviewItem] = useState(null)
-  const [previewImages, setPreviewImages] = useState({}) // handle → imageUrl
-  // Per-card chat state
-  const [chatOpen, setChatOpen] = useState({})       // itemId → bool
-  const [chatHistory, setChatHistory] = useState({}) // itemId → [{role,content}]
-  const [chatInput, setChatInput] = useState({})     // itemId → string
-  const [chatLoading, setChatLoading] = useState({}) // itemId → bool
-
-  const c = content?.content
-
-  // Compute active campaigns for this week
-  const activeCampaigns = (campaigns || []).filter(camp => {
-    if (camp.status === 'archived') return false
-    const s = new Date(camp.startDate), e = new Date(camp.endDate), w = new Date(weekStart)
-    return s <= w && e >= w
-  }).map(camp => {
-    const s = new Date(camp.startDate), w = new Date(weekStart)
-    const weekNum = Math.floor((w - s) / (7 * 24 * 60 * 60 * 1000)) + 1
-    const totalWeeks = Math.ceil((new Date(camp.endDate) - s) / (7 * 24 * 60 * 60 * 1000))
-    const arcWeek = (camp.storyArc || []).find(aw => aw.weekNum === weekNum) || null
-    return { ...camp, weekNum, totalWeeks, arcWeek }
-  })
-
-  // Auto-load strategy when Content Strategy sub-tab is active
-  useEffect(() => {
-    if (subTab === 'strategy' && !strategy && !strategyLoading) loadStrategy()
-  }, [subTab])
-
-  // Sync volumes from first active campaign's contentVolumes
-  useEffect(() => {
-    const camp = activeCampaigns[0]
-    if (camp?.contentVolumes) setVolumes(camp.contentVolumes)
-  }, [activeCampaigns[0]?.id, weekStart])
-
-  // Fetch plan + events when week changes
-  useEffect(() => {
-    setLoadingPlan(true)
-    const year = new Date(weekStart).getFullYear()
-    Promise.all([
-      fetch(`/api/weekly-plan?week=${weekStart}`).then(r => r.json()).catch(() => []),
-      fetch(`/api/ownable-events?year=${year}`).then(r => r.json()).catch(() => []),
-    ]).then(([plan, events]) => {
-      const planArr = Array.isArray(plan) ? plan : []
-      setPlanItems(planArr)
-      syncProductsFromPlan(planArr)
-      setOwnableEvents(Array.isArray(events) ? events : [])
-      setLoadingPlan(false)
-    })
-  }, [weekStart])
-
-  function navigateWeek(dir) {
-    const d = new Date(weekStart)
-    d.setDate(d.getDate() + dir * 7)
-    setWeekStart(d.toISOString().split('T')[0])
-    setChannelFilter('all')
-    setItemDates({})
-  }
-
-  // Events happening in next 35 days from weekStart (5-week lead time for gifting/planning)
-  const weekEnd = new Date(weekStart)
-  weekEnd.setDate(weekEnd.getDate() + 35)
-  const upcomingEvents = ownableEvents.filter(e => {
-    if (!e.date) return false
-    const d = new Date(e.date)
-    return d >= new Date(weekStart) && d <= weekEnd
-  })
-
-  async function generateContent() {
-    setGenerating(true)
-    setPlannerToast(null)
-    try {
-      const res = await fetch('/api/weekly-plan/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weekStart,
-          campaignIds: activeCampaigns.map(c => c.id),
-          volumes,
-          ownableEventIds: upcomingEvents.map(e => e.id),
-        }),
-      })
-      const data = await res.json()
-      if (data.ok) {
-        setPlanItems(data.items || [])
-        setChannelFilter('all')
-        setPlannerToast(`Generated ${data.count} content pieces`)
-        setTimeout(() => setPlannerToast(null), 3000)
-      } else {
-        setPlannerToast(`Error: ${data.error}`)
-        setTimeout(() => setPlannerToast(null), 5000)
-      }
-    } catch (err) {
-      setPlannerToast(`Error: ${err.message}`)
-      setTimeout(() => setPlannerToast(null), 5000)
-    } finally {
-      setGenerating(false)
-    }
-  }
-
-  async function generateMore() {
-    const total = extraVolumes.email + extraVolumes.instagram + extraVolumes.hero
-    if (total === 0) return
-    setGeneratingMore(true)
-    setPlannerToast(null)
-    try {
-      const res = await fetch('/api/weekly-plan/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weekStart,
-          campaignIds: activeCampaigns.map(c => c.id),
-          volumes: extraVolumes,
-          ownableEventIds: upcomingEvents.map(e => e.id),
-          mode: 'append',
-        }),
-      })
-      const data = await res.json()
-      if (data.ok) {
-        setPlanItems(prev => [...prev, ...(data.items || [])])
-        setExtraVolumes({ email: 0, instagram: 0, hero: 0 })
-        setShowGenerateMore(false)
-        setPlannerToast(`Added ${data.count} more content pieces`)
-        setTimeout(() => setPlannerToast(null), 3000)
-      } else {
-        setPlannerToast(`Error: ${data.error}`)
-        setTimeout(() => setPlannerToast(null), 5000)
-      }
-    } catch (err) {
-      setPlannerToast(`Error: ${err.message}`)
-      setTimeout(() => setPlannerToast(null), 5000)
-    } finally {
-      setGeneratingMore(false)
-    }
-  }
-
-  // Initialise itemProducts from planItems when plan loads
-  function syncProductsFromPlan(items) {
-    const init = {}
-    items.forEach(i => { if (i.products?.length) init[i.id] = i.products })
-    setItemProducts(init)
-  }
-
-  function toggleProduct(itemId, product) {
-    setItemProducts(prev => {
-      const current = prev[itemId] || []
-      const exists = current.find(p => p.handle === product.handle)
-      const updated = exists ? current.filter(p => p.handle !== product.handle) : [...current, product]
-      // Persist to server
-      fetch(`/api/weekly-plan/item/${itemId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weekStart, products: updated }),
-      })
-      return { ...prev, [itemId]: updated }
-    })
-  }
-
-  async function openEmailPreview(item) {
-    setEmailPreviewItem(item)
-    // Load product images keyed by handle
-    let products = []
-    if (browseProducts.length > 0) {
-      products = browseProducts
-    } else {
-      const d = await fetch('/api/shopify/products').then(r => r.json()).catch(() => ({ products: [] }))
-      products = d.products || []
-      setBrowseProducts(products)
-    }
-    const imgs = {}
-    products.forEach(p => { if (p.image) imgs[p.handle] = p.image })
-    setPreviewImages(prev => ({ ...prev, ...imgs }))
-  }
-
-  async function refreshStock(handles) {
-    if (!handles?.length) return
-    setCheckingStock(prev => Object.fromEntries(handles.map(h => [h, true])))
-    try {
-      const data = await fetch('/api/shopify/check-availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handles }),
-      }).then(r => r.json())
-      if (data.ok) setStockStatus(prev => ({ ...prev, ...data.results }))
-    } finally {
-      setCheckingStock(prev => {
-        const next = { ...prev }
-        handles.forEach(h => delete next[h])
-        return next
-      })
-    }
-  }
-
-  async function sendChat(item, message) {
-    if (!message.trim() || chatLoading[item.id]) return
-    const id = item.id
-    setChatLoading(prev => ({ ...prev, [id]: true }))
-    const history = chatHistory[id] || []
-    const userMsg = { role: 'user', content: message }
-    setChatHistory(prev => ({ ...prev, [id]: [...history, userMsg] }))
-    setChatInput(prev => ({ ...prev, [id]: '' }))
-    try {
-      const data = await fetch(`/api/weekly-plan/item/${id}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weekStart, message, history }),
-      }).then(r => r.json())
-      if (data.ok) {
-        const assistantMsg = { role: 'assistant', content: data.reply }
-        setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), assistantMsg] }))
-        // Instantly update the card from the response, then sync full state
-        if (data.updatedItem) {
-          setPlanItems(prev => prev.map(i => i.id === id ? data.updatedItem : i))
-          // Also update the preview modal if it's open for this item
-          setEmailPreviewItem(prev => prev?.id === id ? data.updatedItem : prev)
-        }
-        loadData()
-      } else {
-        const errMsg = { role: 'assistant', content: `Error: ${data.error || 'Something went wrong'}` }
-        setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), errMsg] }))
-      }
-    } catch (err) {
-      const errMsg = { role: 'assistant', content: `Error: ${err.message}` }
-      setChatHistory(prev => ({ ...prev, [id]: [...(prev[id] || []), errMsg] }))
-    } finally {
-      setChatLoading(prev => ({ ...prev, [id]: false }))
-    }
-  }
-
-  function toggleApprove(itemId) {
-    setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, approved: !i.approved } : i))
-    fetch('/api/weekly-plan/approve', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ weekStart, itemIds: [itemId] }),
-    })
-  }
-
-  async function skipItem(itemId) {
-    setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, skipped: true } : i))
-    await fetch('/api/weekly-plan/skip', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ weekStart, itemId }),
-    })
-  }
-
-  async function addItemToCalendar(itemId) {
-    setAddingToCalendar(prev => ({ ...prev, [itemId]: true }))
-    try {
-      const res = await fetch('/api/weekly-plan/add-to-calendar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weekStart,
-          itemIds: [itemId],
-          dates: itemDates,
-        }),
-      })
-      const data = await res.json()
-      if (data.ok) {
-        if (setCalItems) setCalItems(prev => [...prev, ...data.items])
-        setPlanItems(prev => prev.map(i => i.id === itemId ? { ...i, addedToCalendar: true } : i))
-        setPlannerToast('Added to calendar')
-        setTimeout(() => setPlannerToast(null), 3000)
-      }
-    } finally {
-      setAddingToCalendar(prev => ({ ...prev, [itemId]: false }))
-    }
-  }
-
-  const visibleItems = planItems.filter(i => {
-    if (i.skipped) return false
-    if (channelFilter === 'all') return true
-    return i.channel === channelFilter
-  })
-
-  const CHANNEL_COLORS = { email: '#6366f1', instagram: '#ec4899', hero: '#8b5cf6' }
-  const CHANNEL_ICONS = { email: '📧', instagram: '📱', hero: '🏠' }
-
-  return (
-    <>
-    <div>
-      {plannerToast && (
-        <div className="ak-toast" style={{ position: 'fixed', bottom: 24, right: 24, background: '#111827', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-          {plannerToast}
-        </div>
-      )}
-
-      {/* Sub-tab toggle */}
-      <div className="ak-sub-tabs" style={{
-        display: 'flex', gap: 0, flexWrap: 'nowrap',
-        background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`,
-        marginLeft: `calc(-1 * clamp(12px, 4vw, 40px))`,
-        marginRight: `calc(-1 * clamp(12px, 4vw, 40px))`,
-        paddingLeft: `clamp(12px, 4vw, 40px)`,
-        marginBottom: 24,
-      }}>
-        {[{ id: 'planner', label: '📅 Weekly Planner' }, { id: 'library', label: '⚡ Quick Create' }, { id: 'strategy', label: '🎯 Content Strategy' }].map(t => (
-          <button key={t.id} onClick={() => { setSubTab(t.id); if (t.id === 'strategy' && !strategy) loadStrategy() }}
-            style={{ padding: '11px 18px', border: 'none', borderBottom: subTab === t.id ? `2px solid ${T.accent}` : '2px solid transparent', background: 'none', color: subTab === t.id ? T.accent : T.textMuted, fontWeight: 600, fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ══════════ WEEKLY PLANNER ══════════ */}
-      {subTab === 'planner' && (
-        <div>
-          {/* Week navigator */}
-          <Card>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
-              <button onClick={() => navigateWeek(-1)}
-                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 16 }}>←</button>
-              <div style={{ flex: 1, textAlign: 'center' }}>
-                <div style={{ fontWeight: 800, fontSize: 18, color: T.text }}>{formatWeekRange(weekStart)}</div>
-                <div style={{ fontSize: 12, color: T.textMuted, marginTop: 2 }}>Week of {weekStart}</div>
-              </div>
-              <button onClick={() => navigateWeek(1)}
-                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 16 }}>→</button>
-            </div>
-
-            {/* Active campaigns */}
-            {activeCampaigns.length > 0 && (
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Campaigns</div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {activeCampaigns.map(camp => (
-                    <div key={camp.id} style={{ background: '#6366f110', border: '1px solid #6366f140', borderRadius: 8, padding: '5px 12px', fontSize: 12, color: '#4f46e5', fontWeight: 600 }}>
-                      {camp.name}
-                      {camp.arcWeek && <span style={{ fontWeight: 400, color: T.textSub, marginLeft: 6 }}>· Week {camp.weekNum}: {camp.arcWeek.theme}</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Upcoming ownable events */}
-            {upcomingEvents.length > 0 && (
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ownable Events (next 35 days)</div>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {upcomingEvents.map(e => (
-                    <div key={e.id} style={{ background: e.relevance === 'high' ? '#fef3c710' : T.stripeBg, border: `1px solid ${e.relevance === 'high' ? '#f59e0b60' : T.border}`, borderRadius: 8, padding: '5px 12px', fontSize: 12, color: e.relevance === 'high' ? '#92400e' : T.textSub, fontWeight: 600 }}>
-                      {e.relevance === 'high' ? '⭐' : '📌'} {e.name} · {e.date}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Volume controls */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Content Volumes</div>
-                <div style={{ fontSize: 11, color: T.textFaint }}>
-                  {activeCampaigns.length > 0 ? `· from "${activeCampaigns[0].name}" — adjust to override` : '· no active campaign'}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {[{ label: '📧 Emails', key: 'email' }, { label: '📱 Instagram', key: 'instagram' }, { label: '🏠 Hero', key: 'hero' }].map(f => (
-                  <div key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 8, background: T.stripeBg, borderRadius: 8, padding: '6px 12px' }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: T.textSub }}>{f.label}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <button onClick={() => setVolumes(v => ({ ...v, [f.key]: Math.max(0, v[f.key] - 1) }))}
-                        style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: T.text, minWidth: 24, textAlign: 'center' }}>{volumes[f.key] || 0}</span>
-                      <button onClick={() => setVolumes(v => ({ ...v, [f.key]: (v[f.key] || 0) + 1 }))}
-                        style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
-              <button onClick={generateContent} disabled={generating}
-                style={{ flex: 1, background: generating ? '#9ca3af' : '#6366f1', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 15, fontWeight: 700, cursor: generating ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}>
-                {generating ? '⏳ Generating… (30–60 sec)' : `✨ Generate for ${formatWeekRange(weekStart)}`}
-              </button>
-              {planItems.length > 0 && (
-                <button onClick={() => setShowGenerateMore(v => !v)} disabled={generating || generatingMore}
-                  style={{ background: showGenerateMore ? T.surfaceAlt : T.surface, color: '#6366f1', border: `1px solid #6366f1`, borderRadius: 10, padding: '12px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  + More
-                </button>
-              )}
-            </div>
-
-            {showGenerateMore && (
-              <div style={{ marginTop: 10, background: T.stripeBg, borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: T.textSub }}>Add pieces:</span>
-                {[['email', '📧'], ['instagram', '📱'], ['hero', '🏠']].map(([ch, icon]) => (
-                  <div key={ch} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 13, color: T.textSub }}>{icon}</span>
-                    <button onClick={() => setExtraVolumes(v => ({ ...v, [ch]: Math.max(0, v[ch] - 1) }))}
-                      style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14 }}>−</button>
-                    <span style={{ width: 20, textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.text }}>{extraVolumes[ch]}</span>
-                    <button onClick={() => setExtraVolumes(v => ({ ...v, [ch]: v[ch] + 1 }))}
-                      style={{ width: 24, height: 24, borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 14 }}>+</button>
-                  </div>
-                ))}
-                <button onClick={generateMore} disabled={generatingMore || (extraVolumes.email + extraVolumes.instagram + extraVolumes.hero === 0)}
-                  style={{ marginLeft: 'auto', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: generatingMore || (extraVolumes.email + extraVolumes.instagram + extraVolumes.hero === 0) ? 0.5 : 1 }}>
-                  {generatingMore ? '⏳ Adding…' : 'Add'}
-                </button>
-              </div>
-            )}
-          </Card>
-
-          {/* Generated items */}
-          {loadingPlan && (
-            <div style={{ textAlign: 'center', padding: 40, color: T.textMuted }}>Loading plan…</div>
-          )}
-
-          {!loadingPlan && planItems.length > 0 && (
-            <>
-              {/* Filter tabs + bulk action */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {['all', 'email', 'instagram', 'hero'].map(ch => {
-                    const count = ch === 'all' ? planItems.filter(i => !i.skipped).length : planItems.filter(i => i.channel === ch && !i.skipped).length
-                    return (
-                      <button key={ch} onClick={() => setChannelFilter(ch)}
-                        style={{ padding: '7px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13,
-                          background: channelFilter === ch ? (CHANNEL_COLORS[ch] || '#6366f1') : T.surfaceAlt,
-                          color: channelFilter === ch ? '#fff' : T.textSub }}>
-                        {CHANNEL_ICONS[ch] || '🗂'} {ch === 'all' ? 'All' : ch.charAt(0).toUpperCase() + ch.slice(1)} ({count})
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Suggestion cards */}
-              {visibleItems.map(item => {
-                const channelColor = CHANNEL_COLORS[item.channel] || '#6366f1'
-                const campaign = (campaigns || []).find(c => c.id === item.campaignId)
-                const event = ownableEvents.find(e => e.id === item.ownableEventId)
-                return (
-                  <div key={item.id} style={{ border: `1px solid ${item.approved ? '#059669' : T.border}`, borderRadius: 12, padding: '16px 18px', marginBottom: 14, background: item.approved ? (T.surface + '08') : T.surface, transition: 'border 0.2s, background 0.2s', position: 'relative' }}>
-                    {item.addedToCalendar && (
-                      <div style={{ position: 'absolute', top: 10, right: 14, fontSize: 12, fontWeight: 700, color: '#059669', background: '#f0fdf4', borderRadius: 20, padding: '2px 10px' }}>✓ On Calendar</div>
-                    )}
-                    {/* Header row */}
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
-                      <span style={{ background: channelColor, color: '#fff', borderRadius: 20, fontSize: 11, fontWeight: 700, padding: '3px 10px' }}>
-                        {CHANNEL_ICONS[item.channel]} {item.channel?.toUpperCase()}
-                      </span>
-                      {campaign && (
-                        <span style={{ background: '#6366f110', border: '1px solid #6366f130', borderRadius: 20, fontSize: 11, fontWeight: 600, padding: '3px 10px', color: '#4f46e5' }}>
-                          {campaign.name}{campaign.arcWeek ? ` · Week ${campaign.weekNum}: ${campaign.arcWeek.theme}` : ''}
-                        </span>
-                      )}
-                      {event && (
-                        <span style={{ background: '#fef3c7', border: '1px solid #f59e0b50', borderRadius: 20, fontSize: 11, fontWeight: 600, padding: '3px 10px', color: '#92400e' }}>
-                          ⭐ {event.name}
-                        </span>
-                      )}
-                      {item.targetPersona && (
-                        <span style={{ fontSize: 11, color: T.textMuted, marginLeft: 'auto' }}>{item.targetPersona}</span>
-                      )}
-                    </div>
-
-                    {/* Theme */}
-                    {item.theme && <div style={{ fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 10 }}>{item.theme}</div>}
-
-                    {/* Validation warning badge — only if auto-fix couldn't fully resolve issues */}
-                    {item.validationWarnings?.length > 0 && (
-                      <div style={{ background: '#FFF3CD', border: '1px solid #FFC107', borderRadius: 6, padding: '6px 12px', fontSize: 12, color: '#856404', marginBottom: 10, lineHeight: 1.5 }}>
-                        ⚠ Needs review: {item.validationWarnings.join(' · ')}
-                      </div>
-                    )}
-
-                    {/* Channel-specific content */}
-                    {item.channel === 'email' && item.email && (
-                      <div style={{ display: 'grid', gap: 8 }}>
-                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>SUBJECT LINE</div>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: T.text }}>"{item.email.subjectLine}"</div>
-                        </div>
-                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>PREVIEW TEXT</div>
-                          <div style={{ fontSize: 13, color: T.textSub }}>{item.email.previewText}</div>
-                        </div>
-                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>BODY OUTLINE</div>
-                          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{item.email.bodyOutline}</div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textSub, flexWrap: 'wrap' }}>
-                          <span>🎯 <strong>{item.email.cta}</strong></span>
-                          {item.email.sendDay && <span>📅 Send: <strong>{item.email.sendDay}</strong></span>}
-                        </div>
-                        {/* Component-story sections summary */}
-                        {item.template === 'component-story' && item.sections?.length > 0 && (
-                          <div style={{ background: T.bg, borderRadius: 8, padding: '8px 14px', fontSize: 12, color: T.textSub }}>
-                            <span style={{ fontWeight: 700, color: T.textMuted, fontSize: 11, marginRight: 8 }}>SECTIONS</span>
-                            {item.sections.map((s, si) => (
-                              <span key={si}>
-                                <strong>{s.label}</strong> ({(s.products || []).length})
-                                {si < item.sections.length - 1 && <span style={{ color: T.textMuted }}> · </span>}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {item.channel === 'instagram' && item.instagram && (
-                      <div style={{ display: 'grid', gap: 8 }}>
-                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>CAPTION</div>
-                          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.7 }}>{item.instagram.caption}</div>
-                        </div>
-                        {item.instagram.imageryDirection && (
-                          <div style={{ background: '#fdf2f8', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#9d174d', fontStyle: 'italic' }}>
-                            📸 {item.instagram.imageryDirection}
-                          </div>
-                        )}
-                        {item.instagram.productFeature && (
-                          <div style={{ fontSize: 13, color: T.textSub }}>🏷 Feature: <strong>{item.instagram.productFeature}</strong></div>
-                        )}
-                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                          {(item.instagram.hashtags || []).map((h, j) => <Badge key={j} color="purple">{h}</Badge>)}
-                        </div>
-                      </div>
-                    )}
-
-                    {item.channel === 'hero' && item.hero && (
-                      <div style={{ display: 'grid', gap: 8 }}>
-                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>HEADLINE</div>
-                          <div style={{ fontSize: 20, fontWeight: 800, color: T.text }}>"{item.hero.headline}"</div>
-                        </div>
-                        <div style={{ background: T.bg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>SUBHEAD</div>
-                          <div style={{ fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{item.hero.subhead}</div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 12, fontSize: 13, color: T.textSub, flexWrap: 'wrap' }}>
-                          <span>🎯 <strong>{item.hero.cta}</strong></span>
-                        </div>
-                        {item.hero.imageDirection && (
-                          <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#6d28d9', fontStyle: 'italic' }}>
-                            🖼 {item.hero.imageDirection}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Product selector — email only */}
-                    {item.channel === 'email' && (() => {
-                      const selected = itemProducts[item.id] || item.products || []
-                      const STOCK_DOT = { inStock: '🟢', lowStock: '🟡', outOfStock: '🔴', notFound: '⚫', error: '⚫' }
-                      return (
-                        <div style={{ marginTop: 12, background: T.stripeBg, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                              Featured Products {selected.length > 0 && <span style={{ background: '#6366f1', color: '#fff', borderRadius: 20, padding: '1px 7px', fontSize: 10, marginLeft: 4 }}>{selected.length}</span>}
-                            </div>
-                            {selected.length > 0 && (
-                              <button onClick={() => refreshStock(selected.map(p => p.handle))}
-                                style={{ fontSize: 11, background: 'none', border: 'none', cursor: 'pointer', color: T.textMuted, padding: '0 4px' }}
-                                title="Refresh stock status">
-                                {selected.some(p => checkingStock[p.handle]) ? '⏳' : '🔄'}
-                              </button>
-                            )}
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-                            {selected.map(p => {
-                              const s = stockStatus[p.handle]
-                              return (
-                                <div key={p.handle} style={{ display: 'flex', alignItems: 'center', gap: 4, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: '3px 10px', fontSize: 12, color: T.textSub }}>
-                                  {s ? STOCK_DOT[s.status] || '' : ''} {p.name} · ${p.price}
-                                  <button onClick={() => toggleProduct(item.id, p)}
-                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.textMuted, fontSize: 12, padding: '0 0 0 4px', lineHeight: 1 }}>✕</button>
-                                </div>
-                              )
-                            })}
-                          </div>
-                          {/* Inline search to swap/add a product */}
-                          <div style={{ marginTop: 6 }}>
-                            <input value={browseFilter} onChange={async e => {
-                              setBrowseFilter(e.target.value)
-                              if (browseProducts.length === 0 && e.target.value.length > 0) {
-                                const d = await fetch('/api/shopify/products').then(r => r.json()).catch(() => ({ products: [] }))
-                                setBrowseProducts(d.products || [])
-                              }
-                            }}
-                              placeholder="+ Swap or add a product…"
-                              style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', fontSize: 12, background: T.inputBg, color: T.text, boxSizing: 'border-box' }} />
-                            {browseFilter.length > 1 && (
-                              <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, marginTop: 4, maxHeight: 160, overflowY: 'auto' }}>
-                                {browseProducts
-                                  .filter(p => p.name.toLowerCase().includes(browseFilter.toLowerCase()) || p.productType?.toLowerCase().includes(browseFilter.toLowerCase()) || p.tags?.some(t => t.toLowerCase().includes(browseFilter.toLowerCase())))
-                                  .slice(0, 8)
-                                  .map(p => {
-                                    const isSel = (itemProducts[item.id] || item.products || []).find(s => s.handle === p.handle)
-                                    return (
-                                      <div key={p.handle} onClick={() => { toggleProduct(item.id, { handle: p.handle, name: p.name, price: p.price }); setBrowseFilter('') }}
-                                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', cursor: 'pointer', borderBottom: `1px solid ${T.border}`, background: isSel ? '#6366f108' : 'none' }}>
-                                        <span style={{ fontSize: 12, color: T.text }}>{isSel ? '✓ ' : ''}{p.name}</span>
-                                        <span style={{ fontSize: 11, color: T.textMuted }}>${p.price} · {p.availableQty} in stock</span>
-                                      </div>
-                                    )
-                                  })}
-                                {browseProducts.filter(p => p.name.toLowerCase().includes(browseFilter.toLowerCase()) || p.productType?.toLowerCase().includes(browseFilter.toLowerCase())).length === 0 && (
-                                  <div style={{ fontSize: 12, color: T.textMuted, padding: '8px 10px' }}>No matches</div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })()}
-
-                    {/* Per-card chat panel */}
-                    {chatOpen[item.id] && (
-                      <div style={{ marginTop: 12, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden', background: T.surface }}>
-                        <div style={{ padding: '10px 14px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: T.textSub, letterSpacing: '0.06em' }}>REFINE WITH CLAUDE</span>
-                          <button onClick={() => setChatOpen(prev => ({ ...prev, [item.id]: false }))}
-                            style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
-                        </div>
-                        {/* Chat history */}
-                        {(chatHistory[item.id] || []).length > 0 && (
-                          <div style={{ padding: '10px 14px', maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            {(chatHistory[item.id] || []).map((msg, i) => (
-                              <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                                <div style={{
-                                  maxWidth: '80%', padding: '7px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
-                                  background: msg.role === 'user' ? '#1f2937' : T.bg,
-                                  color: msg.role === 'user' ? '#fff' : T.text,
-                                  border: msg.role === 'assistant' ? `1px solid ${T.border}` : 'none',
-                                }}>
-                                  {msg.content}
-                                </div>
-                              </div>
-                            ))}
-                            {chatLoading[item.id] && (
-                              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                <div style={{ padding: '7px 12px', borderRadius: 10, fontSize: 13, background: T.bg, border: `1px solid ${T.border}`, color: T.textMuted }}>
-                                  Claude is revising…
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {/* Input row */}
-                        <div style={{ padding: '10px 14px', borderTop: (chatHistory[item.id] || []).length > 0 ? `1px solid ${T.border}` : 'none', display: 'flex', gap: 8 }}>
-                          <input
-                            placeholder="e.g. Replace the white blazer with a black one, or find a heel instead of a flat…"
-                            value={chatInput[item.id] || ''}
-                            onChange={e => setChatInput(prev => ({ ...prev, [item.id]: e.target.value }))}
-                            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(item, chatInput[item.id] || '') } }}
-                            disabled={chatLoading[item.id]}
-                            style={{ flex: 1, border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '7px 12px', fontSize: 13, background: T.inputBg, color: T.text, outline: 'none' }}
-                          />
-                          <button
-                            onClick={() => sendChat(item, chatInput[item.id] || '')}
-                            disabled={chatLoading[item.id] || !(chatInput[item.id] || '').trim()}
-                            style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: '#1f2937', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: chatLoading[item.id] || !(chatInput[item.id] || '').trim() ? 0.5 : 1 }}>
-                            →
-                          </button>
-                        </div>
-                        <div style={{ padding: '4px 14px 8px', fontSize: 11, color: T.textFaint }}>Changes are saved automatically · Feedback improves future content</div>
-                      </div>
-                    )}
-
-                    {/* Actions row */}
-                    {!item.addedToCalendar && (
-                      <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
-                        <button
-                          onClick={() => setChatOpen(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
-                          style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${chatOpen[item.id] ? '#6366f1' : T.border}`, background: chatOpen[item.id] ? '#eef2ff' : T.surface, color: chatOpen[item.id] ? '#6366f1' : T.textSub, fontSize: 13, cursor: 'pointer' }}>
-                          💬 Chat
-                        </button>
-                        {item.channel === 'email' && item.email && (
-                          <button onClick={() => openEmailPreview(item)}
-                            style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-                            ✉ Preview Email
-                          </button>
-                        )}
-                        <button onClick={() => toggleApprove(item.id)}
-                          style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${item.approved ? '#059669' : T.border}`, background: item.approved ? '#059669' : T.surface, color: item.approved ? '#fff' : T.textSub, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}>
-                          {item.approved ? '✓ Approved' : '✓ Approve'}
-                        </button>
-                        {!item.approved && (
-                          <button onClick={() => skipItem(item.id)}
-                            style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.textMuted, fontSize: 13, cursor: 'pointer' }}>
-                            ✕ Skip
-                          </button>
-                        )}
-                        {item.approved && (
-                          <>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <span style={{ fontSize: 12, color: T.textMuted }}>Send date:</span>
-                              <input type="date" value={itemDates[item.id] || ''} placeholder={weekStart}
-                                onChange={e => setItemDates(prev => ({ ...prev, [item.id]: e.target.value }))}
-                                style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 12, background: T.inputBg, color: T.text }} />
-                            </div>
-                            <button onClick={() => addItemToCalendar(item.id)} disabled={!!addingToCalendar[item.id]}
-                              style={{ marginLeft: 'auto', padding: '7px 16px', borderRadius: 8, border: 'none', background: '#059669', color: '#fff', fontSize: 13, fontWeight: 700, cursor: addingToCalendar[item.id] ? 'not-allowed' : 'pointer', opacity: addingToCalendar[item.id] ? 0.7 : 1 }}>
-                              {addingToCalendar[item.id] ? 'Adding…' : '📅 Add to Calendar'}
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-
-              {visibleItems.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '30px 20px', color: T.textFaint }}>
-                  No {channelFilter === 'all' ? '' : channelFilter + ' '}items to show
-                </div>
-              )}
-            </>
-          )}
-
-          {!loadingPlan && planItems.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: T.textFaint }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>✨</div>
-              <div style={{ fontWeight: 600, fontSize: 16, color: T.textMuted, marginBottom: 6 }}>No content generated yet for this week</div>
-              <div style={{ fontSize: 13 }}>Set your volumes and click Generate to create AI-powered content suggestions.</div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ══════════ QUICK CREATE ══════════ */}
-      {subTab === 'library' && (
-        <div>
-          <div style={{ background: T.stripeBg, borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: T.textMuted, lineHeight: 1.6 }}>
-            Use <strong style={{ color: T.textSub }}>Quick Create</strong> for one-off pieces outside your campaign plan — a flash sale email, an urgent IG post, or content for a week with no active campaign.
-          </div>
-          <ContentGeneratorPanel />
-        </div>
-      )}
-
-      {/* ══════════ CONTENT STRATEGY ══════════ */}
-      {subTab === 'strategy' && (
-        <div>
-          {strategyToast && (
-            <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-              {strategyToast}
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>Content Strategy</div>
-              <div style={{ fontSize: 13, color: T.textMuted }}>These rules are injected into every content generation. Claude honors this mix when selecting email types, Instagram angles, and product focus.</div>
-            </div>
-            <button onClick={saveStrategy} disabled={strategySaving || !strategy}
-              style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: strategySaving ? 0.6 : 1 }}>
-              {strategySaving ? 'Saving…' : 'Save Strategy'}
-            </button>
-          </div>
-
-          {strategyLoading && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Loading strategy…</div>}
-          {!strategyLoading && !strategy && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Could not load strategy. <button onClick={loadStrategy} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: 14, textDecoration: 'underline' }}>Retry</button></div>}
-
-          {strategy && (<>
-            {/* Email Monthly Mix */}
-            <Card title="Email Monthly Mix" accent="#6366f1">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>{strategy.monthlyEmailMix?.description}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {(strategy.monthlyEmailMix?.slots || []).map((slot, i) => (
-                  <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '14px 16px' }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
-                      <input value={slot.label} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].label = e.target.value; return s; })}
-                        style={{ flex: 1, fontWeight: 700, fontSize: 14, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', background: T.inputBg, color: T.text }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                        <span style={{ fontSize: 12, color: T.textMuted }}>per month:</span>
-                        <input type="number" min="0" max="10" value={slot.perMonth} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].perMonth = parseInt(e.target.value) || 0; return s; })}
-                          style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 6 }}>Templates: <strong style={{ color: T.textSub }}>{slot.templates?.join(', ')}</strong></div>
-                    <textarea value={slot.description} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].description = e.target.value; return s; })}
-                      rows={3} style={{ width: '100%', fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box' }} />
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Instagram Weekly Mix */}
-            <Card title="Instagram Weekly Mix" accent="#ec4899">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>{strategy.instagramWeeklyMix?.description}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {(strategy.instagramWeeklyMix?.slots || []).map((slot, i) => (
-                  <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
-                      <input value={slot.label} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].label = e.target.value; return s; })}
-                        style={{ flex: 1, fontWeight: 700, fontSize: 14, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', background: T.inputBg, color: T.text }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                        <span style={{ fontSize: 12, color: T.textMuted }}>per week:</span>
-                        <input type="number" min="0" max="10" value={slot.perWeek} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].perWeek = parseInt(e.target.value) || 0; return s; })}
-                          style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                      </div>
-                    </div>
-                    <textarea value={slot.description} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].description = e.target.value; return s; })}
-                      rows={2} style={{ width: '100%', fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box' }} />
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Category Rotation */}
-            <Card title="Category Spotlight Rotation" accent="#f59e0b">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 12 }}>{strategy.categoryRotation?.rationale}</div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>Spotlight every</span>
-                <input type="number" min="1" max="26" value={strategy.categoryRotation?.frequencyWeeks || 6}
-                  onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.frequencyWeeks = parseInt(e.target.value) || 6; return s; })}
-                  style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>weeks · Rotation order:</span>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {(strategy.categoryRotation?.categories || []).map((cat, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, background: T.stripeBg, borderRadius: 20, padding: '4px 10px 4px 14px' }}>
-                    <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600, marginRight: 2 }}>{i + 1}.</span>
-                    <input value={cat} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories[i] = e.target.value; return s; })}
-                      style={{ width: 90, fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 4, padding: '3px 8px', background: T.inputBg, color: T.text }} />
-                    <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories.splice(i, 1); return s; })}
-                      style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 2 }}>×</button>
-                  </div>
-                ))}
-                <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories.push(''); return s; })}
-                  style={{ padding: '4px 14px', borderRadius: 20, border: `1px dashed ${T.border}`, background: 'none', color: T.textMuted, fontSize: 13, cursor: 'pointer' }}>+ Add</button>
-              </div>
-            </Card>
-
-            {/* Persona Rotation */}
-            <Card title="Persona Rotation" accent="#8b5cf6">
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>Each persona as primary target at least once every</span>
-                <input type="number" min="1" max="12" value={strategy.personaRotation?.rotationWeeks || 4}
-                  onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.personaRotation.rotationWeeks = parseInt(e.target.value) || 4; return s; })}
-                  style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>weeks</span>
-              </div>
-              {(strategy.personaRotation?.personas || []).map((p, i) => (
-                <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '12px 14px', marginBottom: 8 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: T.text, marginBottom: 6 }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>Focus: {p.topTopics?.join(', ')}</div>
-                  <div style={{ fontSize: 12, color: T.textMuted }}>Avoid: {p.avoidTopics?.join(', ')}</div>
-                </div>
-              ))}
-            </Card>
-
-            {/* Global Rules */}
-            <Card title="Global Content Rules" accent="#374151">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>Applied to every piece of generated content across all channels.</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {(strategy.globalRules || []).map((rule, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 14, color: T.textMuted, marginTop: 8, flexShrink: 0 }}>—</span>
-                    <textarea value={rule} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules[i] = e.target.value; return s; })}
-                      rows={2} style={{ flex: 1, fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical' }} />
-                    <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules.splice(i, 1); return s; })}
-                      style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 16, marginTop: 6, flexShrink: 0 }}>×</button>
-                  </div>
-                ))}
-                <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules.push(''); return s; })}
-                  style={{ alignSelf: 'flex-start', padding: '7px 16px', borderRadius: 8, border: `1px dashed ${T.border}`, background: 'none', color: T.textMuted, fontSize: 13, cursor: 'pointer', marginTop: 4 }}>+ Add Rule</button>
-              </div>
-            </Card>
-
-            <div style={{ textAlign: 'right', marginTop: 8, marginBottom: 24 }}>
-              <button onClick={saveStrategy} disabled={strategySaving}
-                style={{ padding: '10px 24px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: strategySaving ? 0.6 : 1 }}>
-                {strategySaving ? 'Saving…' : 'Save Strategy'}
-              </button>
-            </div>
-          </>)}
-        </div>
-      )}
-    </div>
-
-    {/* Email Preview Modal — AK-style email mockup */}
-    {emailPreviewItem && (() => {
-      const item = emailPreviewItem
-      const em = item.email || {}
-      const looks = item.looks || []
-      const flatProducts = itemProducts[item.id] || item.products || []
-      const campaign = campaigns.find(c => c.id === item.campaignId)
-      const colorDir = campaign?.styleGuide?.colorDirection || 'Navy, blush, bone white'
-      const heroBg = '#111827'
-
-      // Template switcher state lives inside the IIFE via a ref-like hack —
-      // we use the item's template as the default and store selection in a dataset attr
-      const TEMPLATES = [
-        { id: 'multi-look',      label: 'Multi-Look' },
-        { id: 'story-led',       label: 'Story-Led' },
-        { id: 'category-focus',  label: 'Category Focus' },
-        { id: 'single-hero',     label: 'Single Hero' },
-        { id: 'component-story', label: 'Component Story' },
-      ]
-
-      // Use item.template as default; user can switch via state stored on the modal container
-      // We track template selection in a sibling state on the modal via data-template attr
-      // Simple approach: use a query selector on mount — instead we store in a separate state
-      // Actually we already have emailPreviewItem state — we'll just add a template field to it
-
-      const activeTemplate = emailPreviewItem._previewTemplate || item.template || 'multi-look'
-
-      function switchTemplate(t) {
-        setEmailPreviewItem(prev => ({ ...prev, _previewTemplate: t }))
-      }
-
-      // Helper: render a single product card
-      function ProductCard({ p }) {
-        // Use image embedded in product (new), fall back to handle lookup, then name-prefix match
-        let img = p.image || previewImages[p.handle]
-        if (!img && browseProducts.length > 0) {
-          const genName = (p.name || '').toLowerCase()
-          // Claude often appends color suffix (e.g. "- Crisp White") to the catalog product name.
-          // Find a catalog product whose name (first 28 chars) is contained anywhere in the generated name.
-          const match = browseProducts.find(bp => {
-            if (!bp.image) return false
-            const catName = (bp.name || '').toLowerCase()
-            return catName.length > 10 && genName.includes(catName.substring(0, Math.min(catName.length, 28)))
-          })
-          if (match) img = match.image
-        }
-        return (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ background: '#f5f5f5', aspectRatio: '3/4', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 2 }}>
-              {img
-                ? <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <div style={{ color: '#bbb', fontSize: 11, padding: 8, textAlign: 'center' }}>{p.name}</div>
-              }
-            </div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#111', marginBottom: 2, lineHeight: 1.3 }}>{p.name}</div>
-            <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>${p.price}</div>
-            <div style={{ display: 'inline-block', border: '1px solid #111', color: '#111', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', padding: '6px 14px' }}>SHOP NOW</div>
-          </div>
-        )
-      }
-
-      // Render template-specific body content
-      function TemplateBody() {
-        if (activeTemplate === 'multi-look') {
-          // 3-4 named looks, each with products
-          const displayLooks = looks.length > 0 ? looks : (flatProducts.length > 0 ? [{ name: 'Featured Look', angle: '', products: flatProducts }] : [])
-          return (
-            <div>
-              {displayLooks.map((look, li) => (
-                <div key={li} style={{ borderTop: li > 0 ? '1px solid #f0f0f0' : 'none' }}>
-                  <div style={{ padding: '24px 28px 8px' }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#111', letterSpacing: '0.04em', marginBottom: 4 }}>{look.name}</div>
-                    {look.angle && <div style={{ fontSize: 12, color: '#777', marginBottom: 16, fontStyle: 'italic' }}>{look.angle}</div>}
-                  </div>
-                  {(look.products || []).length > 0 && (
-                    <div style={{ padding: '0 28px 24px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(look.products.length, 3)}, 1fr)`, gap: 12 }}>
-                      {(look.products || []).map(p => <ProductCard key={p.handle} p={p} />)}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )
-        }
-
-        if (activeTemplate === 'story-led') {
-          const heroLook = looks[0] || null
-          const restProducts = looks.slice(1).flatMap(l => l.products || [])
-          return (
-            <div>
-              {heroLook && (
-                <div style={{ padding: '28px 28px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: '#111', letterSpacing: '0.04em', marginBottom: 4 }}>{heroLook.name}</div>
-                  {heroLook.angle && <div style={{ fontSize: 13, color: '#555', marginBottom: 20, fontStyle: 'italic', lineHeight: 1.5 }}>{heroLook.angle}</div>}
-                  {(heroLook.products || []).length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(heroLook.products.length, 3)}, 1fr)`, gap: 14, marginBottom: 24 }}>
-                      {(heroLook.products || []).map(p => <ProductCard key={p.handle} p={p} />)}
-                    </div>
-                  )}
-                </div>
-              )}
-              {restProducts.length > 0 && (
-                <div style={{ borderTop: '1px solid #f0f0f0', padding: '20px 28px 24px' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 16, textAlign: 'center' }}>STYLED WITH</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(restProducts.length, 4)}, 1fr)`, gap: 12 }}>
-                    {restProducts.map(p => <ProductCard key={p.handle} p={p} />)}
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        }
-
-        if (activeTemplate === 'category-focus') {
-          const allP = flatProducts.length > 0 ? flatProducts : looks.flatMap(l => l.products || [])
-          return (
-            <div style={{ padding: '24px 28px' }}>
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 6 }}>THE COLLECTION</div>
-                <div style={{ width: 40, height: 2, background: '#000', margin: '0 auto' }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-                {allP.map(p => <ProductCard key={p.handle} p={p} />)}
-              </div>
-            </div>
-          )
-        }
-
-        if (activeTemplate === 'single-hero') {
-          const heroP = flatProducts[0] || (looks[0]?.products || [])[0] || null
-          const supporting = flatProducts.slice(1).length > 0 ? flatProducts.slice(1) : looks.flatMap(l => l.products || []).slice(1)
-          return (
-            <div>
-              {heroP && (
-                <div style={{ padding: '28px 28px 0', textAlign: 'center' }}>
-                  <div style={{ maxWidth: 240, margin: '0 auto 20px' }}>
-                    <ProductCard p={heroP} />
-                  </div>
-                </div>
-              )}
-              {supporting.length > 0 && (
-                <div style={{ borderTop: '1px solid #f0f0f0', padding: '20px 28px 24px' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 16, textAlign: 'center' }}>COMPLETE THE LOOK</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(supporting.length, 3)}, 1fr)`, gap: 12 }}>
-                    {supporting.slice(0, 3).map(p => <ProductCard key={p.handle} p={p} />)}
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        }
-
-        if (activeTemplate === 'component-story') {
-          const displaySections = item.sections || []
-          return (
-            <div>
-              {displaySections.map((section, si) => (
-                <div key={si} style={{ borderTop: si > 0 ? '1px solid #f0f0f0' : 'none' }}>
-                  <div style={{ padding: '24px 28px 8px' }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#111', letterSpacing: '0.04em', marginBottom: 4 }}>{section.label}</div>
-                    {section.angle && <div style={{ fontSize: 12, color: '#777', marginBottom: 16, fontStyle: 'italic' }}>{section.angle}</div>}
-                  </div>
-                  {(section.products || []).length > 0 && (
-                    <div style={{ padding: '0 28px 24px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(section.products.length, 3)}, 1fr)`, gap: 12 }}>
-                      {(section.products || []).map(p => <ProductCard key={p.handle} p={p} />)}
-                    </div>
-                  )}
-                </div>
-              ))}
-              {displaySections.length === 0 && (
-                <div style={{ padding: '40px 28px', textAlign: 'center', color: '#bbb', fontSize: 13 }}>No sections — regenerate this email as component-story</div>
-              )}
-            </div>
-          )
-        }
-
-        return null
-      }
-
-      return (
-        <div onClick={() => setEmailPreviewItem(null)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '24px 16px' }}>
-          <div onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: 640, background: '#f4f4f4', borderRadius: 12, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)', marginBottom: 24 }}>
-
-            {/* Preview chrome — email client header */}
-            <div style={{ background: '#1f2937', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>EMAIL PREVIEW</div>
-                <div style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>{em.subjectLine}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{em.previewText}</div>
-              </div>
-              <button onClick={() => setEmailPreviewItem(null)}
-                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontSize: 13 }}>✕ Close</button>
-            </div>
-
-            {/* Template switcher */}
-            <div style={{ background: '#f0f0f0', padding: '10px 20px', display: 'flex', gap: 6, alignItems: 'center', borderBottom: '1px solid #e0e0e0', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 11, color: '#888', marginRight: 4, fontWeight: 600 }}>LAYOUT:</span>
-              {TEMPLATES.map(t => (
-                <button key={t.id} onClick={() => switchTemplate(t.id)}
-                  style={{ padding: '5px 12px', borderRadius: 20, border: `1px solid ${activeTemplate === t.id ? '#1f2937' : '#ccc'}`, background: activeTemplate === t.id ? '#1f2937' : '#fff', color: activeTemplate === t.id ? '#fff' : '#555', fontSize: 12, fontWeight: activeTemplate === t.id ? 700 : 400, cursor: 'pointer' }}>
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Email body */}
-            <div style={{ background: '#fff', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-
-              {/* AK nav header */}
-              <div style={{ background: '#000', padding: '14px 20px', textAlign: 'center' }}>
-                <div style={{ color: '#fff', fontWeight: 900, fontSize: 20, letterSpacing: '0.15em' }}>ANNE KLEIN</div>
-              </div>
-              <div style={{ background: '#f9f9f9', borderBottom: '1px solid #e5e5e5', padding: '10px 20px', textAlign: 'center' }}>
-                {['NEW', 'BEST SELLERS', 'CLOTHING', 'SHOES', 'WATCHES'].map((nav, i) => (
-                  <span key={nav}>
-                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: '#333' }}>{nav}</span>
-                    {i < 4 && <span style={{ color: '#ccc', margin: '0 8px' }}>|</span>}
-                  </span>
-                ))}
-              </div>
-
-              {/* Hero section */}
-              <div style={{ background: heroBg, padding: '40px 32px', textAlign: 'center' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)', marginBottom: 10, textTransform: 'uppercase' }}>
-                  {campaign?.name || 'Spring 2026'}
-                </div>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.5px' }}>
-                  {em.subjectLine?.replace(/[✨💫🌸]/g, '').trim()}
-                </div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: 440, margin: '0 auto 22px' }}>
-                  {em.previewText}
-                </div>
-                <div style={{ display: 'inline-block', background: '#fff', color: '#000', fontWeight: 800, fontSize: 12, letterSpacing: '0.1em', padding: '11px 28px' }}>
-                  {em.cta || 'SHOP NOW'}
-                </div>
-              </div>
-
-              {/* Color direction tag */}
-              <div style={{ background: '#f9f9f9', padding: '7px 20px', textAlign: 'center', borderBottom: '1px solid #eee' }}>
-                <span style={{ fontSize: 11, color: '#999', fontStyle: 'italic' }}>Color direction: {colorDir}</span>
-              </div>
-
-              {/* Template-driven body */}
-              <TemplateBody />
-
-              {/* Body outline */}
-              {em.bodyOutline && (
-                <div style={{ padding: '0 28px 28px', borderTop: '1px solid #f0f0f0' }}>
-                  <div style={{ height: 20 }} />
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#999', marginBottom: 12, textAlign: 'center' }}>EMAIL STRUCTURE</div>
-                  <div style={{ background: '#fafafa', borderRadius: 4, padding: '14px 18px', border: '1px solid #eee' }}>
-                    {em.bodyOutline.split(/\n|•/).filter(s => s.trim()).map((section, i, arr) => (
-                      <div key={i} style={{ display: 'flex', gap: 10, marginBottom: i < arr.length - 1 ? 8 : 0 }}>
-                        <span style={{ color: '#000', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>—</span>
-                        <span style={{ fontSize: 13, color: '#444', lineHeight: 1.5 }}>{section.trim()}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Primary CTA */}
-              <div style={{ padding: '20px 28px 36px', textAlign: 'center' }}>
-                <div style={{ background: '#000', color: '#fff', fontWeight: 800, fontSize: 13, letterSpacing: '0.12em', padding: '14px 48px', width: '100%', boxSizing: 'border-box' }}>
-                  {em.cta || 'SHOP NOW'}
-                </div>
-                {em.sendDay && <div style={{ fontSize: 11, color: '#999', marginTop: 8 }}>Recommended send day: {em.sendDay}</div>}
-              </div>
-
-              {/* Footer */}
-              <div style={{ background: '#f9f9f9', borderTop: '1px solid #e5e5e5', padding: '18px', textAlign: 'center' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', color: '#333', marginBottom: 8 }}>ANNE KLEIN</div>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 10 }}>
-                  {['f', 'in', 'ig'].map(s => (
-                    <div key={s} style={{ width: 26, height: 26, borderRadius: '50%', background: '#ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#666', fontWeight: 700 }}>{s}</div>
-                  ))}
-                </div>
-                <div style={{ fontSize: 10, color: '#aaa', lineHeight: 1.6 }}>
-                  530 Fifth Avenue, 12th Floor, New York, NY 10036<br />
-                  customercare@anneklein.com · 1-844-390-AKNY<br />
-                  <span style={{ textDecoration: 'underline' }}>Unsubscribe</span> · <span style={{ textDecoration: 'underline' }}>View in browser</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    })()}
-    </>
-  )
-}
-
-function PriceTab({ priceIntel }) {
-  const T = useT()
-  if (!priceIntel?.akProductsTracked) return (
-    <div style={{ padding: 40, textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>💰</div>
-      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>Price Intelligence Not Run Yet</div>
-      <div style={{ color: T.textMuted, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
-        Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run price:track</code> to start monitoring AK sale events and competitor promotions.
-      </div>
-    </div>
-  )
-
-  const { akSaleRate, akAvgSaleDepth, akProductsTracked, akOnSaleCount,
-          categorySaleRates, changes, competitorPromos, saleRateHistory } = priceIntel
-  const saleColor = akSaleRate > 30 ? '#ef4444' : akSaleRate > 15 ? '#f59e0b' : '#10b981'
-
-  return (
-    <div>
-      <SectionHeader>AK Sale Activity</SectionHeader>
-      <div className="ak-pricing-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-        <Stat label="Products on Sale" value={`${akSaleRate}%`} sub={`${akOnSaleCount} of ${akProductsTracked}`} color={saleColor} />
-        <Stat label="Avg Discount" value={`${akAvgSaleDepth}%`} sub="when on sale" color="#f59e0b" />
-        <Stat label="New Sales Today" value={changes?.newSaleItems?.length ?? '—'} sub="just went on sale" color="#ef4444" />
-        <Stat label="Ended Sales" value={changes?.endedSaleItems?.length ?? '—'} sub="came off sale" color="#6b7280" />
-      </div>
-
-      {/* Sale rate trend */}
-      {saleRateHistory?.length > 1 && (
-        <>
-          <SectionHeader>Sale Rate Over Time</SectionHeader>
-          <Card subtitle="% of AK products on sale each day tracked">
-            {saleRateHistory.slice(-14).map((h, i) => (
-              <div key={i} style={{ marginBottom: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                  <span style={{ fontSize: 12, color: T.textMuted }}>{h.date}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: h.rate > 30 ? '#ef4444' : h.rate > 15 ? '#f59e0b' : '#10b981' }}>{h.rate}%</span>
-                </div>
-                <div style={{ background: T.surfaceAlt, borderRadius: 4, height: 6, overflow: 'hidden' }}>
-                  <div style={{ background: h.rate > 30 ? '#ef4444' : h.rate > 15 ? '#f59e0b' : '#10b981', height: '100%', width: `${Math.min(h.rate, 100)}%`, borderRadius: 4 }} />
-                </div>
-              </div>
-            ))}
-          </Card>
-        </>
-      )}
-
-      {/* Category sale breakdown */}
-      {categorySaleRates?.length > 0 && (
-        <>
-          <SectionHeader>Sale Rate by Category</SectionHeader>
-          <Card>
-            {categorySaleRates.map((c, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                <div>
-                  <span style={{ fontWeight: 600, fontSize: 14, textTransform: 'capitalize', color: T.text }}>{c.category.replace(/-/g, ' ')}</span>
-                  <span style={{ fontSize: 12, color: T.textFaint, marginLeft: 8 }}>{c.onSale}/{c.total} items</span>
-                </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {c.avgDepth > 0 && <span style={{ fontSize: 12, color: T.textMuted }}>avg {c.avgDepth}% off</span>}
-                  <Badge color={c.rate > 30 ? 'red' : c.rate > 10 ? 'yellow' : 'green'}>{c.rate}% on sale</Badge>
-                </div>
-              </div>
-            ))}
-          </Card>
-        </>
-      )}
-
-      {/* Price changes */}
-      {(changes?.newSaleItems?.length > 0 || changes?.endedSaleItems?.length > 0 || changes?.priceChanges?.length > 0) && (
-        <>
-          <SectionHeader>Price Changes Since Last Run</SectionHeader>
-          {changes.newSaleItems?.length > 0 && (
-            <Card title={`${changes.newSaleItems.length} Items Just Went On Sale`} accent="#ef4444">
-              {changes.newSaleItems.slice(0, 10).map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                  <span style={{ fontSize: 13, color: T.textSub, flex: 1 }}>{p.title}</span>
-                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, textDecoration: 'line-through', color: T.textFaint }}>${p.compareAtPrice}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>${p.price}</span>
-                    <Badge color="red">{p.saleDepth}% off</Badge>
-                  </div>
-                </div>
-              ))}
-              {changes.newSaleItems.length > 10 && <div style={{ fontSize: 12, color: T.textFaint, marginTop: 8 }}>+{changes.newSaleItems.length - 10} more</div>}
-            </Card>
-          )}
-          {changes.endedSaleItems?.length > 0 && (
-            <Card title={`${changes.endedSaleItems.length} Items Came Off Sale`} accent="#6b7280">
-              {changes.endedSaleItems.slice(0, 8).map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                  <span style={{ fontSize: 13, color: T.textSub }}>{p.title}</span>
-                  <span style={{ fontSize: 13, color: T.textMuted }}>back to ${p.price}</span>
-                </div>
-              ))}
-            </Card>
-          )}
-          {changes.priceChanges?.length > 0 && (
-            <Card title={`${changes.priceChanges.length} Price Changes`} accent="#f59e0b">
-              {changes.priceChanges.slice(0, 8).map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                  <span style={{ fontSize: 13, color: T.textSub }}>{p.title}</span>
-                  <span style={{ fontSize: 13, color: p.delta < 0 ? '#10b981' : '#ef4444' }}>
-                    ${p.prevPrice} → ${p.price} ({p.delta > 0 ? '+' : ''}{p.delta})
-                  </span>
-                </div>
-              ))}
-            </Card>
-          )}
-          {changes.note && <div style={{ fontSize: 13, color: T.textFaint, marginBottom: 16, fontStyle: 'italic' }}>{changes.note}</div>}
-        </>
-      )}
-
-      {false && (
-        <div>
-          {strategyToast && (
-            <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#059669', color: '#fff', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-              {strategyToast}
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 4 }}>Content Strategy</div>
-              <div style={{ fontSize: 13, color: T.textMuted }}>These rules are injected into every content generation. Claude honors this mix when selecting email types, Instagram angles, and product focus.</div>
-            </div>
-            <button onClick={saveStrategy} disabled={strategySaving || !strategy}
-              style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: strategySaving ? 0.6 : 1 }}>
-              {strategySaving ? 'Saving…' : 'Save Strategy'}
-            </button>
-          </div>
-
-          {strategyLoading && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Loading strategy…</div>}
-          {!strategyLoading && !strategy && <div style={{ color: T.textMuted, padding: 40, textAlign: 'center' }}>Could not load strategy. <button onClick={loadStrategy} style={{ background: 'none', border: 'none', color: T.accent, cursor: 'pointer', fontSize: 14, textDecoration: 'underline' }}>Retry</button></div>}
-
-          {strategy && (<>
-            {/* Email Monthly Mix */}
-            <Card title="Email Monthly Mix" accent="#6366f1">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>{strategy.monthlyEmailMix?.description}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {(strategy.monthlyEmailMix?.slots || []).map((slot, i) => (
-                  <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '14px 16px' }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
-                      <input value={slot.label} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].label = e.target.value; return s; })}
-                        style={{ flex: 1, fontWeight: 700, fontSize: 14, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', background: T.inputBg, color: T.text }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                        <span style={{ fontSize: 12, color: T.textMuted }}>per month:</span>
-                        <input type="number" min="0" max="10" value={slot.perMonth} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].perMonth = parseInt(e.target.value) || 0; return s; })}
-                          style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 6 }}>Templates: <strong style={{ color: T.textSub }}>{slot.templates?.join(', ')}</strong></div>
-                    <textarea value={slot.description} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.monthlyEmailMix.slots[i].description = e.target.value; return s; })}
-                      rows={3} style={{ width: '100%', fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box' }} />
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Instagram Weekly Mix */}
-            <Card title="Instagram Weekly Mix" accent="#ec4899">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>{strategy.instagramWeeklyMix?.description}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {(strategy.instagramWeeklyMix?.slots || []).map((slot, i) => (
-                  <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
-                      <input value={slot.label} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].label = e.target.value; return s; })}
-                        style={{ flex: 1, fontWeight: 700, fontSize: 14, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 10px', background: T.inputBg, color: T.text }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                        <span style={{ fontSize: 12, color: T.textMuted }}>per week:</span>
-                        <input type="number" min="0" max="10" value={slot.perWeek} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].perWeek = parseInt(e.target.value) || 0; return s; })}
-                          style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                      </div>
-                    </div>
-                    <textarea value={slot.description} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.instagramWeeklyMix.slots[i].description = e.target.value; return s; })}
-                      rows={2} style={{ width: '100%', fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box' }} />
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Category Rotation */}
-            <Card title="Category Spotlight Rotation" accent="#f59e0b">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 12 }}>{strategy.categoryRotation?.rationale}</div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>Spotlight every</span>
-                <input type="number" min="1" max="26" value={strategy.categoryRotation?.frequencyWeeks || 6}
-                  onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.frequencyWeeks = parseInt(e.target.value) || 6; return s; })}
-                  style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>weeks · Rotation order:</span>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {(strategy.categoryRotation?.categories || []).map((cat, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, background: T.stripeBg, borderRadius: 20, padding: '4px 10px 4px 14px' }}>
-                    <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600, marginRight: 2 }}>{i + 1}.</span>
-                    <input value={cat} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories[i] = e.target.value; return s; })}
-                      style={{ width: 90, fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 4, padding: '3px 8px', background: T.inputBg, color: T.text }} />
-                    <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories.splice(i, 1); return s; })}
-                      style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 2 }}>×</button>
-                  </div>
-                ))}
-                <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.categoryRotation.categories.push(''); return s; })}
-                  style={{ padding: '4px 14px', borderRadius: 20, border: `1px dashed ${T.border}`, background: 'none', color: T.textMuted, fontSize: 13, cursor: 'pointer' }}>+ Add</button>
-              </div>
-            </Card>
-
-            {/* Persona Rotation */}
-            <Card title="Persona Rotation" accent="#8b5cf6">
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>Each persona as primary target at least once every</span>
-                <input type="number" min="1" max="12" value={strategy.personaRotation?.rotationWeeks || 4}
-                  onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.personaRotation.rotationWeeks = parseInt(e.target.value) || 4; return s; })}
-                  style={{ width: 52, textAlign: 'center', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '5px 8px', background: T.inputBg, color: T.text, fontSize: 14, fontWeight: 700 }} />
-                <span style={{ fontSize: 13, color: T.textSub, fontWeight: 600 }}>weeks</span>
-              </div>
-              {(strategy.personaRotation?.personas || []).map((p, i) => (
-                <div key={i} style={{ background: T.stripeBg, borderRadius: 8, padding: '12px 14px', marginBottom: 8 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: T.text, marginBottom: 6 }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>Focus: {p.topTopics?.join(', ')}</div>
-                  <div style={{ fontSize: 12, color: T.textMuted }}>Avoid: {p.avoidTopics?.join(', ')}</div>
-                </div>
-              ))}
-            </Card>
-
-            {/* Global Rules */}
-            <Card title="Global Content Rules" accent="#374151">
-              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 16 }}>Applied to every piece of generated content across all channels.</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {(strategy.globalRules || []).map((rule, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 14, color: T.textMuted, marginTop: 8, flexShrink: 0 }}>—</span>
-                    <textarea value={rule} onChange={e => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules[i] = e.target.value; return s; })}
-                      rows={2} style={{ flex: 1, fontSize: 13, border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', background: T.inputBg, color: T.text, lineHeight: 1.5, resize: 'vertical' }} />
-                    <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules.splice(i, 1); return s; })}
-                      style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', fontSize: 16, marginTop: 6, flexShrink: 0 }}>×</button>
-                  </div>
-                ))}
-                <button onClick={() => setStrategy(prev => { const s = JSON.parse(JSON.stringify(prev)); s.globalRules.push(''); return s; })}
-                  style={{ alignSelf: 'flex-start', padding: '7px 16px', borderRadius: 8, border: `1px dashed ${T.border}`, background: 'none', color: T.textMuted, fontSize: 13, cursor: 'pointer', marginTop: 4 }}>+ Add Rule</button>
-              </div>
-            </Card>
-
-            <div style={{ textAlign: 'right', marginTop: 8, marginBottom: 24 }}>
-              <button onClick={saveStrategy} disabled={strategySaving}
-                style={{ padding: '10px 24px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: strategySaving ? 0.6 : 1 }}>
-                {strategySaving ? 'Saving…' : 'Save Strategy'}
-              </button>
-            </div>
-          </>)}
-        </div>
-      )}
-
-      {/* Competitor promos */}
-      <SectionHeader>Competitor Promotions</SectionHeader>
-      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>
-        Extracted from site banners during last scrape · run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run scrape:sites</code> to refresh
-      </div>
-      {(competitorPromos || []).map((p, i) => (
-        <Card key={i} accent={p.hasPromo ? (p.maxDiscount >= 40 ? '#ef4444' : '#f59e0b') : '#e5e7eb'}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: p.hasPromo ? 10 : 0 }}>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{p.brand}</div>
-              {p.scrapedAt && <div style={{ fontSize: 11, color: T.textFaint }}>scraped {new Date(p.scrapedAt).toLocaleDateString()}</div>}
-            </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              {p.hasPromo
-                ? <Badge color={p.maxDiscount >= 40 ? 'red' : 'yellow'}>{p.maxDiscount ? `Up to ${p.maxDiscount}% off` : 'Promo active'}</Badge>
-                : <Badge color="gray">No active promo</Badge>}
-            </div>
-          </div>
-          {p.promoBanners?.map((banner, j) => (
-            <div key={j} style={{ fontSize: 13, color: T.textSub, padding: '4px 0', borderBottom: `1px solid ${T.stripeBg}` }}>
-              "{banner}"
-            </div>
-          ))}
-        </Card>
-      ))}
-    </div>
-  )
-}
-
-function AgenticSearchTab({ agenticSearch }) {
-  const T = useT()
-  if (!agenticSearch?.scores) return (
-    <div style={{ padding: 40, textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>🤖</div>
-      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>AI Search Visibility Not Run Yet</div>
-      <div style={{ color: T.textMuted, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
-        Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run agentic:search</code> to test how Anne Klein appears when AI assistants answer shopping queries.
-      </div>
-    </div>
-  )
-
-  const { scores, geoRecommendations, queryResults } = agenticSearch
-  const visColor = scores.visibilityRate >= 60 ? '#10b981' : scores.visibilityRate >= 30 ? '#f59e0b' : '#ef4444'
-
-  return (
-    <div>
-      <SectionHeader>AI Search Visibility Scores</SectionHeader>
-      <div className="ak-ai-grid" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-        <Stat label="Visibility Rate" value={`${scores.visibilityRate}%`} sub={`${scores.queriesMentioned}/${scores.queriesTested} queries`} color={visColor} />
-        <Stat label="Top of Mind" value={`${scores.topOfMindRate}%`} sub="mentioned first" color="#6366f1" />
-        <Stat label="Positive Sentiment" value={`${scores.positiveRateWhenMentioned}%`} sub="when mentioned" color="#10b981" />
-        <Stat label="Visibility Gaps" value={scores.gaps?.length} sub="queries AK missed" color="#ef4444" />
-      </div>
-
-      <div className="ak-ai-main-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
-        {/* LEFT: Visibility stats + brand comparison bars */}
-        <div>
-          {/* Competitor comparison bar chart */}
-          <SectionHeader>AI Visibility vs Competitors</SectionHeader>
-          <Card subtitle={`Tested across ${scores.queriesTested} shopping queries · Model: Claude Sonnet`}>
-            {[{ brand: 'Anne Klein', rate: scores.visibilityRate, mentions: scores.queriesMentioned }, ...(scores.competitorVisibility || [])].map((c, i) => (
-              <div key={i} style={{ marginBottom: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: c.brand === 'Anne Klein' ? 700 : 500, color: c.brand === 'Anne Klein' ? T.accent : T.textSub }}>{c.brand}</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: c.rate >= 60 ? '#10b981' : c.rate >= 30 ? '#f59e0b' : '#9ca3af' }}>{c.rate}%</span>
-                </div>
-                <div style={{ background: T.surfaceAlt, borderRadius: 4, height: 8, overflow: 'hidden' }}>
-                  <div style={{ background: c.brand === 'Anne Klein' ? '#6366f1' : T.border, height: '100%', width: `${c.rate}%`, borderRadius: 4, transition: 'width 0.3s' }} />
-                </div>
-              </div>
-            ))}
-          </Card>
-
-          {/* Competitor drivers — what's making them rank */}
-          <SectionHeader>What's Driving Competitor Rankings</SectionHeader>
-          <Card subtitle="Why AI assistants recommend each competitor — inferred from query responses">
-            {(scores.competitorVisibility || []).filter(c => c.rate > 0).map((c, i) => {
-              const appearances = (queryResults || []).filter(r => r.visibility?.[c.brand]?.mentioned)
-              const catCounts = {}
-              appearances.forEach(r => { catCounts[r.category] = (catCounts[r.category] || 0) + 1 })
-              const topCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 3)
-              const positiveContexts = appearances
-                .filter(r => r.visibility?.[c.brand]?.sentiment === 'positive' && r.visibility?.[c.brand]?.context)
-                .slice(0, 1)
-              const sentimentPos = appearances.filter(r => r.visibility?.[c.brand]?.sentiment === 'positive').length
-              const sentimentPct = appearances.length ? Math.round(sentimentPos / appearances.length * 100) : 0
-              return (
-                <div key={c.brand} style={{ padding: '14px 0', borderBottom: i < (scores.competitorVisibility.filter(x => x.rate > 0).length - 1) ? `1px solid ${T.borderAlt}` : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: T.text }}>{c.brand}</span>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <Badge color={c.rate >= 60 ? 'green' : c.rate >= 30 ? 'yellow' : 'gray'}>{c.rate}% visible</Badge>
-                      <Badge color={sentimentPct >= 60 ? 'green' : sentimentPct >= 30 ? 'yellow' : 'gray'}>{sentimentPct}% positive</Badge>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: positiveContexts.length ? 8 : 0 }}>
-                    {topCats.map(([cat, count]) => (
-                      <span key={cat} style={{ background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 12, fontSize: 12 }}>
-                        {cat} <strong>({count}/{appearances.length})</strong>
-                      </span>
-                    ))}
-                  </div>
-                  {positiveContexts.map((p, j) => (
-                    <div key={j} style={{ fontSize: 12, color: T.textMuted, background: T.bg, borderRadius: 6, padding: '6px 10px', lineHeight: 1.5, fontStyle: 'italic' }}>
-                      "…{p.visibility?.[c.brand]?.context?.substring(0, 200)}…"
-                      <span style={{ display: 'block', fontSize: 11, color: T.textFaint, marginTop: 2 }}>from query: "{p.query}"</span>
-                    </div>
-                  ))}
-                </div>
-              )
-            })}
-          </Card>
-
-          {/* Per-category breakdown */}
-          <SectionHeader>Visibility by Query Type</SectionHeader>
-          <Card>
-            {(scores.categoryBreakdown || []).map((c, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{c.category}</span>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <span style={{ fontSize: 12, color: T.textFaint }}>{c.mentioned}/{c.total} queries</span>
-                  <Badge color={c.visibilityRate >= 60 ? 'green' : c.visibilityRate >= 30 ? 'yellow' : 'red'}>{c.visibilityRate}%</Badge>
-                </div>
-              </div>
-            ))}
-          </Card>
-
-          {/* Visibility gaps */}
-          {scores.gaps?.length > 0 && (
-            <>
-              <SectionHeader>Visibility Gaps — AK Missing, Competitors Present</SectionHeader>
-              <Card subtitle="These are queries where AI assistants recommend competitors but not Anne Klein">
-                {scores.gaps.map((g, i) => (
-                  <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                    <div style={{ fontSize: 14, fontWeight: 500, color: T.text, marginBottom: 4 }}>"{g.query}"</div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 12, color: T.textFaint }}>{g.category} ·</span>
-                      {g.competitorsPresent.map(b => <Badge key={b} color="blue">{b}</Badge>)}
-                      <span style={{ fontSize: 12, color: T.textFaint }}>mentioned instead</span>
-                    </div>
-                  </div>
-                ))}
-              </Card>
-            </>
-          )}
-
-          {/* Query-level detail */}
-          <SectionHeader>All Query Results</SectionHeader>
-          <Card subtitle="Full breakdown of how AK and competitors appeared in each AI search query">
-            {(queryResults || []).filter(r => !r.error).map((r, i) => (
-              <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${T.borderAlt}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                  <div style={{ flex: 1, marginRight: 12 }}>
-                    <span style={{ fontSize: 12, color: T.textFaint, marginRight: 6 }}>[{r.category}]</span>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: T.textSub }}>{r.query}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    <Badge color={r.akMentioned ? (r.akTopOfMind ? 'green' : 'blue') : 'red'}>
-                      {r.akMentioned ? (r.akTopOfMind ? 'AK #1' : `AK #${r.akPosition}`) : 'AK absent'}
-                    </Badge>
-                  </div>
-                </div>
-                {r.akMentioned && r.visibility?.['Anne Klein']?.context && (
-                  <div style={{ fontSize: 12, color: T.textMuted, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px', marginBottom: 4, lineHeight: 1.5 }}>
-                    "…{r.visibility['Anne Klein'].context.substring(0, 150)}…"
-                  </div>
-                )}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {r.competitorsMentioned?.map(b => <Badge key={b} color="gray">{b}</Badge>)}
-                </div>
-              </div>
-            ))}
-          </Card>
-        </div>
-
-        {/* RIGHT: GEO recommendations sidebar */}
-        <div>
-          {geoRecommendations?.length > 0 && (
-            <>
-              <SectionHeader>GEO Recommendations (Generative Engine Optimization)</SectionHeader>
-              {geoRecommendations.map((r, i) => (
-                <Card key={i} title={r.title} accent={r.priority === 'high' ? '#ef4444' : '#f59e0b'}>
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                    <Badge color={r.priority === 'high' ? 'red' : 'yellow'}>{r.priority} priority</Badge>
-                  </div>
-                  <div style={{ marginBottom: 8 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>ACTION</div>
-                    <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{r.action}</p>
-                  </div>
-                  <div style={{ background: T.bg, borderRadius: 8, padding: '8px 12px', fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>
-                    <strong>Why:</strong> {r.rationale}
-                  </div>
-                </Card>
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function PersonaSection({ label, items, borderColor, bullet }) {
-  const T = useT()
-  if (!items?.length) return null
-  return (
-    <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, letterSpacing: '0.05em', marginBottom: 8 }}>{label}</div>
-      {items.map((item, j) => (
-        <div key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 6 }}>
-          {bullet
-            ? <div style={{ width: 6, height: 6, borderRadius: '50%', background: borderColor, flexShrink: 0, marginTop: 5 }} />
-            : <div style={{ width: 3, borderRadius: 2, background: borderColor, flexShrink: 0, alignSelf: 'stretch', minHeight: 16 }} />
-          }
-          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.55 }}>{item}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Persona Card with Chat ───────────────────────────────────────────────────
-function PersonaCard({ p, index, color, contentEmails = [], contentIg = [] }) {
-  const T = useT()
-  const [chatOpen, setChatOpen] = useState(false)
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
-  const [streaming, setStreaming] = useState(false)
-  const [streamText, setStreamText] = useState('')
-  const chatEndRef = useRef(null)
-  const occupations = Array.isArray(p.occupation) ? p.occupation.join(' · ') : p.occupation
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, streamText])
-
-  async function sendMessage() {
-    const text = input.trim()
-    if (!text || streaming) return
-    const userMsg = { role: 'user', content: text }
-    const next = [...messages, userMsg]
-    setMessages(next)
-    setInput('')
-    setStreaming(true)
-    setStreamText('')
-
-    try {
-      const res = await fetch('/api/persona-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ personaIndex: index, messages: next }),
-      })
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let full = ''
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = decoder.decode(value)
-        for (const line of chunk.split('\n')) {
-          if (!line.startsWith('data: ')) continue
-          const payload = line.slice(6)
-          if (payload === '[DONE]') break
-          try {
-            const { token, error } = JSON.parse(payload)
-            if (error) { full = `Error: ${error}`; break }
-            full += token
-            setStreamText(full)
-          } catch {}
-        }
-      }
-      setMessages(prev => [...prev, { role: 'assistant', content: full }])
-      setStreamText('')
-    } catch (e) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${e.message}` }])
-    }
-    setStreaming(false)
-  }
-
-  return (
-    <Card accent={color}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: 20, color: T.text, marginBottom: 4 }}>{p.name}</div>
-          <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 2 }}>
-            {[p.ageRange || p.age, p.income, p.location].filter(Boolean).join(' · ')}
-          </div>
-          {occupations && <div style={{ fontSize: 13, color: T.textFaint }}>{occupations}</div>}
-        </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexShrink: 0 }}>
-          <button onClick={() => { setChatOpen(o => !o); setMessages([]); setStreamText('') }}
-            style={{ padding: '5px 14px', borderRadius: 8, border: `1px solid ${color}`, background: chatOpen ? color : T.surface, color: chatOpen ? '#fff' : color, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
-            {chatOpen ? 'Close Chat' : '💬 Chat'}
-          </button>
-          <div style={{ background: color, color: '#fff', borderRadius: 8, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>
-            Persona {index + 1}
-          </div>
-        </div>
-      </div>
-
-      {/* Quote */}
-      {p.quoteExample && (
-        <div style={{ background: T.bg, borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 14, fontStyle: 'italic', color: T.textSub, lineHeight: 1.6, borderLeft: `3px solid ${color}` }}>
-          "{p.quoteExample}"
-        </div>
-      )}
-
-      {/* Chat Panel */}
-      {chatOpen && (
-        <div style={{ border: `1px solid ${T.border}`, borderTop: `3px solid ${color}`, borderRadius: 10, marginBottom: 20, overflow: 'hidden' }}>
-          <div style={{ background: color, color: '#fff', padding: '8px 14px', fontSize: 12, fontWeight: 700 }}>
-            Chatting with {p.name} · Responses reset on refresh
-          </div>
-          <div className="ak-chat-panel" style={{ height: 260, overflowY: 'auto', padding: 14, background: T.stripeBg, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {messages.length === 0 && !streaming && (
-              <div style={{ color: T.textFaint, fontSize: 13, textAlign: 'center', marginTop: 60 }}>
-                Ask {p.name} anything — about shopping, style, what she wants from a brand…
-              </div>
-            )}
-            {messages.map((m, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                <div className="ak-chat-bubble" style={{
-                  maxWidth: 'min(80%, calc(100vw - 60px))', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5,
-                  background: m.role === 'user' ? color : T.surface,
-                  color: m.role === 'user' ? '#fff' : T.textSub,
-                  border: m.role === 'assistant' ? `1px solid ${T.border}` : 'none',
-                }}>
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {(streaming || streamText) && (
-              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div className="ak-chat-bubble" style={{ maxWidth: 'min(80%, calc(100vw - 60px))', padding: '8px 12px', borderRadius: 10, fontSize: 13, lineHeight: 1.5, background: T.surface, color: T.textSub, border: `1px solid ${T.border}` }}>
-                  {streamText || <span style={{ color: T.textFaint }}>…</span>}
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
-          <div style={{ display: 'flex', gap: 8, padding: 10, background: T.surface, borderTop: `1px solid ${T.border}` }}>
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder={`Ask ${p.name} something…`}
-              style={{ flex: 1, border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '7px 12px', fontSize: 13, outline: 'none', background: T.inputBg, color: T.text }}
-            />
-            <button onClick={sendMessage} disabled={streaming || !input.trim()}
-              style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: color, color: '#fff', cursor: streaming ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, opacity: streaming || !input.trim() ? 0.5 : 1 }}>
-              Send
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 2-column grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20, marginBottom: 16 }}>
-        <PersonaSection label="CORE VALUES"         items={p.values}            borderColor={color}     bullet />
-        <PersonaSection label="FASHION GOALS"       items={p.fashionGoals}      borderColor={T.border} />
-        <PersonaSection label="PURCHASE MOTIVATORS" items={p.motivators}        borderColor={color} />
-        <PersonaSection label="PAIN POINTS"         items={p.painPoints}        borderColor="#fca5a5" />
-        <PersonaSection label="SHOPPING BEHAVIOR"   items={p.shoppingBehaviors} borderColor="#6ee7b7" />
-        {p.contentTopics?.length > 0 && (
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, letterSpacing: '0.05em', marginBottom: 8 }}>CONTENT THAT RESONATES</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {p.contentTopics.map((t, j) => (
-                <div key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: 5 }} />
-                  <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.55 }}>{t}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {p.annKleinFit && (
-        <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', marginBottom: 10 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>WHY ANNE KLEIN FITS</div>
-          <p style={{ margin: 0, fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{p.annKleinFit}</p>
-        </div>
-      )}
-
-      {p.preferredChannels?.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: (contentEmails.length || contentIg.length) ? 16 : 0 }}>
-          <span style={{ fontSize: 12, color: T.textMuted, fontWeight: 600 }}>Preferred channels:</span>
-          {p.preferredChannels.map((ch, j) => (
-            <span key={j} style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, borderRadius: 6, padding: '2px 10px' }}>{j + 1}. {ch}</span>
-          ))}
-        </div>
-      )}
-
-      {(contentEmails.length > 0 || contentIg.length > 0) && (
-        <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 10 }}>CONTENT ASSETS TARGETING THIS PERSONA</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {contentEmails.map((e, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.surfaceAlt, borderRadius: 6, padding: '6px 10px' }}>
-                <span style={{ fontSize: 12, color: '#6366f1' }}>📧</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub }}>"{e.subjectLine}"</div>
-                  <div style={{ fontSize: 11, color: T.textFaint }}>{e.theme} · {e.sendTiming}</div>
-                </div>
-              </div>
-            ))}
-            {contentIg.map((g, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.surfaceAlt, borderRadius: 6, padding: '6px 10px' }}>
-                <span style={{ fontSize: 12, color: '#ec4899' }}>📸</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: T.textSub }}>{g.category}</div>
-                  <div style={{ fontSize: 11, color: T.textFaint, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{g.caption?.slice(0, 90)}…</div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {!contentEmails.length && !contentIg.length && (
-            <div style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>No tagged content yet — re-run Module 5 to generate persona-targeted assets.</div>
-          )}
-        </div>
-      )}
-    </Card>
-  )
-}
-
-function PersonasTab({ personas, content }) {
-  const T = useT()
-  const [suggestions, setSuggestions] = useState(null)
-  const [suggesting, setSuggesting] = useState(false)
-
-  if (!personas?.personas?.length) return (
-    <div style={{ padding: 40, textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
-      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: T.text }}>Customer Personas Not Generated Yet</div>
-      <div style={{ color: T.textMuted, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
-        Run <code style={{ background: T.codeBg, color: T.text, padding: '1px 6px', borderRadius: 4 }}>npm run personas</code> to generate AI-driven customer personas from all available brand intelligence.
-      </div>
-    </div>
-  )
-
-  const PERSONA_COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981']
-
-  async function discoverPersonas() {
-    setSuggesting(true)
-    try {
-      const res = await fetch('/api/suggest-personas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
-      const data = await res.json()
-      setSuggestions(data.suggestions || [])
-    } catch {}
-    setSuggesting(false)
-  }
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
-        <SectionHeader>Customer Personas</SectionHeader>
-        <button onClick={discoverPersonas} disabled={suggesting}
-          style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: suggesting ? 0.6 : 1 }}>
-          {suggesting ? 'Analyzing…' : '✨ Discover Adjacent Personas'}
-        </button>
-      </div>
-      <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 20 }}>
-        AI-generated from competitive intel, product catalog, social data, and email intelligence.
-        {personas.generatedAt && <span> Last updated {new Date(personas.generatedAt).toLocaleDateString()}.</span>}
-      </div>
-
-      {personas.summaryInsights?.length > 0 && (
-        <Card title="Key Cross-Persona Insights" accent="#6366f1">
-          {personas.summaryInsights.map((insight, i) => (
-            <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
-              <div style={{ background: '#6366f1', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-              <p style={{ margin: 0, fontSize: 14, color: T.textSub, lineHeight: 1.6 }}>{insight}</p>
-            </div>
-          ))}
-        </Card>
-      )}
-
-      {suggestions && (
-        <div style={{ marginBottom: 24 }}>
-          <SectionHeader>Adjacent Persona Opportunities</SectionHeader>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-            {suggestions.map((s, i) => (
-              <div key={i} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, borderTop: '3px solid #8b5cf6' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 4 }}>{s.name}</div>
-                <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 8 }}>{s.ageRange} · {s.income}</div>
-                <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8, lineHeight: 1.5 }}>{s.rationale}</div>
-                <div style={{ fontSize: 12, color: '#6366f1', background: '#ede9fe', borderRadius: 6, padding: '4px 10px', marginBottom: 8 }}>{s.keyDifference}</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: s.opportunitySize === 'high' ? '#059669' : s.opportunitySize === 'medium' ? '#d97706' : '#6b7280', textTransform: 'uppercase' }}>
-                  {s.opportunitySize} opportunity
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {personas.personas.map((p, i) => {
-        const emails = (content?.content?.emailCampaigns?.emailCampaigns || []).filter(e => e.targetPersona === p.name)
-        const ig = (content?.content?.instagramCaptions?.instagramCaptions || []).filter(g => g.targetPersona === p.name)
-        return <PersonaCard key={i} p={p} index={i} color={PERSONA_COLORS[i % PERSONA_COLORS.length]} contentEmails={emails} contentIg={ig} />
-      })}
-    </div>
-  )
-}
-
-// ─── Campaigns Tab ────────────────────────────────────────────────────────────
-const CAMPAIGN_STATUSES = ['planning', 'active', 'complete', 'paused']
-const STATUS_COLORS = { planning: '#6366f1', active: '#10b981', complete: '#6b7280', paused: '#f59e0b' }
-const CHANNELS = ['email', 'instagram', 'site', 'hero', 'sms', 'other']
-
-function CampaignsTab({ campaigns, setCampaigns, personas, content, setCalItems }) {
-  const T = useT()
-  const [showForm, setShowForm] = useState(false)
-  const [editId, setEditId] = useState(null)
-  const [form, setForm] = useState({})
-  const [generatingBrief, setGeneratingBrief] = useState(null)
-  const [contentSuggestions, setContentSuggestions] = useState({}) // campaignId → { emails, ig }
-  const personaNames = personas?.personas?.map(p => p.name) || []
-
-  const PCOLS = { 'The Polished Professional': '#6366f1', 'The Emerging Leader': '#10b981', 'The Refined Rewinder': '#f59e0b', 'The Practical Multitasker': '#ec4899' }
-
-  function openNew() {
-    setForm({ name: '', status: 'planning', startDate: '', endDate: '', persona: personaNames[0] || '', contentVolumes: { email: 2, instagram: 3, hero: 1 }, storyArc: [], styleGuide: { colorDirection: '', moodKeywords: [], avoidWords: [], heroImageDirection: '' } })
-    setEditId(null)
-    setShowForm(true)
-  }
-
-  function openEdit(c) {
-    setForm(JSON.parse(JSON.stringify(c)))
-    setEditId(c.id)
-    setShowForm(true)
-  }
-
-  async function save() {
-    const isNew = !editId
-    const method = editId ? 'PUT' : 'POST'
-    const url = editId ? `/api/campaigns/${editId}` : '/api/campaigns'
-    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-    const saved = await res.json()
-    setCampaigns(prev => editId ? prev.map(c => c.id === editId ? saved : c) : [...prev, saved])
-    setShowForm(false)
-
-    // Auto-create a calendar placeholder on the campaign start date
-    if (isNew && saved.startDate && setCalItems) {
-      const calRes = await fetch('/api/calendar/item', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: saved.startDate,
-          channel: 'email',
-          status: 'brief',
-          campaignId: saved.id,
-          personaTarget: saved.persona || '',
-          theme: `${saved.name} — Launch`,
-        }),
-      })
-      const calItem = await calRes.json()
-      setCalItems(prev => [...prev, calItem])
-    }
-
-    // After creating a new campaign, surface matching content assets
-    if (isNew && content?.content) {
-      const persona = saved.persona
-      const emails = (content.content.emailCampaigns?.emailCampaigns || [])
-        .filter(e => !persona || !e.targetPersona || e.targetPersona === persona)
-        .slice(0, 4)
-      const ig = (content.content.instagramCaptions?.instagramCaptions || [])
-        .filter(g => !persona || !g.targetPersona || g.targetPersona === persona)
-        .slice(0, 3)
-      if (emails.length || ig.length) {
-        setContentSuggestions(prev => ({ ...prev, [saved.id]: { emails, ig } }))
-      }
-    }
-  }
-
-  async function pinContent(campaignId, asset) {
-    await fetch(`/api/campaigns/${campaignId}/link-content`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(asset),
-    })
-    setCampaigns(prev => prev.map(c => {
-      if (c.id !== campaignId) return c
-      const linked = c.linkedContent || []
-      const key = asset.type === 'email' ? asset.subjectLine : asset.caption?.slice(0, 80)
-      if (linked.some(a => (a.type === 'email' ? a.subjectLine : a.caption?.slice(0, 80)) === key)) return c
-      return { ...c, linkedContent: [...linked, asset] }
-    }))
-  }
-
-  async function deleteCampaign(id) {
-    if (!confirm('Delete this campaign?')) return
-    await fetch(`/api/campaigns/${id}`, { method: 'DELETE' })
-    setCampaigns(prev => prev.filter(c => c.id !== id))
-  }
-
-  async function generateBrief(id) {
-    setGeneratingBrief(id)
-    const res = await fetch(`/api/campaigns/${id}/generate-brief`, { method: 'POST' })
-    const { brief } = await res.json()
-    setCampaigns(prev => prev.map(c => c.id === id ? { ...c, brief } : c))
-    setGeneratingBrief(null)
-  }
-
-  const setFormIn = (path, val) => {
-    const keys = path.split('.')
-    setForm(prev => {
-      const next = JSON.parse(JSON.stringify(prev))
-      let obj = next
-      for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]]
-      obj[keys[keys.length - 1]] = val
-      return next
-    })
-  }
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 8 }}>
-        <SectionHeader>Campaigns</SectionHeader>
-        <button onClick={openNew} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
-          + New Campaign
-        </button>
-      </div>
-
-      {/* Campaign Form */}
-      {showForm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="ak-modal" style={{ background: T.surface, borderRadius: 12, padding: 'clamp(16px, 4vw, 28px)', width: 'min(560px, 95vw)', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
-            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 20, color: T.text }}>{editId ? 'Edit Campaign' : 'New Campaign'}</div>
-            {[
-              { label: 'Campaign Name', key: 'name', type: 'text' },
-              { label: 'Start Date', key: 'startDate', type: 'date' },
-              { label: 'End Date', key: 'endDate', type: 'date' },
-            ].map(f => (
-              <div key={f.key} style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>{f.label}</div>
-                <input type={f.type} value={form[f.key] || ''} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                  style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
-              </div>
-            ))}
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Target Persona</div>
-              <select value={form.persona || ''} onChange={e => setForm(p => ({ ...p, persona: e.target.value }))}
-                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, background: T.inputBg, color: T.text }}>
-                <option value="">— none —</option>
-                {personaNames.map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Status</div>
-              <select value={form.status || 'planning'} onChange={e => setForm(p => ({ ...p, status: e.target.value }))}
-                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, background: T.inputBg, color: T.text }}>
-                {CAMPAIGN_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: T.textSub, marginBottom: 10, marginTop: 4 }}>Style Guide</div>
-            {[
-              { label: 'Color Direction (e.g. "Navy, blush, bone")', key: 'styleGuide.colorDirection' },
-              { label: 'Hero Image Direction (1 sentence)', key: 'styleGuide.heroImageDirection' },
-            ].map(f => (
-              <div key={f.key} style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>{f.label}</div>
-                <input value={(f.key.includes('.') ? form.styleGuide?.[f.key.split('.')[1]] : form[f.key]) || ''}
-                  onChange={e => setFormIn(f.key, e.target.value)}
-                  style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
-              </div>
-            ))}
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Mood Keywords (comma separated)</div>
-              <input value={(form.styleGuide?.moodKeywords || []).join(', ')}
-                onChange={e => setFormIn('styleGuide.moodKeywords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
-            </div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>Avoid Words (comma separated)</div>
-              <input value={(form.styleGuide?.avoidWords || []).join(', ')}
-                onChange={e => setFormIn('styleGuide.avoidWords', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
-            </div>
-
-            {/* Content Volumes */}
-            <div style={{ fontSize: 13, fontWeight: 700, color: T.textSub, marginBottom: 10, marginTop: 4 }}>Weekly Content Volumes</div>
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-              {[{ label: 'Emails / week', key: 'email' }, { label: 'Instagram / week', key: 'instagram' }, { label: 'Hero banners / week', key: 'hero' }].map(f => (
-                <div key={f.key} style={{ flex: '1 1 100px' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4 }}>{f.label}</div>
-                  <input type="number" min={0} max={10} value={(form.contentVolumes || {})[f.key] ?? 0}
-                    onChange={e => setForm(p => ({ ...p, contentVolumes: { ...(p.contentVolumes || {}), [f.key]: parseInt(e.target.value) || 0 } }))}
-                    style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 14, fontWeight: 700, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
-                </div>
-              ))}
-            </div>
-
-            {/* Story Arc Editor */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: T.textSub }}>Campaign Story Arc</div>
-              <button onClick={() => setForm(p => ({ ...p, storyArc: [...(p.storyArc || []), { weekNum: (p.storyArc || []).length + 1, theme: '', angle: '', keyMessage: '' }] }))}
-                style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
-                + Add Week
-              </button>
-            </div>
-            {(form.storyArc || []).length === 0 && (
-              <div style={{ fontSize: 12, color: T.textFaint, marginBottom: 16, padding: '10px 12px', background: T.stripeBg, borderRadius: 8 }}>
-                No arc weeks yet. Add weeks to define how this campaign's story unfolds over time — the AI will use this to plan content.
-              </div>
-            )}
-            {(form.storyArc || []).map((week, wi) => (
-              <div key={wi} style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 10, padding: 14, marginBottom: 12, background: T.stripeBg }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Week {week.weekNum}</div>
-                  <button onClick={() => setForm(p => ({ ...p, storyArc: p.storyArc.filter((_, i) => i !== wi).map((w, i) => ({ ...w, weekNum: i + 1 })) }))}
-                    style={{ fontSize: 11, padding: '2px 8px', borderRadius: 5, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.textMuted, cursor: 'pointer' }}>
-                    Remove
-                  </button>
-                </div>
-                {[{ label: 'Theme (e.g. "Awareness")', key: 'theme' }, { label: 'Angle (1 sentence)', key: 'angle' }, { label: 'Key Message (what the customer should feel)', key: 'keyMessage' }].map(f => (
-                  <div key={f.key} style={{ marginBottom: 10 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 3 }}>{f.label}</div>
-                    <input value={week[f.key] || ''} onChange={e => setForm(p => ({ ...p, storyArc: p.storyArc.map((w, i) => i === wi ? { ...w, [f.key]: e.target.value } : w) }))}
-                      style={{ width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '7px 10px', fontSize: 12, boxSizing: 'border-box', background: T.inputBg, color: T.text }} />
-                  </div>
-                ))}
-              </div>
-            ))}
-
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button onClick={() => setShowForm(false)} style={{ padding: '8px 18px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
-              <button onClick={save} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>Save</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {campaigns.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: T.textFaint }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🗂️</div>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: T.textMuted }}>No campaigns yet</div>
-          <div style={{ fontSize: 13 }}>Create a campaign to group content under shared creative direction.</div>
-        </div>
-      )}
-
-      {campaigns.map(c => (
-        <Card key={c.id} accent={STATUS_COLORS[c.status] || '#6366f1'}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: 18, color: T.text, marginBottom: 4 }}>{c.name}</div>
-              <div style={{ fontSize: 13, color: T.textMuted }}>
-                {[c.startDate, c.endDate].filter(Boolean).join(' → ')}
-                {c.persona && <span> · {c.persona}</span>}
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
-              <span style={{ background: T.surfaceAlt, border: `1px solid ${STATUS_COLORS[c.status]}`, color: STATUS_COLORS[c.status], borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>{c.status}</span>
-              <button onClick={() => openEdit(c)} style={{ padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 12 }}>Edit</button>
-              <button onClick={() => deleteCampaign(c.id)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: T.surface, color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
-            </div>
-          </div>
-
-          {c.styleGuide && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-              {c.styleGuide.colorDirection && <span style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, borderRadius: 6, padding: '3px 10px' }}>🎨 {c.styleGuide.colorDirection}</span>}
-              {(c.styleGuide.moodKeywords || []).map((k, i) => <span key={i} style={{ fontSize: 12, background: '#ede9fe', color: '#6366f1', borderRadius: 6, padding: '3px 10px' }}>{k}</span>)}
-              {(c.styleGuide.avoidWords || []).map((k, i) => <span key={i} style={{ fontSize: 12, background: '#fee2e2', color: '#ef4444', borderRadius: 6, padding: '3px 10px' }}>✕ {k}</span>)}
-            </div>
-          )}
-
-          {c.brief ? (
-            <div style={{ background: T.bg, borderRadius: 8, padding: 14, fontSize: 13, color: T.textSub, lineHeight: 1.6, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{c.brief}</div>
-          ) : (
-            <button onClick={() => generateBrief(c.id)} disabled={generatingBrief === c.id}
-              style={{ padding: '7px 16px', borderRadius: 8, border: '1px dashed #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, opacity: generatingBrief === c.id ? 0.6 : 1 }}>
-              {generatingBrief === c.id ? '✨ Generating brief…' : '✨ Generate Campaign Brief'}
-            </button>
-          )}
-
-          {/* Pinned content assets */}
-          {(c.linkedContent || []).length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, marginBottom: 6 }}>PINNED CONTENT</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {c.linkedContent.map((a, ai) => (
-                  <div key={ai} style={{ display: 'flex', alignItems: 'center', gap: 8, background: T.bg, borderRadius: 6, padding: '5px 10px', fontSize: 12 }}>
-                    <span style={{ color: a.type === 'email' ? '#6366f1' : '#ec4899', fontWeight: 700 }}>{a.type === 'email' ? '📧' : '📸'}</span>
-                    <span style={{ color: T.textSub, flex: 1 }}>{a.type === 'email' ? `"${a.subjectLine}"` : a.caption?.slice(0, 80) + '…'}</span>
-                    {a.targetPersona && <span style={{ color: PCOLS[a.targetPersona] || '#9ca3af', fontSize: 11, fontWeight: 600 }}>{a.targetPersona}</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Auto-suggested content (shown after new campaign creation) */}
-          {contentSuggestions[c.id] && (
-            <div style={{ marginTop: 14, border: '1px dashed #6366f1', borderRadius: 8, padding: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.accent }}>SUGGESTED CONTENT FOR THIS CAMPAIGN</div>
-                <button onClick={() => setContentSuggestions(prev => { const n = { ...prev }; delete n[c.id]; return n })}
-                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: T.textFaint, fontSize: 12 }}>dismiss</button>
-              </div>
-              {contentSuggestions[c.id].emails.map((e, ei) => (
-                <div key={ei} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: T.bg, borderRadius: 6, padding: '5px 10px' }}>
-                  <span style={{ fontSize: 12, color: T.accent }}>📧</span>
-                  <span style={{ fontSize: 12, color: T.textSub, flex: 1 }}>"{e.subjectLine}" <span style={{ color: T.textFaint }}>· {e.theme}</span></span>
-                  {e.targetPersona && <span style={{ fontSize: 11, color: PCOLS[e.targetPersona] || '#9ca3af', fontWeight: 600 }}>{e.targetPersona}</span>}
-                  <button onClick={() => pinContent(c.id, { type: 'email', subjectLine: e.subjectLine, theme: e.theme, targetPersona: e.targetPersona, brief: e.brief })}
-                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
-                </div>
-              ))}
-              {contentSuggestions[c.id].ig.map((g, gi) => (
-                <div key={gi} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, background: T.bg, borderRadius: 6, padding: '5px 10px' }}>
-                  <span style={{ fontSize: 12, color: '#ec4899' }}>📸</span>
-                  <span style={{ fontSize: 12, color: T.textSub, flex: 1 }}>{g.category} <span style={{ color: T.textFaint }}>· {g.caption?.slice(0, 60)}…</span></span>
-                  {g.targetPersona && <span style={{ fontSize: 11, color: PCOLS[g.targetPersona] || '#9ca3af', fontWeight: 600 }}>{g.targetPersona}</span>}
-                  <button onClick={() => pinContent(c.id, { type: 'ig', caption: g.caption, category: g.category, targetPersona: g.targetPersona })}
-                    style={{ padding: '2px 8px', borderRadius: 5, border: '1px solid #ec4899', background: T.surface, color: '#ec4899', cursor: 'pointer', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Pin</button>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  )
-}
-
-// ─── Calendar Tab ─────────────────────────────────────────────────────────────
-const CHANNEL_COLORS = { email: '#6366f1', instagram: '#ec4899', site: '#f59e0b', hero: '#3b82f6', sms: '#10b981', other: '#6b7280' }
-const CHANNEL_ICONS  = { email: '📧', instagram: '📸', site: '🌐', hero: '🖼️', sms: '💬', other: '📌' }
-const ITEM_STATUSES  = ['brief', 'ready', 'sent']
-const STATUS_BG      = { brief: '#ede9fe', ready: '#d1fae5', sent: '#f3f4f6' }
-const STATUS_FG      = { brief: '#6366f1', ready: '#059669', sent: '#6b7280' }
-
-function getWeekDates(baseDate) {
-  const d = new Date(baseDate)
-  const day = d.getDay()
-  const start = new Date(d)
-  start.setDate(d.getDate() - day)
-  return Array.from({ length: 7 }, (_, i) => {
-    const dt = new Date(start)
-    dt.setDate(start.getDate() + i)
-    return dt
-  })
-}
-
-function dateKey(d) {
-  return d.toISOString().slice(0, 10)
-}
-
-function CalendarItemDrawer({ item, onClose, onSave, onDelete, campaigns, personas, catalog }) {
-  const T = useT()
-  const [draft, setDraft] = useState(JSON.parse(JSON.stringify(item)))
-  const [saving, setSaving] = useState(false)
-  const [genBrief, setGenBrief] = useState(false)
-  const [genHero, setGenHero] = useState(false)
-  const [productSearch, setProductSearch] = useState('')
-  const personaNames = personas?.personas?.map(p => p.name) || []
-
-  const allProducts = catalog?.products || []
-  const filteredProducts = allProducts
-    .filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()) || p.category?.toLowerCase().includes(productSearch.toLowerCase()))
-    .slice(0, 24)
-
-  const isSelected = (p) => draft.selectedProducts?.some(s => s.href === p.href)
-
-  function toggleProduct(p) {
-    setDraft(prev => {
-      const sel = prev.selectedProducts || []
-      const exists = sel.some(s => s.href === p.href)
-      return { ...prev, selectedProducts: exists ? sel.filter(s => s.href !== p.href) : [...sel, { name: p.name, href: p.href, image: p.image, price: p.price, category: p.category }] }
-    })
-  }
-
-  async function save() {
-    setSaving(true)
-    const res = await fetch(`/api/calendar/item/${draft.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) })
-    const saved = await res.json()
-    onSave(saved)
-    setSaving(false)
-  }
-
-  async function doGenBrief() {
-    setSaving(true); setGenBrief(true)
-    const res = await fetch(`/api/calendar/item/${draft.id}/generate-brief`, { method: 'POST' })
-    const { brief } = await res.json()
-    setDraft(p => ({ ...p, brief }))
-    setSaving(false); setGenBrief(false)
-  }
-
-  async function doGenHero() {
-    setSaving(true); setGenHero(true)
-    const res = await fetch(`/api/calendar/item/${draft.id}/generate-hero-brief`, { method: 'POST' })
-    const { heroImageBrief } = await res.json()
-    setDraft(p => ({ ...p, heroImageBrief }))
-    setSaving(false); setGenHero(false)
-  }
-
-  const iStyle = { width: '100%', border: `1px solid ${T.inputBorder}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', background: T.inputBg, color: T.text }
-  const taStyle = { ...iStyle, resize: 'vertical', minHeight: 70 }
-  const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 4, marginTop: 12 }}>{children}</div>
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
-      <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)' }} onClick={onClose} />
-      <div className="ak-cal-drawer" style={{ width: 'min(520px, 100vw)', background: T.surface, overflowY: 'auto', boxShadow: '-4px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column' }}>
-        {/* Drawer header */}
-        <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: T.bg }}>
-          <div style={{ fontWeight: 800, fontSize: 16, color: T.text }}>
-            {CHANNEL_ICONS[draft.channel] || '📌'} {draft.theme || 'New Item'}
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => { if (confirm('Delete this item?')) onDelete(draft.id) }} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: T.surface, color: '#ef4444', cursor: 'pointer', fontSize: 12 }}>Delete</button>
-            <button onClick={onClose} style={{ padding: '5px 12px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 12 }}>Close</button>
-            <button onClick={save} disabled={saving} style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>{saving ? 'Saving…' : 'Save'}</button>
-          </div>
-        </div>
-
-        <div style={{ padding: '16px 20px', flex: 1 }}>
-          {/* Row: date + channel + status */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 10 }}>
-            <div><Label>Date</Label><input type="date" value={draft.date || ''} onChange={e => setDraft(p => ({ ...p, date: e.target.value }))} style={iStyle} /></div>
-            <div><Label>Channel</Label>
-              <select value={draft.channel || 'email'} onChange={e => setDraft(p => ({ ...p, channel: e.target.value }))} style={iStyle}>
-                {CHANNELS.map(c => <option key={c} value={c}>{CHANNEL_ICONS[c]} {c}</option>)}
-              </select>
-            </div>
-            <div><Label>Status</Label>
-              <select value={draft.status || 'brief'} onChange={e => setDraft(p => ({ ...p, status: e.target.value }))} style={iStyle}>
-                {ITEM_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <Label>Theme / Campaign Angle</Label>
-          <input value={draft.theme || ''} onChange={e => setDraft(p => ({ ...p, theme: e.target.value }))} style={iStyle} placeholder="e.g. Spring Into Work — Monday-to-Friday formula" />
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
-            <div><Label>Target Persona</Label>
-              <select value={draft.personaTarget || ''} onChange={e => setDraft(p => ({ ...p, personaTarget: e.target.value }))} style={iStyle}>
-                <option value="">— none —</option>
-                {personaNames.map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-            <div><Label>Campaign</Label>
-              <select value={draft.campaignId || ''} onChange={e => setDraft(p => ({ ...p, campaignId: e.target.value || null }))} style={iStyle}>
-                <option value="">— none —</option>
-                {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
-            <div><Label>Assigned To</Label><input value={draft.assignedTo || ''} onChange={e => setDraft(p => ({ ...p, assignedTo: e.target.value }))} style={iStyle} placeholder="Name or team" /></div>
-          </div>
-
-          {(draft.channel === 'email' || draft.channel === 'sms') && <>
-            <Label>Subject Line</Label>
-            <input value={draft.subjectLine || ''} onChange={e => setDraft(p => ({ ...p, subjectLine: e.target.value }))} style={iStyle} placeholder="Under 45 characters" />
-            <Label>Preview Text</Label>
-            <input value={draft.previewText || ''} onChange={e => setDraft(p => ({ ...p, previewText: e.target.value }))} style={iStyle} placeholder="Under 90 characters" />
-          </>}
-
-          {/* Brief */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 4 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>CONTENT BRIEF</div>
-            <button onClick={doGenBrief} disabled={genBrief || saving}
-              style={{ fontSize: 12, color: '#6366f1', border: '1px dashed #6366f1', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', opacity: genBrief ? 0.6 : 1 }}>
-              {genBrief ? '✨ Generating…' : '✨ Generate Brief'}
-            </button>
-          </div>
-          <textarea value={draft.brief || ''} onChange={e => setDraft(p => ({ ...p, brief: e.target.value }))} style={{ ...taStyle, minHeight: 100 }} placeholder="What to feature, key message, CTA, tone notes…" />
-
-          {/* Hero image brief */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 4 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted }}>HERO IMAGE BRIEF</div>
-            <button onClick={doGenHero} disabled={genHero || saving}
-              style={{ fontSize: 12, color: '#3b82f6', border: '1px dashed #3b82f6', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', opacity: genHero ? 0.6 : 1 }}>
-              {genHero ? '✨ Generating…' : '✨ Generate Hero Brief'}
-            </button>
-          </div>
-          <textarea value={draft.heroImageBrief || ''} onChange={e => setDraft(p => ({ ...p, heroImageBrief: e.target.value }))} style={taStyle} placeholder="Subject, setting, wardrobe, mood, AI image prompt…" />
-
-          <Label>Notes</Label>
-          <textarea value={draft.notes || ''} onChange={e => setDraft(p => ({ ...p, notes: e.target.value }))} style={taStyle} placeholder="Internal notes…" />
-
-          {/* Product Picker */}
-          <div style={{ marginTop: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, marginBottom: 8 }}>FEATURED PRODUCTS
-              {draft.selectedProducts?.length > 0 && <span style={{ marginLeft: 8, background: T.accent, color: '#fff', borderRadius: 10, padding: '1px 8px', fontSize: 11 }}>{draft.selectedProducts.length} selected</span>}
-            </div>
-            {draft.selectedProducts?.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-                {draft.selectedProducts.map(p => (
-                  <div key={p.href} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#ede9fe', borderRadius: 8, padding: '4px 8px' }}>
-                    {p.image && <img src={p.image} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />}
-                    <span style={{ fontSize: 12, color: '#6366f1', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
-                    <span onClick={() => toggleProduct(p)} style={{ cursor: 'pointer', color: '#6366f1', fontWeight: 700, fontSize: 14 }}>×</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Search products by name or category…"
-              style={{ ...iStyle, marginBottom: 8 }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
-              {filteredProducts.map(p => (
-                <div key={p.href} onClick={() => toggleProduct(p)}
-                  style={{ border: `2px solid ${isSelected(p) ? T.accent : T.border}`, borderRadius: 8, padding: 6, cursor: 'pointer', background: isSelected(p) ? T.surfaceAlt : T.surface, textAlign: 'center' }}>
-                  {p.image && <img src={p.image} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 4, marginBottom: 4 }} />}
-                  <div style={{ fontSize: 10, color: T.textSub, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</div>
-                  <div style={{ fontSize: 10, color: T.textMuted, marginTop: 2 }}>${p.price}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function CalendarTab({ calItems, setCalItems, campaigns, personas, catalog }) {
-  const T = useT()
-  const [weekStart, setWeekStart] = useState(() => {
-    const today = new Date()
-    const d = new Date(today)
-    d.setDate(today.getDate() - today.getDay())
-    return dateKey(d)
-  })
-  const [drawerItem, setDrawerItem] = useState(null)
-
-  const weekDates = getWeekDates(new Date(weekStart + 'T12:00:00'))
-  const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-  function prevWeek() {
-    const d = new Date(weekStart + 'T12:00:00')
-    d.setDate(d.getDate() - 7)
-    setWeekStart(dateKey(d))
-  }
-  function nextWeek() {
-    const d = new Date(weekStart + 'T12:00:00')
-    d.setDate(d.getDate() + 7)
-    setWeekStart(dateKey(d))
-  }
-
-  const monthLabel = weekDates[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-
-  async function addItem(date) {
-    const res = await fetch('/api/calendar/item', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, channel: 'email', status: 'brief', theme: '' }),
-    })
-    const item = await res.json()
-    setCalItems(prev => [...prev, item])
-    setDrawerItem(item)
-  }
-
-  async function deleteItem(id) {
-    await fetch(`/api/calendar/item/${id}`, { method: 'DELETE' })
-    setCalItems(prev => prev.filter(i => i.id !== id))
-    setDrawerItem(null)
-  }
-
-  function onSave(updated) {
-    setCalItems(prev => prev.map(i => i.id === updated.id ? updated : i))
-    setDrawerItem(updated)
-  }
-
-  const today = dateKey(new Date())
-
-  return (
-    <div>
-      {/* Week nav */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <SectionHeader style={{ margin: 0 }}>Content Calendar</SectionHeader>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={prevWeek} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>← Prev</button>
-          <div style={{ fontWeight: 700, fontSize: 14, minWidth: 160, textAlign: 'center', color: T.text }}>{monthLabel}</div>
-          <button onClick={nextWeek} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Next →</button>
-        </div>
-      </div>
-
-      {/* Campaign legend */}
-      {campaigns?.filter(c => c.startDate && c.endDate).length > 0 && (
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: T.textFaint }}>CAMPAIGNS:</span>
-          {campaigns.filter(c => c.startDate && c.endDate).map((c) => (
-            <span key={c.id} style={{ fontSize: 11, background: T.surfaceAlt, border: `1px solid ${Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4]}`, color: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4], borderRadius: 6, padding: '2px 8px', fontWeight: 600 }}>{c.name}</span>
-          ))}
-        </div>
-      )}
-
-      {/* Week grid */}
-      <div className="ak-cal-week-scroll" style={{ overflowX: 'auto' }}>
-        <div className="ak-cal-week-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))', gap: 8 }}>
-          {weekDates.map((date, di) => {
-            const dk = dateKey(date)
-            const dayItems = calItems.filter(i => i.date === dk)
-            const isToday = dk === today
-            const activeCamps = (campaigns || []).filter(c => {
-              if (!c.startDate || !c.endDate) return false
-              return dk >= c.startDate && dk <= c.endDate
-            })
-            return (
-              <div key={dk} style={{ minHeight: 120, background: T.surface, borderRadius: 10, border: `1px solid ${isToday ? T.accent : T.border}`, padding: 8, display: 'flex', flexDirection: 'column' }}>
-                {/* Campaign bands */}
-                {activeCamps.map((c) => (
-                  <div key={c.id} title={c.name}
-                    style={{ height: 4, borderRadius: 2, marginBottom: 3, background: Object.values(STATUS_COLORS)[campaigns.indexOf(c) % 4] }} />
-                ))}
-                {/* Day header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: 'uppercase' }}>{DAY_NAMES[di]}</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: isToday ? T.accent : T.text }}>{date.getDate()}</div>
-                  </div>
-                  <button onClick={() => addItem(dk)}
-                    style={{ width: 22, height: 22, borderRadius: '50%', border: `1px solid ${T.inputBorder}`, background: T.surface, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.textMuted, lineHeight: 1 }}>+</button>
-                </div>
-
-                {/* Items */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-                  {dayItems.map(item => (
-                    <div key={item.id} onClick={() => setDrawerItem(item)}
-                      style={{ background: (CHANNEL_COLORS[item.channel] || '#6b7280') + '18', borderLeft: `3px solid ${CHANNEL_COLORS[item.channel] || '#6b7280'}`, borderRadius: 5, padding: '4px 7px', cursor: 'pointer', fontSize: 11 }}>
-                      <div style={{ fontWeight: 700, color: CHANNEL_COLORS[item.channel] || '#6b7280', textTransform: 'uppercase', fontSize: 10 }}>{item.channel}</div>
-                      <div style={{ color: T.textSub, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.theme || '(no theme)'}</div>
-                      <div style={{ marginTop: 2 }}>
-                        <span style={{ fontSize: 10, background: STATUS_BG[item.status], color: STATUS_FG[item.status], borderRadius: 4, padding: '1px 5px', fontWeight: 600 }}>{item.status}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Drawer */}
-      {drawerItem && (
-        <CalendarItemDrawer
-          item={drawerItem}
-          onClose={() => setDrawerItem(null)}
-          onSave={onSave}
-          onDelete={deleteItem}
-          campaigns={campaigns}
-          personas={personas}
-          catalog={catalog}
-        />
-      )}
-    </div>
-  )
-}
-
-// ─── SEO Product Intelligence Tab ────────────────────────────────────────────
-const SEO_FILTERS = [
-  { id: 'all',          label: 'All' },
-  { id: 'new_arrivals', label: 'New Arrivals' },
-  { id: 'clothing',     label: 'Clothing' },
-  { id: 'shoes',        label: 'Shoes' },
-  { id: 'jewelry',      label: 'Jewelry' },
-  { id: 'handbags',     label: 'Handbags' },
-]
-
-function SeoProductTab() {
-  const T = useT()
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [running, setRunning] = useState(false)
-  const [runLog, setRunLog] = useState(null)
-  const [viewFilter, setViewFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('pending')
-  const [runFilter, setRunFilter] = useState('new_arrivals')
-  const [runLimit, setRunLimit] = useState(50)
-  const [forceReanalyze, setForceReanalyze] = useState(false)
-  const [selected, setSelected] = useState(new Set())
-  const [bulkApproving, setBulkApproving] = useState(false)
-  const [expandedHref, setExpandedHref] = useState(null)
+  const [error, setError] = useState('')
+  const [discoverySlug, setDiscoverySlug] = useState(null)
+  const [moduleStatus, setModuleStatus] = useState([])
+  const [discoveryDone, setDiscoveryDone] = useState(false)
   const pollRef = useRef(null)
-  const [shopifyConfig, setShopifyConfig] = useState(null)
-  const [reanalyzingHref, setReanalyzingHref] = useState(null)
-  const [pushing, setPushing] = useState(false)
-  const [pushLog, setPushLog] = useState(null)
-  const [editingHref, setEditingHref] = useState(null)
-  const [editDraft, setEditDraft] = useState({})
-  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    fetch('/api/shopify/status').then(r => r.json()).then(setShopifyConfig).catch(() => {})
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
   }, [])
 
-  async function loadData() {
-    setLoading(true)
-    const params = new URLSearchParams({ status: statusFilter, filter: viewFilter })
-    const res = await fetch(`/api/seo-suggestions?${params}`)
-    const d = await res.json()
-    setData(d)
-    setSelected(new Set())
-    setLoading(false)
+  async function handleAdd() {
+    if (!url) return
+    setLoading(true); setError('')
+    try {
+      const res = await fetch(`${API}/brands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to add brand')
+      setDiscoverySlug(data.slug)
+      startPolling(data.slug)
+    } catch (e) {
+      setError(e.message)
+      setLoading(false)
+    }
   }
 
-  useEffect(() => { loadData() }, [statusFilter, viewFilter])
-
-  async function runAnalysis() {
-    setRunning(true)
-    setRunLog(null)
-    const res = await fetch('/api/seo-suggestions/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filter: runFilter, limit: runLimit, force: forceReanalyze }),
-    })
-    const result = await res.json()
-    if (!result.ok) {
-      setRunLog(result)
-      setRunning(false)
-      return
-    }
-    // Analyzer is running in background — poll every 3s until running=false
+  function startPolling(slug) {
     pollRef.current = setInterval(async () => {
       try {
-        const r = await fetch('/api/seo-suggestions')
-        const d = await r.json()
-        setData(prev => prev ? { ...prev, totalAnalyzed: d.totalAnalyzed, totalProducts: d.totalProducts } : d)
-        if (!d.running) {
+        const [brandsRes, statusRes] = await Promise.all([
+          fetch(`${API}/brands`).then(r => r.json()),
+          fetch(`${API}/brands/${slug}/status`).then(r => r.json()),
+        ])
+        const brand = (brandsRes.brands || []).find(b => b.slug === slug)
+        if (brand?.discoveryStatus === 'complete' || brand?.discoveryStatus === 'failed') setDiscoveryDone(true)
+        setModuleStatus(statusRes.modules || [])
+
+        // All steps done when action_plan file exists
+        const allDone = (statusRes.modules || []).find(m => m.module === 'action_plan')?.exists
+        if (allDone) {
           clearInterval(pollRef.current)
-          pollRef.current = null
-          setRunning(false)
-          loadData()
+          setTimeout(() => { onAdded(slug) }, 1200)
         }
       } catch {}
     }, 3000)
   }
 
-  async function updateStatus(href, status) {
-    await fetch('/api/seo-suggestions/status', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ href, status }),
-    })
-    setData(prev => ({ ...prev, products: prev.products.map(p => p.href === href ? { ...p, status } : p) }))
-    setSelected(prev => { const s = new Set(prev); s.delete(href); return s; })
+  function getStepState(step, idx) {
+    if (step.key === 'discovery') return discoveryDone ? 'done' : loading ? 'running' : 'pending'
+    const mod = moduleStatus.find(m => m.module === step.file)
+    if (mod?.exists) return 'done'
+    // If previous step is done and this one isn't, mark as running
+    const prevFile = PIPELINE_STEPS[idx - 1]?.file
+    const prevDone = idx === 1 ? discoveryDone : moduleStatus.find(m => m.module === prevFile)?.exists
+    return prevDone ? 'running' : 'pending'
   }
 
-  async function bulkApprove() {
-    setBulkApproving(true)
-    await fetch('/api/seo-suggestions/bulk-approve', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hrefs: [...selected] }),
-    })
-    setBulkApproving(false)
-    loadData()
-  }
+  const isInProgress = !!discoverySlug
+  const doneCount = PIPELINE_STEPS.filter((s, i) => getStepState(s, i) === 'done').length
+  const progressPct = Math.round((doneCount / PIPELINE_STEPS.length) * 100)
 
-  async function pushToShopify(hrefs, dryRun = false) {
-    setPushing(true)
-    setPushLog(null)
-    const res = await fetch('/api/seo-suggestions/push-shopify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hrefs, dryRun }),
-    })
-    const result = await res.json()
-    setPushLog(result)
-    setPushing(false)
-    loadData()
-  }
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div style={{ background: T.surface, borderRadius: 16, padding: 32, width: isInProgress ? 520 : 480, maxWidth: '90vw' }}>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{isInProgress ? 'Running Analysis Pipeline' : 'Add Brand'}</h2>
 
-  async function reanalyzeOne(href) {
-    setReanalyzingHref(href)
-    try {
-      const res = await fetch('/api/seo-suggestions/reanalyze-one', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ href }),
-      })
-      const result = await res.json()
-      if (!result.ok) alert(`Re-analyze failed: ${result.output?.split('\n').pop() || 'unknown error'}`)
-    } catch (err) {
-      alert(`Re-analyze error: ${err.message}`)
-    }
-    setReanalyzingHref(null)
-    loadData()
-  }
+        {!isInProgress ? (
+          <>
+            <p style={{ color: T.textMuted, fontSize: 14, marginBottom: 24 }}>Enter the brand's website URL. We'll automatically discover the brand, identify competitors, and run the full analysis pipeline.</p>
+            <input
+              type="url"
+              placeholder="https://www.brandname.com"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAdd()}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 15, marginBottom: 8, boxSizing: 'border-box' }}
+              autoFocus
+            />
+            {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 8 }}>{error}</p>}
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button onClick={handleAdd} disabled={loading || !url} style={{ flex: 1, background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: loading ? 'wait' : 'pointer', opacity: loading || !url ? 0.7 : 1 }}>
+                {loading ? 'Starting discovery...' : 'Add Brand'}
+              </button>
+              <button onClick={onClose} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, color: T.textSub, cursor: 'pointer' }}>Cancel</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>This takes 8–12 minutes. You can close this window — the pipeline continues in the background.</p>
 
-  function startEdit(p) {
-    const s = p.suggested || {}
-    // Flatten JSON fields to strings for textarea editing
-    const draft = { ...s }
-    ;['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases'].forEach(k => {
-      if (draft[k] && typeof draft[k] === 'object') draft[k] = JSON.stringify(draft[k], null, 2)
-    })
-    if (Array.isArray(draft.tags)) draft.tags = draft.tags.join(', ')
-    setEditDraft(draft)
-    setEditingHref(p.href)
-  }
+            {/* Progress bar */}
+            <div style={{ background: T.surfaceAlt, borderRadius: 8, height: 8, marginBottom: 20, overflow: 'hidden' }}>
+              <div style={{ background: T.accent, height: '100%', width: `${progressPct}%`, borderRadius: 8, transition: 'width 0.6s ease' }} />
+            </div>
 
-  function cancelEdit() {
-    setEditingHref(null)
-    setEditDraft({})
-  }
+            {/* Steps */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {PIPELINE_STEPS.map((step, i) => {
+                const state = getStepState(step, i)
+                const icons = { done: '✓', running: '⟳', pending: '○' }
+                const colors = { done: '#059669', running: T.accent, pending: T.textFaint }
+                const bgColors = { done: '#d1fae5', running: '#ede9fe', pending: T.surfaceAlt }
+                return (
+                  <div key={step.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, background: bgColors[state], transition: 'background 0.4s' }}>
+                    <span style={{ fontSize: 16, color: colors[state], fontWeight: 800, width: 20, textAlign: 'center', animation: state === 'running' ? 'spin 1s linear infinite' : 'none' }}>{icons[state]}</span>
+                    <span style={{ fontSize: 14, fontWeight: state === 'running' ? 700 : 400, color: state === 'pending' ? T.textFaint : T.text }}>{step.label}</span>
+                    {state === 'done' && <span style={{ marginLeft: 'auto', fontSize: 11, color: '#059669', fontWeight: 600 }}>Done</span>}
+                    {state === 'running' && <span style={{ marginLeft: 'auto', fontSize: 11, color: T.accent, fontWeight: 600 }}>Running...</span>}
+                  </div>
+                )
+              })}
+            </div>
 
-  async function saveEdit(href) {
-    setSaving(true)
-    try {
-      const out = { ...editDraft }
-      // Parse tags back to array
-      if (typeof out.tags === 'string') out.tags = out.tags.split(',').map(t => t.trim()).filter(Boolean)
-      // Parse JSON fields back to objects
-      ;['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases'].forEach(k => {
-        if (typeof out[k] === 'string' && out[k].trim()) {
-          try { out[k] = JSON.parse(out[k]) } catch { /* leave as string if invalid JSON */ }
-        }
-      })
-      const res = await fetch('/api/seo-suggestions/update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ href, suggested: out }),
-      })
-      const result = await res.json()
-      if (!result.ok) alert('Save failed')
-      else { setEditingHref(null); setEditDraft({}); loadData() }
-    } catch (err) {
-      alert(`Save error: ${err.message}`)
-    }
-    setSaving(false)
-  }
+            <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+              <button onClick={() => { onAdded(discoverySlug) }} style={{ flex: 1, background: T.surfaceAlt, color: T.textSub, border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, cursor: 'pointer' }}>
+                Open Dashboard Now →
+              </button>
+              <button onClick={onClose} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, color: T.textSub, cursor: 'pointer' }}>Close</button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
 
-  function toggleSelect(href) {
-    setSelected(prev => { const s = new Set(prev); s.has(href) ? s.delete(href) : s.add(href); return s; })
-  }
-  function toggleSelectAll() {
-    const all = (data?.products || []).map(p => p.href)
-    setSelected(prev => prev.size === all.length ? new Set() : new Set(all))
-  }
+// ─── Portfolio Tab ──────────────────────────────────────────────────────────────
+function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
+  const T = useT()
 
-  const products = data?.products || []
-  const totalAnalyzed = data?.totalAnalyzed || 0
-  const totalProducts = data?.totalProducts || 0
-  const pctDone = totalProducts > 0 ? Math.round((totalAnalyzed / totalProducts) * 100) : 0
+  if (brands.length === 0) {
+    return <EmptyState message="No brands tracked yet. Add your first brand to begin the analysis pipeline." cta="Add Brand" onCta={onAddBrand} />
+  }
 
   return (
     <div>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 16, flexWrap: 'wrap' }}>
-        <div>
-          <SectionHeader>SEO Product Intelligence</SectionHeader>
-          <div style={{ fontSize: 13, color: T.textMuted }}>
-            {totalAnalyzed} of {totalProducts} products analyzed ({pctDone}%)
-          </div>
-          <div style={{ marginTop: 6, width: '100%', maxWidth: 220, height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${pctDone}%`, background: '#6366f1', borderRadius: 3, transition: 'width 0.4s' }} />
-          </div>
-        </div>
-
-        {/* Run controls */}
-        <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 14, display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, marginBottom: 4 }}>FILTER</div>
-            <select value={runFilter} onChange={e => setRunFilter(e.target.value)}
-              style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '6px 10px', fontSize: 13, background: T.inputBg, color: T.text }}>
-              {SEO_FILTERS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, marginBottom: 4 }}>BATCH SIZE</div>
-            <select value={runLimit} onChange={e => setRunLimit(Number(e.target.value))}
-              style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '6px 10px', fontSize: 13, background: T.inputBg, color: T.text }}>
-              {[25, 50, 100].map(n => <option key={n} value={n}>{n} products</option>)}
-            </select>
-          </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: T.textSub, cursor: 'pointer', userSelect: 'none', paddingBottom: 2 }}>
-            <input type="checkbox" checked={forceReanalyze} onChange={e => setForceReanalyze(e.target.checked)}
-              style={{ width: 14, height: 14, accentColor: '#f59e0b', cursor: 'pointer' }} />
-            <span>Re-analyze existing</span>
-          </label>
-          <button onClick={runAnalysis} disabled={running}
-            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: forceReanalyze ? '#f59e0b' : '#6366f1', color: '#fff', cursor: running ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13, opacity: running ? 0.7 : 1 }}>
-            {running ? '⚙️ Analyzing…' : forceReanalyze ? '🔄 Re-analyze Batch' : '✨ Analyze Next Batch'}
-          </button>
-          <a href="/api/seo-suggestions/export-csv" download
-            style={{ padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
-            ↓ Export CSV
-          </a>
-        </div>
-      </div>
-
-      {/* Shopify connection status banner */}
-      {shopifyConfig && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderRadius: 8, marginBottom: 14,
-          background: shopifyConfig.configured ? '#dcfce7' : '#fefce8',
-          border: `1px solid ${shopifyConfig.configured ? '#86efac' : '#fde68a'}`,
-          color: shopifyConfig.configured ? '#14532d' : '#713f12' }}>
-          <span style={{ fontSize: 16 }}>{shopifyConfig.configured ? '🟢' : '🔑'}</span>
-          <div style={{ flex: 1, fontSize: 12 }}>
-            {shopifyConfig.configured
-              ? <><strong>Shopify connected</strong> — {shopifyConfig.domain} · API {shopifyConfig.apiVersion}</>
-              : <><strong>Shopify not connected</strong> — Add <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3, color: '#713f12' }}>SHOPIFY_STORE_DOMAIN</code> and <code style={{ background: '#fef9c3', padding: '1px 4px', borderRadius: 3, color: '#713f12' }}>SHOPIFY_ADMIN_API_TOKEN</code> to your .env to enable pushing</>}
-          </div>
-        </div>
-      )}
-
-      {/* Run log */}
-      {runLog && (
-        <div style={{ background: runLog.ok ? '#dcfce7' : '#fee2e2', border: `1px solid ${runLog.ok ? '#86efac' : '#fca5a5'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
-          <div style={{ fontWeight: 700, marginBottom: 4, color: runLog.ok ? '#14532d' : '#991b1b' }}>
-            {runLog.ok ? `✓ Batch complete — ${runLog.totalAnalyzed} of ${runLog.totalProducts} products analyzed` : '✗ Analysis encountered errors'}
-          </div>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 160, overflowY: 'auto', color: '#1e293b' }}>{runLog.output}</pre>
-        </div>
-      )}
-
-      {/* Push log */}
-      {pushLog && (
-        <div style={{ background: pushLog.ok ? '#dcfce7' : '#fee2e2', border: `1px solid ${pushLog.ok ? '#86efac' : '#fca5a5'}`, borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <div style={{ fontWeight: 700, color: pushLog.ok ? '#14532d' : '#991b1b' }}>
-              {pushLog.ok
-                ? `✓ Push complete — ${pushLog.pushed} pushed to Shopify${pushLog.errors ? `, ${pushLog.errors} errors` : ''}`
-                : `✗ Push failed — ${pushLog.errors} errors`}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+        {brands.map(brand => (
+          <Card key={brand.slug}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+              <div>
+                <h3 style={{ color: T.text, fontSize: 17, fontWeight: 700, marginBottom: 4 }}>{brand.name}</h3>
+                <p style={{ color: T.textMuted, fontSize: 13 }}>{brand.industry || 'Industry unknown'}</p>
+              </div>
+              <HealthBadge status={brand.healthStatus} />
             </div>
-            <button onClick={() => navigator.clipboard.writeText(pushLog.output || '')}
-              style={{ padding: '2px 10px', borderRadius: 5, border: '1px solid #86efac', background: '#f0fdf4', color: '#166534', fontSize: 11, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-              Copy log
-            </button>
-          </div>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 200, overflowY: 'auto', color: '#1e293b' }}>{pushLog.output}</pre>
-        </div>
-      )}
-
-      {/* View filter pills + status tabs */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {SEO_FILTERS.map(f => (
-            <button key={f.id} onClick={() => setViewFilter(f.id)}
-              style={{ padding: '5px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: viewFilter === f.id ? '#6366f1' : T.surfaceAlt, color: viewFilter === f.id ? '#fff' : T.textSub }}>
-              {f.label}
-            </button>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {['pending', 'approved', 'skipped'].map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)}
-              style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: 'capitalize', cursor: 'pointer',
-                background: statusFilter === s ? { pending: '#ede9fe', approved: '#d1fae5', skipped: T.surfaceAlt }[s] : T.surface,
-                color: statusFilter === s ? { pending: '#6366f1', approved: '#059669', skipped: T.textSub }[s] : T.textMuted,
-                border: `1px solid ${T.border}` }}>
-              {s}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Bulk action bar — pending */}
-      {statusFilter === 'pending' && products.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: T.surfaceAlt, borderRadius: 8, border: `1px solid ${T.border}` }}>
-          <input type="checkbox" checked={selected.size === products.length && products.length > 0}
-            onChange={toggleSelectAll} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-          <span style={{ fontSize: 13, color: T.textSub }}>
-            {selected.size > 0 ? `${selected.size} selected` : `Select all ${products.length}`}
-          </span>
-          {selected.size > 0 && (
-            <button onClick={bulkApprove} disabled={bulkApproving}
-              style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
-              {bulkApproving ? 'Approving…' : `✓ Approve ${selected.size}`}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Bulk action bar — approved */}
-      {statusFilter === 'approved' && products.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '8px 12px', background: T.surfaceAlt, borderRadius: 8, border: `1px solid ${T.border}` }}>
-          <input type="checkbox" checked={selected.size === products.length && products.length > 0}
-            onChange={toggleSelectAll} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-          <span style={{ fontSize: 13, color: T.textSub }}>
-            {selected.size > 0 ? `${selected.size} selected` : `Select all ${products.length}`}
-          </span>
-          {selected.size > 0 && shopifyConfig?.configured && (
-            <button onClick={() => pushToShopify([...selected])} disabled={pushing}
-              style={{ padding: '5px 14px', borderRadius: 6, border: 'none', background: '#0284c7', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, opacity: pushing ? 0.7 : 1 }}>
-              {pushing ? '⏳ Pushing…' : `↑ Push ${selected.size} to Shopify`}
-            </button>
-          )}
-          {selected.size > 0 && !shopifyConfig?.configured && (
-            <span style={{ fontSize: 12, color: '#d97706', fontWeight: 600 }}>🔑 Add Shopify credentials to push</span>
-          )}
-          {selected.size > 0 && shopifyConfig?.configured && (
-            <button onClick={() => pushToShopify([...selected], true)} disabled={pushing}
-              style={{ padding: '5px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer', fontSize: 12 }}>
-              Dry run
-            </button>
-          )}
-        </div>
-      )}
-
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: T.textMuted }}>Loading…</div>}
-
-      {!loading && products.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: T.textMuted }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: T.text }}>
-            {totalAnalyzed === 0 ? 'No products analyzed yet' : `No ${statusFilter} suggestions`}
-          </div>
-          <div style={{ fontSize: 13 }}>
-            {totalAnalyzed === 0 ? 'Choose a filter and batch size above, then click Analyze Next Batch.' : `All products in this view have been reviewed.`}
-          </div>
-        </div>
-      )}
-
-      {/* Product rows */}
-      {!loading && products.map(p => {
-        const isExpanded = expandedHref === p.href
-        const isSelected = selected.has(p.href)
-        const isPushed = p.pushStatus === 'pushed'
-        const isPushError = p.pushStatus === 'error'
-        return (
-          <div key={p.href} style={{ background: T.surface, border: `1px solid ${isSelected ? '#6366f1' : T.border}`, borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
-            {/* Collapsed row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: 'pointer', flexWrap: 'wrap' }}
-              onClick={() => setExpandedHref(isExpanded ? null : p.href)}>
-              {(statusFilter === 'pending' || statusFilter === 'approved') && (
-                <input type="checkbox" checked={isSelected} onChange={e => { e.stopPropagation(); toggleSelect(p.href) }}
-                  onClick={e => e.stopPropagation()} style={{ width: 16, height: 16, flexShrink: 0, cursor: 'pointer' }} />
-              )}
-              <div style={{ width: 52, height: 52, flexShrink: 0, borderRadius: 6, overflow: 'hidden', background: T.surfaceAlt }}>
-                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👗</div>}
+            <p style={{ color: T.textFaint, fontSize: 12, marginBottom: 16 }}>{brand.url}</p>
+            {brand.discoveryStatus === 'running' && (
+              <div style={{ background: '#dbeafe', color: '#1e40af', fontSize: 12, padding: '6px 12px', borderRadius: 8, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span> Pipeline running...
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: T.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: T.textSub }}>
-                  {p.category} · {p.price}
-                  {p.isNewArrival && <span style={{ marginLeft: 8, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '1px 6px', fontSize: 11, fontWeight: 700 }}>NEW</span>}
-                </div>
-                {p.suggested?.meta_title && (
-                  <div style={{ fontSize: 12, color: '#6366f1', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    → {p.suggested.meta_title}
-                  </div>
-                )}
+            )}
+            {brand.discoveryStatus === 'failed' && (
+              <div style={{ background: '#fee2e2', color: '#991b1b', fontSize: 12, padding: '6px 12px', borderRadius: 8, marginBottom: 12 }}>
+                ⚠ Discovery failed — check brand URL and try again
               </div>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4, textTransform: 'capitalize',
-                  background: { pending: '#ede9fe', approved: '#d1fae5', skipped: T.surfaceAlt }[p.status],
-                  color: { pending: '#6366f1', approved: '#059669', skipped: T.textSub }[p.status] }}>
-                  {p.status}
-                </span>
-                {p.status === 'pending' && <>
-                  <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'approved') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: 'none', background: '#059669', color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✓ Approve</button>
-                  <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'skipped') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer', fontSize: 11 }}>Skip</button>
-                </>}
-                <button onClick={e => { e.stopPropagation(); reanalyzeOne(p.href) }}
-                  disabled={reanalyzingHref === p.href}
-                  title="Re-analyze this product with the latest AI model"
-                  style={{ padding: '3px 8px', borderRadius: 6, border: `1px solid ${T.border}`, background: reanalyzingHref === p.href ? T.surfaceAlt : T.surface, color: '#6366f1', cursor: reanalyzingHref === p.href ? 'not-allowed' : 'pointer', fontSize: 11 }}>
-                  {reanalyzingHref === p.href ? '⚙️' : '↻'}
-                </button>
-                {p.status !== 'pending' && (
-                  <button onClick={e => { e.stopPropagation(); updateStatus(p.href, 'pending') }}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer', fontSize: 11 }}>Undo</button>
-                )}
-                {p.status === 'approved' && shopifyConfig?.configured && !isPushed && (
-                  <button onClick={e => { e.stopPropagation(); pushToShopify([p.href]) }} disabled={pushing}
-                    style={{ padding: '3px 10px', borderRadius: 6, border: 'none', background: '#0284c7', color: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>↑ Push</button>
-                )}
-                {isPushed && (
-                  <span style={{ fontSize: 11, color: '#0284c7', fontWeight: 700 }}>✓ Live</span>
-                )}
-                {isPushError && (
-                  <span style={{ fontSize: 11, color: '#dc2626', fontWeight: 700 }} title={p.pushError}>⚠ Error</span>
-                )}
-                <span style={{ fontSize: 14, color: T.textMuted, transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', display: 'inline-block' }}>▾</span>
-              </div>
-            </div>
-
-            {/* Expanded detail */}
-            {isExpanded && (
-              <div style={{ borderTop: `1px solid ${T.border}`, padding: 16, background: T.surfaceAlt }}>
-                {/* Edit / Save / Cancel bar */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12, gap: 8 }}>
-                  {editingHref === p.href ? (
-                    <>
-                      <button onClick={cancelEdit} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer' }}>Cancel</button>
-                      <button onClick={() => saveEdit(p.href)} disabled={saving} style={{ fontSize: 12, padding: '4px 14px', borderRadius: 6, border: 'none', background: '#059669', color: 'white', cursor: 'pointer', fontWeight: 600 }}>
-                        {saving ? 'Saving…' : 'Save changes'}
-                      </button>
-                    </>
-                  ) : (
-                    <button onClick={() => startEdit(p)} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.textSub, cursor: 'pointer' }}>✏ Edit</button>
-                  )}
-                </div>
-                {p.suggested?.image_insights && (
-                  <div style={{ background: '#ede9fe', borderRadius: 8, padding: '8px 12px', marginBottom: 14, fontSize: 13, color: '#6366f1' }}>
-                    <span style={{ fontWeight: 700 }}>🔍 Image insights: </span>{p.suggested.image_insights}
-                  </div>
-                )}
-                <div className="ak-seo-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 14 }}>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Title</div>
-                    <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 4 }}>{p.name}</div>
-                    {editingHref === p.href ? (
-                      <div>
-                        <input value={editDraft.meta_title || ''} onChange={e => setEditDraft(d => ({ ...d, meta_title: e.target.value }))} maxLength={70}
-                          style={{ width: '100%', fontSize: 13, padding: '6px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
-                        <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{(editDraft.meta_title || '').length}/60</div>
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: 13, color: '#059669', fontWeight: 600, background: '#f0fdf4', borderRadius: 6, padding: '6px 10px' }}>
-                        {p.suggested?.meta_title || '—'}
-                        <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8, fontWeight: 400 }}>{(p.suggested?.meta_title || '').length}/60</span>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Tags</div>
-                    <div style={{ fontSize: 11, color: T.textFaint, textDecoration: 'line-through', marginBottom: 6 }}>{(p.current?.tags || []).join(', ') || '(none)'}</div>
-                    {editingHref === p.href ? (
-                      <div>
-                        <input value={editDraft.tags || ''} onChange={e => setEditDraft(d => ({ ...d, tags: e.target.value }))} placeholder="tag1, tag2, tag3"
-                          style={{ width: '100%', fontSize: 12, padding: '6px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
-                        <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>comma-separated</div>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                        {(p.suggested?.tags || []).map((t, i) => (
-                          <span key={i} style={{ fontSize: 11, background: '#d1fae5', color: '#059669', borderRadius: 4, padding: '2px 8px' }}>{t}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Meta Description</div>
-                  <div style={{ fontSize: 12, color: T.textFaint, textDecoration: 'line-through', marginBottom: 6, lineHeight: 1.4 }}>
-                    {(p.current?.description || '').substring(0, 160) || '(not set)'}
-                  </div>
-                  {editingHref === p.href ? (
-                    <div>
-                      <textarea value={editDraft.meta_description || ''} onChange={e => setEditDraft(d => ({ ...d, meta_description: e.target.value }))} maxLength={180} rows={3}
-                        style={{ width: '100%', fontSize: 13, padding: '8px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, lineHeight: 1.5, boxSizing: 'border-box', resize: 'vertical' }} />
-                      <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{(editDraft.meta_description || '').length}/160</div>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
-                      {p.suggested?.meta_description || '—'}
-                      <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{(p.suggested?.meta_description || '').length}/160</span>
-                    </div>
-                  )}
-                </div>
-                <div style={{ marginTop: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Image Alt Text <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(Shopify productUpdateMedia)</span></div>
-                  {editingHref === p.href ? (
-                    <div>
-                      <input value={editDraft.alt_text || ''} onChange={e => setEditDraft(d => ({ ...d, alt_text: e.target.value }))} maxLength={130}
-                        style={{ width: '100%', fontSize: 13, padding: '6px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, boxSizing: 'border-box' }} />
-                      <div style={{ fontSize: 11, color: T.textFaint, marginTop: 2 }}>{(editDraft.alt_text || '').length}/125</div>
-                    </div>
-                  ) : p.suggested?.alt_text ? (
-                    <div style={{ fontSize: 13, color: '#059669', background: '#f0fdf4', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>
-                      {p.suggested.alt_text}
-                      <span style={{ fontSize: 11, color: T.textFaint, marginLeft: 8 }}>{p.suggested.alt_text.length}/125</span>
-                    </div>
-                  ) : <div style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>not set</div>}
-                </div>
-                <div style={{ marginTop: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>GEO Description <span style={{ fontWeight: 400, textTransform: 'none', color: T.textMuted }}>(AI assistant discoverability)</span></div>
-                  {editingHref === p.href ? (
-                    <textarea value={editDraft.geo_description || ''} onChange={e => setEditDraft(d => ({ ...d, geo_description: e.target.value }))} rows={3}
-                      style={{ width: '100%', fontSize: 13, padding: '8px 12px', borderRadius: 6, border: `1px solid ${T.border}`, background: T.surface, color: T.text, lineHeight: 1.5, boxSizing: 'border-box', resize: 'vertical' }} />
-                  ) : p.suggested?.geo_description ? (
-                    <div style={{ fontSize: 13, color: '#1d4ed8', background: '#eff6ff', borderRadius: 6, padding: '8px 12px', lineHeight: 1.6 }}>
-                      {p.suggested.geo_description}
-                    </div>
-                  ) : <div style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>not set</div>}
-                </div>
-                {/* AI Product Intelligence — GEO metafields (UCP + ACP) */}
-                {(() => {
-                  const s = p.suggested || {}
-                  const geoFields = ['why_it_works','compatibility','care_notes','fit_logic','customer_qa','use_cases'].filter(k => s[k])
-                  if (!geoFields.length) return null
+            )}
+            {/* Pipeline progress steps */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+                {PIPELINE_STEPS.map(step => {
+                  const mod = brand.moduleStatus?.find(m => m.module === step.file)
+                  const done = step.key === 'discovery' ? brand.discoveryStatus === 'complete' : mod?.exists
                   return (
-                    <div style={{ marginTop: 14, padding: '10px 12px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 10 }}>
-                        AI Product Intelligence <span style={{ fontWeight: 400, textTransform: 'none', color: '#6b7280', fontSize: 10 }}>(Shopify UCP + ChatGPT ACP)</span>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {s.why_it_works && (
-                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Why It Works</div>
-                            {s.why_it_works.headline && <div style={{ fontSize: 12, fontWeight: 600, color: '#111827', marginBottom: 4 }}>{s.why_it_works.headline}</div>}
-                            {Array.isArray(s.why_it_works.reasons) && (
-                              <ul style={{ margin: 0, paddingLeft: 16 }}>
-                                {s.why_it_works.reasons.map((r, i) => <li key={i} style={{ fontSize: 12, color: '#374151', marginBottom: 2 }}>{r}</li>)}
-                              </ul>
-                            )}
-                          </div>
-                        )}
-                        {s.use_cases && Array.isArray(s.use_cases) && (
-                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 6 }}>Use Cases</div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                              {s.use_cases.map((u, i) => <span key={i} style={{ fontSize: 11, background: '#dcfce7', color: '#166534', borderRadius: 4, padding: '2px 8px' }}>{u}</span>)}
-                            </div>
-                          </div>
-                        )}
-                        {s.compatibility && (
-                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Compatibility</div>
-                            {Array.isArray(s.compatibility.pairs_with) && (
-                              <div style={{ marginBottom: 4 }}>
-                                {s.compatibility.pairs_with.map((pw, i) => (
-                                  <span key={i} style={{ fontSize: 11, color: '#374151', marginRight: 6 }}>
-                                    {typeof pw === 'object' ? pw.item : pw}
-                                    {typeof pw === 'object' && pw.relationship_type && <span style={{ color: '#9ca3af', fontSize: 10 }}> ({pw.relationship_type})</span>}
-                                    {i < s.compatibility.pairs_with.length - 1 ? ' ·' : ''}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            {Array.isArray(s.compatibility.outfit_contexts) && (
-                              <div style={{ fontSize: 11, color: '#6b7280' }}>Contexts: {s.compatibility.outfit_contexts.join(' · ')}</div>
-                            )}
-                          </div>
-                        )}
-                        {s.fit_logic && (
-                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Fit Logic</div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
-                              {Object.entries(s.fit_logic).filter(([,v]) => v).map(([k,v]) => (
-                                <div key={k} style={{ fontSize: 11, color: '#374151' }}>
-                                  <span style={{ color: '#9ca3af', textTransform: 'capitalize' }}>{k.replace(/_/g,' ')}: </span>{v}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {s.care_notes && (
-                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 4 }}>Care Notes</div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px' }}>
-                              {Object.entries(s.care_notes).filter(([,v]) => v).map(([k,v]) => (
-                                <div key={k} style={{ fontSize: 11, color: '#374151' }}>
-                                  <span style={{ color: '#9ca3af', textTransform: 'capitalize' }}>{k.replace(/_/g,' ')}: </span>{v}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {s.customer_qa && Array.isArray(s.customer_qa) && (
-                          <div style={{ background: 'white', borderRadius: 6, padding: '8px 10px', border: '1px solid #bbf7d0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803d', textTransform: 'uppercase', marginBottom: 6 }}>Customer Q&amp;A</div>
-                            {s.customer_qa.map((qa, i) => (
-                              <div key={i} style={{ marginBottom: i < s.customer_qa.length - 1 ? 6 : 0 }}>
-                                <div style={{ fontSize: 11, fontWeight: 600, color: '#1f2937' }}>Q: {qa.question}</div>
-                                <div style={{ fontSize: 11, color: '#4b5563', marginLeft: 8 }}>A: {qa.answer}</div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <div key={step.key} title={step.label} style={{ flex: 1, height: 4, borderRadius: 2, background: done ? '#6366f1' : T.surfaceAlt, transition: 'background 0.3s' }} />
                   )
-                })()}
-                {/* Category-specific Shopify metafields */}
-                {p.categoryGroup && p.categoryGroup !== 'other' && (() => {
-                  const s = p.suggested || {}
-                  const typeKey = p.specificType || p.categoryGroup
-                  const catFields = SPECIFIC_TYPE_FIELDS[typeKey] || SPECIFIC_TYPE_FIELDS[p.categoryGroup] || []
-                  const visibleFields = catFields  // always show all slots
-                  if (!s.shopify_taxonomy_gid && !s.shopify_category && catFields.every(([k]) => !s[k])) return null
+                })}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {PIPELINE_STEPS.slice(1).map(step => {
+                  const mod = brand.moduleStatus?.find(m => m.module === step.file)
                   return (
-                    <div style={{ marginTop: 14, padding: '10px 12px', background: '#fdf4ff', border: '1px solid #e9d5ff', borderRadius: 8 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 8 }}>
-                        Shopify Taxonomy — {typeKey} metafields
-                      </div>
-                      {(s.shopify_taxonomy_gid || s.shopify_category) && (
-                        <div style={{ fontSize: 12, marginBottom: 8 }}>
-                          <span style={{ color: T.textSub, fontWeight: 600 }}>Shopify category: </span>
-                          {s.shopify_taxonomy_gid
-                            ? <><span style={{ color: '#7c3aed', fontWeight: 700 }}>{TAXONOMY_LABELS[s.shopify_taxonomy_gid] || s.shopify_taxonomy_gid}</span>
-                                <span style={{ color: T.textMuted, fontFamily: 'monospace', fontSize: 10, marginLeft: 6 }}>{s.shopify_taxonomy_gid.replace('gid://shopify/TaxonomyCategory/', '')}</span></>
-                            : <span style={{ color: T.textMuted, fontStyle: 'italic' }}>re-analyze to get GID</span>}
+                    <span key={step.key} style={{ fontSize: 10, color: mod?.exists ? '#059669' : T.textFaint, background: mod?.exists ? '#d1fae5' : T.surfaceAlt, padding: '2px 7px', borderRadius: 4, fontWeight: mod?.exists ? 600 : 400 }}>
+                      {mod?.exists ? '✓' : '○'} {step.label}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => onSelectBrand(brand.slug)} style={{ flex: 1, background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Open</button>
+              <button onClick={() => onRefresh(brand.slug)} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>↻ Refresh All</button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Brand Profile Tab ──────────────────────────────────────────────────────────
+function BrandProfileTab({ slug, onRefresh, running }) {
+  const T = useT()
+  const [data, setData] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [newCompUrl, setNewCompUrl] = useState('')
+  const [newCompName, setNewCompName] = useState('')
+
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/profile`).then(r => r.json()).then(d => { setData(d); setForm(d) }).catch(() => {})
+  }, [slug])
+
+  async function save() {
+    setSaving(true)
+    await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    setData(form); setEditing(false); setSaving(false)
+  }
+
+  async function saveAndReanalyze() {
+    setSaving(true)
+    await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    setData(form); setEditing(false); setSaving(false)
+    onRefresh('competitive_analysis')
+    onRefresh('site_intelligence')
+    onRefresh('social_intelligence')
+  }
+
+  async function addCompetitorAndReanalyze() {
+    if (!newCompUrl || !newCompName) return
+    const newEntry = { name: newCompName, url: newCompUrl, discoveredAt: new Date().toISOString() }
+    const updated = { ...form, identifiedCompetitors: [...(form.identifiedCompetitors || []), newEntry] }
+    setForm(updated); setData(updated)
+    setNewCompUrl(''); setNewCompName('')
+    await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) })
+    onRefresh('competitive_analysis')
+    onRefresh('site_intelligence')
+    onRefresh('social_intelligence')
+  }
+
+  function removeCompetitor(url) {
+    setForm({ ...form, identifiedCompetitors: (form.identifiedCompetitors || []).filter(c => c.url !== url) })
+  }
+
+  if (!data) return <Spinner />
+
+  const archetypes = ['The Hero', 'The Caregiver', 'The Explorer', 'The Sage', 'The Creator', 'The Ruler', 'The Jester', 'The Lover', 'The Outlaw', 'The Magician', 'The Everyman', 'The Innocent']
+
+  return (
+    <div style={{ maxWidth: 800 }}>
+      {running && <RunningBanner moduleLabel="Analysis" detail="Competitor scraping and analysis is running. Competitive, Website, and Social tabs will update when complete." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Brand Profile</h2>
+        <div style={{ display: 'flex', gap: 10 }}>
+          {editing
+            ? <><button onClick={saveAndReanalyze} disabled={saving || running} style={{ background: running ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: saving || running ? 'not-allowed' : 'pointer' }}>{saving ? 'Saving...' : 'Save & Re-analyze'}</button>
+                <button onClick={save} disabled={saving} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
+                <button onClick={() => { setEditing(false); setForm(data) }} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>Cancel</button></>
+            : <><button onClick={() => setEditing(true)} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>Edit</button>
+                <RefreshButton onClick={() => onRefresh('competitive_analysis')} loading={running} label="Re-discover" /></>
+          }
+        </div>
+      </div>
+
+      <Card style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          {[['Brand Name', 'name'], ['Website URL', 'url'], ['Industry', 'industry'], ['Tagline', 'tagline']].map(([label, key]) => (
+            <div key={key}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>{label}</label>
+              {editing && key !== 'url'
+                ? <input value={form[key] || ''} onChange={e => setForm({ ...form, [key]: e.target.value })} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 14, boxSizing: 'border-box' }} />
+                : <p style={{ color: T.text, fontSize: 14, marginTop: 2 }}>{data[key] || <span style={{ color: T.textFaint }}>Not set</span>}</p>
+              }
+            </div>
+          ))}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Positioning</label>
+            {editing
+              ? <textarea value={form.positioning || ''} onChange={e => setForm({ ...form, positioning: e.target.value })} rows={2} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }} />
+              : <p style={{ color: T.text, fontSize: 14 }}>{data.positioning || <span style={{ color: T.textFaint }}>Not set</span>}</p>
+            }
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Brand Archetype</label>
+            {editing
+              ? <select value={form.brandArchetype || ''} onChange={e => setForm({ ...form, brandArchetype: e.target.value })} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 14 }}>
+                  <option value="">Select...</option>
+                  {archetypes.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              : <p style={{ color: T.text, fontSize: 14 }}>{data.brandArchetype || <span style={{ color: T.textFaint }}>Not set</span>}</p>
+            }
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Social Handles</label>
+            {editing
+              ? <div style={{ display: 'flex', gap: 8 }}>
+                  <input placeholder="Instagram handle" value={form.social?.instagram || ''} onChange={e => setForm({ ...form, social: { ...form.social, instagram: e.target.value } })} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                  <input placeholder="Twitter/X handle" value={form.social?.twitter || ''} onChange={e => setForm({ ...form, social: { ...form.social, twitter: e.target.value } })} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                </div>
+              : <p style={{ color: T.text, fontSize: 14 }}>
+                  {data.social?.instagram ? `@${data.social.instagram} (IG)` : ''}{data.social?.instagram && data.social?.twitter ? ' · ' : ''}{data.social?.twitter ? `@${data.social.twitter} (X)` : ''}
+                  {!data.social?.instagram && !data.social?.twitter && <span style={{ color: T.textFaint }}>Not set</span>}
+                </p>
+            }
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Identified Competitors ({(form.identifiedCompetitors || []).length})</h3>
+          {!editing && <p style={{ color: T.textFaint, fontSize: 12 }}>Edit URLs/handles above, then click Save & Re-analyze to re-scrape with corrected data.</p>}
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: T.surfaceAlt }}>
+                {['Competitor', 'Website URL', 'Instagram Handle', editing ? 'Remove' : ''].filter(Boolean).map(h => (
+                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {(editing ? form : data).identifiedCompetitors?.map((c, idx) => (
+                <tr key={c.url || idx} style={{ borderTop: `1px solid ${T.border}` }}>
+                  <td style={{ padding: '10px 12px', fontWeight: 600, color: T.text, minWidth: 140 }}>
+                    {editing
+                      ? <input value={c.name} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, name: e.target.value }; setForm({ ...form, identifiedCompetitors: comps }) }} style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                      : c.name
+                    }
+                  </td>
+                  <td style={{ padding: '10px 12px', color: T.textMuted, minWidth: 200 }}>
+                    {editing
+                      ? <input value={c.url || ''} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, url: e.target.value }; setForm({ ...form, identifiedCompetitors: comps }) }} placeholder="https://..." style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
+                      : <a href={c.url} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none', fontSize: 12 }}>{c.url?.replace(/^https?:\/\/(www\.)?/, '') || '—'}</a>
+                    }
+                  </td>
+                  <td style={{ padding: '10px 12px', minWidth: 160 }}>
+                    {editing
+                      ? <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ color: T.textMuted, fontSize: 13 }}>@</span>
+                          <input value={c.instagramHandle || ''} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, instagramHandle: e.target.value.replace(/^@/, '') }; setForm({ ...form, identifiedCompetitors: comps }) }} placeholder="handle" style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
                         </div>
-                      )}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 6 }}>
-                        {visibleFields.map(([key, label]) => (
-                          <div key={key} style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #e9d5ff' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
-                            {editingHref === p.href ? (
-                              <input value={editDraft[key] || ''} onChange={e => setEditDraft(d => ({ ...d, [key]: e.target.value }))}
-                                style={{ width: '100%', fontSize: 12, padding: '3px 6px', borderRadius: 4, border: `1px solid ${T.border}`, background: '#fff8', color: T.text, boxSizing: 'border-box' }} />
-                            ) : (
-                              <div style={{ fontSize: 12, color: s[key] ? T.textSub : T.textFaint, fontStyle: s[key] ? 'normal' : 'italic' }}>{s[key] || 'not set — re-analyze'}</div>
-                            )}
-                          </div>
-                        ))}
-                        {/* Shopify Category constants — always pushed for clothing */}
-                        {p.categoryGroup === 'clothing' && <>
-                          <div style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #c4b5fd', opacity: 0.7 }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 2 }}>Age Group</div>
-                            <div style={{ fontSize: 12, color: '#7c3aed' }}>Adult <span style={{ color: T.textMuted, fontSize: 10 }}>(auto)</span></div>
-                          </div>
-                          <div style={{ background: T.surface, borderRadius: 6, padding: '6px 10px', border: '1px solid #c4b5fd', opacity: 0.7 }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', marginBottom: 2 }}>Target Gender</div>
-                            <div style={{ fontSize: 12, color: '#7c3aed' }}>Women <span style={{ color: T.textMuted, fontSize: 10 }}>(auto)</span></div>
-                          </div>
-                        </>}
-                      </div>
+                      : c.instagramHandle
+                          ? <a href={`https://instagram.com/${c.instagramHandle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none', fontSize: 12 }}>@{c.instagramHandle}</a>
+                          : <span style={{ color: T.textFaint, fontSize: 12 }}>Not set</span>
+                    }
+                  </td>
+                  {editing && (
+                    <td style={{ padding: '10px 12px' }}>
+                      <button onClick={() => removeCompetitor(c.url)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: '#ef4444', cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>Remove</button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 16, borderTop: `1px solid ${T.border}`, paddingTop: 16 }}>
+          <input placeholder="Competitor name" value={newCompName} onChange={e => setNewCompName(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+          <input placeholder="https://www.competitor.com" value={newCompUrl} onChange={e => setNewCompUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCompetitorAndReanalyze()} style={{ flex: 2, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+          <button onClick={addCompetitorAndReanalyze} disabled={!newCompName || !newCompUrl || running} style={{ background: running ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: (!newCompName || !newCompUrl || running) ? 'not-allowed' : 'pointer', opacity: (!newCompName || !newCompUrl || running) ? 0.5 : 1 }}>{running ? 'Running...' : 'Add & Re-analyze'}</button>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+// ─── Competitive Analysis Tab ───────────────────────────────────────────────────
+function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
+  const T = useT()
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/competitive_analysis`).then(r => r.json()).then(setData).catch(() => {})
+  }, [slug, dataVersion])
+
+  if (!data) return <EmptyState message="Competitive analysis not yet generated." cta="Run Competitive Analysis" onCta={() => onRefresh('competitive_analysis')} />
+
+  const pricingColors = { budget: 'green', mid: 'blue', premium: 'purple', luxury: 'red' }
+
+  return (
+    <div>
+      {running && <RunningBanner moduleLabel="Competitive Analysis" detail="Scraping competitor sites and analyzing strengths, opportunities, and positioning with Claude." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Competitive Analysis</h2>
+        <RefreshButton onClick={() => onRefresh('competitive_analysis')} loading={running} />
+      </div>
+
+      {data.positioningMap?.narrative && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Positioning Landscape</h3>
+          <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.7 }}>{data.positioningMap.narrative}</p>
+          {data.positioningMap.whiteSpaceOpportunities?.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>White Space Opportunities</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {data.positioningMap.whiteSpaceOpportunities.map((o, i) => (
+                  <span key={i} style={{ background: '#ede9fe', color: '#5b21b6', fontSize: 12, padding: '4px 12px', borderRadius: 20 }}>{o}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {data.topAssortmentGaps?.length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Top Assortment Gaps</h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {data.topAssortmentGaps.map((g, i) => (
+              <span key={i} style={{ background: '#fef3c7', color: '#92400e', fontSize: 12, padding: '4px 12px', borderRadius: 20 }}>{g}</span>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 20 }}>
+        {(data.competitors || []).map(comp => (
+          <Card key={comp.name}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+              <div>
+                <h3 style={{ color: T.text, fontSize: 16, fontWeight: 700 }}>{comp.name}</h3>
+                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>{comp.url}</p>
+              </div>
+              <Badge label={comp.pricingTier || 'mid'} color={pricingColors[comp.pricingTier] || 'gray'} />
+            </div>
+            {comp.positioningStatement && <p style={{ color: T.textSub, fontSize: 13, fontStyle: 'italic', marginBottom: 12, borderLeft: `3px solid ${T.accent}`, paddingLeft: 10 }}>{comp.positioningStatement}</p>}
+            {comp.botBlocked && <div style={{ background: '#fef3c7', color: '#92400e', fontSize: 11, padding: '4px 10px', borderRadius: 6, marginBottom: 10 }}>⚠ Bot-protected — limited data</div>}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#065f46', marginBottom: 6, textTransform: 'uppercase' }}>Strengths</p>
+                <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                  {(comp.strengths || []).map((s, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 4, lineHeight: 1.4 }}>{s}</li>)}
+                </ul>
+              </div>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', marginBottom: 6, textTransform: 'uppercase' }}>Opportunities</p>
+                <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                  {(comp.opportunities || []).map((o, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 4, lineHeight: 1.4 }}>{o}</li>)}
+                </ul>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Personas Tab ───────────────────────────────────────────────────────────────
+function PersonasTab({ slug, onRefresh, running, dataVersion }) {
+  const T = useT()
+  const [data, setData] = useState(null)
+  const [activePersona, setActivePersona] = useState(0)
+  const [chatMessages, setChatMessages] = useState([])
+  const [chatInput, setChatInput] = useState('')
+  const [streaming, setStreaming] = useState(false)
+  const [suggestions, setSuggestions] = useState(null)
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false)
+  const chatEndRef = useRef(null)
+
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/personas`).then(r => r.json()).then(d => { setData(d); setActivePersona(0); setChatMessages([]) }).catch(() => {})
+  }, [slug, dataVersion])
+
+  useEffect(() => {
+    if (chatMessages.length > 0) chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages])
+
+  async function sendChat() {
+    if (!chatInput.trim() || streaming) return
+    const userMsg = { role: 'user', content: chatInput }
+    setChatMessages(prev => [...prev, userMsg, { role: 'assistant', content: '', streaming: true }])
+    setChatInput(''); setStreaming(true)
+
+    const res = await fetch(`${API}/brands/${slug}/persona-chat`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ personaIndex: activePersona, messages: [...chatMessages, userMsg] }),
+    })
+    const reader = res.body.getReader(); const decoder = new TextDecoder(); let text = ''
+    while (true) {
+      const { done, value } = await reader.read(); if (done) break
+      for (const line of decoder.decode(value).split('\n')) {
+        if (line.startsWith('data: ')) {
+          const payload = line.slice(6)
+          if (payload === '[DONE]') break
+          try { const { token } = JSON.parse(payload); text += token; setChatMessages(prev => { const msgs = [...prev]; msgs[msgs.length - 1] = { role: 'assistant', content: text }; return msgs }) } catch {}
+        }
+      }
+    }
+    setStreaming(false)
+  }
+
+  async function loadSuggestions() {
+    setLoadingSuggestions(true)
+    const res = await fetch(`${API}/brands/${slug}/suggest-personas`, { method: 'POST' })
+    const d = await res.json(); setSuggestions(d.suggestions || []); setLoadingSuggestions(false)
+  }
+
+  if (!data) return <EmptyState message="Personas not yet generated." cta="Generate Personas" onCta={() => onRefresh('personas')} />
+
+  const persona = data.personas?.[activePersona]
+
+  return (
+    <div>
+      {running && <RunningBanner moduleLabel="Customer Personas" detail="Generating personas from competitive, social, and site intelligence using Claude Opus." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Customer Personas</h2>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={loadSuggestions} disabled={loadingSuggestions} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '7px 14px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>{loadingSuggestions ? 'Analyzing...' : '+ Suggest Adjacent'}</button>
+          <RefreshButton onClick={() => onRefresh('personas')} loading={running} />
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {data.personas?.map((p, i) => (
+          <button key={i} onClick={() => { setActivePersona(i); setChatMessages([]) }} style={{ padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: i === activePersona ? 700 : 400, background: i === activePersona ? T.accent : T.surfaceAlt, color: i === activePersona ? '#fff' : T.textSub, border: 'none', cursor: 'pointer' }}>
+            {p.name}
+          </button>
+        ))}
+      </div>
+
+      {persona && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <Card style={{ marginBottom: 20 }}>
+              <h3 style={{ color: T.accent, fontSize: 17, fontWeight: 700, marginBottom: 4 }}>{persona.name}</h3>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>{persona.ageRange} · {persona.income} · {persona.location}</p>
+              <p style={{ fontSize: 13, color: T.textSub, fontStyle: 'italic', marginBottom: 16, borderLeft: `3px solid ${T.accent}`, paddingLeft: 10 }}>"{persona.quoteExample}"</p>
+              {[['Occupation', persona.occupation], ['Lifestyle', persona.lifestyle], ['Values', persona.values], ['Fashion Goals', persona.fashionGoals], ['Pain Points', persona.painPoints], ['Motivators', persona.motivators]].map(([label, items]) => items?.length ? (
+                <div key={label} style={{ marginBottom: 12 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>{label}</p>
+                  <p style={{ fontSize: 13, color: T.textSub }}>
+                    {Array.isArray(items) ? items.join(' · ') : items}
+                  </p>
+                </div>
+              ) : null)}
+              {persona.brandFit && (
+                <div style={{ marginTop: 12, background: '#ede9fe', borderRadius: 8, padding: '10px 14px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 4 }}>Brand Fit</p>
+                  <p style={{ fontSize: 13, color: '#4c1d95' }}>{persona.brandFit}</p>
+                </div>
+              )}
+            </Card>
+          </div>
+
+          <div style={{ position: 'sticky', top: 80, alignSelf: 'flex-start' }}>
+            <Card style={{ display: 'flex', flexDirection: 'column', maxHeight: 480 }}>
+              <div style={{ marginBottom: 12 }}>
+                <h3 style={{ color: T.text, fontSize: 14, fontWeight: 700 }}>Chat with {persona.name}</h3>
+                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>Ask about shopping habits, preferences, or brand reactions.</p>
+              </div>
+              <div style={{ flex: 1, height: 300, overflowY: 'auto', marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
+                {chatMessages.length === 0 && <p style={{ color: T.textFaint, fontSize: 13, textAlign: 'center', marginTop: 60 }}>Start a conversation...</p>}
+                {chatMessages.map((msg, i) => (
+                  <div key={i} style={{ alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '88%', background: msg.role === 'user' ? T.accent : T.surfaceAlt, color: msg.role === 'user' ? '#fff' : T.text, padding: '8px 12px', borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px', fontSize: 13, lineHeight: 1.5, border: msg.role === 'assistant' ? `1px solid ${T.border}` : 'none' }}>
+                    {msg.content || (msg.streaming ? <span style={{ opacity: 0.4 }}>●</span> : '')}{msg.streaming && msg.content && <span style={{ opacity: 0.4 }}> ●</span>}
+                  </div>
+                ))}
+                <div ref={chatEndRef} />
+              </div>
+              <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${T.border}`, paddingTop: 12 }}>
+                <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendChat()} placeholder={`Ask ${persona.name}...`} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                <button onClick={sendChat} disabled={streaming || !chatInput.trim()} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: streaming || !chatInput.trim() ? 0.6 : 1 }}>Send</button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {suggestions && (
+        <div style={{ marginTop: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Adjacent Segments to Consider</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            {suggestions.map((s, i) => (
+              <Card key={i}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <h4 style={{ color: T.text, fontSize: 14, fontWeight: 700 }}>{s.name}</h4>
+                  <Badge label={s.opportunitySize} color={s.opportunitySize === 'high' ? 'red' : s.opportunitySize === 'medium' ? 'yellow' : 'green'} />
+                </div>
+                <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 8 }}>{s.ageRange} · {s.income}</p>
+                <p style={{ fontSize: 13, color: T.textSub, marginBottom: 8 }}>{s.rationale}</p>
+                <p style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>{s.keyDifference}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Social Audit Tab ───────────────────────────────────────────────────────────
+function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
+  const T = useT()
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/social_intelligence`).then(r => r.json()).then(setData).catch(() => {})
+  }, [slug, dataVersion])
+
+  function Sparkline({ data: points, width = 120, height = 36 }) {
+    if (!points?.length || points.length < 2) return <span style={{ color: T.textFaint, fontSize: 11 }}>No trend data</span>
+    const values = points.map(p => p.avgEngagement)
+    const max = Math.max(...values) || 1
+    const pts = values.map((v, i) => `${(i / (values.length - 1)) * width},${height - (v / max) * (height - 4) - 2}`).join(' ')
+    return <svg width={width} height={height} style={{ overflow: 'visible', display: 'block' }}><polyline points={pts} fill="none" stroke={T.accent} strokeWidth={2} strokeLinejoin="round" /></svg>
+  }
+
+  const THEME_COLORS = ['#dbeafe', '#d1fae5', '#ede9fe', '#fef3c7', '#fee2e2', '#f0fdf4', '#fdf4ff']
+  const THEME_TEXT   = ['#1e40af', '#065f46', '#5b21b6', '#92400e', '#991b1b', '#14532d', '#7e22ce']
+
+  if (!data) return <EmptyState message="Social audit not yet generated." cta="Run Social Audit" onCta={() => onRefresh('social_intelligence')} />
+
+  const target = data.brands?.find(b => b.role === 'target')
+  const competitors = data.brands?.filter(b => b.role === 'competitor') || []
+
+  function splitGapCard(text) {
+    // Split on EM dash, colon after first clause, or first period
+    const dashIdx = text.indexOf(' — ')
+    const colonIdx = text.search(/:\s/)
+    const periodIdx = text.indexOf('. ')
+    const splitAt = [dashIdx, colonIdx, periodIdx].filter(i => i > 10 && i < text.length - 10).sort((a,b) => a-b)[0]
+    if (splitAt !== undefined) return [text.slice(0, splitAt).replace(/[:—]\s*$/, ''), text.slice(splitAt).replace(/^[—:\s.]+/, '')]
+    return [text.slice(0, 80), text.slice(80)]
+  }
+
+  return (
+    <div>
+      {running && <RunningBanner moduleLabel="Social Media Audit" detail="Scraping Instagram via Apify and analyzing content themes, engagement, and gaps across brand and competitors." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Social Media Audit</h2>
+        <RefreshButton onClick={() => onRefresh('social_intelligence')} loading={running} />
+      </div>
+
+      {target && (
+        <Card style={{ marginBottom: 24 }}>
+          {/* Header row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+            <div>
+              <h3 style={{ color: T.text, fontSize: 17, fontWeight: 700 }}>{target.name}</h3>
+              {target.handle && (
+                <a href={`https://instagram.com/${target.handle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, fontSize: 13, textDecoration: 'none', display: 'inline-block', marginTop: 2 }}>@{target.handle} ↗</a>
+              )}
+              {(target.error || target.partialData) && (
+                <div style={{ background: '#fef3c7', color: '#92400e', fontSize: 12, padding: '4px 10px', borderRadius: 6, marginTop: 8, display: 'inline-block' }}>⚠ {target.error || 'Partial data — limited access'}</div>
+              )}
+            </div>
+            {target.monthlyTrend?.length > 1 && (
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 11, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>12-Month Engagement</p>
+                <Sparkline data={target.monthlyTrend} width={160} height={44} />
+              </div>
+            )}
+          </div>
+
+          {/* Key metrics */}
+          <div style={{ display: 'flex', gap: 0, marginBottom: 20, borderRadius: 10, overflow: 'hidden', border: `1px solid ${T.border}` }}>
+            {[
+              ['Avg Engagement', target.summary?.avgEngagement?.toLocaleString() || '0', null],
+              ['Posts Analyzed', target.summary?.postCount || 0, null],
+              ['Posts / Week', target.summary?.postingFrequencyPerWeek || 0, null],
+              ['Followers', target.summary?.followersEstimate || target.summary?.estimatedPostCount ? (target.summary.followersEstimate || '—') : '—', null],
+            ].map(([label, val], i, arr) => (
+              <div key={label} style={{ flex: 1, padding: '14px 16px', borderRight: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', textAlign: 'center' }}>
+                <p style={{ fontSize: 24, fontWeight: 800, color: T.text }}>{val}</p>
+                <p style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Content themes */}
+          {target.contentThemes?.length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Content Themes</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {target.contentThemes.map((t, i) => (
+                  <span key={t.theme} style={{ background: THEME_COLORS[i % THEME_COLORS.length], color: THEME_TEXT[i % THEME_TEXT.length], fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 20 }}>
+                    {t.theme} <span style={{ opacity: 0.7, fontWeight: 400 }}>× {t.count}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Top hashtags */}
+          {target.topHashtags?.length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Top Hashtags</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {target.topHashtags.slice(0, 15).map(h => (
+                  <span key={h.tag} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{h.tag}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent posts */}
+          {target.recentPosts?.filter(p => p.caption || p.likes > 0).length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Recent Posts</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+                {target.recentPosts.slice(0, 4).filter(p => p.caption || p.likes > 0).map((post, i) => (
+                  <div key={i} style={{ background: T.surfaceAlt, borderRadius: 8, padding: 12, border: `1px solid ${T.border}` }}>
+                    <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, marginBottom: 8, minHeight: 40 }}>{post.caption ? `"${post.caption.slice(0, 100)}${post.caption.length > 100 ? '…' : ''}"` : <span style={{ color: T.textFaint, fontStyle: 'italic' }}>No caption</span>}</p>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      <span style={{ fontSize: 11, color: T.textMuted }}>♥ {post.likes?.toLocaleString() || 0}</span>
+                      <span style={{ fontSize: 11, color: T.textMuted }}>💬 {post.comments?.toLocaleString() || 0}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Content gaps */}
+          {target.contentGaps?.length > 0 && (
+            <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 20 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>Content Gap Opportunities</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+                {target.contentGaps.map((gap, i) => {
+                  const [headline, detail] = splitGapCard(gap)
+                  return (
+                    <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${T.accent}` }}>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: 6, lineHeight: 1.4 }}>{headline}</p>
+                      {detail && <p style={{ color: T.textSub, fontSize: 12, lineHeight: 1.6 }}>{detail}</p>}
                     </div>
                   )
-                })()}
-                <div style={{ marginTop: 12 }}>
-                  <a href={p.href} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: '#6366f1' }}>View on anneklein.com ↗</a>
+                })}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {competitors.length > 0 && (
+        <div>
+          <h3 style={{ color: T.text, fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Competitor Comparison</h3>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: T.surfaceAlt }}>
+                  {['Brand', 'Handle', 'Avg Engagement', 'Posts/Week', 'Trend', 'Top Themes'].map(h => (
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {competitors.map(c => (
+                  <tr key={c.name} style={{ borderTop: `1px solid ${T.border}` }}>
+                    <td style={{ padding: '12px 16px', color: T.text, fontWeight: 600 }}>{c.name}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      {c.handle
+                        ? <a href={`https://instagram.com/${c.handle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none' }}>@{c.handle}</a>
+                        : <span style={{ background: '#fef3c7', color: '#92400e', fontSize: 11, padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>No data</span>
+                      }
+                    </td>
+                    <td style={{ padding: '12px 16px', color: c.summary?.avgEngagement > 0 ? T.text : T.textFaint }}>
+                      {c.summary?.avgEngagement > 0 ? c.summary.avgEngagement.toLocaleString() : '—'}
+                    </td>
+                    <td style={{ padding: '12px 16px', color: T.text }}>{c.summary?.postingFrequencyPerWeek || '—'}</td>
+                    <td style={{ padding: '12px 16px' }}><Sparkline data={c.monthlyTrend} width={80} height={28} /></td>
+                    <td style={{ padding: '12px 16px', color: T.textSub }}>
+                      {(c.contentThemes || []).slice(0, 2).map(t => t.theme).join(', ') || (c.partialData ? <span style={{ color: T.textFaint, fontSize: 11 }}>handle not found</span> : '—')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ color: T.textFaint, fontSize: 12, marginTop: 10 }}>Competitors showing "No data" could not have their Instagram handle auto-detected. Set handles manually in Brand Profile → Competitors.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Website Audit Tab ──────────────────────────────────────────────────────────
+function LighthouseScore({ label, score }) {
+  const T = useT()
+  const color = score >= 90 ? '#059669' : score >= 50 ? '#d97706' : '#dc2626'
+  const bg = score >= 90 ? '#d1fae5' : score >= 50 ? '#fef3c7' : '#fee2e2'
+  return (
+    <div style={{ textAlign: 'center', flex: 1 }}>
+      <div style={{ width: 56, height: 56, borderRadius: '50%', background: bg, border: `3px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 800, fontSize: 16, color }}>{score}</div>
+      <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+    </div>
+  )
+}
+
+function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
+  const T = useT()
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/site_intelligence`).then(r => r.json()).then(setData).catch(() => {})
+  }, [slug, dataVersion])
+
+  if (!data) return <EmptyState message="Website audit not yet generated." cta="Run Website Audit" onCta={() => onRefresh('site_intelligence')} />
+
+  const target = data.brands?.find(b => b.role === 'target') || {}
+  const competitors = data.brands?.filter(b => b.role === 'competitor') || []
+  const lh = data.lighthouseAudit
+  const cv = data.crawlerVisibility
+  const na = data.navigationAnalysis
+  const pcr = data.productContentReview
+
+  return (
+    <div>
+      {running && <RunningBanner moduleLabel="Website Audit" detail="Scraping brand and competitor sites with screenshots, running Lighthouse, then analyzing with Claude vision." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Website Audit</h2>
+        <RefreshButton onClick={() => onRefresh('site_intelligence')} loading={running} />
+      </div>
+
+      {lh?.scores && (
+        <Card style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Lighthouse Technical Audit</h3>
+            {data.hasScreenshot && <span style={{ fontSize: 12, color: '#059669', background: '#d1fae5', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>Visual analysis included</span>}
+          </div>
+          <div style={{ display: 'flex', gap: 16, marginBottom: lh.topIssues?.length ? 20 : 0 }}>
+            <LighthouseScore label="SEO" score={lh.scores.seo} />
+            <LighthouseScore label="Performance" score={lh.scores.performance} />
+            <LighthouseScore label="Accessibility" score={lh.scores.accessibility} />
+            <LighthouseScore label="Best Practices" score={lh.scores.bestPractices} />
+          </div>
+          {lh.topIssues?.length > 0 && (
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Top Issues to Fix</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {lh.topIssues.slice(0, 8).map((issue, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, background: issue.score < 50 ? '#fee2e2' : '#fef3c7', color: issue.score < 50 ? '#dc2626' : '#d97706', padding: '2px 8px', borderRadius: 12, minWidth: 36, textAlign: 'center' }}>{issue.score}</span>
+                    <span style={{ fontSize: 13, color: T.textSub }}>{issue.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {(data.topOpportunities || []).length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Top Opportunities</h3>
+          {data.topOpportunities.slice(0, 5).map((opp, i) => (
+            <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '12px 0', borderBottom: i < 4 ? `1px solid ${T.border}` : 'none' }}>
+              <span style={{ fontSize: 20, fontWeight: 800, color: T.accent, minWidth: 28 }}>{opp.rank || i + 1}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{opp.title}</span>
+                  <ImpactBadge impact={opp.impact} />
+                </div>
+                <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.5 }}>{opp.description}</p>
+              </div>
+            </div>
+          ))}
+        </Card>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+        {cv && (
+          <Card>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Crawler & AI Visibility</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <span style={{ fontSize: 18 }}>{cv.heroTextIsLive ? '✓' : '✗'}</span>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Hero text is {cv.heroTextIsLive ? 'live HTML' : 'image-embedded'}</p>
+                <p style={{ fontSize: 12, color: T.textMuted }}>{cv.heroTextIsLive ? 'Visible to crawlers and AI agents' : 'Invisible to crawlers — SEO risk'}</p>
+              </div>
+            </div>
+            {cv.contentInImagesLevel && (
+              <div style={{ marginBottom: 10 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>Content in Images</p>
+                <Badge label={`${cv.contentInImagesLevel} image content`} color={cv.contentInImagesLevel === 'low' ? 'green' : cv.contentInImagesLevel === 'medium' ? 'yellow' : 'red'} />
+              </div>
+            )}
+            {cv.aiReadabilityNote && <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>{cv.aiReadabilityNote}</p>}
+          </Card>
+        )}
+        {na && (
+          <Card>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Navigation Analysis</h3>
+            {na.depth && <Badge label={`${na.depth} navigation`} color={na.depth === 'deep' ? 'green' : na.depth === 'moderate' ? 'yellow' : 'gray'} />}
+            {na.topCategories?.length > 0 && (
+              <div style={{ marginTop: 10 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>Top Categories</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {na.topCategories.slice(0, 8).map(c => <span key={c} style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{c}</span>)}
                 </div>
               </div>
+            )}
+            {na.missingCategories?.length > 0 && (
+              <div style={{ marginTop: 10 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>Missing Categories</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {na.missingCategories.slice(0, 6).map(c => <span key={c} style={{ fontSize: 12, background: '#fee2e2', color: '#dc2626', padding: '3px 10px', borderRadius: 20 }}>{c}</span>)}
+                </div>
+              </div>
+            )}
+            {na.notes && <p style={{ fontSize: 12, color: T.textMuted, marginTop: 10 }}>{na.notes}</p>}
+          </Card>
+        )}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+        {data.messagingGaps?.length > 0 && (
+          <Card>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Messaging Gaps</h3>
+            {data.messagingGaps.slice(0, 4).map((g, i) => (
+              <div key={i} style={{ borderLeft: `3px solid #f59e0b`, paddingLeft: 12, marginBottom: 12 }}>
+                <p style={{ fontWeight: 700, color: T.text, fontSize: 13 }}>{g.gap}</p>
+                {g.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>{g.competitorExample}</p>}
+              </div>
+            ))}
+          </Card>
+        )}
+        {data.ctaEffectiveness && (
+          <Card>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>CTA Effectiveness</h3>
+            {data.ctaEffectiveness.rating && <Badge label={data.ctaEffectiveness.rating === 'needs improvement' ? 'Needs Improvement' : data.ctaEffectiveness.rating} color={data.ctaEffectiveness.rating === 'strong' ? 'green' : data.ctaEffectiveness.rating === 'moderate' ? 'yellow' : 'red'} />}
+            <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginTop: 10 }}>{data.ctaEffectiveness.observations}</p>
+            {data.ctaEffectiveness.recommendation && <p style={{ color: T.accent, fontSize: 13, marginTop: 8, fontWeight: 600 }}>→ {data.ctaEffectiveness.recommendation}</p>}
+          </Card>
+        )}
+      </div>
+
+      {pcr && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Product Content Review</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+            {pcr.brandsCovered?.length > 0 && (
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Brands / Lines</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {pcr.brandsCovered.slice(0, 10).map(b => <span key={b} style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{b}</span>)}
+                </div>
+              </div>
+            )}
+            {pcr.ageGroupCoverage?.length > 0 && (
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Audience / Age Groups</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {pcr.ageGroupCoverage.map(a => <span key={a} style={{ fontSize: 12, background: '#ede9fe', color: '#7c3aed', padding: '3px 10px', borderRadius: 20 }}>{a}</span>)}
+                </div>
+              </div>
+            )}
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Price Visibility</p>
+              {pcr.priceVisibility && <Badge label={pcr.priceVisibility} color={pcr.priceVisibility === 'visible' ? 'green' : pcr.priceVisibility === 'partial' ? 'yellow' : 'red'} />}
+              {pcr.contentGaps?.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>Content Gaps</p>
+                  <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                    {pcr.contentGaps.slice(0, 4).map((g, i) => <li key={i} style={{ fontSize: 12, color: T.textSub, marginBottom: 3 }}>{g}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {competitors.length > 0 && (
+        <Card>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Navigation Comparison</h3>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: T.surfaceAlt }}>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Brand</th>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Hero Headline</th>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Top Nav Categories</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[target, ...competitors].filter(b => b.name).map(b => (
+                  <tr key={b.name} style={{ borderTop: `1px solid ${T.border}`, background: b.role === 'target' ? '#ede9fe22' : 'transparent' }}>
+                    <td style={{ padding: '12px 16px', fontWeight: b.role === 'target' ? 700 : 400, color: T.text }}>{b.name}{b.role === 'target' && ' ★'}</td>
+                    <td style={{ padding: '12px 16px', color: T.textSub, fontStyle: 'italic', maxWidth: 200 }}>{b.heroContent?.headline || '—'}</td>
+                    <td style={{ padding: '12px 16px', color: T.textSub }}>{(b.featuredCategories || []).slice(0, 6).join(', ') || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+// ─── Search & SEO / GEO Tab ─────────────────────────────────────────────────────
+const KW_CATEGORIES = [
+  { key: 'brandTerms', label: 'Brand' },
+  { key: 'categoryTerms', label: 'Categories' },
+  { key: 'ageGroupTerms', label: 'Age Groups' },
+  { key: 'occasionTerms', label: 'Occasions' },
+  { key: 'topBrands', label: 'Top Brands' },
+  { key: 'localTerms', label: 'Local' },
+  { key: 'competitorGapTerms', label: 'Gap Terms' },
+  { key: 'aiDiscoveryQueries', label: 'AI Queries' },
+]
+
+function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
+  const T = useT()
+  const [data, setData] = useState(null)
+  const [view, setView] = useState('seo')
+  const [kwCat, setKwCat] = useState('brandTerms')
+  const [geoAgent, setGeoAgent] = useState('claude')
+
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/search_seo`).then(r => r.json()).then(setData).catch(() => {})
+  }, [slug, dataVersion])
+
+  if (!data) return <EmptyState message="Search & SEO analysis not yet generated." cta="Run Search & SEO Analysis" onCta={() => onRefresh('search_seo')} />
+
+  const seo = data.onPageSeo || {}
+  const geo = data.geoSection || {}
+  const kw = data.keywordUniverse || {}
+  const speedColors = { fast: 'green', medium: 'yellow', slow: 'red', unknown: 'gray' }
+  const byAgent = geo.byAgent || {}
+  const agents = Object.keys(byAgent)
+  const activeAgentData = byAgent[geoAgent] || {}
+
+  return (
+    <div>
+      {running && <RunningBanner moduleLabel="Search & SEO / GEO" detail="Generating 200-term keyword universe, scraping on-page SEO signals, and querying AI agents for GEO visibility." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {['seo', 'keywords', 'geo'].map(v => (
+            <button key={v} onClick={() => setView(v)} style={{ padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: v === view ? 700 : 400, background: v === view ? T.accent : T.surfaceAlt, color: v === view ? '#fff' : T.textSub, border: 'none', cursor: 'pointer' }}>
+              {v === 'seo' ? 'On-Page SEO' : v === 'keywords' ? `Keywords${kw.totalCount ? ` (${kw.totalCount})` : ''}` : 'GEO (AI Visibility)'}
+            </button>
+          ))}
+        </div>
+        <RefreshButton onClick={() => onRefresh('search_seo')} loading={running} />
+      </div>
+
+      {view === 'seo' && (() => {
+        // Compute SEO health score from on-page signals
+        const signals = []
+        let totalScore = 0
+        // Title tag (25 pts)
+        if (!seo.titleTag) { signals.push({ field: 'Title Tag', value: '—', pts: 0, max: 25, status: 'fail', rec: 'Missing — add a descriptive 50–60 character title tag' }) }
+        else if (seo.titleTag.length < 30) { totalScore += 10; signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: `Too short (${seo.titleTag.length} chars) — aim for 50–60 characters` }) }
+        else if (seo.titleTag.length <= 60) { totalScore += 25; signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 25, max: 25, status: 'pass', rec: '' }) }
+        else { totalScore += 15; signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 15, max: 25, status: 'warn', rec: `Too long (${seo.titleTag.length} chars) — gets truncated in search results` }) }
+        // Meta description (20 pts)
+        if (!seo.metaDescription) { signals.push({ field: 'Meta Description', value: '—', pts: 0, max: 20, status: 'fail', rec: 'Missing — Google will auto-generate one, usually poorly' }) }
+        else if (seo.metaDescription.length < 120) { totalScore += 10; signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 10, max: 20, status: 'warn', rec: `Too short (${seo.metaDescription.length} chars) — aim for 140–160` }) }
+        else if (seo.metaDescription.length <= 160) { totalScore += 20; signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 20, max: 20, status: 'pass', rec: '' }) }
+        else { totalScore += 12; signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 12, max: 20, status: 'warn', rec: `Too long (${seo.metaDescription.length} chars) — will be truncated` }) }
+        // H1 (20 pts)
+        if (!seo.h1) { signals.push({ field: 'H1 Heading', value: '—', pts: 0, max: 20, status: 'fail', rec: 'Missing — every page should have exactly one H1 with target keywords' }) }
+        else { totalScore += 20; signals.push({ field: 'H1 Heading', value: seo.h1, pts: 20, max: 20, status: 'pass', rec: '' }) }
+        // Canonical (10 pts)
+        if (!seo.canonicalTag) { totalScore += 5; signals.push({ field: 'Canonical Tag', value: '—', pts: 5, max: 10, status: 'warn', rec: 'Not set — risk of duplicate content penalties' }) }
+        else { totalScore += 10; signals.push({ field: 'Canonical Tag', value: seo.canonicalTag.slice(0, 60), pts: 10, max: 10, status: 'pass', rec: '' }) }
+        // Schema (15 pts)
+        const hasRichSchema = seo.schemaMarkup?.some(s => /product|offer|breadcrumb|itemlist|faq/i.test(s))
+        const hasBasicSchema = seo.schemaMarkup?.some(s => /organization|website/i.test(s))
+        if (!seo.schemaMarkup?.length) { signals.push({ field: 'Schema Markup', value: 'None', pts: 0, max: 15, status: 'fail', rec: 'Add Organization, Product, and BreadcrumbList schema for rich results' }) }
+        else if (!hasRichSchema) { totalScore += 8; signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 8, max: 15, status: 'warn', rec: 'Only basic schema — add Product, BreadcrumbList, or FAQ for rich results' }) }
+        else { totalScore += 15; signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 15, max: 15, status: 'pass', rec: '' }) }
+        // Page speed (10 pts)
+        const speedPts = { fast: 10, medium: 5, slow: 0 }[seo.pageSpeedSignal] ?? 3
+        totalScore += speedPts
+        if (speedPts < 10) { signals.push({ field: 'Page Speed', value: seo.pageSpeedSignal || 'unknown', pts: speedPts, max: 10, status: speedPts === 0 ? 'fail' : 'warn', rec: seo.pageSpeedSignal === 'slow' ? 'Slow load time — major ranking factor; optimize images and JS bundles' : 'Medium — consider further performance optimization' }) }
+        else { signals.push({ field: 'Page Speed', value: 'fast', pts: 10, max: 10, status: 'pass', rec: '' }) }
+
+        const scoreColor = totalScore >= 75 ? '#059669' : totalScore >= 50 ? '#d97706' : '#dc2626'
+        const scoreBg = totalScore >= 75 ? '#d1fae5' : totalScore >= 50 ? '#fef3c7' : '#fee2e2'
+
+        return (
+          <div>
+            <Card style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginBottom: 24 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>SEO Health Score</p>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{ fontSize: 52, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>{totalScore}</span>
+                    <span style={{ fontSize: 20, color: T.textMuted, fontWeight: 400 }}>/100</span>
+                  </div>
+                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Based on on-page technical signals</p>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Issues to Fix</p>
+                  {signals.filter(s => s.status !== 'pass').length === 0
+                    ? <p style={{ fontSize: 13, color: '#059669' }}>All signals passing</p>
+                    : signals.filter(s => s.status !== 'pass').map((s, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+                          <span style={{ fontSize: 11, color: s.status === 'fail' ? '#dc2626' : '#d97706', fontWeight: 700, minWidth: 28 }}>{s.status === 'fail' ? '✗' : '!'}</span>
+                          <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.4 }}><strong>{s.field}:</strong> {s.rec}</p>
+                        </div>
+                      ))
+                  }
+                </div>
+              </div>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: T.surfaceAlt }}>
+                    {['Signal', 'Current Value', 'Score', 'Recommendation'].map(h => (
+                      <th key={h} style={{ padding: '8px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {signals.map((s, i) => (
+                    <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
+                      <td style={{ padding: '10px 14px', fontWeight: 600, color: T.text }}>{s.field}</td>
+                      <td style={{ padding: '10px 14px', color: s.value === '—' ? T.textFaint : T.textSub, maxWidth: 220, wordBreak: 'break-word', fontStyle: s.value === '—' ? 'italic' : 'normal' }}>{s.value.length > 70 ? s.value.slice(0, 70) + '…' : s.value}</td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, background: s.status === 'pass' ? '#d1fae5' : s.status === 'warn' ? '#fef3c7' : '#fee2e2', color: s.status === 'pass' ? '#059669' : s.status === 'warn' ? '#d97706' : '#dc2626', padding: '3px 10px', borderRadius: 12 }}>
+                          {s.pts}/{s.max}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12 }}>{s.rec || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card>
+
+            {data.competitors?.length > 0 && (
+              <Card>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Competitor SEO Comparison</h3>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ background: T.surfaceAlt }}>
+                        {['Competitor', 'Title Tag', 'H1', 'Schema', 'Speed'].map(h => (
+                          <th key={h} style={{ padding: '8px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderTop: `1px solid ${T.border}`, background: '#ede9fe22' }}>
+                        <td style={{ padding: '10px 14px', fontWeight: 700, color: T.text }}>{data.onPageSeo?.url?.replace(/https?:\/\/(www\.)?/, '').split('/')[0]} ★</td>
+                        <td style={{ padding: '10px 14px', color: seo.titleTag ? T.text : T.textFaint, fontStyle: seo.titleTag ? 'normal' : 'italic' }}>{seo.titleTag?.slice(0, 40) || 'Missing'}</td>
+                        <td style={{ padding: '10px 14px' }}><Badge label={seo.h1 ? 'Yes' : 'Missing'} color={seo.h1 ? 'green' : 'red'} /></td>
+                        <td style={{ padding: '10px 14px', color: T.textSub }}>{seo.schemaMarkup?.join(', ') || '—'}</td>
+                        <td style={{ padding: '10px 14px' }}><Badge label={seo.pageSpeedSignal || 'unknown'} color={speedColors[seo.pageSpeedSignal] || 'gray'} /></td>
+                      </tr>
+                      {data.competitors.map((c, i) => (
+                        <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
+                          <td style={{ padding: '10px 14px', color: T.text }}>{c.name}</td>
+                          <td style={{ padding: '10px 14px', color: c.titleTag ? T.textSub : T.textFaint, fontStyle: c.titleTag ? 'normal' : 'italic' }}>{c.titleTag?.slice(0, 40) || 'Not found'}</td>
+                          <td style={{ padding: '10px 14px' }}><Badge label={c.h1 ? 'Yes' : 'Missing'} color={c.h1 ? 'green' : 'red'} /></td>
+                          <td style={{ padding: '10px 14px', color: T.textSub }}>{c.schemaMarkup?.join(', ') || '—'}</td>
+                          <td style={{ padding: '10px 14px' }}><Badge label={c.pageSpeedSignal || 'unknown'} color={speedColors[c.pageSpeedSignal] || 'gray'} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
             )}
           </div>
         )
-      })}
+      })()}
+
+      {view === 'keywords' && (
+        <div>
+          <Card style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Keyword Universe</h3>
+              {kw.totalCount > 0 && <span style={{ fontSize: 13, color: T.textMuted }}>{kw.totalCount} total terms</span>}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 16 }}>
+              {KW_CATEGORIES.map(({ key, label }) => {
+                const count = (kw[key] || []).length
+                if (!count) return null
+                return (
+                  <button key={key} onClick={() => setKwCat(key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: kwCat === key ? 700 : 400, background: kwCat === key ? T.accent : T.surfaceAlt, color: kwCat === key ? '#fff' : T.textSub, border: kwCat === key ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
+                    {label} <span style={{ opacity: 0.7 }}>({count})</span>
+                  </button>
+                )
+              })}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {(kw[kwCat] || []).map(k => (
+                <span key={k} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '5px 14px', borderRadius: 20, border: `1px solid ${T.border}` }}>{k}</span>
+              ))}
+              {!(kw[kwCat] || []).length && <p style={{ color: T.textFaint, fontSize: 13 }}>No terms in this category yet.</p>}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {view === 'geo' && (
+        <div>
+          <Card style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32, flexWrap: 'wrap' }}>
+              {agents.map(agent => {
+                const agentData = byAgent[agent] || {}
+                const score = agentData.visibilityScore ?? 0
+                return (
+                  <div key={agent} style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{agent === 'claude' ? 'Claude' : 'Perplexity'}</p>
+                    <p style={{ fontSize: 48, fontWeight: 800, color: score >= 60 ? '#059669' : score >= 30 ? '#d97706' : '#dc2626', lineHeight: 1 }}>{score}%</p>
+                    <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>AI visibility</p>
+                  </div>
+                )
+              })}
+              {agents.length > 1 && (
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Combined</p>
+                  <p style={{ fontSize: 48, fontWeight: 800, color: (geo.combinedScore ?? 0) >= 60 ? '#059669' : (geo.combinedScore ?? 0) >= 30 ? '#d97706' : '#dc2626', lineHeight: 1 }}>{geo.combinedScore ?? 0}%</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>avg score</p>
+                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Improvement Opportunities</p>
+                <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                  {(geo.gapRecommendations || []).slice(0, 5).map((r, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 6, lineHeight: 1.4 }}>{r}</li>)}
+                </ul>
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Query-Level Visibility</h3>
+              {agents.length > 1 && (
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {agents.map(a => (
+                    <button key={a} onClick={() => setGeoAgent(a)} style={{ padding: '5px 14px', borderRadius: 8, fontSize: 13, fontWeight: geoAgent === a ? 700 : 400, background: geoAgent === a ? T.accent : T.surfaceAlt, color: geoAgent === a ? '#fff' : T.textSub, border: 'none', cursor: 'pointer' }}>
+                      {a === 'claude' ? 'Claude' : 'Perplexity'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: T.surfaceAlt }}>
+                  {['Query', 'Category', 'Mentioned?', 'Sentiment', 'Competitors Also Mentioned'].map(h => (
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(activeAgentData.queries || geo.queries || []).map((q, i) => (
+                  <tr key={i} style={{ borderTop: `1px solid ${T.border}`, background: !q.brandMentioned ? '#fee2e211' : 'transparent' }}>
+                    <td style={{ padding: '10px 14px', color: T.text, maxWidth: 220 }}>{q.query}</td>
+                    <td style={{ padding: '10px 14px', color: T.textMuted }}>{q.category}</td>
+                    <td style={{ padding: '10px 14px' }}><Badge label={q.brandMentioned ? 'Yes' : 'No'} color={q.brandMentioned ? 'green' : 'red'} /></td>
+                    <td style={{ padding: '10px 14px' }}>{q.sentiment !== 'not_mentioned' && <Badge label={q.sentiment} color={q.sentiment === 'positive' ? 'green' : q.sentiment === 'negative' ? 'red' : 'gray'} />}</td>
+                    <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12 }}>{(q.competitorMentions || []).join(', ') || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
 
-function BrandGuidelinesTab({ guidelines }) {
+// ─── Action Plan Tab ────────────────────────────────────────────────────────────
+function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
   const T = useT()
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(null)
-  const [saving, setSaving] = useState(false)
-  const [saveMsg, setSaveMsg] = useState(null)
-  const [activeFormat, setActiveFormat] = useState('productDescription')
-  const [activeSample, setActiveSample] = useState('blazers')
+  const [data, setData] = useState(null)
+  const [exporting, setExporting] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
 
-  const data = editing ? draft : guidelines
+  useEffect(() => {
+    if (!slug) return
+    fetch(`${API}/brands/${slug}/action_plan`).then(r => r.json()).then(setData).catch(() => {})
+  }, [slug, dataVersion])
 
-  if (!data?.brandVoice) return (
-    <div style={{ padding: 40, textAlign: 'center', color: T.textMuted }}>No brand guidelines data found.</div>
-  )
-
-  const formatLabels = { productDescription: 'Product Description', emailSubjectLine: 'Email Subject', emailPreviewText: 'Email Preview Text', instagramCaption: 'Instagram Caption', heroHeadline: 'Hero Headline' }
-  const sampleCategories = Object.keys(data.writingSamples || {})
-
-  function startEdit() {
-    setDraft(JSON.parse(JSON.stringify(guidelines)))
-    setEditing(true)
-    setSaveMsg(null)
-  }
-
-  function cancelEdit() {
-    setDraft(null)
-    setEditing(false)
-    setSaveMsg(null)
-  }
-
-  async function saveEdit() {
-    setSaving(true)
+  async function exportPdf() {
+    setExporting(true)
     try {
-      const res = await fetch('/api/brand-guidelines', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(draft),
-      })
-      if (!res.ok) throw new Error('Save failed')
-      setSaveMsg('Saved!')
-      setEditing(false)
-      setDraft(null)
-    } catch (e) {
-      setSaveMsg('Error saving — try again')
-    }
-    setSaving(false)
+      const res = await fetch(`${API}/brands/${slug}/export/pdf`, { method: 'POST' })
+      if (!res.ok) throw new Error('PDF export failed')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a'); a.href = url; a.download = `${slug}-brand-intelligence.pdf`; a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) { alert(e.message) }
+    setExporting(false)
   }
 
-  // Helpers for editing nested state
-  function setIn(path, value) {
-    const keys = path.split('.')
-    setDraft(prev => {
-      const next = JSON.parse(JSON.stringify(prev))
-      let obj = next
-      for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]]
-      obj[keys[keys.length - 1]] = value
-      return next
-    })
+  async function copyShareLink() {
+    const res = await fetch(`${API}/brands/${slug}/export/share-link`, { method: 'POST' })
+    const d = await res.json()
+    setShareUrl(d.shareUrl)
+    await navigator.clipboard.writeText(d.shareUrl).catch(() => {})
   }
 
-  function setListItem(path, index, value) {
-    const keys = path.split('.')
-    setDraft(prev => {
-      const next = JSON.parse(JSON.stringify(prev))
-      let obj = next
-      for (const k of keys) obj = obj[k]
-      obj[index] = value
-      return next
-    })
-  }
+  if (!data) return <EmptyState message="Action plan not yet generated." cta="Generate Action Plan" onCta={() => onRefresh('action_plan')} />
 
-  function addListItem(path, value = '') {
-    const keys = path.split('.')
-    setDraft(prev => {
-      const next = JSON.parse(JSON.stringify(prev))
-      let obj = next
-      for (const k of keys) obj = obj[k]
-      obj.push(value)
-      return next
-    })
-  }
-
-  function removeListItem(path, index) {
-    const keys = path.split('.')
-    setDraft(prev => {
-      const next = JSON.parse(JSON.stringify(prev))
-      let obj = next
-      for (const k of keys) obj = obj[k]
-      obj.splice(index, 1)
-      return next
-    })
-  }
-
-  const iStyle = { border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', boxSizing: 'border-box', background: T.inputBg, color: T.text }
-  const taStyle = { ...iStyle, resize: 'vertical', minHeight: 60 }
-
-  function ET({ val, path, multiline }) {
-    if (!editing) return <span>{val}</span>
-    return multiline
-      ? <textarea style={taStyle} value={val} onChange={e => setIn(path, e.target.value)} />
-      : <input style={iStyle} value={val} onChange={e => setIn(path, e.target.value)} />
-  }
-
-  function EList({ items, path }) {
-    return (
-      <div>
-        {items.map((item, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 6 }}>
-            {editing
-              ? <input style={{ ...iStyle, flex: 1 }} value={item} onChange={e => setListItem(path, i, e.target.value)} />
-              : <span style={{ fontSize: 13, color: T.textSub, flex: 1 }}>{item}</span>}
-            {editing && <button onClick={() => removeListItem(path, i)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 16, padding: '2px 4px' }}>×</button>}
-          </div>
-        ))}
-        {editing && <button onClick={() => addListItem(path)} style={{ fontSize: 12, color: '#6366f1', border: '1px dashed #6366f1', background: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', marginTop: 4 }}>+ Add</button>}
-      </div>
-    )
-  }
-
-  function EPills({ items, path, bg, color }) {
-    return (
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-        {items.map((k, i) => (
-          <span key={i} style={{ background: bg, color, padding: '3px 10px', borderRadius: 12, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-            {editing
-              ? <input value={k} onChange={e => setListItem(path, i, e.target.value)} style={{ border: 'none', background: 'transparent', color, fontSize: 12, width: Math.max(60, k.length * 8), padding: 0 }} />
-              : k}
-            {editing && <span onClick={() => removeListItem(path, i)} style={{ cursor: 'pointer', fontWeight: 700, opacity: 0.6 }}>×</span>}
-          </span>
-        ))}
-        {editing && <button onClick={() => addListItem(path)} style={{ background: bg, color, border: '1px dashed', borderRadius: 12, fontSize: 12, padding: '3px 10px', cursor: 'pointer' }}>+ Add</button>}
-      </div>
-    )
-  }
-
-  const { brandVoice, brandValues, brandHeritage, brandPillars, toneByChannel, targetCustomer, writingRules, keywords, copyFormats, writingSamples } = data
+  const moduleSourceColors = { competitive: 'purple', social: 'blue', website: 'yellow', search: 'green', personas: 'red' }
 
   return (
     <div>
-      {/* Toolbar */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-        {saveMsg && <span style={{ fontSize: 13, color: saveMsg.includes('Error') ? '#ef4444' : '#10b981', fontWeight: 600 }}>{saveMsg}</span>}
-        {editing ? (
-          <>
-            <button onClick={cancelEdit} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.surface, color: T.text, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
-            <button onClick={saveEdit} disabled={saving} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>{saving ? 'Saving…' : 'Save Changes'}</button>
-          </>
-        ) : (
-          <button onClick={startEdit} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #6366f1', background: T.surface, color: '#6366f1', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Edit Guidelines</button>
-        )}
+      {running && <RunningBanner moduleLabel="Action Plan" detail="Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes." />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+        <div>
+          <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Action Plan</h2>
+          {data.generatedAt && <p style={{ color: T.textFaint, fontSize: 12, marginTop: 4 }}>Generated {new Date(data.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
+            {exporting ? 'Generating PDF...' : '↓ Export PDF'}
+          </button>
+          <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
+            🔗 Share Link
+          </button>
+          <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label="Regenerate" />
+        </div>
       </div>
 
-      {/* Brand Voice */}
-      <SectionHeader>Brand Voice</SectionHeader>
-      <Card>
-        <div style={{ fontSize: editing ? 13 : 18, fontWeight: 700, color: T.text, marginBottom: 8 }}>
-          {editing ? <ET val={brandVoice.summary} path="brandVoice.summary" multiline /> : `"${brandVoice.summary}"`}
+      {shareUrl && (
+        <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: 8, padding: '10px 16px', marginBottom: 20, fontSize: 13 }}>
+          ✓ Share link copied: <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: '#065f46', fontWeight: 600 }}>{shareUrl}</a>
         </div>
-        <div style={{ fontSize: 13, color: T.textSub, marginBottom: 16 }}>
-          Tone: {editing ? <ET val={brandVoice.tone} path="brandVoice.tone" /> : <strong>{brandVoice.tone}</strong>}
-        </div>
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>AK Is</div>
-            {!editing && brandVoice.personality.map((p, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
-                <span style={{ color: '#10b981', fontWeight: 700 }}>✓</span>
-                <span style={{ fontSize: 13, color: T.textSub }}>{p}</span>
-              </div>
-            ))}
-            {editing && <EList items={brandVoice.personality} path="brandVoice.personality" />}
-          </div>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Writing Style</div>
-            {!editing && brandVoice.writingStyle.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
-                <span style={{ color: '#6366f1', fontWeight: 700 }}>→</span>
-                <span style={{ fontSize: 13, color: T.textSub }}>{s}</span>
-              </div>
-            ))}
-            {editing && <EList items={brandVoice.writingStyle} path="brandVoice.writingStyle" />}
-          </div>
-        </div>
-      </Card>
-
-      {/* Target Customer */}
-      <SectionHeader>Target Customer</SectionHeader>
-      <Card>
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <div style={{ flex: 1, minWidth: 220 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 4 }}><ET val={targetCustomer.name} path="targetCustomer.name" /></div>
-            <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {editing ? (
-                <>Age <ET val={targetCustomer.age} path="targetCustomer.age" /> · <ET val={targetCustomer.income} path="targetCustomer.income" /> · <ET val={targetCustomer.priceRange} path="targetCustomer.priceRange" /></>
-              ) : `Age ${targetCustomer.age} · ${targetCustomer.income} · ${targetCustomer.priceRange}`}
-            </div>
-            <div style={{ fontSize: 13, color: T.textSub, marginBottom: 12 }}><ET val={targetCustomer.description} path="targetCustomer.description" multiline /></div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Values</div>
-            <EPills items={targetCustomer.values} path="targetCustomer.values" bg="#ede9fe" color="#6366f1" />
-          </div>
-          <div style={{ flex: 1, minWidth: 220, background: T.bg, borderRadius: 8, padding: 16, borderLeft: '3px solid #6366f1' }}>
-            <div style={{ fontSize: 11, color: T.textFaint, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Her Voice</div>
-            <ET val={targetCustomer.quote} path="targetCustomer.quote" multiline />
-          </div>
-        </div>
-      </Card>
-
-      {/* Brand Values */}
-      {brandValues?.length > 0 && (
-        <>
-          <SectionHeader>Brand Values</SectionHeader>
-          <Card>
-            {!editing && brandValues.map((v, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: i < brandValues.length - 1 ? `1px solid ${T.border}` : 'none' }}>
-                <span style={{ color: '#6366f1', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>◆</span>
-                <span style={{ fontSize: 13, color: T.textSub }}>{v}</span>
-              </div>
-            ))}
-            {editing && <EList items={brandValues} path="brandValues" />}
-          </Card>
-        </>
       )}
 
-      {/* Brand Heritage */}
-      {brandHeritage && (
-        <>
-          <SectionHeader>Brand Heritage</SectionHeader>
-          <Card>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-              <div>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Founded</div>
-                  <ET val={brandHeritage.founded || ''} path="brandHeritage.founded" />
-                  {' by '}
-                  <ET val={brandHeritage.founder || ''} path="brandHeritage.founder" />
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Legacy</div>
-                  <span style={{ fontSize: 13, color: T.textSub }}><ET val={brandHeritage.legacy || ''} path="brandHeritage.legacy" multiline /></span>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Design Philosophy</div>
-                  <span style={{ fontSize: 13, color: T.textSub, fontStyle: editing ? 'normal' : 'italic' }}><ET val={brandHeritage.designPhilosophy || ''} path="brandHeritage.designPhilosophy" multiline /></span>
-                </div>
-              </div>
-              <div>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 4 }}>Modern Mission</div>
-                  <span style={{ fontSize: 13, color: T.textSub }}><ET val={brandHeritage.modernMission || ''} path="brandHeritage.modernMission" multiline /></span>
-                </div>
-                {brandHeritage.keyFacts?.length > 0 && (
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase', marginBottom: 6 }}>Key Facts</div>
-                    {!editing && brandHeritage.keyFacts.map((f, i) => (
-                      <div key={i} style={{ fontSize: 13, color: T.textSub, padding: '4px 0', borderBottom: i < brandHeritage.keyFacts.length - 1 ? `1px solid ${T.border}` : 'none' }}>• {f}</div>
-                    ))}
-                    {editing && <EList items={brandHeritage.keyFacts} path="brandHeritage.keyFacts" />}
-                  </div>
-                )}
-              </div>
-            </div>
-          </Card>
-        </>
+      {data.executiveSummary && (
+        <Card style={{ marginBottom: 24, borderLeft: `4px solid ${T.accent}`, background: `linear-gradient(135deg, ${T.surface} 0%, ${T.surfaceAlt} 100%)` }}>
+          <h3 style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Executive Summary</h3>
+          <p style={{ color: T.text, fontSize: 16, lineHeight: 1.85, fontWeight: 400 }}>{data.executiveSummary}</p>
+        </Card>
       )}
 
-      {/* Brand Pillars */}
-      {brandPillars?.length > 0 && (
-        <>
-          <SectionHeader>Brand Pillars</SectionHeader>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
-            {brandPillars.map((p, i) => (
-              <div key={i} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 10, padding: 16, borderTop: '3px solid #6366f1' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>
-                  {editing ? <input style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', background: T.inputBg, color: T.text }} value={p.pillar} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].pillar = e.target.value; setDraft(next); }} /> : p.pillar}
+      {(data.immediateWins || []).length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Immediate Wins <span style={{ color: T.textMuted, fontWeight: 400, fontSize: 13 }}>— top 5 by impact/effort ratio</span></h3>
+          {data.immediateWins.map((win, i) => (
+            <div key={i} style={{ display: 'flex', gap: 16, padding: '16px 0', borderBottom: i < data.immediateWins.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+              <span style={{ width: 32, height: 32, background: i === 0 ? T.accent : T.surfaceAlt, color: i === 0 ? '#fff' : T.textMuted, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, flexShrink: 0 }}>{win.rank}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{win.title}</span>
+                  <ImpactBadge impact={win.impact} />
+                  <Badge label={`${win.effort} effort`} color="gray" />
+                  {win.sourceModule && <Badge label={win.sourceModule} color={moduleSourceColors[win.sourceModule] || 'gray'} />}
                 </div>
-                <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8 }}>
-                  {editing ? <textarea style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', minHeight: 50, resize: 'vertical', background: T.inputBg, color: T.text }} value={p.description} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].description = e.target.value; setDraft(next); }} /> : p.description}
-                </div>
-                {p.inCopy && (
-                  <div style={{ fontSize: 12, color: '#6366f1', background: '#ede9fe', borderRadius: 6, padding: '6px 10px' }}>
-                    <span style={{ fontWeight: 700 }}>In copy: </span>
-                    {editing ? <input style={{ border: 'none', background: 'transparent', color: '#6366f1', fontSize: 12, width: '80%', outline: 'none' }} value={p.inCopy} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.brandPillars[i].inCopy = e.target.value; setDraft(next); }} /> : p.inCopy}
-                  </div>
-                )}
+                <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6 }}>{win.description}</p>
               </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Tone by Channel */}
-      {toneByChannel && Object.keys(toneByChannel).length > 0 && (
-        <>
-          <SectionHeader>Tone by Channel</SectionHeader>
-          <Card>
-            {Object.entries(toneByChannel).map(([channel, guidance], i, arr) => (
-              <div key={channel} style={{ display: 'flex', gap: 16, padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                <div className="ak-brand-tone-label" style={{ minWidth: 140, fontSize: 12, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: 0.5, paddingTop: 2 }}>{channel.replace(/([A-Z])/g, ' $1').trim()}</div>
-                <div style={{ flex: 1, fontSize: 13, color: T.textSub }}>
-                  {editing
-                    ? <textarea style={{ border: `1px solid ${T.inputBorder}`, borderRadius: 6, padding: '4px 8px', fontSize: 13, width: '100%', resize: 'vertical', minHeight: 40, background: T.inputBg, color: T.text }} value={guidance} onChange={e => { const next = JSON.parse(JSON.stringify(draft)); next.toneByChannel[channel] = e.target.value; setDraft(next); }} />
-                    : guidance}
-                </div>
-              </div>
-            ))}
-          </Card>
-        </>
-      )}
-
-      {/* Writing Rules */}
-      <SectionHeader>Writing Rules</SectionHeader>
-      <div className="ak-brand-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
-        <Card title="Do">
-          {!editing && writingRules.dos.map((d, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.dos.length - 1 ? `1px solid ${T.border}` : 'none' }}>
-              <span style={{ color: '#10b981', fontWeight: 700, flexShrink: 0 }}>✓</span>
-              <span style={{ fontSize: 13, color: T.textSub }}>{d}</span>
             </div>
           ))}
-          {editing && <EList items={writingRules.dos} path="writingRules.dos" />}
         </Card>
-        <Card title="Don't">
-          {!editing && writingRules.donts.map((d, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '5px 0', borderBottom: i < writingRules.donts.length - 1 ? `1px solid ${T.border}` : 'none' }}>
-              <span style={{ color: '#ef4444', fontWeight: 700, flexShrink: 0 }}>✕</span>
-              <span style={{ fontSize: 13, color: T.textSub }}>{d}</span>
-            </div>
-          ))}
-          {editing && <EList items={writingRules.donts} path="writingRules.donts" />}
-        </Card>
-      </div>
+      )}
 
-      {/* Keywords */}
-      <SectionHeader>Keywords</SectionHeader>
-      <div className="ak-brand-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
-        <Card title="Use These Words">
-          <EPills items={keywords.positive} path="keywords.positive" bg="#d1fae5" color="#065f46" />
-        </Card>
-        <Card title="Avoid These Words">
-          <EPills items={keywords.negative} path="keywords.negative" bg="#fee2e2" color="#991b1b" />
-        </Card>
-        <Card title="SEO Keywords">
-          <EPills items={keywords.seoKeywords} path="keywords.seoKeywords" bg="#ede9fe" color="#5b21b6" />
-        </Card>
-      </div>
-
-      {/* Copy Formats */}
-      <SectionHeader>Copy Formats</SectionHeader>
-      <Card>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-          {Object.keys(formatLabels).map(f => (
-            <button key={f} onClick={() => setActiveFormat(f)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeFormat === f ? '#6366f1' : T.surfaceAlt, color: activeFormat === f ? '#fff' : T.textSub }}>{formatLabels[f]}</button>
-          ))}
-        </div>
-        {copyFormats[activeFormat] && (() => {
-          const fmt = copyFormats[activeFormat]
-          const fpath = `copyFormats.${activeFormat}`
-          return (
-            <div>
-              {fmt.structure !== undefined && <div style={{ marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase' }}>Structure: </span><ET val={fmt.structure} path={`${fpath}.structure`} /></div>}
-              {fmt.guidance !== undefined && <div style={{ marginBottom: 12 }}><span style={{ fontSize: 12, fontWeight: 700, color: T.textSub, textTransform: 'uppercase' }}>Guidance: </span><ET val={fmt.guidance} path={`${fpath}.guidance`} multiline /></div>}
-              {fmt.paragraphGuidance !== undefined && <div style={{ marginBottom: 6, fontSize: 13, color: T.textSub }}><strong>Paragraph: </strong><ET val={fmt.paragraphGuidance} path={`${fpath}.paragraphGuidance`} multiline /></div>}
-              {fmt.bulletGuidance !== undefined && <div style={{ marginBottom: 12, fontSize: 13, color: T.textSub }}><strong>Bullets: </strong><ET val={fmt.bulletGuidance} path={`${fpath}.bulletGuidance`} multiline /></div>}
-              {fmt.example && (
-                <div style={{ background: T.surfaceAlt, borderRadius: 8, padding: 14, marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 6 }}>EXAMPLE — {fmt.example.title}</div>
-                  <div style={{ fontSize: 13, color: T.textSub, marginBottom: 8, fontStyle: editing ? 'normal' : 'italic' }}><ET val={fmt.example.paragraph} path={`${fpath}.example.paragraph`} multiline /></div>
-                  <EList items={fmt.example.bullets || []} path={`${fpath}.example.bullets`} />
-                </div>
-              )}
-              {fmt.examples && Array.isArray(fmt.examples) && fmt.examples.map((ex, i) => (
-                <div key={i} style={{ background: T.surfaceAlt, borderRadius: 8, padding: 10, marginBottom: 8 }}>
-                  {typeof ex === 'string'
-                    ? <ET val={ex} path={`${fpath}.examples.${i}`} />
-                    : <div>
-                        <div style={{ marginBottom: 4 }}><strong style={{ fontSize: 12, color: T.textMuted }}>Headline: </strong><ET val={ex.headline} path={`${fpath}.examples.${i}.headline`} /></div>
-                        <div><strong style={{ fontSize: 12, color: T.textMuted }}>Subhead: </strong><ET val={ex.subhead} path={`${fpath}.examples.${i}.subhead`} /></div>
-                      </div>}
+      {data.roadmap && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+          {[['day30', '30 Days', '#6366f1', '#ede9fe', '#4c1d95'], ['day60', '60 Days', '#7c3aed', '#f5f3ff', '#5b21b6'], ['day90', '90 Days', '#8b5cf6', '#faf5ff', '#6b21a8']].map(([key, label, color, bgColor, textColor]) => (
+            <div key={key} style={{ background: bgColor, borderRadius: 12, padding: 20, border: `1px solid ${color}22` }}>
+              <h4 style={{ color, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{label}</h4>
+              {(data.roadmap[key] || []).map((item, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 8, padding: '10px 14px', marginBottom: 10, borderLeft: `3px solid ${color}` }}>
+                  <p style={{ color: textColor, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.action}</p>
+                  <p style={{ color: '#6b7280', fontSize: 11 }}>{item.owner}</p>
+                  <p style={{ color: '#6b7280', fontSize: 11, fontStyle: 'italic' }}>{item.metric}</p>
                 </div>
               ))}
-              {fmt.donts && (
-                <div style={{ marginTop: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', marginBottom: 6 }}>Avoid</div>
-                  <EList items={fmt.donts} path={`${fpath}.donts`} />
-                </div>
-              )}
             </div>
-          )
-        })()}
-      </Card>
-
-      {/* Writing Samples */}
-      <SectionHeader>Writing Samples</SectionHeader>
-      <Card>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-          {sampleCategories.map(cat => (
-            <button key={cat} onClick={() => setActiveSample(cat)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: activeSample === cat ? '#6366f1' : T.surfaceAlt, color: activeSample === cat ? '#fff' : T.textSub, textTransform: 'capitalize' }}>{cat}</button>
           ))}
         </div>
-        {(writingSamples[activeSample] || []).map((s, i) => (
-          <div key={i} style={{ padding: '14px 0', borderBottom: i < writingSamples[activeSample].length - 1 ? `1px solid ${T.border}` : 'none' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}><ET val={s.title} path={`writingSamples.${activeSample}.${i}.title`} /></div>
-            <div style={{ marginBottom: 8 }}><ET val={s.paragraph} path={`writingSamples.${activeSample}.${i}.paragraph`} multiline /></div>
-            <EList items={s.bullets} path={`writingSamples.${activeSample}.${i}.bullets`} />
-          </div>
-        ))}
-      </Card>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+        {(data.competitiveGapsToClose || []).length > 0 && (
+          <Card>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Competitive Gaps to Close</h3>
+            {data.competitiveGapsToClose.map((gap, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < data.competitiveGapsToClose.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                <Badge label={gap.priority} color={gap.priority === 'high' ? 'red' : gap.priority === 'medium' ? 'yellow' : 'green'} />
+                <div>
+                  <p style={{ color: T.text, fontSize: 13, fontWeight: 600 }}>{gap.gap}</p>
+                  {gap.competitor && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>vs. {gap.competitor}</p>}
+                </div>
+              </div>
+            ))}
+          </Card>
+        )}
+
+        {(data.opportunitiesRanked || []).length > 0 && (
+          <Card>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Top Opportunities</h3>
+            {data.opportunitiesRanked.map((opp, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < data.opportunitiesRanked.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 18, fontWeight: 800, color: T.accent, minWidth: 24, lineHeight: 1.2 }}>{opp.rank}</span>
+                <div>
+                  <p style={{ color: T.text, fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{opp.opportunity}</p>
+                  <p style={{ color: T.textMuted, fontSize: 12, lineHeight: 1.5 }}>{opp.estimatedImpact}</p>
+                </div>
+              </div>
+            ))}
+          </Card>
+        )}
+      </div>
     </div>
   )
 }
 
-const TABS = [
-  { id: 'overview',     label: '🏠 Overview' },
-  { id: 'calendar',     label: '📅 Calendar' },
-  { id: 'campaigns',    label: '🗂️ Campaigns' },
-  { id: 'catalog',      label: '👗 Catalog',      dividerBefore: true },
-  { id: 'site',         label: '🔍 Site Intel' },
-  { id: 'email',        label: '📧 Email' },
-  { id: 'social',       label: '📱 Social' },
-  { id: 'seo',          label: '📊 SEO' },
-  { id: 'seo-products', label: '🏷️ SEO Products' },
-  { id: 'content',      label: '✍️ Content',      dividerBefore: true },
-  { id: 'ai',           label: '🤖 AI Search' },
-  { id: 'personas',     label: '👥 Personas',     dividerBefore: true },
-  { id: 'brand',        label: '📘 Brand' },
-  { id: 'price',        label: '💰 Pricing' },
-]
-
+// ─── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
-  const [tab, setTab] = useState('overview')
-  const [data, setData] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState(null)
-  const [campaigns, setCampaigns] = useState([])
-  const [calItems, setCalItems] = useState([])
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('ak-dark') === '1')
-
-  function toggleDark() {
-    setDarkMode(prev => {
-      const next = !prev
-      localStorage.setItem('ak-dark', next ? '1' : '0')
-      return next
-    })
-  }
-
+  const [darkMode, setDarkMode] = useState(false)
   const T = darkMode ? DARK_T : LIGHT_T
+  const [tab, setTab] = useState('portfolio')
+  const [brands, setBrands] = useState([])
+  const [activeBrand, setActiveBrand] = useState(null)
+  const [showAddBrand, setShowAddBrand] = useState(false)
+  const [refreshingAt, setRefreshingAt] = useState({})   // module → trigger timestamp
+  const [moduleVersions, setModuleVersions] = useState({}) // module → version counter (increments on completion)
+  const fetchIdRef = useRef(0)
+  const pollRef = useRef(null)
+  const modulePollRefs = useRef({}) // module → intervalId
 
+  async function loadBrands() {
+    const res = await fetch(`${API}/brands`)
+    const d = await res.json()
+    setBrands(d.brands || [])
+    return d.brands || []
+  }
+
+  useEffect(() => { loadBrands() }, [])
+
+  // Poll if any brand is in 'running' state
   useEffect(() => {
-    async function load() {
-      setLoading(true)
-      const [siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines, campaignsData, calendarData] = await Promise.all([
-        fetchEndpoint('/site-intelligence'),
-        fetchEndpoint('/product-catalog'),
-        fetchEndpoint('/site-analysis'),
-        fetchEndpoint('/email-intelligence'),
-        fetchEndpoint('/social-intelligence'),
-        fetchEndpoint('/seo-intelligence'),
-        fetchEndpoint('/content-recommendations'),
-        fetchEndpoint('/email-inbox'),
-        fetchEndpoint('/email-analysis'),
-        fetchEndpoint('/agentic-search'),
-        fetchEndpoint('/price-intelligence'),
-        fetchEndpoint('/personas'),
-        fetchEndpoint('/apify-usage'),
-        fetchEndpoint('/brand-guidelines'),
-        fetchEndpoint('/campaigns'),
-        fetchEndpoint('/calendar'),
-      ])
-      setData({ siteIntel, catalog, siteAnalysis, emailIntel, socialIntel, seoIntel, content, inboxData, emailAnalysis, agenticSearch, priceIntel, personas, apifyUsage, brandGuidelines })
-      setCampaigns(Array.isArray(campaignsData) ? campaignsData : [])
-      setCalItems(Array.isArray(calendarData) ? calendarData : [])
-      setLastUpdated(new Date().toLocaleTimeString())
-      setLoading(false)
+    const hasRunning = brands.some(b => b.discoveryStatus === 'running')
+    if (hasRunning && !pollRef.current) {
+      pollRef.current = setInterval(async () => {
+        const updated = await loadBrands()
+        if (!updated.some(b => b.discoveryStatus === 'running')) {
+          clearInterval(pollRef.current); pollRef.current = null
+        }
+      }, 5000)
     }
-    load()
-  }, [])
+    return () => { if (!hasRunning && pollRef.current) { clearInterval(pollRef.current); pollRef.current = null } }
+  }, [brands])
 
-  async function reloadEmailAnalysis() {
-    const emailAnalysis = await fetchEndpoint('/email-analysis')
-    setData(prev => ({ ...prev, emailAnalysis }))
+  function selectBrand(slug) {
+    setActiveBrand(slug); setTab('profile')
   }
 
-  async function reloadContent() {
-    const content = await fetchEndpoint('/content-recommendations')
-    setData(prev => ({ ...prev, content }))
+  async function handleBrandAdded(slug) {
+    setShowAddBrand(false)
+    await loadBrands()
+    setActiveBrand(slug); setTab('profile')
   }
+
+  async function handleRefreshAll(slug) {
+    await fetch(`${API}/brands/${slug}/refresh/all`, { method: 'POST' })
+    await loadBrands()
+  }
+
+  async function handleRefreshModule(module) {
+    if (!activeBrand) return
+    const triggerTime = Date.now()
+    setRefreshingAt(r => ({ ...r, [module]: triggerTime }))
+    await fetch(`${API}/brands/${activeBrand}/refresh/${module}`, { method: 'POST' })
+    // Poll status until lastRefreshed > triggerTime, then mark done and bump version
+    const slug = activeBrand
+    const POLL_TIMEOUT_MS = 10 * 60 * 1000 // 10 minutes max
+    if (modulePollRefs.current[module]) clearInterval(modulePollRefs.current[module])
+    modulePollRefs.current[module] = setInterval(async () => {
+      try {
+        // Timeout: if it's been running > 10 min, assume failure and clear
+        if (Date.now() - triggerTime > POLL_TIMEOUT_MS) {
+          clearInterval(modulePollRefs.current[module])
+          delete modulePollRefs.current[module]
+          setRefreshingAt(r => { const n = { ...r }; delete n[module]; return n })
+          return
+        }
+        const res = await fetch(`${API}/brands/${slug}/status`)
+        const s = await res.json()
+        const mod = s.modules?.find(m => m.module === module)
+        if (mod?.lastRefreshed && new Date(mod.lastRefreshed).getTime() > triggerTime) {
+          clearInterval(modulePollRefs.current[module])
+          delete modulePollRefs.current[module]
+          setRefreshingAt(r => { const n = { ...r }; delete n[module]; return n })
+          setModuleVersions(v => ({ ...v, [module]: (v[module] || 0) + 1 }))
+        }
+      } catch {}
+    }, 4000)
+  }
+
+  const activeBrandData = brands.find(b => b.slug === activeBrand)
+  const nonPortfolioTabs = TABS.filter(t => t.id !== 'portfolio')
 
   return (
     <ThemeContext.Provider value={T}>
-    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: T.bg, minHeight: '100vh', width: '100%', color: T.text, transition: 'background 0.2s, color 0.2s', overflowX: 'hidden' }}>
-      {/* Top nav */}
-      <div className="ak-nav" style={{ background: T.navBg, color: T.navText, padding: 'clamp(10px, 2vw, 14px) clamp(12px, 3vw, 32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-        <div>
-          <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.5px', color: T.navText }}>ANNE KLEIN</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>Brand Intelligence Platform</div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-            {loading ? 'Loading data…' : `Updated ${lastUpdated}`}
-          </div>
-          <button onClick={toggleDark} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.25)', color: 'rgba(255,255,255,0.8)', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
-            {darkMode ? '☀️ Light' : '🌙 Dark'}
-          </button>
-        </div>
-      </div>
+      <style>{`
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+      `}</style>
 
-      {/* Tab bar */}
-      <div className="ak-tabs" style={{ background: T.tabBg, borderBottom: `1px solid ${T.tabBorder}`, padding: `0 clamp(8px, 3vw, 32px)`, display: 'flex', gap: 0, flexWrap: 'nowrap' }}>
-        {TABS.map(t => (
-          <React.Fragment key={t.id}>
-            {t.dividerBefore && (
-              <div style={{ width: 1, background: T.border, margin: '10px 6px', alignSelf: 'stretch' }} />
-            )}
-            <button className="ak-tab-btn" onClick={() => setTab(t.id)}
-              style={{ padding: '13px 14px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 12,
-                color: tab === t.id ? T.accent : T.textMuted,
-                borderBottom: tab === t.id ? `2px solid ${T.accent}` : '2px solid transparent',
-                whiteSpace: 'nowrap', transition: 'color 0.15s' }}>
-              {t.label}
-            </button>
-          </React.Fragment>
-        ))}
-      </div>
+      <div style={{ minHeight: '100vh', background: T.bg }}>
+        {/* Nav */}
+        <nav style={{ background: T.navBg, padding: '0 24px', display: 'flex', alignItems: 'center', gap: 16, height: 56, position: 'sticky', top: 0, zIndex: 100 }}>
+          <span style={{ color: T.navText, fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', marginRight: 8 }}>Brand Intelligence</span>
 
-      {/* Content */}
-      <div className="ak-content" style={{ width: '100%', padding: `clamp(12px, 3vw, 24px) clamp(12px, 4vw, 40px)`, boxSizing: 'border-box' }}>
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: 80, color: T.textMuted }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
-            <div>Loading intelligence data…</div>
+          {/* Brand switcher */}
+          <select
+            value={activeBrand || ''}
+            onChange={e => { if (e.target.value) { setActiveBrand(e.target.value); setTab('profile') } else { setActiveBrand(null); setTab('portfolio') } }}
+            style={{ background: 'rgba(255,255,255,0.1)', color: T.navText, border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', fontSize: 13, cursor: 'pointer' }}
+          >
+            <option value="">All Brands</option>
+            {brands.map(b => <option key={b.slug} value={b.slug}>{b.name}</option>)}
+          </select>
+
+          <button onClick={() => setShowAddBrand(true)} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add Brand</button>
+
+          <div style={{ flex: 1 }} />
+
+          {/* Tab nav (only show brand tabs when a brand is selected) */}
+          <div style={{ display: 'flex', gap: 2 }}>
+            <button onClick={() => { setActiveBrand(null); setTab('portfolio') }} style={{ background: tab === 'portfolio' && !activeBrand ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === 'portfolio' ? 1 : 0.6 }}>Portfolio</button>
+            {activeBrand && nonPortfolioTabs.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)} style={{ background: tab === t.id ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === t.id ? 1 : 0.6 }}>{t.label}</button>
+            ))}
           </div>
-        ) : (
-          <>
-            {tab === 'overview'     && <OverviewTab catalog={data.catalog} siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} emailIntel={data.emailIntel} socialIntel={data.socialIntel} content={data.content} apifyUsage={data.apifyUsage} />}
-            {tab === 'calendar'     && <CalendarTab calItems={calItems} setCalItems={setCalItems} campaigns={campaigns} personas={data.personas} catalog={data.catalog} />}
-            {tab === 'campaigns'    && <CampaignsTab campaigns={campaigns} setCampaigns={setCampaigns} personas={data.personas} content={data.content} setCalItems={setCalItems} />}
-            {tab === 'catalog'      && <CatalogTab catalog={data.catalog} onRefreshComplete={(freshCatalog) => setData(prev => ({ ...prev, catalog: freshCatalog }))} />}
-            {tab === 'site'         && <SiteIntelTab siteIntel={data.siteIntel} siteAnalysis={data.siteAnalysis} />}
-            {tab === 'email'        && <EmailTab inboxData={data.inboxData} emailAnalysis={data.emailAnalysis} loadData={reloadEmailAnalysis} />}
-            {tab === 'social'       && <SocialTab socialIntel={data.socialIntel} />}
-            {tab === 'seo'          && <SEOTab seoIntel={data.seoIntel} content={data.content} />}
-            {tab === 'seo-products' && <SeoProductTab />}
-            {tab === 'content'      && <ContentTab content={data.content} catalog={data.catalog} campaigns={campaigns} loadData={reloadContent} setCalItems={setCalItems} />}
-            {tab === 'price'        && <PriceTab priceIntel={data.priceIntel} />}
-            {tab === 'ai'           && <AgenticSearchTab agenticSearch={data.agenticSearch} />}
-            {tab === 'personas'     && <PersonasTab personas={data.personas} content={data.content} />}
-            {tab === 'brand'        && <BrandGuidelinesTab guidelines={data.brandGuidelines} />}
-          </>
+
+          <button onClick={() => setDarkMode(d => !d)} style={{ background: 'none', border: 'none', color: T.navText, fontSize: 18, cursor: 'pointer', opacity: 0.7, padding: 4 }}>{darkMode ? '☀' : '🌙'}</button>
+        </nav>
+
+        {/* Brand sub-header */}
+        {activeBrandData && (
+          <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ color: T.text, fontWeight: 700, fontSize: 15 }}>{activeBrandData.name}</span>
+            {activeBrandData.industry && <span style={{ color: T.textMuted, fontSize: 13 }}>{activeBrandData.industry}</span>}
+            <HealthBadge status={activeBrandData.healthStatus} />
+            {activeBrandData.discoveryStatus === 'running' && <span style={{ color: '#3b82f6', fontSize: 12, fontWeight: 600 }}>🔍 Discovery running...</span>}
+          </div>
         )}
-      </div>
-    </div>
 
+        {/* Main content */}
+        <main style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+          {tab === 'portfolio' && (
+            <PortfolioTab brands={brands} onSelectBrand={selectBrand} onAddBrand={() => setShowAddBrand(true)} onRefresh={handleRefreshAll} />
+          )}
+          {tab === 'profile' && activeBrand && <BrandProfileTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!(refreshingAt['competitive_analysis'] || refreshingAt['site_intelligence'] || refreshingAt['social_intelligence'])} />}
+          {tab === 'competitive' && activeBrand && <CompetitiveTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['competitive_analysis']} dataVersion={moduleVersions['competitive_analysis'] || 0} />}
+          {tab === 'personas' && activeBrand && <PersonasTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['personas']} dataVersion={moduleVersions['personas'] || 0} />}
+          {tab === 'social' && activeBrand && <SocialAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['social_intelligence']} dataVersion={moduleVersions['social_intelligence'] || 0} />}
+          {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
+          {tab === 'search' && activeBrand && <SearchSeoTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['search_seo']} dataVersion={moduleVersions['search_seo'] || 0} />}
+          {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} />}
+          {!activeBrand && tab !== 'portfolio' && (
+            <EmptyState message="Select a brand to view this section." cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
+          )}
+        </main>
+      </div>
+
+      {showAddBrand && <AddBrandModal onClose={() => setShowAddBrand(false)} onAdded={handleBrandAdded} />}
     </ThemeContext.Provider>
   )
 }

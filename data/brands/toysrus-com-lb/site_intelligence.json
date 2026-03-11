@@ -1,0 +1,3274 @@
+{
+  "generatedAt": "2026-03-11T20:50:20.942Z",
+  "brandSlug": "toysrus-com-lb",
+  "brands": [
+    {
+      "id": "toysrus-com-lb",
+      "name": "Toys R Us",
+      "url": "https://toysrus.com.lb/",
+      "role": "target",
+      "scrapedAt": "2026-03-11T20:47:49.020Z",
+      "navigation": [
+        {
+          "text": "Find A Store",
+          "href": "https://toysrus.com.lb/lb/en/contact-us"
+        },
+        {
+          "text": "What's On",
+          "href": "https://toysrus.com.lb/lb/en/happening-now"
+        },
+        {
+          "text": "Sign In / Register",
+          "href": "https://toysrus.com.lb/lb/en/login"
+        },
+        {
+          "text": "Shop By Category",
+          "href": "https://toysrus.com.lb/lb/en/products"
+        },
+        {
+          "text": "Arts & Crafts",
+          "href": "https://toysrus.com.lb/lb/en/products/all/arts-crafts"
+        },
+        {
+          "text": "Building & Construction",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/building-construction"
+        },
+        {
+          "text": "Dolls & Plushes",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/dolls-plushes"
+        },
+        {
+          "text": "Guns, Vehicles & RC",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/guns-vehicles-rc"
+        },
+        {
+          "text": "Outdoor & Sports Toys",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/outdoor-sports-toys"
+        },
+        {
+          "text": "Figures & Collectibles",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/figures-collectibles"
+        },
+        {
+          "text": "Electronics",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/electronics"
+        },
+        {
+          "text": "Impulse Buy & Gadgets",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/impulse-buy-gadgets"
+        },
+        {
+          "text": "Preschool Toys",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/preschool-toys"
+        },
+        {
+          "text": "Puzzles & Board Games",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/puzzles-board-games"
+        },
+        {
+          "text": "Educational & Science",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/educational-science"
+        },
+        {
+          "text": "Back to School",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/back-to-school"
+        },
+        {
+          "text": "Books",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/books"
+        },
+        {
+          "text": "Clothing",
+          "href": "https://toysrus.com.lb/lb/en/products/all/clothing"
+        },
+        {
+          "text": "Shop by Age",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "0 - 2 Years",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90006"
+        },
+        {
+          "text": "3 - 5 Years",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90005"
+        },
+        {
+          "text": "6 - 8 Years",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90004"
+        },
+        {
+          "text": "9 - 12 Years",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90003"
+        },
+        {
+          "text": "12 + Years",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90002"
+        },
+        {
+          "text": "Shop by Brand",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "Mattel Barbie",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all?brands=%2C26"
+        },
+        {
+          "text": "Funko",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all?brands=%2C10"
+        },
+        {
+          "text": "Crayola",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all?brands=%2C8"
+        },
+        {
+          "text": "Lego",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all?brands=%2C3"
+        },
+        {
+          "text": "Clementoni",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all?brands=%2C55"
+        },
+        {
+          "text": "Classic World",
+          "href": "https://toysrusco_68ef7409066ca.twalab.cloud/lb/en/products/all/preschool-toys?brands=%2C99"
+        },
+        {
+          "text": "Shop by Character",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "Barbie",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90239"
+        },
+        {
+          "text": "Pokemon",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90048"
+        },
+        {
+          "text": "Stitch",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90566"
+        },
+        {
+          "text": "Peppa Pig",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90404"
+        },
+        {
+          "text": "Disney",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90274"
+        },
+        {
+          "text": "Mickey & Friends",
+          "href": "https://toysrus.com.lb/lb/en/products?filter%5B0%5D=90606"
+        },
+        {
+          "text": "R Deals",
+          "href": "https://toysrus.com.lb/lb/en/products/r-deals"
+        },
+        {
+          "text": "0",
+          "href": "https://toysrus.com.lb/lb/en/cart"
+        },
+        {
+          "text": "Shop",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "Top Picks",
+          "href": "https://toysrus.com.lb/lb/en/products/top-picks"
+        },
+        {
+          "text": "Geoffrey The Giraffe",
+          "href": "https://toysrus.com.lb/lb/en/products/geoffrey-the-giraffe"
+        },
+        {
+          "text": "Trending",
+          "href": "https://toysrus.com.lb/lb/en/products/trending"
+        },
+        {
+          "text": "Gift Registry",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "Create Registry",
+          "href": "https://toysrus.com.lb/lb/en/create-registry"
+        },
+        {
+          "text": "Find Registry",
+          "href": "https://toysrus.com.lb/lb/en/find-registry"
+        },
+        {
+          "text": "About",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "Our Story",
+          "href": "https://toysrus.com.lb/lb/en/our-story"
+        },
+        {
+          "text": "Happening Now",
+          "href": "https://toysrus.com.lb/lb/en/happening-now"
+        },
+        {
+          "text": "Help Center",
+          "href": "https://toysrus.com.lb/lb/en/faqs"
+        },
+        {
+          "text": "Legal",
+          "href": "https://toysrus.com.lb/lb/en"
+        },
+        {
+          "text": "Terms & Conditions",
+          "href": "https://toysrus.com.lb/lb/en/policy/terms-conditions"
+        },
+        {
+          "text": "Privacy Policy",
+          "href": "https://toysrus.com.lb/lb/en/policy/privacy-policy"
+        },
+        {
+          "text": "Cookies Policy",
+          "href": "https://toysrus.com.lb/lb/en/policy/cookies-policy"
+        }
+      ],
+      "heroContent": {
+        "headline": "",
+        "allText": []
+      },
+      "promoBanners": [
+        "Free Delivery During Ramadan on Orders Above $50"
+      ],
+      "featuredCategories": [
+        "Find A Store",
+        "What's On",
+        "Shop By Category",
+        "Arts & Crafts",
+        "Building & Construction",
+        "Dolls & Plushes",
+        "Guns, Vehicles & RC",
+        "Outdoor & Sports Toys",
+        "Figures & Collectibles",
+        "Electronics",
+        "Impulse Buy & Gadgets",
+        "Preschool Toys",
+        "Puzzles & Board Games",
+        "Educational & Science",
+        "Back to School",
+        "Books",
+        "Clothing",
+        "Shop by Age",
+        "3 - 5 Years",
+        "6 - 8 Years",
+        "9 - 12 Years",
+        "12 + Years",
+        "Shop by Brand",
+        "Mattel Barbie",
+        "Funko",
+        "Crayola",
+        "Lego",
+        "Clementoni",
+        "Classic World",
+        "Shop by Character",
+        "Barbie",
+        "Pokemon",
+        "Stitch",
+        "Peppa Pig",
+        "Disney",
+        "Mickey & Friends",
+        "R Deals",
+        "Shop",
+        "Top Picks",
+        "Geoffrey The Giraffe"
+      ],
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "id": "playone",
+      "name": "PlayOne",
+      "url": "https://playone.com.lb",
+      "role": "competitor",
+      "scrapedAt": "2026-03-11T20:47:54.982Z",
+      "navigation": [
+        {
+          "text": "View All",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "Girls",
+          "href": "https://playone.com.lb/girls/"
+        },
+        {
+          "text": "Boys",
+          "href": "https://playone.com.lb/boys/"
+        },
+        {
+          "text": "0-12months",
+          "href": "https://playone.com.lb/age/0-12-months/"
+        },
+        {
+          "text": "1-3years",
+          "href": "https://playone.com.lb/age/1-3-years/"
+        },
+        {
+          "text": "3-5years",
+          "href": "https://playone.com.lb/age/3-5-years/"
+        },
+        {
+          "text": "5-8years",
+          "href": "https://playone.com.lb/age/5-8-years/"
+        },
+        {
+          "text": "8-13years",
+          "href": "https://playone.com.lb/age/8-13-years/"
+        },
+        {
+          "text": "13+years",
+          "href": "https://playone.com.lb/age/13-years/"
+        },
+        {
+          "text": "Activity Books",
+          "href": "https://playone.com.lb/books/activity-and-coloring-books/"
+        },
+        {
+          "text": "Beginner Readers",
+          "href": "https://playone.com.lb/books/beginner-readers/"
+        },
+        {
+          "text": "Best Sellers",
+          "href": "https://playone.com.lb/books/best-sellers/"
+        },
+        {
+          "text": "Character Books",
+          "href": "https://playone.com.lb/books/character-books/"
+        },
+        {
+          "text": "Comic Books",
+          "href": "https://playone.com.lb/books/comic-books/"
+        },
+        {
+          "text": "Educational",
+          "href": "https://playone.com.lb/books/educational-books/"
+        },
+        {
+          "text": "Litterature & Fiction",
+          "href": "https://playone.com.lb/books/literature-and-fiction/"
+        },
+        {
+          "text": "Seasonal",
+          "href": "https://playone.com.lb/books/seasonal-books/"
+        },
+        {
+          "text": "Sound Books",
+          "href": "https://playone.com.lb/books/sound-books/"
+        },
+        {
+          "text": "Story Books",
+          "href": "https://playone.com.lb/books/story-books/"
+        },
+        {
+          "text": "SHOP BOOKS BY AGE",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "Baby to 2 »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "Ages 3 - 5 »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "Ages 6 - 8 »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "Ages 9 - 13 »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "SHOP BOOKS BY LANGUAGE",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "ENGLISH »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "ARABIC »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "HINDI »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "FRENCH »",
+          "href": "https://playone.com.lb/"
+        },
+        {
+          "text": "School Bags & Backpacks",
+          "href": "https://playone.com.lb/school/school-bags-and-backpacks/"
+        },
+        {
+          "text": "Day Care",
+          "href": "https://playone.com.lb/school/school-bags-and-backpacks/day-care-backpacks/"
+        },
+        {
+          "text": "KG1-KG2",
+          "href": "https://playone.com.lb/school/school-bags-and-backpacks/kg1-kg2-backpacks/"
+        },
+        {
+          "text": "KG3-Grade 1",
+          "href": "https://playone.com.lb/school/school-bags-and-backpacks/kg3-grade-1-backpacks/"
+        },
+        {
+          "text": "Grade 2-4",
+          "href": "https://playone.com.lb/school/school-bags-and-backpacks/grade-2-4-backpacks/"
+        },
+        {
+          "text": "Grade 5+",
+          "href": "https://playone.com.lb/school/school-bags-and-backpacks/grade-5-backpacks/"
+        },
+        {
+          "text": "Lunch Boxes/Bags",
+          "href": "https://playone.com.lb/school/lunch-boxes-and-water-bottles-en/"
+        },
+        {
+          "text": "Water Bottles",
+          "href": "https://playone.com.lb/school/water-bottles-and-drinkware1/"
+        },
+        {
+          "text": "Umbrellas",
+          "href": "https://playone.com.lb/school/umbrellas/"
+        },
+        {
+          "text": "Stationery",
+          "href": "https://playone.com.lb/school/stationery/"
+        },
+        {
+          "text": "Pencil Cases",
+          "href": "https://playone.com.lb/school/pencil-cases/"
+        },
+        {
+          "text": "Forgot your password?",
+          "href": "https://playone.com.lb/?dispatch=auth.recover_password"
+        },
+        {
+          "text": "Create a PlayOne Account",
+          "href": "https://playone.com.lb/profiles-add/"
+        },
+        {
+          "text": "Create Account",
+          "href": "https://playone.com.lb/profiles-add/"
+        },
+        {
+          "text": "Log In",
+          "href": "https://playone.com.lb/login/"
+        },
+        {
+          "text": "My Cart",
+          "href": "https://playone.com.lb/cart/"
+        },
+        {
+          "text": "Wish List",
+          "href": "https://playone.com.lb/wishlist/"
+        },
+        {
+          "text": "My Orders",
+          "href": "https://playone.com.lb/login/?return_url=index.php%3Fdispatch%3Dorders.search"
+        },
+        {
+          "text": "Delivery Policy",
+          "href": "https://playone.com.lb/deliveries"
+        },
+        {
+          "text": "Payment Facilities",
+          "href": "https://playone.com.lb/payment"
+        },
+        {
+          "text": "Return Policy",
+          "href": "https://playone.com.lb/returns-exchanges"
+        },
+        {
+          "text": "FAQs",
+          "href": "https://playone.com.lb/faq"
+        },
+        {
+          "text": "Terms & Conditions",
+          "href": "https://playone.com.lb/terms-and-conditions"
+        },
+        {
+          "text": "Legals",
+          "href": "https://playone.com.lb/legals"
+        },
+        {
+          "text": "Contact Us",
+          "href": "https://playone.com.lb/contact-us"
+        },
+        {
+          "text": "About Us",
+          "href": "https://playone.com.lb/about-us/"
+        }
+      ],
+      "heroContent": {
+        "headline": "",
+        "allText": []
+      },
+      "promoBanners": [],
+      "featuredCategories": [
+        "View All",
+        "Girls",
+        "Boys",
+        "1-3years",
+        "3-5years",
+        "5-8years",
+        "8-13years",
+        "13+years",
+        "Activity Books",
+        "Beginner Readers",
+        "Best Sellers",
+        "Character Books",
+        "Comic Books",
+        "Educational",
+        "Litterature & Fiction",
+        "Seasonal",
+        "Sound Books",
+        "Story Books",
+        "SHOP BOOKS BY AGE",
+        "Baby to 2 »",
+        "Ages 3 - 5 »",
+        "Ages 6 - 8 »",
+        "Ages 9 - 13 »",
+        "SHOP BOOKS BY LANGUAGE",
+        "ENGLISH »",
+        "ARABIC »",
+        "HINDI »",
+        "FRENCH »",
+        "School Bags & Backpacks",
+        "Day Care",
+        "KG1-KG2",
+        "KG3-Grade 1",
+        "Grade 2-4",
+        "Grade 5+",
+        "Lunch Boxes/Bags",
+        "Water Bottles",
+        "Umbrellas",
+        "Stationery",
+        "Pencil Cases",
+        "Forgot your password?"
+      ],
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "id": "jouéclub-lebanon",
+      "name": "JouéClub Lebanon",
+      "url": "https://joueclubliban.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-11T20:47:58.872Z",
+      "navigation": [
+        {
+          "text": "Home",
+          "href": "https://joueclubliban.com/"
+        },
+        {
+          "text": "Products",
+          "href": "https://joueclubliban.com/"
+        },
+        {
+          "text": "About us",
+          "href": "https://joueclubliban.com/pages/https-joueclubliban-com-pages-about-us"
+        },
+        {
+          "text": "Contact us",
+          "href": "https://joueclubliban.com/pages/https-joueclubliban-com-pages-contact"
+        },
+        {
+          "text": "Account",
+          "href": "https://joueclubliban.com/customer_authentication/redirect?locale=en&region_country=LB"
+        },
+        {
+          "text": "Search Products",
+          "href": "https://joueclubliban.com/search"
+        },
+        {
+          "text": "Gift Finder",
+          "href": "https://joueclubliban.com/pages/gift-finder"
+        },
+        {
+          "text": "Lego",
+          "href": "https://joueclubliban.com/collections/lego-1"
+        },
+        {
+          "text": "Playmobil",
+          "href": "https://joueclubliban.com/collections/playmobil"
+        },
+        {
+          "text": "Building Blocks",
+          "href": "https://joueclubliban.com/collections/building-blocks"
+        },
+        {
+          "text": "Magnetic Sets",
+          "href": "https://joueclubliban.com/collections/magnetic-sets"
+        },
+        {
+          "text": "Mechanical Sets",
+          "href": "https://joueclubliban.com/collections/mechanical-sets"
+        },
+        {
+          "text": "Bildits",
+          "href": "https://joueclubliban.com/collections/bildits"
+        },
+        {
+          "text": "Kapla",
+          "href": "https://joueclubliban.com/collections/kapla"
+        },
+        {
+          "text": "Plus-Plus",
+          "href": "https://joueclubliban.com/collections/plus-plus"
+        },
+        {
+          "text": "Rikbits",
+          "href": "https://joueclubliban.com/collections/rikbits"
+        },
+        {
+          "text": "Baby Walkers & Ride Ons",
+          "href": "https://joueclubliban.com/collections/baby-walkers-ride-ons"
+        },
+        {
+          "text": "Interactive & Learning Toys",
+          "href": "https://joueclubliban.com/collections/interactive-learning-toys"
+        },
+        {
+          "text": "Playmats & Baby Gyms",
+          "href": "https://joueclubliban.com/collections/playmats-baby-gyms"
+        },
+        {
+          "text": "Puzzles & Sorting Shapes",
+          "href": "https://joueclubliban.com/collections/puzzles-sorting-shapes"
+        },
+        {
+          "text": "TV Characters",
+          "href": "https://joueclubliban.com/collections/tv-characters"
+        },
+        {
+          "text": "Wooden Toys",
+          "href": "https://joueclubliban.com/collections/wooden-toys"
+        },
+        {
+          "text": "Bath Toys",
+          "href": "https://joueclubliban.com/collections/bath-toys"
+        },
+        {
+          "text": "Action Heroes Figurine",
+          "href": "https://joueclubliban.com/collections/action-heroes-figurine"
+        },
+        {
+          "text": "Army Sets",
+          "href": "https://joueclubliban.com/collections/army-sets"
+        },
+        {
+          "text": "Heroes Playsets",
+          "href": "https://joueclubliban.com/collections/heroes-playsets"
+        },
+        {
+          "text": "Baby Dolls",
+          "href": "https://joueclubliban.com/collections/baby-dolls"
+        },
+        {
+          "text": "Fashion Dolls",
+          "href": "https://joueclubliban.com/collections/fashion-dolls"
+        },
+        {
+          "text": "Princesses Dolls",
+          "href": "https://joueclubliban.com/collections/princesses-dolls"
+        },
+        {
+          "text": "Doll Houses & Accessories",
+          "href": "https://joueclubliban.com/collections/doll-houses-accessories"
+        },
+        {
+          "text": "Activity & Learning Games",
+          "href": "https://joueclubliban.com/collections/activity-learning-games"
+        },
+        {
+          "text": "Animals Sets",
+          "href": "https://joueclubliban.com/collections/animals-sets"
+        },
+        {
+          "text": "Musical Toys",
+          "href": "https://joueclubliban.com/collections/musical-toys"
+        },
+        {
+          "text": "Scientific Games",
+          "href": "https://joueclubliban.com/collections/scientific-games"
+        },
+        {
+          "text": "Kitchens & Shopping",
+          "href": "https://joueclubliban.com/collections/kitchens-shopping"
+        },
+        {
+          "text": "Puppets & Theatres",
+          "href": "https://joueclubliban.com/collections/puppets-theatres"
+        },
+        {
+          "text": "Role Play",
+          "href": "https://joueclubliban.com/collections/role-play"
+        },
+        {
+          "text": "Tools & Workshops",
+          "href": "https://joueclubliban.com/collections/tools-workshops"
+        },
+        {
+          "text": "Costumes",
+          "href": "https://joueclubliban.com/collections/costumes"
+        },
+        {
+          "text": "Coloring",
+          "href": "https://joueclubliban.com/collections/coloring"
+        },
+        {
+          "text": "Creative Toys",
+          "href": "https://joueclubliban.com/collections/creative-toys"
+        },
+        {
+          "text": "Modeling Sets",
+          "href": "https://joueclubliban.com/collections/modeling-sets"
+        },
+        {
+          "text": "Slime",
+          "href": "https://joueclubliban.com/collections/slime"
+        },
+        {
+          "text": "Stickers",
+          "href": "https://joueclubliban.com/collections/stickers"
+        },
+        {
+          "text": "Tattoos & Nails",
+          "href": "https://joueclubliban.com/collections/tattoos-nails"
+        },
+        {
+          "text": "Activity Desks & Boards",
+          "href": "https://joueclubliban.com/collections/activity-desks-boards"
+        },
+        {
+          "text": "Interactive",
+          "href": "https://joueclubliban.com/collections/interactive"
+        },
+        {
+          "text": "Plushes",
+          "href": "https://joueclubliban.com/collections/plushes"
+        },
+        {
+          "text": "Squishmallows",
+          "href": "https://joueclubliban.com/collections/squishmallows"
+        },
+        {
+          "text": "Hair & Beauty",
+          "href": "https://joueclubliban.com/collections/hair-beauty"
+        },
+        {
+          "text": "Make-Up Sets",
+          "href": "https://joueclubliban.com/collections/make-up-sets"
+        },
+        {
+          "text": "Shampoo & Body Care",
+          "href": "https://joueclubliban.com/collections/shampoo-body-care"
+        },
+        {
+          "text": "Circuit",
+          "href": "https://joueclubliban.com/collections/circuit"
+        },
+        {
+          "text": "Diecast",
+          "href": "https://joueclubliban.com/collections/diecast"
+        },
+        {
+          "text": "Guns",
+          "href": "https://joueclubliban.com/collections/guns"
+        },
+        {
+          "text": "Mini Skateboards",
+          "href": "https://joueclubliban.com/collections/mini-skateboards"
+        },
+        {
+          "text": "Motorized Vehicles",
+          "href": "https://joueclubliban.com/collections/motorized-vehicles"
+        },
+        {
+          "text": "Robots & Drones",
+          "href": "https://joueclubliban.com/collections/robots-drones"
+        },
+        {
+          "text": "Trucks",
+          "href": "https://joueclubliban.com/collections/trucks"
+        },
+        {
+          "text": "Vehicles",
+          "href": "https://joueclubliban.com/collections/vehicles"
+        },
+        {
+          "text": "Fidgets",
+          "href": "https://joueclubliban.com/collections/fidgets"
+        },
+        {
+          "text": "Funko Pop",
+          "href": "https://joueclubliban.com/collections/funko-pop"
+        },
+        {
+          "text": "Gadgets",
+          "href": "https://joueclubliban.com/collections/gadgets"
+        },
+        {
+          "text": "Hand Watches",
+          "href": "https://joueclubliban.com/collections/hand-watches"
+        },
+        {
+          "text": "Collectibles Girls",
+          "href": "https://joueclubliban.com/collections/collectibles%F0%9F%91%A9"
+        },
+        {
+          "text": "Collectibles Boys",
+          "href": "https://joueclubliban.com/collections/collectibles-%F0%9F%91%A8"
+        },
+        {
+          "text": "AGP Pools & Jacuzzi",
+          "href": "https://joueclubliban.com/collections/agp-pools-jacuzzi"
+        },
+        {
+          "text": "Air Beds, Sofa Beds & Chairs",
+          "href": "https://joueclubliban.com/collections/air-beds-sofa-beds-chairs"
+        },
+        {
+          "text": "Inflatable Boats",
+          "href": "https://joueclubliban.com/collections/inflatable-boats"
+        },
+        {
+          "text": "Inflatable Pools And Floaters",
+          "href": "https://joueclubliban.com/collections/inflatable-pools-and-floaters"
+        },
+        {
+          "text": "Pools & Spa Accessories",
+          "href": "https://joueclubliban.com/collections/pools-spa-accessories"
+        },
+        {
+          "text": "Sand Tables & Toys",
+          "href": "https://joueclubliban.com/collections/sand-tables-toys"
+        },
+        {
+          "text": "Swimwear & Accessories",
+          "href": "https://joueclubliban.com/collections/swimwear-accessories"
+        },
+        {
+          "text": "Water Toys",
+          "href": "https://joueclubliban.com/collections/water-toys"
+        },
+        {
+          "text": "Bikes & Trikes",
+          "href": "https://joueclubliban.com/collections/bikes-trikes"
+        },
+        {
+          "text": "Electric Scooters & Ride Ons",
+          "href": "https://joueclubliban.com/collections/electric-scooters-ride-ons"
+        },
+        {
+          "text": "Gardening & Camping",
+          "href": "https://joueclubliban.com/collections/gardening-camping"
+        },
+        {
+          "text": "Play Centers & Houses",
+          "href": "https://joueclubliban.com/collections/play-centers-houses"
+        },
+        {
+          "text": "Rollers & Skate Boards",
+          "href": "https://joueclubliban.com/collections/rollers-skate-boards"
+        },
+        {
+          "text": "Scooters & Helmets",
+          "href": "https://joueclubliban.com/collections/scooters-helmets"
+        },
+        {
+          "text": "Sport Activities",
+          "href": "https://joueclubliban.com/collections/sport-activities"
+        },
+        {
+          "text": "Swings & Slides",
+          "href": "https://joueclubliban.com/collections/swings-slides"
+        },
+        {
+          "text": "Trampolines",
+          "href": "https://joueclubliban.com/collections/trampolines"
+        },
+        {
+          "text": "Inflatable Indoors & Bouncers",
+          "href": "https://joueclubliban.com/collections/inflatable-indoors-bouncers"
+        },
+        {
+          "text": "Room Essentials",
+          "href": "https://joueclubliban.com/collections/room-essentials"
+        },
+        {
+          "text": "3D Puzzles",
+          "href": "https://joueclubliban.com/collections/3d-puzzles"
+        },
+        {
+          "text": "Board Games",
+          "href": "https://joueclubliban.com/collections/board-games"
+        },
+        {
+          "text": "Family Games",
+          "href": "https://joueclubliban.com/collections/family-games"
+        },
+        {
+          "text": "Magic Games",
+          "href": "https://joueclubliban.com/collections/magic-games"
+        },
+        {
+          "text": "Mind Teasers",
+          "href": "https://joueclubliban.com/collections/mind-teasers"
+        },
+        {
+          "text": "Play Tables",
+          "href": "https://joueclubliban.com/collections/play-tables"
+        },
+        {
+          "text": "Puzzles",
+          "href": "https://joueclubliban.com/collections/puzzles"
+        },
+        {
+          "text": "3-5 Years",
+          "href": "https://joueclubliban.com/collections/3-5-years-1"
+        },
+        {
+          "text": "7-10 Years",
+          "href": "https://joueclubliban.com/collections/7-10-years-1"
+        },
+        {
+          "text": "Lunch Bags",
+          "href": "https://joueclubliban.com/collections/lunch-bags"
+        },
+        {
+          "text": "Lunch Boxes",
+          "href": "https://joueclubliban.com/collections/lunch-boxes"
+        },
+        {
+          "text": "Lunch Sets",
+          "href": "https://joueclubliban.com/collections/lunch-sets"
+        },
+        {
+          "text": "Water Bottles",
+          "href": "https://joueclubliban.com/collections/water-bottles"
+        },
+        {
+          "text": "Stationery Sets",
+          "href": "https://joueclubliban.com/collections/stationery-sets"
+        },
+        {
+          "text": "Coloring Sets",
+          "href": "https://joueclubliban.com/collections/coloring-sets"
+        },
+        {
+          "text": "Pencil Cases",
+          "href": "https://joueclubliban.com/collections/pencil-cases"
+        },
+        {
+          "text": "Activity & Coloring Books",
+          "href": "https://joueclubliban.com/collections/activity-coloring-books"
+        },
+        {
+          "text": "French",
+          "href": "https://joueclubliban.com/collections/french"
+        },
+        {
+          "text": "Video Games",
+          "href": "https://joueclubliban.com/collections/video-games"
+        },
+        {
+          "text": "Cameras",
+          "href": "https://joueclubliban.com/collections/cameras"
+        },
+        {
+          "text": "CD Players",
+          "href": "https://joueclubliban.com/collections/cd-players"
+        },
+        {
+          "text": "Headphones",
+          "href": "https://joueclubliban.com/collections/headphones"
+        },
+        {
+          "text": "Secret Diaries",
+          "href": "https://joueclubliban.com/collections/secret-diaries"
+        },
+        {
+          "text": "Smartwatch & Walkie Talkies",
+          "href": "https://joueclubliban.com/collections/smartwatch-walkie-talkies"
+        },
+        {
+          "text": "Speakers",
+          "href": "https://joueclubliban.com/collections/speakers"
+        },
+        {
+          "text": "Karaoke",
+          "href": "https://joueclubliban.com/collections/karaoke"
+        },
+        {
+          "text": "Fashion Bags",
+          "href": "https://joueclubliban.com/collections/fashion-bags"
+        },
+        {
+          "text": "Hoodies",
+          "href": "https://joueclubliban.com/collections/hoodies"
+        },
+        {
+          "text": "Handwarmers",
+          "href": "https://joueclubliban.com/collections/handwarmers"
+        },
+        {
+          "text": "Socks",
+          "href": "https://joueclubliban.com/collections/socks"
+        },
+        {
+          "text": "Slippers",
+          "href": "https://joueclubliban.com/collections/slippers"
+        },
+        {
+          "text": "T-Shirts",
+          "href": "https://joueclubliban.com/collections/t-shirts"
+        },
+        {
+          "text": "0",
+          "href": "https://joueclubliban.com/apps/advanced-wishlist"
+        },
+        {
+          "text": "Cart",
+          "href": "https://joueclubliban.com/cart"
+        },
+        {
+          "text": "Log in",
+          "href": "https://joueclubliban.com/customer_authentication/redirect?locale=en&region_country=LB"
+        },
+        {
+          "text": "Our Brands",
+          "href": "https://joueclubliban.com/pages/https-joueclubliban-com-pages-brands"
+        },
+        {
+          "text": "My profile",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "My orders",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Wishlist",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "My cart",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "News",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Toys",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Outdoor & Indoor",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Games & Puzzles",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Back to School",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Gaming & Electronics",
+          "href": "https://joueclubliban.com/#"
+        },
+        {
+          "text": "Terms & conditions",
+          "href": "https://joueclubliban.com/pages/https-joueclubliban-com-pages-terms-conditions"
+        },
+        {
+          "text": "Privacy policy",
+          "href": "https://joueclubliban.com/pages/https-joueclubliban-com-pages-privacy-policy"
+        },
+        {
+          "text": "Return & Refund policy",
+          "href": "https://joueclubliban.com/pages/https-joueclubliban-com-pages-return-refund-policy"
+        }
+      ],
+      "heroContent": {
+        "headline": "",
+        "allText": []
+      },
+      "promoBanners": [
+        "#Slide-template--17728037060777__slideshow_knpM9i-1 .banner__media::after { opacity: 0.0; }",
+        "#Slide-template--17728037060777__slideshow_knpM9i-2 .banner__media::after { opacity: 0.0; }",
+        "#Slide-template--17728037060777__slideshow_knpM9i-3 .banner__media::after { opacity: 0.0; }",
+        "#Slide-template--17728037060777__slideshow_knpM9i-4 .banner__media::after { opacity: 0.0; }",
+        "#Slide-template--17728037060777__slideshow_knpM9i-5 .banner__media::after { opacity: 0.0; }"
+      ],
+      "featuredCategories": [
+        "Home",
+        "Products",
+        "About us",
+        "Contact us",
+        "Gift Finder",
+        "Lego",
+        "Playmobil",
+        "Building Blocks",
+        "Magnetic Sets",
+        "Mechanical Sets",
+        "Bildits",
+        "Kapla",
+        "Plus-Plus",
+        "Rikbits",
+        "Baby Walkers & Ride Ons",
+        "Interactive & Learning Toys",
+        "Playmats & Baby Gyms",
+        "Puzzles & Sorting Shapes",
+        "TV Characters",
+        "Wooden Toys",
+        "Bath Toys",
+        "Action Heroes Figurine",
+        "Army Sets",
+        "Heroes Playsets",
+        "Baby Dolls",
+        "Fashion Dolls",
+        "Princesses Dolls",
+        "Doll Houses & Accessories",
+        "Activity & Learning Games",
+        "Animals Sets",
+        "Musical Toys",
+        "Scientific Games",
+        "Kitchens & Shopping",
+        "Puppets & Theatres",
+        "Role Play",
+        "Tools & Workshops",
+        "Costumes",
+        "Coloring",
+        "Creative Toys",
+        "Modeling Sets"
+      ],
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "id": "chez-les-petits",
+      "name": "Chez Les Petits",
+      "url": "https://chez-les-petits.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-11T20:48:03.929Z",
+      "navigation": [
+        {
+          "text": "BABY ITEMS",
+          "href": ""
+        },
+        {
+          "text": "TOYS",
+          "href": ""
+        },
+        {
+          "text": "PLAYGROUND",
+          "href": ""
+        },
+        {
+          "text": "FIGURINES",
+          "href": ""
+        },
+        {
+          "text": "BOOKS",
+          "href": ""
+        },
+        {
+          "text": "CLOTHING",
+          "href": ""
+        },
+        {
+          "text": "Return to shop",
+          "href": "https://chez-les-petits.com/shop/"
+        },
+        {
+          "text": "Skip to content",
+          "href": "https://chez-les-petits.com/#main"
+        },
+        {
+          "text": "STROLLERS",
+          "href": "https://chez-les-petits.com/product-category/baby-items/strollers/"
+        },
+        {
+          "text": "Ride Ons",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/ride-ons-playground-toys/"
+        },
+        {
+          "text": "playground toys",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/"
+        },
+        {
+          "text": "shop all",
+          "href": "https://chez-les-petits.com/product-category/baby-items/"
+        },
+        {
+          "text": "Add to wishlist",
+          "href": "https://chez-les-petits.com/?add_to_wishlist=22892&_wpnonce=db3e1b1e11"
+        },
+        {
+          "text": "QUICK VIEW",
+          "href": "https://chez-les-petits.com/#quick-view"
+        },
+        {
+          "text": "Deluxe Original Kids Large Teepee Tent",
+          "href": "https://chez-les-petits.com/product/deluxe-original-kids-large-teepee-tent/"
+        },
+        {
+          "text": "ADD TO CART",
+          "href": "https://chez-les-petits.com/?add-to-cart=22892"
+        },
+        {
+          "text": "Baby Head Protection Backpack Safety Cushion Pink",
+          "href": "https://chez-les-petits.com/product/baby-head-protection-backpack-safety-cushion-pink/"
+        },
+        {
+          "text": "Baby Head Protection Backpack Safety Cushion Blue",
+          "href": "https://chez-les-petits.com/product/baby-head-protection-backpack-safety-cushion-blue/"
+        },
+        {
+          "text": "Avent 6-18m Pacifiers Ultra Air Animals Pink",
+          "href": "https://chez-les-petits.com/product/avent-6-18m-pacifiers-ultra-air-animals-pink/"
+        },
+        {
+          "text": "Avent 6-18m Pacifiers Ultra Air Animals Blue",
+          "href": "https://chez-les-petits.com/product/avent-6-18m-pacifiers-ultra-air-animals-blue/"
+        },
+        {
+          "text": "Avent Hands Free Single Electric Breast Pump",
+          "href": "https://chez-les-petits.com/product/avent-hands-free-single-electric-breast-pump/"
+        },
+        {
+          "text": "Asalvo Tumbuctu Baby Stroller, Car Seat & Base Black",
+          "href": "https://chez-les-petits.com/product/asalvo-tumbuctu-baby-stroller-car-seat-base-black/"
+        },
+        {
+          "text": "Optimal 4m+ Water Filled Baby Triangle Shaped Teether",
+          "href": "https://chez-les-petits.com/product/optimal-4m-water-filled-baby-triangle-shaped-teether/"
+        },
+        {
+          "text": "Optimal 3m+ to 12Kg Ergonomic Baby Carrier Red",
+          "href": "https://chez-les-petits.com/product/optimal-3m-to-12kg-ergonomic-baby-carrier-red/"
+        },
+        {
+          "text": "Optimal 3m+ to 12Kg Ergonomic Baby Carrier Pink",
+          "href": "https://chez-les-petits.com/product/optimal-3m-to-12kg-ergonomic-baby-carrier-pink/"
+        },
+        {
+          "text": "Optimal Mom And Baby Backpack Maternity Diaper Bag Grey",
+          "href": "https://chez-les-petits.com/product/optimal-mom-and-baby-backpack-maternity-diaper-bag-grey/"
+        },
+        {
+          "text": "Optimal 4m+ Water Filled Baby Rattle Shaped Teether",
+          "href": "https://chez-les-petits.com/product/optimal-4m-water-filled-baby-rattle-shaped-teether/"
+        },
+        {
+          "text": "Step2 USA American Play Up Gym Set Swing",
+          "href": "https://chez-les-petits.com/product/step2-usa-american-play-up-gym-set-swing/"
+        },
+        {
+          "text": "Step2 Discovery Northbrook American Wood Swing",
+          "href": "https://chez-les-petits.com/product/step2-discovery-northbrook-american-wood-swing/"
+        },
+        {
+          "text": "DevesSport 1.37m Deluxe Trampoline Blue",
+          "href": "https://chez-les-petits.com/product/devessport-1-37m-deluxe-trampoline-blue/"
+        },
+        {
+          "text": "Step2 Shooting Hoops Pro Basketball Set",
+          "href": "https://chez-les-petits.com/product/step2-shooting-hoops-pro-basketball-set/"
+        },
+        {
+          "text": "Step2 USA American Adventure Lodge Play Center Swing",
+          "href": "https://chez-les-petits.com/product/step2-usa-american-adventure-lodge-play-center-swing/"
+        },
+        {
+          "text": "Step2 USA American Playhouse Climber & Swing Extension",
+          "href": "https://chez-les-petits.com/product/step2-usa-american-playhouse-climber-swing-extension/"
+        },
+        {
+          "text": "Dunster Squirrel Fort British UK Wood Swing",
+          "href": "https://chez-les-petits.com/product/dunster-squirrel-fort-swing/"
+        },
+        {
+          "text": "Robust 4x Seater Metal Swing With Glider",
+          "href": "https://chez-les-petits.com/product/robust-4x-seater-metal-swing-with-glider/"
+        },
+        {
+          "text": "6 Months Baby to 10 Years Metal 3 in 1 Swing Blue",
+          "href": "https://chez-les-petits.com/product/6-months-baby-to-10-years-metal-3-in-1-swing-blue/"
+        },
+        {
+          "text": "Step2 Up & Down Coaster Anniversary Edition",
+          "href": "https://chez-les-petits.com/product/step2-up-down-coaster-anniversary-edition/"
+        },
+        {
+          "text": "Step2 Clubhouse Climber Multicolor",
+          "href": "https://chez-les-petits.com/product/step2-clubhouse-climber-multicolor/"
+        },
+        {
+          "text": "Step2 Neighborhood Fun Center Playhouse & Slide",
+          "href": "https://chez-les-petits.com/product/step2-neighborhood-fun-center-playhouse-slide/"
+        },
+        {
+          "text": "Step2 Skyward Summit",
+          "href": "https://chez-les-petits.com/product/step2-skyward-summit/"
+        },
+        {
+          "text": "Red Castle Cocoonababy Nest White",
+          "href": "https://chez-les-petits.com/product/beaba-cocoonababy-nest-white/"
+        },
+        {
+          "text": "Peg Perego Veloce Travel System Sand",
+          "href": "https://chez-les-petits.com/product/peg-perego-veloce-travel-system-sand/"
+        },
+        {
+          "text": "Lionelo Baby Electric Swing Bella Grey Concrete",
+          "href": "https://chez-les-petits.com/product/lionelo-baby-electric-swing-bella-grey-concrete/"
+        },
+        {
+          "text": "Chicco Next2me Magic Evo Cot Bed Dark Grey",
+          "href": "https://chez-les-petits.com/product/chicco-next2me-magic-evo-cot-bed-dark-grey/"
+        },
+        {
+          "text": "Dr Brown’s Clean Stream Bottle Steriliser And Dryer",
+          "href": "https://chez-les-petits.com/product/dr-browns-clean-stream-bottle-steriliser-and-dryer/"
+        },
+        {
+          "text": "Founded in 1912,",
+          "href": "https://chez-les-petits.com/about-us/"
+        },
+        {
+          "text": "http://www.gebrangeahchan.com/",
+          "href": "http://www.gebrangeahchan.com/"
+        },
+        {
+          "text": "About Us",
+          "href": "https://chez-les-petits.com/about-us/"
+        },
+        {
+          "text": "Distribution",
+          "href": "https://chez-les-petits.com/distribution/"
+        },
+        {
+          "text": "Store Location",
+          "href": "https://chez-les-petits.com/Store-Location/"
+        },
+        {
+          "text": "Contact Us",
+          "href": "https://chez-les-petits.com/contact-us/"
+        },
+        {
+          "text": "My Baby's Checklist",
+          "href": "https://chez-les-petits.com/my-babys-checklist/"
+        },
+        {
+          "text": "Baby Birth List",
+          "href": "https://chez-les-petits.com/baby-birth-list/"
+        },
+        {
+          "text": "TERMS & CONDITIONS",
+          "href": "https://chez-les-petits.com/terms-conditions/"
+        },
+        {
+          "text": "privacy policy",
+          "href": "https://chez-les-petits.com/"
+        },
+        {
+          "text": "EXCHANGE & REFUND",
+          "href": "https://chez-les-petits.com/exchange-refund/"
+        },
+        {
+          "text": "By RD",
+          "href": "https://www.rabihdib.com/"
+        },
+        {
+          "text": "Stroller & Car Seat Sets",
+          "href": "https://chez-les-petits.com/product-category/baby-items/strollers/stroller-car-seat-sets/"
+        },
+        {
+          "text": "Single Strollers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/strollers/single-strollers/"
+        },
+        {
+          "text": "Twin Strollers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/strollers/twin-strollers/"
+        },
+        {
+          "text": "Stroller Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/strollers/stroller-accessories/"
+        },
+        {
+          "text": "CAR SEATS",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/"
+        },
+        {
+          "text": "Newborn+",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/newborn/"
+        },
+        {
+          "text": "1 Year+",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/1-year/"
+        },
+        {
+          "text": "4 Years+",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/4-years/"
+        },
+        {
+          "text": "Booster Seats",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/booster-seats/"
+        },
+        {
+          "text": "Car Seat Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/car-seat-accessories/"
+        },
+        {
+          "text": "Car Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/car-seats/car-accessories/"
+        },
+        {
+          "text": "BEDROOM & ACCESSORIES",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/"
+        },
+        {
+          "text": "Wood Beds",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/wood-beds/"
+        },
+        {
+          "text": "Playpens",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/playpens/"
+        },
+        {
+          "text": "Next2Me",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/next2me/"
+        },
+        {
+          "text": "Carrycots & Nests",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/carrycots-nests/"
+        },
+        {
+          "text": "Chest of Drawers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/chest-of-drawers/"
+        },
+        {
+          "text": "Wardrobes",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/wardrobes/"
+        },
+        {
+          "text": "Changing Mats",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bath-accessories/changing-mats-bath-accessories/"
+        },
+        {
+          "text": "Bed Rails",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/bed-rails/"
+        },
+        {
+          "text": "Pillows & Positioners",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/pillows-positioners/"
+        },
+        {
+          "text": "Bed Sheets",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/bed-sheets/"
+        },
+        {
+          "text": "Sleeping Bags",
+          "href": "https://chez-les-petits.com/product-category/clothing/sleeping-bags-clothing/"
+        },
+        {
+          "text": "Musical Mobiles",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/musical-mobiles/"
+        },
+        {
+          "text": "Floor Mats",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/floor-mats-playground-toys/"
+        },
+        {
+          "text": "Humidifiers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/humidifiers/"
+        },
+        {
+          "text": "Bedroom Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bedroom-accessories/bedroom-accessories-bedroom-accessories/"
+        },
+        {
+          "text": "BATH & ACCESSORIES",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bath-accessories/"
+        },
+        {
+          "text": "Bathtubs",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bath-accessories/bathtubs/"
+        },
+        {
+          "text": "Bath Seats",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bath-accessories/bath-seats/"
+        },
+        {
+          "text": "Bath Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/bath-accessories/bath-accessories-bath-accessories/"
+        },
+        {
+          "text": "BABY ESSENTIALS",
+          "href": ""
+        },
+        {
+          "text": "Baby Rockers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/baby-rockers/"
+        },
+        {
+          "text": "Baby Walkers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/baby-walkers-baby-essentials/"
+        },
+        {
+          "text": "Exersaucers & Jumpers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/exersaucers-jumpers/"
+        },
+        {
+          "text": "Play Gyms",
+          "href": "https://chez-les-petits.com/product-category/toys/newborn-toys/play-gyms-newborn-toys/"
+        },
+        {
+          "text": "Baby Monitors",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/baby-monitors/"
+        },
+        {
+          "text": "Feeding Pillows",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/feeding-pillows/"
+        },
+        {
+          "text": "Maternity Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/maternity-accessories/"
+        },
+        {
+          "text": "Baby Carriers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/baby-carriers/"
+        },
+        {
+          "text": "Nursery Bags",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-essentials/nursery-bags-baby-essentials/"
+        },
+        {
+          "text": "BABY CARE",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/"
+        },
+        {
+          "text": "Brush & Combs",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/brush-combs/"
+        },
+        {
+          "text": "Nasal Aspirators",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/nasal-aspirators/"
+        },
+        {
+          "text": "Nail Clippers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/nail-clippers/"
+        },
+        {
+          "text": "Toothbrushes",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/toothbrushes/"
+        },
+        {
+          "text": "Thermometers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/thermometers/"
+        },
+        {
+          "text": "Sun Glasses",
+          "href": "https://chez-les-petits.com/product-category/baby-items/safety-accessories/sun-glasses-safety-accessories/"
+        },
+        {
+          "text": "Care Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/baby-care/care-accessories/"
+        },
+        {
+          "text": "TOILET TRAINING",
+          "href": "https://chez-les-petits.com/product-category/baby-items/toilet-training/"
+        },
+        {
+          "text": "Potties",
+          "href": "https://chez-les-petits.com/product-category/baby-items/toilet-training/potties/"
+        },
+        {
+          "text": "Toilet Seat Reducers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/toilet-training/toilet-seat-reducers/"
+        },
+        {
+          "text": "Steppers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/toilet-training/steppers/"
+        },
+        {
+          "text": "FEEDING CHAIRS",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-chairs/"
+        },
+        {
+          "text": "High Chairs",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-chairs/high-chairs/"
+        },
+        {
+          "text": "Feeding Boosters",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-chairs/feeding-boosters/"
+        },
+        {
+          "text": "Feeding Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/feeding-accessories-feeding-accessories/"
+        },
+        {
+          "text": "Bottles & Teats",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/bottles-teats/"
+        },
+        {
+          "text": "Sterilizers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/sterilizers/"
+        },
+        {
+          "text": "Drying Racks",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/drying-racks/"
+        },
+        {
+          "text": "Bottle Brushes",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/bottle-brushes/"
+        },
+        {
+          "text": "Bottle Warmers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/bottle-warmers/"
+        },
+        {
+          "text": "Pacifiers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/pacifiers/"
+        },
+        {
+          "text": "Milk Dispencers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/milk-dispencers/"
+        },
+        {
+          "text": "Breast Pumps",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/breast-pumps/"
+        },
+        {
+          "text": "Water Bottles/Cups",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/water-bottles-cups/"
+        },
+        {
+          "text": "Bibs",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/bibs/"
+        },
+        {
+          "text": "Teethers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/teethers/"
+        },
+        {
+          "text": "Bags & Pouches",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/bags-pouches/"
+        },
+        {
+          "text": "Muslins",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/muslins/"
+        },
+        {
+          "text": "Food Processors",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/food-processors/"
+        },
+        {
+          "text": "Food Containers",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/food-containers/"
+        },
+        {
+          "text": "Cutlery",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/cutlery/"
+        },
+        {
+          "text": "Plates/Bowls",
+          "href": "https://chez-les-petits.com/product-category/baby-items/feeding-accessories/plates-bowls/"
+        },
+        {
+          "text": "Safety Accessories",
+          "href": "https://chez-les-petits.com/product-category/baby-items/safety-accessories/safety-accessories-safety-accessories/"
+        },
+        {
+          "text": "Mosquito Nets",
+          "href": "https://chez-les-petits.com/product-category/baby-items/safety-accessories/mosquito-nets/"
+        },
+        {
+          "text": "Safety Gates & Fences",
+          "href": "https://chez-les-petits.com/product-category/baby-items/safety-accessories/safety-gates-fences/"
+        },
+        {
+          "text": "NEWBORN TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/newborn-toys/"
+        },
+        {
+          "text": "Soft Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/newborn-toys/soft-toys/"
+        },
+        {
+          "text": "Hanging Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/newborn-toys/hanging-toys/"
+        },
+        {
+          "text": "Comforters",
+          "href": "https://chez-les-petits.com/product-category/toys/newborn-toys/comforters/"
+        },
+        {
+          "text": "Rattle Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/newborn-toys/rattle-toys/"
+        },
+        {
+          "text": "BABY TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/"
+        },
+        {
+          "text": "6 Months+",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/6-month/"
+        },
+        {
+          "text": "12 Months+",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/12-month/"
+        },
+        {
+          "text": "Bath Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/bath-toys/"
+        },
+        {
+          "text": "Activity Walkers",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/activity-walkers/"
+        },
+        {
+          "text": "Activity Tables",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/activity-tables/"
+        },
+        {
+          "text": "Baby Garages",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/baby-garages/"
+        },
+        {
+          "text": "Ball Pits & Tents",
+          "href": "https://chez-les-petits.com/product-category/toys/baby-toys/ball-pits-tents/"
+        },
+        {
+          "text": "ELECTRONIC TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/electronic-toys/"
+        },
+        {
+          "text": "Tablets",
+          "href": "https://chez-les-petits.com/product-category/toys/electronic-toys/tablets/"
+        },
+        {
+          "text": "Cameras",
+          "href": "https://chez-les-petits.com/product-category/toys/electronic-toys/camera/"
+        },
+        {
+          "text": "Robots",
+          "href": "https://chez-les-petits.com/product-category/toys/electronic-toys/robots/"
+        },
+        {
+          "text": "Watches",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/watches-tintin/"
+        },
+        {
+          "text": "Walkie Talkies",
+          "href": "https://chez-les-petits.com/product-category/toys/electronic-toys/walkie-talkies/"
+        },
+        {
+          "text": "CONSTRUCTION TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/construction-toys/"
+        },
+        {
+          "text": "Shapes & Blocks",
+          "href": "https://chez-les-petits.com/product-category/toys/construction-toys/shapes-blocks/"
+        },
+        {
+          "text": "Lego",
+          "href": "https://chez-les-petits.com/product-category/toys/construction-toys/lego/"
+        },
+        {
+          "text": "Playmobil",
+          "href": "https://chez-les-petits.com/product-category/toys/construction-toys/playmobil/"
+        },
+        {
+          "text": "VARIOUS TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/"
+        },
+        {
+          "text": "Kitchen Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/kitchentoys/"
+        },
+        {
+          "text": "Magic Sets",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/magic-sets/"
+        },
+        {
+          "text": "Animal & Farm",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/animal-farm/"
+        },
+        {
+          "text": "Character Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/character-toys/"
+        },
+        {
+          "text": "Educational Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/educational-toys/"
+        },
+        {
+          "text": "Scientific Toys",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/scientific-toys/"
+        },
+        {
+          "text": "Action Figures",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/action-figures/"
+        },
+        {
+          "text": "R/C Cars",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/r-c-cars/"
+        },
+        {
+          "text": "Musical Instruments",
+          "href": "https://chez-les-petits.com/product-category/toys/various-toys/musical-instruments/"
+        },
+        {
+          "text": "Balls",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/balls-playground-toys/"
+        },
+        {
+          "text": "MODELING TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/modeling-toys/"
+        },
+        {
+          "text": "Dough Modeling",
+          "href": "https://chez-les-petits.com/product-category/toys/modeling-toys/dough-modeling/"
+        },
+        {
+          "text": "Sand Modeling",
+          "href": "https://chez-les-petits.com/product-category/toys/modeling-toys/sand-modeling/"
+        },
+        {
+          "text": "WEAPON TOYS",
+          "href": "https://chez-les-petits.com/product-category/toys/weapon-toys/"
+        },
+        {
+          "text": "Guns",
+          "href": "https://chez-les-petits.com/product-category/toys/weapon-toys/guns/"
+        },
+        {
+          "text": "Swords",
+          "href": "https://chez-les-petits.com/product-category/toys/weapon-toys/swords/"
+        },
+        {
+          "text": "Bows & Arrows",
+          "href": "https://chez-les-petits.com/product-category/toys/weapon-toys/bows-arrows/"
+        },
+        {
+          "text": "Board Games",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/lucky-luke/board-games-lucky-luke/"
+        },
+        {
+          "text": "3 Years+",
+          "href": "https://chez-les-petits.com/product-category/toys/board-games/3-years/"
+        },
+        {
+          "text": "8 Years+",
+          "href": "https://chez-les-petits.com/product-category/toys/puzzles/8-years-puzzles/"
+        },
+        {
+          "text": "CARS & TRACKS",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/"
+        },
+        {
+          "text": "Cars",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/cars/"
+        },
+        {
+          "text": "Trains",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/trains/"
+        },
+        {
+          "text": "Planes",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/planes/"
+        },
+        {
+          "text": "Garages",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/garages/"
+        },
+        {
+          "text": "Train Tracks",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/train-tracks/"
+        },
+        {
+          "text": "Scalextrics",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/scalextrics/"
+        },
+        {
+          "text": "Trucks",
+          "href": "https://chez-les-petits.com/product-category/toys/cars-tracks/trucks/"
+        },
+        {
+          "text": "Plush Toys",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/marsupilami/plush-toys-marsupilami/"
+        },
+        {
+          "text": "Animal Plush",
+          "href": "https://chez-les-petits.com/product-category/toys/plush-toys/animal-plush/"
+        },
+        {
+          "text": "Character Plush",
+          "href": "https://chez-les-petits.com/product-category/toys/plush-toys/character-plush/"
+        },
+        {
+          "text": "Interactive Plush",
+          "href": "https://chez-les-petits.com/product-category/toys/plush-toys/interactive-plush/"
+        },
+        {
+          "text": "DOLLS",
+          "href": "https://chez-les-petits.com/product-category/toys/dolls/"
+        },
+        {
+          "text": "Baby Dolls & Accessories",
+          "href": "https://chez-les-petits.com/product-category/toys/dolls/baby-dolls-accessories/"
+        },
+        {
+          "text": "Dolls & Accessories",
+          "href": "https://chez-les-petits.com/product-category/toys/dolls/dolls-accessories/"
+        },
+        {
+          "text": "ARTS & CRAFTS",
+          "href": "https://chez-les-petits.com/product-category/toys/arts-crafts/"
+        },
+        {
+          "text": "Painting Sets",
+          "href": "https://chez-les-petits.com/product-category/toys/arts-crafts/painting-sets/"
+        },
+        {
+          "text": "Craft Toy Sets",
+          "href": "https://chez-les-petits.com/product-category/toys/arts-crafts/craft-toy-sets/"
+        },
+        {
+          "text": "Candle Making",
+          "href": "https://chez-les-petits.com/product-category/toys/arts-crafts/candle-making/"
+        },
+        {
+          "text": "Cosmetic Lab",
+          "href": "https://chez-les-petits.com/product-category/toys/arts-crafts/cosmetic-lab/"
+        },
+        {
+          "text": "Jewelery Making",
+          "href": "https://chez-les-petits.com/product-category/toys/arts-crafts/jewelery-making/"
+        },
+        {
+          "text": "Stationery",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/stationery-tintin/"
+        },
+        {
+          "text": "Pencils & Markers",
+          "href": "https://chez-les-petits.com/product-category/toys/stationery/pencils-markers/"
+        },
+        {
+          "text": "Stickers & Coloring Books",
+          "href": "https://chez-les-petits.com/product-category/toys/stationery/stickers-coloring-books/"
+        },
+        {
+          "text": "Fridge Magnets",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/les-schtroumpfs/fridge-magnets-les-schtroumpfs/"
+        },
+        {
+          "text": "KIDS FURNITURE",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/"
+        },
+        {
+          "text": "Toy Boxes",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/toy-boxes/"
+        },
+        {
+          "text": "Beds",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/beds/"
+        },
+        {
+          "text": "Table & Chairs",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/table-chairs/"
+        },
+        {
+          "text": "Desks",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/desks/"
+        },
+        {
+          "text": "Sofas",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/sofas/"
+        },
+        {
+          "text": "Easels & Boards",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/easels-boards/"
+        },
+        {
+          "text": "Vanity Tables",
+          "href": "https://chez-les-petits.com/product-category/toys/kids-furniture/vanity-tables/"
+        },
+        {
+          "text": "Puzzles",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/puzzles-tintin/"
+        },
+        {
+          "text": "2 Years+",
+          "href": "https://chez-les-petits.com/product-category/toys/puzzles/2-years/"
+        },
+        {
+          "text": "5 Years+",
+          "href": "https://chez-les-petits.com/product-category/toys/puzzles/5-years/"
+        },
+        {
+          "text": "3D Puzzles",
+          "href": "https://chez-les-petits.com/product-category/toys/puzzles/3d-puzzles/"
+        },
+        {
+          "text": "SPORTS & TABLES",
+          "href": "https://chez-les-petits.com/product-category/toys/sports-tables/"
+        },
+        {
+          "text": "Baby Foot",
+          "href": "https://chez-les-petits.com/product-category/toys/sports-tables/baby-foot/"
+        },
+        {
+          "text": "Hockey",
+          "href": "https://chez-les-petits.com/product-category/toys/sports-tables/hockey/"
+        },
+        {
+          "text": "Ping Pong",
+          "href": "https://chez-les-petits.com/product-category/toys/sports-tables/ping-pong/"
+        },
+        {
+          "text": "Billiard",
+          "href": "https://chez-les-petits.com/product-category/toys/sports-tables/billiard/"
+        },
+        {
+          "text": "Darts",
+          "href": "https://chez-les-petits.com/product-category/toys/sports-tables/darts/"
+        },
+        {
+          "text": "Water Toys",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/water-toys-swimming-pools/"
+        },
+        {
+          "text": "Water Guns",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/water-guns-swimming-pools/"
+        },
+        {
+          "text": "SWINGS",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swings/"
+        },
+        {
+          "text": "Plastic Swings",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swings/plastic-swings/"
+        },
+        {
+          "text": "Wood Swings",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swings/wood-swings/"
+        },
+        {
+          "text": "Metal Swings",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swings/metal-swings/"
+        },
+        {
+          "text": "Swing Chairs",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swings/swing-chairs/"
+        },
+        {
+          "text": "OUTDOOR TOYS",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/"
+        },
+        {
+          "text": "Slides",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/slides/"
+        },
+        {
+          "text": "Seesaws",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/seesaws/"
+        },
+        {
+          "text": "Climbing Toys",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/climbing-toys/"
+        },
+        {
+          "text": "Roller Coasters",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/roller-coasters/"
+        },
+        {
+          "text": "Basketball Hoops",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/basketball-hoops/"
+        },
+        {
+          "text": "Soccer Goals",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/soccer-goals/"
+        },
+        {
+          "text": "Sand & Water Toys",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/sand-water-toys/"
+        },
+        {
+          "text": "Play Fences",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/outdoor-toys/play-fences/"
+        },
+        {
+          "text": "PLAYHOUSES",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/playhouses/"
+        },
+        {
+          "text": "Plastic Playhouses",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/playhouses/plastic-playhouses/"
+        },
+        {
+          "text": "Wood Playhouses",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/playhouses/wood-playhouses/"
+        },
+        {
+          "text": "Trampolines",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/trampolines/trampolines-trampolines/"
+        },
+        {
+          "text": "Inflatable Bouncers",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/trampolines/inflatable-bouncers/"
+        },
+        {
+          "text": "SWIMMING POOLS",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/"
+        },
+        {
+          "text": "Inflatable Pools",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/inflatable-pools/"
+        },
+        {
+          "text": "Frame Pools",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/frame-pools/"
+        },
+        {
+          "text": "Pumps & Filters",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/pumps-filters/"
+        },
+        {
+          "text": "Floating Seats",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/floating-seats/"
+        },
+        {
+          "text": "Arm Floats",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/arm-floats/"
+        },
+        {
+          "text": "Floating Jackets",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/floating-jackets/"
+        },
+        {
+          "text": "Floating Mattress",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/floating-mattress/"
+        },
+        {
+          "text": "Inflatable Boats",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/inflatable-boats/"
+        },
+        {
+          "text": "Goggles",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/goggles/"
+        },
+        {
+          "text": "Kickboards",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/swimming-pools/kickboards/"
+        },
+        {
+          "text": "RIDE ONS & PEDALS",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/"
+        },
+        {
+          "text": "Tricycles",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/tricycles/"
+        },
+        {
+          "text": "Pedal Cars",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/pedal-cars/"
+        },
+        {
+          "text": "Scooters",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/scooters/"
+        },
+        {
+          "text": "PlasmaCars",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/plasmacars/"
+        },
+        {
+          "text": "Rollers & Skates",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/rollers-skates/"
+        },
+        {
+          "text": "Helmets & Safety",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/ride-ons-pedals/helmets-safety/"
+        },
+        {
+          "text": "BICYCLES",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/"
+        },
+        {
+          "text": "12 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/12-inch-size/"
+        },
+        {
+          "text": "14 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/14-inch-size/"
+        },
+        {
+          "text": "16 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/16-inch-size/"
+        },
+        {
+          "text": "18 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/18-inch-size/"
+        },
+        {
+          "text": "20 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/20-inch-size/"
+        },
+        {
+          "text": "24 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/24-inch-size/"
+        },
+        {
+          "text": "26 Inch Size",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/26-inch-size/"
+        },
+        {
+          "text": "Bicycle Racks",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/bicycles/bicycle-racks/"
+        },
+        {
+          "text": "Electric Cars",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/electric-cars/electric-cars-electric-cars/"
+        },
+        {
+          "text": "Electric Motorbikes",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/electric-cars/electric-motorbikes/"
+        },
+        {
+          "text": "Electric Quads",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/electric-cars/electric-quads/"
+        },
+        {
+          "text": "Electric Tractors",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/electric-cars/electric-tractors/"
+        },
+        {
+          "text": "Electric Trains",
+          "href": "https://chez-les-petits.com/product-category/playground-toys/electric-cars/electric-trains/"
+        },
+        {
+          "text": "TINTIN",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/"
+        },
+        {
+          "text": "Resin Figurines",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/les-schtroumpfs/resin-figurines-les-schtroumpfs/"
+        },
+        {
+          "text": "Metal Figurines",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/star-wars/metal-figurines-star-wars/"
+        },
+        {
+          "text": "Wood Figurines",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/wood-figurines/"
+        },
+        {
+          "text": "PVC Figurines",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/pvc-figurines/"
+        },
+        {
+          "text": "Cars Collection",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/cars-collection/"
+        },
+        {
+          "text": "Planes Collection",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/planes-collection/"
+        },
+        {
+          "text": "Play Figurines",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/les-chevaliers/play-figurines-les-chevaliers/"
+        },
+        {
+          "text": "Key Chains",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/marsupilami/key-chains-marsupilami/"
+        },
+        {
+          "text": "Plasters",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/plasters/"
+        },
+        {
+          "text": "Tintin Books",
+          "href": "https://chez-les-petits.com/product-category/books/tintin-books-books/"
+        },
+        {
+          "text": "Comic Books",
+          "href": "https://chez-les-petits.com/product-category/books/comic-books-books/"
+        },
+        {
+          "text": "Tableware",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/tableware/"
+        },
+        {
+          "text": "Posters",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/tintin/posters/"
+        },
+        {
+          "text": "T-Shirts",
+          "href": "https://chez-les-petits.com/product-category/clothing/t-shirts-clothing/"
+        },
+        {
+          "text": "Jeans",
+          "href": "https://chez-les-petits.com/product-category/clothing/jeans-clothing/"
+        },
+        {
+          "text": "Pullovers",
+          "href": "https://chez-les-petits.com/product-category/clothing/pullovers-clothing/"
+        },
+        {
+          "text": "Towels",
+          "href": "https://chez-les-petits.com/product-category/clothing/towels-clothing/"
+        },
+        {
+          "text": "ASTERIX & OBELIX",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/asterix-obelix/"
+        },
+        {
+          "text": "PIGGY BANKS",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/barbapapa/piggy-banks-barbapapa/"
+        },
+        {
+          "text": "SPIROU",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/spirou/"
+        },
+        {
+          "text": "GASTON LAGAFFE",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/gaston-lagaffe/"
+        },
+        {
+          "text": "STAR WARS",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/star-wars/"
+        },
+        {
+          "text": "CALIMERO",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/calimero/"
+        },
+        {
+          "text": "SUPER HEROES",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/super-heroes/"
+        },
+        {
+          "text": "Die Cast Figurines",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/super-heroes/die-cast-figurines/"
+        },
+        {
+          "text": "BLAKE ET MORTIMER",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/blake-et-mortimer/"
+        },
+        {
+          "text": "MICHEL VAILLANT",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/michel-vaillant/"
+        },
+        {
+          "text": "LES TUNIQUES BLEUES",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/les-tuniques-bleues/"
+        },
+        {
+          "text": "THORGAL",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/thorgal/"
+        },
+        {
+          "text": "LES SCHTROUMPFS",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/les-schtroumpfs/"
+        },
+        {
+          "text": "MARSUPILAMI",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/marsupilami/"
+        },
+        {
+          "text": "LUCKY LUKE",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/lucky-luke/"
+        },
+        {
+          "text": "TITEUF",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/titeuf/"
+        },
+        {
+          "text": "LES CHEVALIERS",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/les-chevaliers/"
+        },
+        {
+          "text": "DRAGON BALL",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/dragon-ball/"
+        },
+        {
+          "text": "BARBAPAPA",
+          "href": "https://chez-les-petits.com/product-category/collectible-figurines/barbapapa/"
+        },
+        {
+          "text": "Newborn Shoes",
+          "href": "https://chez-les-petits.com/product-category/clothing/newborn-shoes/"
+        },
+        {
+          "text": "Costumes",
+          "href": "https://chez-les-petits.com/product-category/clothing/costumes/"
+        },
+        {
+          "text": "Lost your password?",
+          "href": "https://chez-les-petits.com/my-account/lost-password/"
+        }
+      ],
+      "heroContent": {
+        "headline": "back with a new look",
+        "allText": [
+          "back with a new look",
+          "OUTDOOR FUN",
+          "PEG PEREGO",
+          "FOR YOUR BABY",
+          "SHOP NOW",
+          "ONLINE",
+          "outdoor",
+          "peg perego",
+          "your baby",
+          "baby items"
+        ]
+      },
+      "promoBanners": [
+        "Toys & Baby Boutique… back with a new look STROLLERS RIDE ONS",
+        "Toys & Baby Boutique…",
+        "back with a new look",
+        "#text-3758726407 { font-size: 1rem; line-height: 0.75; text-align: left; }",
+        "STROLLERS",
+        "RIDE ONS",
+        "#banner-81481978 { padding-top: 50vh; } #banner-81481978 .banner-bg img { object-position: 0% 0%; } @media (min-width:550px) { #banner-81481978 { padding-top: 600px; } }",
+        "Live In A Playful World OUTDOOR FUN PLAYGROUND TOYS",
+        "Live In A Playful World",
+        "#gap-1860671433 { padding-top: 6px; }"
+      ],
+      "featuredCategories": [
+        "BABY ITEMS",
+        "TOYS",
+        "PLAYGROUND",
+        "FIGURINES",
+        "BOOKS",
+        "CLOTHING",
+        "Return to shop",
+        "Skip to content",
+        "STROLLERS",
+        "Ride Ons",
+        "playground toys",
+        "shop all",
+        "Add to wishlist",
+        "QUICK VIEW",
+        "Deluxe Original Kids Large Teepee Tent",
+        "ADD TO CART",
+        "DevesSport 1.37m Deluxe Trampoline Blue",
+        "Step2 Shooting Hoops Pro Basketball Set",
+        "Step2 Clubhouse Climber Multicolor",
+        "Step2 Skyward Summit",
+        "Red Castle Cocoonababy Nest White",
+        "Peg Perego Veloce Travel System Sand",
+        "Founded in 1912,",
+        "http://www.gebrangeahchan.com/",
+        "About Us",
+        "Distribution",
+        "Store Location",
+        "Contact Us",
+        "My Baby's Checklist",
+        "Baby Birth List",
+        "TERMS & CONDITIONS",
+        "privacy policy",
+        "EXCHANGE & REFUND",
+        "By RD",
+        "Stroller & Car Seat Sets",
+        "Single Strollers",
+        "Twin Strollers",
+        "Stroller Accessories",
+        "CAR SEATS",
+        "Newborn+"
+      ],
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "id": "wild-willy-toys",
+      "name": "Wild Willy Toys",
+      "url": "https://wildwillytoys.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-11T20:48:07.395Z",
+      "navigation": [
+        {
+          "text": "Shop by Age",
+          "href": "https://www.wildwillytoys.com/pages/shop-by-age"
+        },
+        {
+          "text": "Shop by Category",
+          "href": "https://www.wildwillytoys.com/pages/shop-by-category"
+        },
+        {
+          "text": "LEGO",
+          "href": "https://www.wildwillytoys.com/collections/lego"
+        },
+        {
+          "text": "Geomag",
+          "href": "https://www.wildwillytoys.com/collections/geomag"
+        },
+        {
+          "text": "Building Blocks",
+          "href": "https://www.wildwillytoys.com/collections/building-blocks"
+        },
+        {
+          "text": "Mechanical Sets",
+          "href": "https://www.wildwillytoys.com/collections/mechanical-sets"
+        },
+        {
+          "text": "View all Playsets & Construction",
+          "href": "https://www.wildwillytoys.com/collections/playsets-construction"
+        },
+        {
+          "text": "Baby Walkers & Ride-Ons",
+          "href": "https://www.wildwillytoys.com/collections/baby-walkers-ride-ons"
+        },
+        {
+          "text": "Montessori & Development Toys",
+          "href": "https://www.wildwillytoys.com/collections/montessori-development-toys"
+        },
+        {
+          "text": "Interactive & Learning Toys",
+          "href": "https://www.wildwillytoys.com/collections/interactive-learning-toys"
+        },
+        {
+          "text": "Puzzles & Sorting toys",
+          "href": "https://www.wildwillytoys.com/collections/puzzles-sorting-toys"
+        },
+        {
+          "text": "View all Babies & Toddlers",
+          "href": "https://www.wildwillytoys.com/collections/babies-toddlers"
+        },
+        {
+          "text": "Action Heroes, Figures & Playsets",
+          "href": "https://www.wildwillytoys.com/collections/action-heroes-figures-playsets"
+        },
+        {
+          "text": "TV & Movie Characters",
+          "href": "https://www.wildwillytoys.com/collections/tv-movie-characters"
+        },
+        {
+          "text": "View all Characters, Action Figures & Collectibles",
+          "href": "https://www.wildwillytoys.com/collections/characters-action-figures-collectibles"
+        },
+        {
+          "text": "Baby Dolls & Accessories",
+          "href": "https://www.wildwillytoys.com/collections/baby-dolls-accessories"
+        },
+        {
+          "text": "Fashion Dolls & Playsets",
+          "href": "https://www.wildwillytoys.com/collections/fashion-dolls-playsets"
+        },
+        {
+          "text": "View all Dolls & Playsets",
+          "href": "https://www.wildwillytoys.com/collections/dolls-playsets"
+        },
+        {
+          "text": "Learning & Activity",
+          "href": "https://www.wildwillytoys.com/collections/learning-activity"
+        },
+        {
+          "text": "STEM Kits",
+          "href": "https://www.wildwillytoys.com/collections/stem-kits"
+        },
+        {
+          "text": "View all Educational",
+          "href": "https://www.wildwillytoys.com/collections/educational"
+        },
+        {
+          "text": "Kitchen & Home Appliances",
+          "href": "https://www.wildwillytoys.com/collections/kitchen-home-appliances"
+        },
+        {
+          "text": "Musical Kits",
+          "href": "https://www.wildwillytoys.com/collections/musical-kits"
+        },
+        {
+          "text": "View all Pretend Play",
+          "href": "https://www.wildwillytoys.com/collections/pretend-play"
+        },
+        {
+          "text": "Coloring & Modeling Sets",
+          "href": "https://www.wildwillytoys.com/collections/coloring-modeling-sets"
+        },
+        {
+          "text": "Creative Toys",
+          "href": "https://www.wildwillytoys.com/collections/creative-toys"
+        },
+        {
+          "text": "Beauty Sets",
+          "href": "https://www.wildwillytoys.com/collections/beauty-sets"
+        },
+        {
+          "text": "View all Arts & Crafts",
+          "href": "https://www.wildwillytoys.com/collections/arts-crafts"
+        },
+        {
+          "text": "Die-Cast",
+          "href": "https://www.wildwillytoys.com/collections/die-cast"
+        },
+        {
+          "text": "Circuits & Garages",
+          "href": "https://www.wildwillytoys.com/collections/circuits-garages"
+        },
+        {
+          "text": "Guns",
+          "href": "https://www.wildwillytoys.com/collections/guns"
+        },
+        {
+          "text": "Remote Control",
+          "href": "https://www.wildwillytoys.com/collections/remote-control"
+        },
+        {
+          "text": "Trucks",
+          "href": "https://www.wildwillytoys.com/collections/trucks"
+        },
+        {
+          "text": "View all Vehicles, Circuits & Guns",
+          "href": "https://www.wildwillytoys.com/collections/vehicles-circuits-guns"
+        },
+        {
+          "text": "Summer Toys",
+          "href": "https://www.wildwillytoys.com/collections/summer-toys"
+        },
+        {
+          "text": "Sports",
+          "href": "https://www.wildwillytoys.com/collections/sports"
+        },
+        {
+          "text": "Scooters & Ride-Ons",
+          "href": "https://www.wildwillytoys.com/collections/scooters-ride-ons"
+        },
+        {
+          "text": "Outdoor Play",
+          "href": "https://www.wildwillytoys.com/collections/outdoor-play"
+        },
+        {
+          "text": "View all Outdoor & Sports",
+          "href": "https://www.wildwillytoys.com/collections/outdoor-sports"
+        },
+        {
+          "text": "Board Games",
+          "href": "https://www.wildwillytoys.com/collections/board-games-1"
+        },
+        {
+          "text": "Family Games",
+          "href": "https://www.wildwillytoys.com/collections/family-games"
+        },
+        {
+          "text": "Puzzles",
+          "href": "https://www.wildwillytoys.com/collections/puzzles-1"
+        },
+        {
+          "text": "View all Games & Puzzles",
+          "href": "https://www.wildwillytoys.com/collections/games-puzzles"
+        },
+        {
+          "text": "Shop by Brands",
+          "href": "https://www.wildwillytoys.com/pages/shop-by-brands"
+        },
+        {
+          "text": "Gift Finder",
+          "href": "https://www.wildwillytoys.com/pages/gift-finder"
+        },
+        {
+          "text": "My Account",
+          "href": "https://www.wildwillytoys.com/account/login"
+        },
+        {
+          "text": "Facebook",
+          "href": "https://www.wildwillytoys.com/#"
+        },
+        {
+          "text": "Instagram",
+          "href": "https://www.wildwillytoys.com/#"
+        },
+        {
+          "text": "YouTube",
+          "href": "https://www.wildwillytoys.com/#"
+        },
+        {
+          "text": "Cart",
+          "href": "https://www.wildwillytoys.com/cart"
+        },
+        {
+          "text": "About Us",
+          "href": "https://www.wildwillytoys.com/pages/about"
+        },
+        {
+          "text": "Contact Us",
+          "href": "https://www.wildwillytoys.com/pages/contactus"
+        },
+        {
+          "text": "FAQ",
+          "href": "https://www.wildwillytoys.com/pages/faq"
+        },
+        {
+          "text": "Store Locator",
+          "href": "https://www.wildwillytoys.com/#"
+        },
+        {
+          "text": "Shipping & Returns",
+          "href": "https://www.wildwillytoys.com/policies/shipping-policy"
+        },
+        {
+          "text": "Privacy Policy",
+          "href": "https://www.wildwillytoys.com/policies/privacy-policy"
+        },
+        {
+          "text": "Terms of Service",
+          "href": "https://www.wildwillytoys.com/policies/terms-of-service"
+        },
+        {
+          "text": "Cookies Settings",
+          "href": "https://www.wildwillytoys.com/#"
+        }
+      ],
+      "heroContent": {
+        "headline": "Imagine. Build. Play!",
+        "allText": [
+          "Imagine. Build. Play!",
+          "Find the perfect gift"
+        ]
+      },
+      "promoBanners": [
+        "Imagine. Build. Play! From City to Technic, endless imagination for every age Shop LEGO",
+        "Imagine. Build. Play!",
+        "From City to Technic, endless imagination for every age",
+        "Shop LEGO",
+        "Find the perfect gift Use the dropdowns below to find the perfect gift, straight away.",
+        "Find the perfect gift",
+        "Use the dropdowns below to find the perfect gift, straight away."
+      ],
+      "featuredCategories": [
+        "Shop by Age",
+        "Shop by Category",
+        "LEGO",
+        "Geomag",
+        "Building Blocks",
+        "Mechanical Sets",
+        "View all Playsets & Construction",
+        "Baby Walkers & Ride-Ons",
+        "Montessori & Development Toys",
+        "Interactive & Learning Toys",
+        "Puzzles & Sorting toys",
+        "View all Babies & Toddlers",
+        "Action Heroes, Figures & Playsets",
+        "TV & Movie Characters",
+        "Baby Dolls & Accessories",
+        "Fashion Dolls & Playsets",
+        "View all Dolls & Playsets",
+        "Learning & Activity",
+        "STEM Kits",
+        "View all Educational",
+        "Kitchen & Home Appliances",
+        "Musical Kits",
+        "View all Pretend Play",
+        "Coloring & Modeling Sets",
+        "Creative Toys",
+        "Beauty Sets",
+        "View all Arts & Crafts",
+        "Die-Cast",
+        "Circuits & Garages",
+        "Guns",
+        "Remote Control",
+        "Trucks",
+        "View all Vehicles, Circuits & Guns",
+        "Summer Toys",
+        "Sports",
+        "Scooters & Ride-Ons",
+        "Outdoor Play",
+        "View all Outdoor & Sports",
+        "Board Games",
+        "Family Games"
+      ],
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "id": "the-toy-store-lb",
+      "name": "The Toy Store LB",
+      "url": "https://thetoystorelb.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-11T20:48:10.439Z",
+      "navigation": [
+        {
+          "text": "Lego",
+          "href": "https://thetoystorelb.com/search?options%5Bprefix%5D=last&q=Lego"
+        },
+        {
+          "text": "Barbie",
+          "href": "https://thetoystorelb.com/search?options%5Bprefix%5D=last&q=Barbie"
+        },
+        {
+          "text": "X-Shot",
+          "href": "https://thetoystorelb.com/search?options%5Bprefix%5D=last&q=X-Shot"
+        },
+        {
+          "text": "LOL",
+          "href": "https://thetoystorelb.com/search?options%5Bprefix%5D=last&q=LOL"
+        },
+        {
+          "text": "Gift",
+          "href": "https://thetoystorelb.com/search?options%5Bprefix%5D=last&q=Gift"
+        },
+        {
+          "text": "Playmobil",
+          "href": "https://thetoystorelb.com/search?options%5Bprefix%5D=last&q=Playmobil"
+        },
+        {
+          "text": "My Account",
+          "href": "https://account.thetoystorelb.com/?locale=en&region_country=LB"
+        },
+        {
+          "text": "Cart",
+          "href": "https://thetoystorelb.com/cart"
+        },
+        {
+          "text": "Ramadan Collection",
+          "href": "https://thetoystorelb.com/collections/ramadan-collection"
+        },
+        {
+          "text": "Trending Top Picks",
+          "href": "https://thetoystorelb.com/collections/hot-picks"
+        },
+        {
+          "text": "Your Move",
+          "href": "https://thetoystorelb.com/collections/board-card-games"
+        },
+        {
+          "text": "Drive. Build. Repeat.",
+          "href": "https://thetoystorelb.com/collections/lego-cars"
+        },
+        {
+          "text": "Collect The Fun",
+          "href": "https://thetoystorelb.com/collections/funko"
+        },
+        {
+          "text": "Fuel Their Need for Speed",
+          "href": "https://thetoystorelb.com/collections/hot-wheels"
+        },
+        {
+          "text": "Play Big, Dream Bigger",
+          "href": "https://thetoystorelb.com/collections/cuddle-barn"
+        },
+        {
+          "text": "Inspire Her Imagination",
+          "href": "https://thetoystorelb.com/collections/barbie"
+        },
+        {
+          "text": "New Arrivals",
+          "href": "https://thetoystorelb.com/collections/new-arrival"
+        },
+        {
+          "text": "Collectibles",
+          "href": "https://thetoystorelb.com/collections/collectibles"
+        },
+        {
+          "text": "Our Exclusives",
+          "href": "https://thetoystorelb.com/collections/exclusive"
+        },
+        {
+          "text": "Cadeau De Retour",
+          "href": "https://thetoystorelb.com/collections/cadeau-de-retour"
+        },
+        {
+          "text": "Play & Win",
+          "href": "https://thetoystorelb.com/pages/play-win"
+        },
+        {
+          "text": "LEGO Gifts",
+          "href": "https://thetoystorelb.com/collections/lego"
+        },
+        {
+          "text": "VIP Membership",
+          "href": "https://thetoystorelb.com/products/vip-membership"
+        },
+        {
+          "text": "About us",
+          "href": "https://thetoystorelb.com/pages/about-us"
+        },
+        {
+          "text": "Our Brands",
+          "href": "https://thetoystorelb.com/pages/brands"
+        },
+        {
+          "text": "Contact us",
+          "href": "https://thetoystorelb.com/pages/contact-us"
+        },
+        {
+          "text": "Shipping Policy",
+          "href": "https://thetoystorelb.com/policies/shipping-policy"
+        },
+        {
+          "text": "Refund Policy",
+          "href": "https://thetoystorelb.com/policies/refund-policy"
+        },
+        {
+          "text": "Privacy Policy",
+          "href": "https://thetoystorelb.com/policies/privacy-policy"
+        },
+        {
+          "text": "Terms of Service",
+          "href": "https://thetoystorelb.com/policies/terms-of-service"
+        }
+      ],
+      "heroContent": {
+        "headline": "The Toy Store Lebanon: #1 Online Shop For Kids & Baby Toys",
+        "allText": [
+          "The Toy Store Lebanon: #1 Online Shop For Kids & Baby Toys"
+        ]
+      },
+      "promoBanners": [],
+      "featuredCategories": [
+        "Lego",
+        "Barbie",
+        "X-Shot",
+        "LOL",
+        "Gift",
+        "Playmobil",
+        "My Account",
+        "Ramadan Collection",
+        "Trending Top Picks",
+        "Your Move",
+        "Drive. Build. Repeat.",
+        "Collect The Fun",
+        "Fuel Their Need for Speed",
+        "Play Big, Dream Bigger",
+        "Inspire Her Imagination",
+        "New Arrivals",
+        "Collectibles",
+        "Our Exclusives",
+        "Cadeau De Retour",
+        "Play & Win",
+        "LEGO Gifts",
+        "VIP Membership",
+        "About us",
+        "Our Brands",
+        "Contact us",
+        "Shipping Policy",
+        "Refund Policy",
+        "Privacy Policy",
+        "Terms of Service"
+      ],
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "id": "big-fun-lebanon",
+      "name": "Big Fun Lebanon",
+      "url": "https://bigfunlebanon.com",
+      "role": "competitor",
+      "scrapedAt": "2026-03-11T20:48:29.366Z",
+      "navigation": [],
+      "heroContent": {
+        "headline": "bigfunlebanon.com",
+        "allText": [
+          "bigfunlebanon.com"
+        ]
+      },
+      "promoBanners": [],
+      "featuredCategories": [],
+      "botBlocked": true,
+      "error": null,
+      "note": "No navigation found — site may be bot-protected"
+    }
+  ],
+  "lighthouseAudit": {
+    "scores": {
+      "seo": 92,
+      "performance": 52,
+      "accessibility": 82,
+      "bestPractices": 77
+    },
+    "topIssues": [
+      {
+        "id": "first-contentful-paint",
+        "title": "First Contentful Paint",
+        "score": 0
+      },
+      {
+        "id": "largest-contentful-paint",
+        "title": "Largest Contentful Paint",
+        "score": 0
+      },
+      {
+        "id": "errors-in-console",
+        "title": "Browser errors were logged to the console",
+        "score": 0
+      },
+      {
+        "id": "server-response-time",
+        "title": "Reduce initial server response time",
+        "score": 0
+      },
+      {
+        "id": "redirects",
+        "title": "Avoid multiple page redirects",
+        "score": 0
+      },
+      {
+        "id": "deprecations",
+        "title": "Uses deprecated APIs",
+        "score": 0
+      },
+      {
+        "id": "valid-source-maps",
+        "title": "Missing source maps for large first-party JavaScript",
+        "score": 0
+      },
+      {
+        "id": "aria-hidden-focus",
+        "title": "`[aria-hidden=\"true\"]` elements contain focusable descendents",
+        "score": 0
+      },
+      {
+        "id": "color-contrast",
+        "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+        "score": 0
+      },
+      {
+        "id": "landmark-one-main",
+        "title": "Document does not have a main landmark.",
+        "score": 0
+      },
+      {
+        "id": "link-name",
+        "title": "Links do not have a discernible name",
+        "score": 0
+      },
+      {
+        "id": "list",
+        "title": "Lists do not contain only `<li>` elements and script supporting elements (`<script>` and `<template>`).",
+        "score": 0
+      }
+    ]
+  },
+  "hasScreenshot": true,
+  "navGaps": [
+    {
+      "category": "Baby & Toddler / Montessori / Development Toys",
+      "competitorsWithIt": [
+        "Wild Willy Toys",
+        "Chez Les Petits",
+        "PlayOne"
+      ],
+      "priority": "high"
+    },
+    {
+      "category": "Baby Items / Strollers / Baby Walkers & Ride-Ons",
+      "competitorsWithIt": [
+        "Chez Les Petits",
+        "Wild Willy Toys",
+        "JouéClub Lebanon"
+      ],
+      "priority": "high"
+    },
+    {
+      "category": "Playground / Outdoor Play Structures",
+      "competitorsWithIt": [
+        "Chez Les Petits"
+      ],
+      "priority": "medium"
+    },
+    {
+      "category": "Gift Finder / Gift Guide",
+      "competitorsWithIt": [
+        "JouéClub Lebanon",
+        "The Toy Store LB"
+      ],
+      "priority": "high"
+    },
+    {
+      "category": "Playmobil (as dedicated nav category)",
+      "competitorsWithIt": [
+        "JouéClub Lebanon",
+        "The Toy Store LB"
+      ],
+      "priority": "medium"
+    },
+    {
+      "category": "Ramadan / Seasonal Collection",
+      "competitorsWithIt": [
+        "The Toy Store LB"
+      ],
+      "priority": "medium"
+    },
+    {
+      "category": "Magnetic Sets / Geomag / Specialty Construction",
+      "competitorsWithIt": [
+        "JouéClub Lebanon",
+        "Wild Willy Toys"
+      ],
+      "priority": "low"
+    },
+    {
+      "category": "0-2 Years / Infant Age Group",
+      "competitorsWithIt": [
+        "PlayOne",
+        "Wild Willy Toys",
+        "Chez Les Petits"
+      ],
+      "priority": "high"
+    }
+  ],
+  "messagingGaps": [
+    {
+      "gap": "No visible hero headline or value proposition text above the fold — the hero relies entirely on an image with embedded text ('Fun for the whole family!') which is not crawlable or accessible",
+      "competitorExample": "Wild Willy Toys uses a clear live-text hero headline 'Imagine. Build. Play!' with a supporting subline 'From City to Technic, endless imagination for every age' which communicates brand positioning and specific product focus immediately",
+      "recommendation": "Add a live-text H1 hero headline that communicates Toys R Us Lebanon's unique value proposition (e.g., 'Lebanon's Biggest Toy Store — Thousands of Toys for Every Age') with a supporting subtitle. This improves SEO, accessibility, and AI crawler visibility simultaneously."
+    },
+    {
+      "gap": "Generic CTA 'Shop Now' lacks specificity and urgency — it doesn't tell users what they'll find or why they should click",
+      "competitorExample": "The Toy Store LB uses action-oriented, category-specific CTAs like 'Drive. Build. Repeat.' and 'Inspire Her Imagination' that create emotional hooks and direct users to curated experiences rather than a generic store page",
+      "recommendation": "Replace generic 'Shop Now' with contextual CTAs tied to the hero content, such as 'Explore Family Fun Picks', 'Shop Ramadan Gifts', or 'Find the Perfect Toy by Age'. Rotate CTAs seasonally to maintain relevance."
+    },
+    {
+      "gap": "The Ramadan promo banner mentions free delivery but does not tie into any emotional or cultural messaging about gifting, celebration, or family togetherness during the holiday",
+      "competitorExample": "The Toy Store LB has a dedicated 'Ramadan Collection' nav category, signaling curated seasonal content rather than just a transactional promotion. This approach builds cultural relevance and guides shoppers to relevant products.",
+      "recommendation": "Create a dedicated Ramadan landing page with curated gift guides by age, a warm culturally-relevant hero message (e.g., 'Make Ramadan Magical — Gifts They'll Love'), and integrate it into the main navigation as a seasonal category."
+    }
+  ],
+  "ctaEffectiveness": {
+    "rating": "needs improvement",
+    "observations": "The primary CTA 'Shop Now' is a generic red button floating above the hero image without contextual support from a headline or subtext. It competes visually with the busy illustrated background featuring Geoffrey the Giraffe, reducing its visual prominence. The CTA does not specify what the user will shop for, and there is no secondary CTA or directional guidance above the fold.",
+    "recommendation": "Increase CTA specificity by tying it to the hero content (e.g., 'Browse Family Favorites' or 'Shop Top Picks for Ramadan'). Add a contrasting text headline above the CTA to create a visual hierarchy: headline → subtext → CTA. Consider adding a secondary CTA for a different user journey (e.g., 'Find by Age' or 'Explore Deals') to capture different intent types."
+  },
+  "topOpportunities": [
+    {
+      "rank": 1,
+      "title": "Add Live-Text Hero Headlines for SEO & AI Visibility",
+      "description": "The current hero uses image-embedded text ('Fun for the whole family!') which is invisible to search engines, AI crawlers, and screen readers. Implement live HTML text overlays with keyword-rich H1 headlines (e.g., 'Toys R Us Lebanon — Shop Toys, Games & Gifts for Every Age') to dramatically improve organic search visibility and AI shopping agent discoverability.",
+      "impact": "high"
+    },
+    {
+      "rank": 2,
+      "title": "Introduce Baby & Infant Category (0-2 Years)",
+      "description": "Toys R Us Lebanon's age navigation starts at 3-5 years, completely missing the lucrative 0-2 year infant/baby segment that competitors like Wild Willy, Chez Les Petits, and PlayOne actively serve. Add a dedicated 'Babies & Toddlers' or '0-2 Years' category with strollers, developmental toys, and Montessori items to capture this high-intent parent audience.",
+      "impact": "high"
+    },
+    {
+      "rank": 3,
+      "title": "Build a Gift Finder / Interactive Shopping Tool",
+      "description": "No competitor in the Lebanese market has a robust gift finder except JouéClub's basic version. Toys R Us should build an interactive gift finder (by age, interest, budget, occasion) to differentiate the experience, reduce bounce rates, increase average order value, and capture long-tail search queries like 'best gift for 5 year old boy Lebanon'.",
+      "impact": "high"
+    },
+    {
+      "rank": 4,
+      "title": "Create Seasonal & Cultural Landing Pages with Dedicated Navigation",
+      "description": "The Ramadan free delivery banner is a missed opportunity. Build dedicated seasonal landing pages (Ramadan gifts, Eid gifts, Christmas, Back-to-School, Summer) with curated collections, gift guides by age/budget, and add them as temporary nav items. This captures seasonal search traffic and positions Toys R Us as culturally relevant.",
+      "impact": "medium"
+    },
+    {
+      "rank": 5,
+      "title": "Strengthen Brand Storytelling with Geoffrey the Giraffe",
+      "description": "Geoffrey is prominently featured visually but not leveraged in messaging. Create a 'Geoffrey's Picks' curated section, use Geoffrey as a guide in the gift finder, and develop content around the mascot (e.g., 'Geoffrey's Top 10 This Month') to build brand affinity and differentiate from competitors who lack a recognizable mascot character.",
+      "impact": "medium"
+    },
+    {
+      "rank": 6,
+      "title": "Expand Brand-Specific Navigation and Landing Pages",
+      "description": "Currently only 6 brands are featured in the 'Shop by Brand' dropdown (Mattel Barbie, Funko, Crayola, Lego, Clementoni, Classic World). Expand to include Playmobil, Hot Wheels, Nerf, Hasbro Gaming, Fisher-Price, and other high-search-volume brands with dedicated landing pages to capture branded search traffic that competitors like JouéClub and The Toy Store LB are targeting.",
+      "impact": "medium"
+    },
+    {
+      "rank": 7,
+      "title": "Implement Structured Data and Product Schema for Rich Results",
+      "description": "With heavy reliance on image-based content above the fold, ensure all product pages and category pages have comprehensive structured data (Product schema, BreadcrumbList, FAQ) to maximize visibility in Google Shopping results, rich snippets, and AI-powered search experiences where competitors may lack technical SEO sophistication.",
+      "impact": "medium"
+    }
+  ],
+  "heroMessagingAnalysis": {
+    "targetStrengths": [
+      "Strong brand mascot presence — Geoffrey the Giraffe is instantly recognizable and creates emotional warmth aligned with the Innocent brand archetype",
+      "Colorful, whimsical illustration style appeals to children and creates a sense of wonder and magic",
+      "Ramadan-specific promotion in the top banner shows awareness of local cultural context and timeliness",
+      "Clean navigation structure with logical category organization (by category, age, brand, character) provides multiple shopping pathways"
+    ],
+    "targetGaps": [
+      "No live-text hero headline — the primary message 'Fun for the whole family!' is baked into an image, making it invisible to search engines and AI crawlers",
+      "Hero message is generic and doesn't communicate a specific value proposition, product focus, or reason to shop at Toys R Us vs. competitors",
+      "No mention of product range breadth, exclusive brands, price competitiveness, or Lebanon-specific trust signals (e.g., delivery speed, store locations)",
+      "Missing social proof or urgency elements above the fold (e.g., 'Trusted by X Lebanese families', trending products, limited-time offers)",
+      "The 'Fun for the whole family' tagline skews vague — doesn't differentiate from any toy retailer and misses the opportunity to highlight what makes Toys R Us unique in the Lebanese market",
+      "No secondary navigation or quick-access links to trending, seasonal, or deal content above the fold"
+    ],
+    "competitorBestPractices": [
+      "Wild Willy Toys uses specific, action-oriented hero messaging ('Imagine. Build. Play!') paired with a category focus (LEGO) and a clear CTA — providing both emotional appeal and shopping direction",
+      "The Toy Store LB uses its title tag and meta description to position as '#1 Online Shop For Kids & Baby Toys' in Lebanon — claiming market leadership even if aspirational",
+      "The Toy Store LB uses multiple themed hero sections with lifestyle-driven CTAs ('Drive. Build. Repeat.', 'Inspire Her Imagination') that segment audiences and create multiple entry points",
+      "Chez Les Petits leads with a rebranding story ('back with a new look') combined with clear product category callouts (Strollers, Ride-Ons), giving both brand narrative and shopping utility",
+      "JouéClub Lebanon features dedicated brand navigation (Lego, Playmobil) as top-level categories, making high-demand brands immediately accessible and SEO-friendly"
+    ]
+  },
+  "crawlerVisibility": {
+    "heroTextIsLive": false,
+    "contentInImagesLevel": "high",
+    "aiReadabilityNote": "The primary hero message ('Fun for the whole family!') and the 'Shop Now' CTA label appear to be rendered as live elements, but the hero headline itself is embedded in the illustration image. The heavy reliance on image-based hero content means AI crawlers, Google's indexing systems, and AI shopping agents (like Google Shopping, ChatGPT plugins, or Perplexity Shopping) will see minimal semantic content above the fold. The site's promotional messaging, brand positioning, and seasonal offers are largely invisible to non-visual crawlers, severely limiting discoverability in AI-powered search and recommendation systems."
+  },
+  "navigationAnalysis": {
+    "topCategories": [
+      "Shop by Category",
+      "Shop by Age",
+      "Shop by Brand",
+      "Shop by Character",
+      "R Deals",
+      "Find A Store",
+      "What's On"
+    ],
+    "missingCategories": [
+      "Baby & Infant (0-2 years)",
+      "Gift Finder / Gift Guide",
+      "Seasonal Collections (Ramadan, Eid, Christmas)",
+      "Playmobil (dedicated brand page)",
+      "Hot Wheels / Nerf / other major brands",
+      "Ride-Ons / Baby Walkers",
+      "Montessori / Developmental Toys",
+      "Playground Equipment",
+      "New Arrivals (as top-level nav)",
+      "Sale / Clearance (dedicated section beyond R Deals)"
+    ],
+    "depth": "moderate",
+    "notes": "Navigation is well-organized with four logical shopping dimensions (category, age, brand, character) plus deals. However, the age range starts at 3 years, missing the infant segment entirely. The brand selection is notably limited to 6 brands despite Toys R Us likely carrying dozens. The 'Shop by Character' section is strong with 6 characters but could expand. 'R Deals' is a clever branded deals section but its contents aren't visible from the homepage. The utility nav (Find A Store, What's On) is a good touch for omnichannel shoppers."
+  },
+  "productContentReview": {
+    "brandsCovered": [
+      "Mattel Barbie",
+      "Funko",
+      "Crayola",
+      "Lego",
+      "Clementoni",
+      "Classic World"
+    ],
+    "ageGroupCoverage": [
+      "3-5 Years",
+      "6-8 Years",
+      "9-12 Years",
+      "12+ Years"
+    ],
+    "priceVisibility": "hidden",
+    "contentGaps": [
+      "No infant/baby age group (0-2 years) despite competitors serving this segment",
+      "Only 6 brands featured in navigation despite likely carrying 50+ brands — major brands like Playmobil, Hot Wheels, Nerf, Hasbro, Fisher-Price, and Paw Patrol are absent from nav",
+      "No price points visible on homepage — no 'starting from' or price range indicators to set expectations",
+      "No product cards, bestseller showcases, or trending items visible above the fold",
+      "No user-generated content, reviews, or ratings visible on the homepage",
+      "No educational content, buying guides, or blog/resource section visible",
+      "Limited character coverage — missing major franchises like Paw Patrol, Marvel, Bluey, Cocomelon, and Minecraft that drive children's purchasing",
+      "'New & Best Sellers' and 'Shop The Latest Arrivals' sections appear below the fold but their product content is not visible in the screenshot",
+      "No 'Back to School' seasonal prominence despite having it as a category — seasonal content should be surfaced dynamically based on timing"
+    ]
+  }
+}

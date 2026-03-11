@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "brandSlug": "demo-brand",
+  "totalPersonas": 3,
+  "personas": [
+    {
+      "name": "The Polished Professional",
+      "ageRange": "38-48",
+      "income": "$75K–$110K",
+      "occupation": ["Marketing Director", "Senior Manager", "HR Business Partner"],
+      "location": "Suburban metro (Chicago, Atlanta, Dallas)",
+      "lifestyle": ["Morning workouts", "Weekend farmers markets", "Active PTA member"],
+      "values": ["Career growth", "Family balance", "Authenticity", "Quality over quantity"],
+      "fashionGoals": ["Look authoritative without being stiff", "Build a capsule wardrobe", "Feel confident at board meetings"],
+      "shoppingBehaviors": ["Researches online, buys in-store", "Loyal to 3-4 brands", "Influenced by peer recommendations"],
+      "painPoints": ["Hard to find office-appropriate clothes that don't feel 'old'", "Sizing inconsistency across brands", "Fast fashion feels cheap and unsustainable"],
+      "motivators": ["Compliments from colleagues", "Feeling put-together effortlessly", "Pieces that transition work to dinner"],
+      "contentTopics": ["Career advice", "Capsule wardrobe tips", "Work-life integration"],
+      "preferredChannels": ["Email newsletters", "Pinterest", "LinkedIn"],
+      "brandFit": "Demo Brand's classic silhouettes and quality fabrications directly address her need for office-appropriate clothing that doesn't feel outdated. The price point sits comfortably within her discretionary spending."
+    },
+    {
+      "name": "The Modern Minimalist",
+      "ageRange": "30-40",
+      "income": "$55K–$85K",
+      "occupation": ["UX Designer", "Brand Strategist", "Copywriter"],
+      "location": "Urban core (NYC, LA, Seattle, Austin)",
+      "lifestyle": ["Gallery openings", "Cycling commuter", "Meal prep Sunday"],
+      "values": ["Sustainability", "Intentional consumption", "Aesthetic consistency", "Experiences over things"],
+      "fashionGoals": ["Fewer, better pieces", "Timeless over trendy", "Easy outfit formulas"],
+      "shoppingBehaviors": ["Researches sustainability credentials", "Shops seasonally", "Heavy Instagram influence"],
+      "painPoints": ["Most brands are too trend-driven", "Sustainability claims feel greenwashed", "Hard to find simple, well-made basics"],
+      "motivators": ["Finding a perfect-fit staple", "Brands with a clear POV", "Effortless polish"],
+      "contentTopics": ["Slow fashion", "Wardrobe auditing", "Brand story and values"],
+      "preferredChannels": ["Instagram", "Substack", "Brand website"],
+      "brandFit": "Her desire for timeless, quality pieces aligns with Demo Brand's classic design ethos. Converting her requires stronger sustainability storytelling and a cleaner brand narrative."
+    },
+    {
+      "name": "The Practical Achiever",
+      "ageRange": "45-58",
+      "income": "$90K–$140K",
+      "occupation": ["VP of Sales", "Hospital Administrator", "School Principal"],
+      "location": "Mid-size cities (Charlotte, Denver, Nashville)",
+      "lifestyle": ["Youth sports parent", "Weekend entertaining", "Community volunteer"],
+      "values": ["Reliability", "Value", "Practicality", "Approachability"],
+      "fashionGoals": ["Versatile pieces that work for multiple occasions", "Easy care fabrics", "Professional but not stuffy"],
+      "shoppingBehaviors": ["Brand loyal once trust is established", "Shops sales strategically", "Influenced by comfort and reviews"],
+      "painPoints": ["No time to shop", "Clothes that require dry cleaning only", "Trend-focused stores that ignore her age group"],
+      "motivators": ["A reliable go-to brand", "Pieces that last multiple seasons", "Easy returns and great customer service"],
+      "contentTopics": ["Outfit formulas for busy schedules", "What to wear to work events", "Seasonal refreshes"],
+      "preferredChannels": ["Email", "Facebook", "Direct mail"],
+      "brandFit": "Demo Brand's classic positioning and accessible price point resonate strongly with her pragmatic approach to fashion. Loyalty programs and consistent quality are key retention levers."
+    }
+  ]
+}

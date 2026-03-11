@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "brandSlug": "demo-brand",
+  "brands": [
+    {
+      "id": "demo-brand",
+      "name": "Demo Brand",
+      "role": "target",
+      "url": "https://www.example.com",
+      "scrapedAt": "2026-01-01T00:00:00.000Z",
+      "navCategories": [],
+      "heroHeadline": "",
+      "heroCta": "",
+      "promoBanner": "",
+      "error": null,
+      "botBlocked": false
+    }
+  ],
+  "navGaps": ["Website audit not yet run — add the brand URL and run the Website Audit module."],
+  "messagingGaps": [],
+  "ctaEffectiveness": "",
+  "topOpportunities": [
+    {
+      "rank": 1,
+      "title": "Run Website Audit",
+      "description": "Add a brand URL and run the Website Audit module to populate competitive site intelligence.",
+      "impact": "high"
+    }
+  ]
+}

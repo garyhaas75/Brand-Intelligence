@@ -1,0 +1,442 @@
+{
+  "generatedAt": "2026-03-11T20:52:52.085Z",
+  "brandSlug": "toysrus-com-lb",
+  "brands": [
+    {
+      "id": "toysrus-com-lb",
+      "name": "Toys R Us",
+      "role": "target",
+      "handle": "toysruslb",
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:47:46.802Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0,
+        "estimatedPostCount": null
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [
+        "Add Product Showcase content to close gap vs competitors",
+        "Add Promotional content to close gap vs competitors",
+        "Add Seasonal content to close gap vs competitors",
+        "Add Lifestyle content to close gap vs competitors",
+        "Add Behind the Scenes content to close gap vs competitors"
+      ],
+      "error": "Post data unavailable (account may be private or scraper blocked) — profile stats only",
+      "partialData": true
+    },
+    {
+      "id": "playone",
+      "name": "PlayOne",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:48:32.208Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    },
+    {
+      "id": "jouéclub-lebanon",
+      "name": "JouéClub Lebanon",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:48:44.225Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    },
+    {
+      "id": "chez-les-petits",
+      "name": "Chez Les Petits",
+      "role": "competitor",
+      "handle": "chezlespetits_by_geahchan",
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:48:52.614Z",
+      "summary": {
+        "postCount": 50,
+        "avgEngagement": 3,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 5.3
+      },
+      "contentThemes": [
+        {
+          "theme": "Product Showcase",
+          "count": 50
+        },
+        {
+          "theme": "Promotional",
+          "count": 9
+        },
+        {
+          "theme": "Seasonal",
+          "count": 7
+        },
+        {
+          "theme": "Lifestyle",
+          "count": 2
+        }
+      ],
+      "topHashtags": [
+        {
+          "tag": "#chezlespetits",
+          "count": 50
+        },
+        {
+          "tag": "#gebrangeahchan",
+          "count": 50
+        },
+        {
+          "tag": "#pegperego",
+          "count": 41
+        },
+        {
+          "tag": "#carseat",
+          "count": 23
+        },
+        {
+          "tag": "#madeinitaly",
+          "count": 21
+        },
+        {
+          "tag": "#PEG",
+          "count": 20
+        },
+        {
+          "tag": "#babycarseat",
+          "count": 15
+        },
+        {
+          "tag": "#highchair",
+          "count": 14
+        },
+        {
+          "tag": "#babyhighchair",
+          "count": 14
+        },
+        {
+          "tag": "#babychair",
+          "count": 14
+        },
+        {
+          "tag": "#babyaccessories",
+          "count": 13
+        },
+        {
+          "tag": "#stroller",
+          "count": 12
+        },
+        {
+          "tag": "#strollers",
+          "count": 12
+        },
+        {
+          "tag": "#travelsystem",
+          "count": 9
+        },
+        {
+          "tag": "#babystroller",
+          "count": 9
+        },
+        {
+          "tag": "#carseats",
+          "count": 9
+        },
+        {
+          "tag": "#babycarseats",
+          "count": 9
+        },
+        {
+          "tag": "#siegeauto",
+          "count": 9
+        },
+        {
+          "tag": "#newbornhighchair",
+          "count": 7
+        },
+        {
+          "tag": "#feedingchair",
+          "count": 7
+        }
+      ],
+      "recentPosts": [
+        {
+          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Wonder Grey Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9",
+          "likes": 1,
+          "comments": 0,
+          "timestamp": "2026-03-10T22:37:49.000Z"
+        },
+        {
+          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Licorice Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – ",
+          "likes": 1,
+          "comments": 0,
+          "timestamp": "2026-03-10T22:36:02.000Z"
+        },
+        {
+          "caption": "Peg Perego’s Vivace travel system, made in Italy!\n\nWhat fun it is to zip around and explore the city together. The Vivace SLK Travel System is your pe",
+          "likes": 1,
+          "comments": 0,
+          "timestamp": "2026-02-21T10:19:22.000Z"
+        },
+        {
+          "caption": "Stay Safe & Shop Online! We Deliver ALL Over Lebanon!\n\n•Visit or Call our Shop:\n01482369 (Sin el Fil)\n09636017 (Maameltein)\n\n•Order on WhatsApp:\n70217",
+          "likes": 2,
+          "comments": 0,
+          "timestamp": "2026-03-06T18:12:02.000Z"
+        },
+        {
+          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Forest Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat",
+          "likes": 1,
+          "comments": 0,
+          "timestamp": "2026-03-11T10:38:28.000Z"
+        }
+      ],
+      "monthlyTrend": [
+        {
+          "month": "2025-12",
+          "avgEngagement": 6,
+          "postCount": 3
+        },
+        {
+          "month": "2026-01",
+          "avgEngagement": 4,
+          "postCount": 24
+        },
+        {
+          "month": "2026-02",
+          "avgEngagement": 2,
+          "postCount": 13
+        },
+        {
+          "month": "2026-03",
+          "avgEngagement": 1,
+          "postCount": 10
+        }
+      ],
+      "contentGaps": [],
+      "error": null,
+      "partialData": false
+    },
+    {
+      "id": "wild-willy-toys",
+      "name": "Wild Willy Toys",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:50:11.194Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": [],
+      "error": "Could not detect Instagram handle",
+      "partialData": true
+    },
+    {
+      "id": "the-toy-store-lb",
+      "name": "The Toy Store LB",
+      "role": "competitor",
+      "handle": "thetoystorelb",
+      "platform": "instagram",
+      "scrapedAt": "2026-03-11T20:50:15.974Z",
+      "summary": {
+        "postCount": 50,
+        "avgEngagement": 15,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 6
+      },
+      "contentThemes": [
+        {
+          "theme": "Product Showcase",
+          "count": 19
+        },
+        {
+          "theme": "Behind the Scenes",
+          "count": 6
+        },
+        {
+          "theme": "Promotional",
+          "count": 5
+        },
+        {
+          "theme": "User Generated",
+          "count": 3
+        },
+        {
+          "theme": "Lifestyle",
+          "count": 2
+        },
+        {
+          "theme": "Brand Story",
+          "count": 1
+        }
+      ],
+      "topHashtags": [
+        {
+          "tag": "#TheToyStore",
+          "count": 7
+        },
+        {
+          "tag": "#thetoystore",
+          "count": 4
+        },
+        {
+          "tag": "#toyrotation",
+          "count": 3
+        },
+        {
+          "tag": "#Lebtivity",
+          "count": 3
+        },
+        {
+          "tag": "#learningthroughplay",
+          "count": 2
+        },
+        {
+          "tag": "#kidstoys",
+          "count": 2
+        },
+        {
+          "tag": "#fun",
+          "count": 2
+        },
+        {
+          "tag": "#Ramadan2026",
+          "count": 2
+        },
+        {
+          "tag": "#CopicoLive",
+          "count": 2
+        },
+        {
+          "tag": "#RamadanFun",
+          "count": 2
+        },
+        {
+          "tag": "#KidsShow",
+          "count": 2
+        },
+        {
+          "tag": "#PlayMore",
+          "count": 2
+        },
+        {
+          "tag": "#intentionalplay",
+          "count": 1
+        },
+        {
+          "tag": "#toddleractivities",
+          "count": 1
+        },
+        {
+          "tag": "#preschooltoys",
+          "count": 1
+        },
+        {
+          "tag": "#toys",
+          "count": 1
+        },
+        {
+          "tag": "#familyfun",
+          "count": 1
+        },
+        {
+          "tag": "#RamadanGifts",
+          "count": 1
+        },
+        {
+          "tag": "#RamadanActivities",
+          "count": 1
+        },
+        {
+          "tag": "#KidsGifts",
+          "count": 1
+        }
+      ],
+      "recentPosts": [
+        {
+          "caption": "Lebanon’s toy stores and play destinations are coming together to bring smiles back to displaced children.\nDonate a toy in good condition and make a c",
+          "likes": 74,
+          "comments": 3,
+          "timestamp": "2026-03-10T18:24:47.000Z"
+        },
+        {
+          "caption": "Operating with extra care to keep our customers and team safe. 💙\nThank you for your patience and support.\nHoping for safer, better days ahead. 🇱🇧🧸",
+          "likes": -1,
+          "comments": 0,
+          "timestamp": "2026-03-04T16:18:18.000Z"
+        },
+        {
+          "caption": "POV: You tried to punch the monkey…\nNow the whole squad pulled up 🐒👀",
+          "likes": -1,
+          "comments": 0,
+          "timestamp": "2026-02-24T10:07:02.000Z"
+        },
+        {
+          "caption": "Toy rotation هالأسبوع 🧺🤍\nكم لعبة جديدة، مختارة عن قصد،\nحتى يكون اللعب ممتع… ومفيد بنفس الوقت.\n\nI always prefer simple toys that grow with my kids,\na",
+          "likes": 13,
+          "comments": 0,
+          "timestamp": "2026-03-04T13:06:08.000Z"
+        },
+        {
+          "caption": "Your next best friend is waiting for you at The Toy Store! Come visit us and find your perfect match. 🎁\n#thetoystore #toys #kidstoys #familyfun #fun",
+          "likes": -1,
+          "comments": 0,
+          "timestamp": "2026-03-05T10:19:00.000Z"
+        }
+      ],
+      "monthlyTrend": [
+        {
+          "month": "2026-01",
+          "avgEngagement": 20,
+          "postCount": 18
+        },
+        {
+          "month": "2026-02",
+          "avgEngagement": 13,
+          "postCount": 24
+        },
+        {
+          "month": "2026-03",
+          "avgEngagement": 11,
+          "postCount": 8
+        }
+      ],
+      "contentGaps": [],
+      "error": null,
+      "partialData": false
+    }
+  ]
+}

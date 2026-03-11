@@ -1,0 +1,20 @@
+{
+  "slug": "demo-brand",
+  "name": "Demo Brand",
+  "url": "https://www.example.com",
+  "industry": "Women's Apparel",
+  "tagline": "Style for Every Chapter",
+  "positioning": "A mid-market women's fashion brand targeting professional women 35-55 with classic, versatile workwear.",
+  "brandArchetype": "The Caregiver",
+  "identifiedCompetitors": [
+    { "name": "Competitor A", "url": "https://www.competitor-a.com", "discoveredAt": "2026-01-01T00:00:00.000Z" },
+    { "name": "Competitor B", "url": "https://www.competitor-b.com", "discoveredAt": "2026-01-01T00:00:00.000Z" },
+    { "name": "Competitor C", "url": "https://www.competitor-c.com", "discoveredAt": "2026-01-01T00:00:00.000Z" }
+  ],
+  "social": {
+    "instagram": null,
+    "twitter": null
+  },
+  "discoveredAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z"
+}

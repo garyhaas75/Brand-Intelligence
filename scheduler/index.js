@@ -1,26 +1,24 @@
 /**
- * Anne Klein Intel — Scheduler
- * Runs all intelligence modules on a cron schedule.
+ * Brand Intelligence — Scheduler
+ * Runs analysis modules for all tracked brands on a cron schedule.
+ * Staggers pipeline per brand by 90s to avoid memory exhaustion.
  *
- * Schedule (all times local):
- *   Daily  6:00 AM  — Site scraper + product catalog + site analysis (Module 3)
- *   Daily  6:30 AM  — Social scraper (Module 2)
- *   Daily  7:00 AM  — SEO / GSC keywords (Module 4)
- *   Daily  7:30 AM  — Check email inbox (Module 6)
- *   Daily  8:00 AM  — Analyze inbox + generate content (Modules 6b + 5)
- *   Weekly Mon 8:30 — Agentic search visibility (Module 7, expensive — API calls per query)
- *
- * Run with: node scheduler/index.js
- * Or add to npm start via concurrently.
+ * Schedule:
+ *   Daily  6:00 AM  — Website audit + competitive analysis for all brands
+ *   Daily  7:00 AM  — Social audit for all brands
+ *   Weekly Mon 8:00 — Search/SEO + GEO for all brands (API-intensive)
+ *   Monthly 1st 9:00 — Personas refresh for all brands
+ *   Monthly 1st 10:00 — Action plan refresh for all brands
  */
 
 require('dotenv').config();
 const cron = require('node-cron');
-const { execSync } = require('child_process');
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 const LOG_FILE = path.join(__dirname, '../logs/scheduler.log');
+const BRANDS_FILE = path.join(__dirname, '../data/brands.json');
 
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}`;
@@ -33,76 +31,77 @@ function ensureLogs() {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-function run(label, command) {
-  log(`START  ${label}`);
-  try {
-    execSync(command, { cwd: path.join(__dirname, '..'), stdio: 'inherit', timeout: 10 * 60 * 1000 });
-    log(`DONE   ${label}`);
-  } catch (err) {
-    log(`ERROR  ${label}: ${err.message}`);
-  }
+function loadBrands() {
+  try { return JSON.parse(fs.readFileSync(BRANDS_FILE, 'utf8')).brands || []; }
+  catch { return []; }
+}
+
+/**
+ * Spawn a module for each brand, staggered by delayMs per brand.
+ * @param {string} script - relative path to analysis script
+ * @param {number} delayMs - milliseconds to stagger between brands
+ */
+function runForAllBrands(script, delayMs = 90000) {
+  const brands = loadBrands();
+  if (brands.length === 0) { log(`No brands to process for ${script}`); return; }
+
+  log(`Running ${script} for ${brands.length} brand(s) (staggered by ${delayMs / 1000}s)`);
+
+  brands.forEach((brand, i) => {
+    setTimeout(() => {
+      log(`  Spawning ${script} for ${brand.name} (${brand.slug})`);
+      const child = spawn('node', [path.join(__dirname, '..', script), `--slug=${brand.slug}`], {
+        env: { ...process.env },
+        cwd: path.join(__dirname, '..'),
+        detached: true,
+        stdio: 'ignore',
+      });
+      child.unref();
+    }, i * delayMs);
+  });
 }
 
 ensureLogs();
-log('=== Scheduler started ===');
+log('=== Brand Intelligence Scheduler started ===');
 
-// Price tracker: AK sale events + competitor promos — runs daily (free, Shopify API only)
-cron.schedule('0 5 * * *', () => {
-  log('--- Price Tracker ---');
-  run('price_tracker', 'node scrapers/price_tracker.js');
-});
-
-// Module 3: site scrape + product catalog + site analysis
+// Daily 6:00 AM — Website audit + competitive analysis
 cron.schedule('0 6 * * *', () => {
-  log('--- Module 3: Site + Products + Analysis ---');
-  run('site_scraper',    'node scrapers/site_scraper.js');
-  run('product_scraper', 'node scrapers/product_scraper.js');
-  run('site_analysis',   'node analysis/site_analysis.js');
+  log('--- Daily: Website Audit ---');
+  runForAllBrands('analysis/website_audit.js', 90000);
+  // Competitive analysis 30 min later (depends on fresh site scrapes)
+  setTimeout(() => {
+    log('--- Daily: Competitive Analysis ---');
+    runForAllBrands('analysis/competitive_analysis.js', 90000);
+  }, 30 * 60 * 1000);
 });
 
-// Module 2: social scraper
-cron.schedule('30 6 * * *', () => {
-  log('--- Module 2: Social ---');
-  run('social_scraper', 'node scrapers/social_scraper.js');
-});
-
-// Module 4: SEO / GSC
+// Daily 7:00 AM — Social audit
 cron.schedule('0 7 * * *', () => {
-  log('--- Module 4: SEO/GSC ---');
-  run('gsc_keywords', 'node seo/gsc_keywords.js');
+  log('--- Daily: Social Audit ---');
+  runForAllBrands('analysis/social_audit.js', 120000); // 2min stagger (Apify rate limits)
 });
 
-// Module 6: check inbox
-cron.schedule('30 7 * * *', () => {
-  log('--- Module 6: Check Inbox ---');
-  run('check_inbox', 'node email/check_inbox.js');
+// Weekly Monday 8:00 AM — Search/SEO + GEO (Playwright + Claude API — slower)
+cron.schedule('0 8 * * 1', () => {
+  log('--- Weekly: Search & SEO / GEO ---');
+  runForAllBrands('analysis/search_seo.js', 180000); // 3min stagger
 });
 
-// Module 6b + 5: analyze inbox + generate content
-cron.schedule('0 8 * * *', () => {
-  log('--- Module 6b + 5: Analyze Inbox + Content ---');
-  run('analyze_inbox',     'node email/analyze_inbox.js');
-  run('content_generator', 'node analysis/content_generator.js');
-});
-
-// Module 7: agentic search — weekly (Monday 8:30 AM) to conserve API budget
-cron.schedule('30 8 * * 1', () => {
-  log('--- Module 7: Agentic Search Visibility ---');
-  run('agentic_search', 'node analysis/agentic_search.js');
-});
-
-// Module 8: customer personas — 1st of month (data-intensive, no need more often)
+// Monthly 1st 9:00 AM — Personas refresh
 cron.schedule('0 9 1 * *', () => {
-  log('--- Module 8: Customer Personas ---');
-  run('personas', 'node analysis/personas.js');
+  log('--- Monthly: Personas ---');
+  runForAllBrands('analysis/personas.js', 90000);
+});
+
+// Monthly 1st 10:00 AM — Action plan refresh (depends on all others being fresh)
+cron.schedule('0 10 1 * *', () => {
+  log('--- Monthly: Action Plan ---');
+  runForAllBrands('analysis/action_plan.js', 90000);
 });
 
 log('Cron jobs registered. Waiting...');
-log('  Daily  05:00  Price Tracker — AK sales + competitor promos (free)');
-log('  Daily  06:00  Module 3  — Site + Products + Analysis');
-log('  Daily  06:30  Module 2  — Social');
-log('  Daily  07:00  Module 4  — SEO/GSC');
-log('  Daily  07:30  Module 6  — Check Inbox');
-log('  Daily  08:00  Module 6b+5 — Analyze + Content');
-log('  Weekly Mon 08:30  Module 7  — AI Search Visibility');
-log('  Monthly 1st 09:00  Module 8  — Customer Personas');
+log('  Daily  06:00  Website Audit + Competitive Analysis (all brands)');
+log('  Daily  07:00  Social Audit (all brands)');
+log('  Weekly Mon 08:00  Search & SEO / GEO (all brands)');
+log('  Monthly 1st 09:00  Personas refresh (all brands)');
+log('  Monthly 1st 10:00  Action Plan refresh (all brands)');

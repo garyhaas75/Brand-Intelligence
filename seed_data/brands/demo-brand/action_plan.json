@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "brandSlug": "demo-brand",
+  "executiveSummary": "This is a demo brand. Add a real brand URL using the 'Add Brand' button to begin the discovery and analysis pipeline. Once all modules have run, this Action Plan will be automatically populated with an AI-generated executive summary, prioritized immediate wins, and a 30/60/90 day roadmap.",
+  "immediateWins": [
+    {
+      "rank": 1,
+      "title": "Add Your First Brand",
+      "description": "Click 'Add Brand' in the header, enter a brand website URL, and let the discovery pipeline run. All 7 analysis modules will execute automatically.",
+      "effort": "low",
+      "impact": "high",
+      "sourceModule": "portfolio"
+    }
+  ],
+  "roadmap": {
+    "day30": [{ "action": "Complete brand discovery and review identified competitors", "owner": "Brand Manager", "metric": "All 7 modules completed" }],
+    "day60": [{ "action": "Review personas and social audit findings", "owner": "Marketing Team", "metric": "Persona chat sessions completed" }],
+    "day90": [{ "action": "Prioritize top 5 action items from this Action Plan", "owner": "Leadership", "metric": "Action items assigned with owners" }]
+  },
+  "competitiveGapsToClose": [],
+  "opportunitiesRanked": [
+    { "rank": 1, "opportunity": "Run full brand discovery pipeline", "rationale": "No real brand data exists yet — add a brand to populate this section", "estimatedImpact": "High" }
+  ]
+}
