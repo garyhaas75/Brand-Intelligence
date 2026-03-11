@@ -276,13 +276,13 @@ async function ensureTaxonomyDefinitionsEnabled() {
   for (const key of TAXONOMY_SHOPIFY_KEYS) {
     try {
       // First attempt: namespace + key (cleaner, no hardcoded IDs)
+      // NOTE: taxonomy attribute definitions (constrained) do NOT support pin:true — omit it.
       const data = await shopifyGraphQL(`
         mutation enableDef($key: String!, $namespace: String!) {
           standardMetafieldDefinitionEnable(
             key: $key
             namespace: $namespace
             ownerType: PRODUCT
-            pin: true
           ) {
             createdDefinition { id name key namespace }
             userErrors { field message code }
@@ -324,7 +324,6 @@ async function ensureTaxonomyDefinitionsEnabled() {
           standardMetafieldDefinitionEnable(
             id: $id
             ownerType: PRODUCT
-            pin: true
           ) {
             createdDefinition { id name key namespace }
             userErrors { field message code }
@@ -575,10 +574,22 @@ async function pushCategoryMetafields(productGid, suggested) {
   return { ok: true, count: metafields.length };
 }
 
-// GEO metafield keys — JSON type, custom namespace.
-// These populate the AI/GEO product discovery metafields for Shopify Semantic Search,
-// Shop app, Google Shopping AI (UCP), and ChatGPT product feeds (ACP).
-const GEO_FIELD_KEYS = ['why_it_works', 'compatibility', 'care_notes', 'fit_logic', 'customer_qa', 'use_cases'];
+// GEO metafield mapping: our analyzed JSON key → actual Shopify custom.* definition key.
+// Our seo_suggestions.json stores data under 'fit_logic' and 'customer_qa' but the Shopify
+// Admin definitions were created with different auto-generated keys (confirmed via diagnose.js).
+const GEO_FIELD_KEYS = [
+  'why_it_works',   // custom.why_it_works  "GEO - Why it works"
+  'compatibility',  // custom.compatibility "GEO - Compatibility"
+  'care_notes',     // custom.care_notes    "GEO - Care Notes"
+  'fit_logic',      // stored as fit_logic in our JSON
+  'customer_qa',    // stored as customer_qa in our JSON
+  'use_cases',      // custom.use_cases     "GEO - Use Cases"
+];
+// Map from our internal JSON keys → Shopify definition keys (where they differ)
+const GEO_KEY_MAP = {
+  fit_logic:   'fit_guidance',   // Shopify definition key for "GEO - Fit Logic"
+  customer_qa: 'buyer_questions', // Shopify definition key for "GEO - Customer Q&A"
+};
 
 // Push GEO JSON metafields (custom.why_it_works, custom.compatibility, etc.).
 // Non-blocking — logs warnings on error, never throws.
@@ -592,12 +603,13 @@ async function pushGeoMetafields(productGid, suggested) {
     if (typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length === 0) { log(`    GEO skip ${key}: empty object {}`); continue; }
     if (Array.isArray(val) && val.length === 0) { log(`    GEO skip ${key}: empty array []`); continue; }
     // Log the actual value being pushed (truncated) for diagnostics
+    const shopifyKey = GEO_KEY_MAP[key] || key;
     const preview = JSON.stringify(val).slice(0, 120);
-    log(`    GEO push ${key}: ${preview}${preview.length >= 120 ? '…' : ''}`);
+    log(`    GEO push ${key}${shopifyKey !== key ? ` → custom.${shopifyKey}` : ''}: ${preview}${preview.length >= 120 ? '…' : ''}`);
     metafields.push({
       ownerId: productGid,
       namespace: 'custom',
-      key,
+      key: shopifyKey,
       type: 'json',
       value: JSON.stringify(val),
     });
