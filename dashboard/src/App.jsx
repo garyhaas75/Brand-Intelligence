@@ -1125,12 +1125,88 @@ const KW_CATEGORIES = [
   { key: 'aiDiscoveryQueries', label: 'AI Queries' },
 ]
 
+function computePageSeoScore(seoPage, brandName) {
+  const signals = []
+  let totalScore = 0
+  const seo = seoPage || {}
+  // Title tag (25 pts) — detect brand-name-only vs genuinely short vs good
+  if (!seo.titleTag) {
+    signals.push({ field: 'Title Tag', value: '—', pts: 0, max: 25, status: 'fail', rec: 'No title tag at all — this is the headline Google shows in search results. Without it Google guesses, often using random text. Add a 50–60 character title describing what you sell and where.' })
+  } else {
+    const bn = (brandName || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
+    const tl = seo.titleTag.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
+    const isBrandOnly = seo.titleTag.length < 35 && bn && tl === bn
+    if (isBrandOnly) {
+      totalScore += 10
+      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: `Your title just says the brand name — shoppers who don't already know you will scroll past. Add what you sell and where: e.g. "${seo.titleTag} Lebanon | Toys, LEGO, Barbie & More"` })
+    } else if (seo.titleTag.length < 30) {
+      totalScore += 5
+      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 5, max: 25, status: 'warn', rec: `Title is too short (${seo.titleTag.length} chars) — aim for 50–60 characters that describe what you sell and where you operate` })
+    } else if (seo.titleTag.length <= 60) {
+      totalScore += 25
+      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 25, max: 25, status: 'pass', rec: '' })
+    } else {
+      totalScore += 15
+      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 15, max: 25, status: 'warn', rec: `Title is too long (${seo.titleTag.length} chars) — Google cuts it off at around 60 characters in search results, hiding key info from shoppers` })
+    }
+  }
+  // Meta description (20 pts)
+  if (!seo.metaDescription) {
+    signals.push({ field: 'Meta Description', value: '—', pts: 0, max: 20, status: 'fail', rec: 'No meta description — this is the text snippet under your link in Google results. Without it, Google picks random body text, which looks unprofessional and gets fewer clicks. Write 140–160 characters that make people want to visit.' })
+  } else if (seo.metaDescription.length < 120) {
+    totalScore += 10
+    signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 10, max: 20, status: 'warn', rec: `Too short (${seo.metaDescription.length} chars) — aim for 140–160 characters so Google shows your full message` })
+  } else if (seo.metaDescription.length <= 160) {
+    totalScore += 20
+    signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 20, max: 20, status: 'pass', rec: '' })
+  } else {
+    totalScore += 12
+    signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 12, max: 20, status: 'warn', rec: `Too long (${seo.metaDescription.length} chars) — Google will cut it off; trim to 160 characters` })
+  }
+  // H1 (20 pts)
+  if (!seo.h1) {
+    signals.push({ field: 'H1 Heading', value: '—', pts: 0, max: 20, status: 'fail', rec: 'No H1 heading — every page should have one main headline containing your key topic. Search engines use it to understand what the page is about; missing it wastes a prime ranking opportunity.' })
+  } else {
+    totalScore += 20
+    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 20, max: 20, status: 'pass', rec: '' })
+  }
+  // Canonical (10 pts)
+  if (!seo.canonicalTag) {
+    totalScore += 5
+    signals.push({ field: 'Canonical Tag', value: '—', pts: 5, max: 10, status: 'warn', rec: 'No canonical tag — when Google finds the same product at multiple URLs (e.g. with filters or sorting applied), it splits your ranking power across duplicates. One line of code tells Google which version to credit.' })
+  } else {
+    totalScore += 10
+    signals.push({ field: 'Canonical Tag', value: seo.canonicalTag.slice(0, 60), pts: 10, max: 10, status: 'pass', rec: '' })
+  }
+  // Schema (15 pts)
+  const hasRichSchema = seo.schemaMarkup?.some(s => /product|offer|breadcrumb|itemlist|faq/i.test(s))
+  if (!seo.schemaMarkup?.length) {
+    signals.push({ field: 'Schema Markup', value: 'None', pts: 0, max: 15, status: 'fail', rec: 'No structured data — adding product and organization markup helps Google display star ratings, prices, and breadcrumbs directly in search results, increasing click-through rate without any extra ad spend.' })
+  } else if (!hasRichSchema) {
+    totalScore += 8
+    signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 8, max: 15, status: 'warn', rec: 'Only basic markup present — adding product schema lets Google show prices and availability directly in search results ("rich results"), which can significantly increase clicks compared to plain text results.' })
+  } else {
+    totalScore += 15
+    signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 15, max: 15, status: 'pass', rec: '' })
+  }
+  // Page speed (10 pts)
+  const speedPts = { fast: 10, medium: 5, slow: 0 }[seo.pageSpeedSignal] ?? 3
+  totalScore += speedPts
+  if (speedPts < 10) {
+    signals.push({ field: 'Page Speed', value: seo.pageSpeedSignal || 'unknown', pts: speedPts, max: 10, status: speedPts === 0 ? 'fail' : 'warn', rec: seo.pageSpeedSignal === 'slow' ? 'Page loads slowly — Google uses speed as a direct ranking factor, especially on mobile. Every second of delay loses roughly 7% of visitors before they even see your products.' : 'Medium speed — consider image compression and reducing JavaScript to improve rankings and reduce bounce rate.' })
+  } else {
+    signals.push({ field: 'Page Speed', value: 'fast', pts: 10, max: 10, status: 'pass', rec: '' })
+  }
+  return { totalScore, signals }
+}
+
 function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
   const [view, setView] = useState('seo')
   const [kwCat, setKwCat] = useState('brandTerms')
   const [geoAgent, setGeoAgent] = useState('claude')
+  const [expandedPage, setExpandedPage] = useState(null)
 
   useEffect(() => {
     if (!slug) return
@@ -1162,51 +1238,47 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
       </div>
 
       {view === 'seo' && (() => {
-        // Compute SEO health score from on-page signals
-        const signals = []
-        let totalScore = 0
-        // Title tag (25 pts)
-        if (!seo.titleTag) { signals.push({ field: 'Title Tag', value: '—', pts: 0, max: 25, status: 'fail', rec: 'Missing — add a descriptive 50–60 character title tag' }) }
-        else if (seo.titleTag.length < 30) { totalScore += 10; signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: `Too short (${seo.titleTag.length} chars) — aim for 50–60 characters` }) }
-        else if (seo.titleTag.length <= 60) { totalScore += 25; signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 25, max: 25, status: 'pass', rec: '' }) }
-        else { totalScore += 15; signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 15, max: 25, status: 'warn', rec: `Too long (${seo.titleTag.length} chars) — gets truncated in search results` }) }
-        // Meta description (20 pts)
-        if (!seo.metaDescription) { signals.push({ field: 'Meta Description', value: '—', pts: 0, max: 20, status: 'fail', rec: 'Missing — Google will auto-generate one, usually poorly' }) }
-        else if (seo.metaDescription.length < 120) { totalScore += 10; signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 10, max: 20, status: 'warn', rec: `Too short (${seo.metaDescription.length} chars) — aim for 140–160` }) }
-        else if (seo.metaDescription.length <= 160) { totalScore += 20; signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 20, max: 20, status: 'pass', rec: '' }) }
-        else { totalScore += 12; signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 12, max: 20, status: 'warn', rec: `Too long (${seo.metaDescription.length} chars) — will be truncated` }) }
-        // H1 (20 pts)
-        if (!seo.h1) { signals.push({ field: 'H1 Heading', value: '—', pts: 0, max: 20, status: 'fail', rec: 'Missing — every page should have exactly one H1 with target keywords' }) }
-        else { totalScore += 20; signals.push({ field: 'H1 Heading', value: seo.h1, pts: 20, max: 20, status: 'pass', rec: '' }) }
-        // Canonical (10 pts)
-        if (!seo.canonicalTag) { totalScore += 5; signals.push({ field: 'Canonical Tag', value: '—', pts: 5, max: 10, status: 'warn', rec: 'Not set — risk of duplicate content penalties' }) }
-        else { totalScore += 10; signals.push({ field: 'Canonical Tag', value: seo.canonicalTag.slice(0, 60), pts: 10, max: 10, status: 'pass', rec: '' }) }
-        // Schema (15 pts)
-        const hasRichSchema = seo.schemaMarkup?.some(s => /product|offer|breadcrumb|itemlist|faq/i.test(s))
-        const hasBasicSchema = seo.schemaMarkup?.some(s => /organization|website/i.test(s))
-        if (!seo.schemaMarkup?.length) { signals.push({ field: 'Schema Markup', value: 'None', pts: 0, max: 15, status: 'fail', rec: 'Add Organization, Product, and BreadcrumbList schema for rich results' }) }
-        else if (!hasRichSchema) { totalScore += 8; signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 8, max: 15, status: 'warn', rec: 'Only basic schema — add Product, BreadcrumbList, or FAQ for rich results' }) }
-        else { totalScore += 15; signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 15, max: 15, status: 'pass', rec: '' }) }
-        // Page speed (10 pts)
-        const speedPts = { fast: 10, medium: 5, slow: 0 }[seo.pageSpeedSignal] ?? 3
-        totalScore += speedPts
-        if (speedPts < 10) { signals.push({ field: 'Page Speed', value: seo.pageSpeedSignal || 'unknown', pts: speedPts, max: 10, status: speedPts === 0 ? 'fail' : 'warn', rec: seo.pageSpeedSignal === 'slow' ? 'Slow load time — major ranking factor; optimize images and JS bundles' : 'Medium — consider further performance optimization' }) }
-        else { signals.push({ field: 'Page Speed', value: 'fast', pts: 10, max: 10, status: 'pass', rec: '' }) }
-
+        const brandName = data.brandName || data.brandSlug?.replace(/-/g, ' ') || ''
+        const { totalScore, signals } = computePageSeoScore(seo, brandName)
         const scoreColor = totalScore >= 75 ? '#059669' : totalScore >= 50 ? '#d97706' : '#dc2626'
-        const scoreBg = totalScore >= 75 ? '#d1fae5' : totalScore >= 50 ? '#fef3c7' : '#fee2e2'
+
+        const pageTypeColor = { homepage: 'purple', category: 'blue', product: 'green' }
+        const pageTypeLabel = { homepage: 'Homepage', category: 'Category Page', product: 'Product Page' }
 
         return (
           <div>
+
+            {/* ── Priority Actions ── */}
+            {data.priorityActions?.length > 0 && (
+              <Card style={{ marginBottom: 20, borderLeft: '4px solid #6366f1' }}>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Priority Actions</h3>
+                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>Ranked by business impact across all SEO signals — homepage, category pages, product pages, sitemap, and competitor comparison.</p>
+                {data.priorityActions.map((action, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 16, marginBottom: 16, borderBottom: i < data.priorityActions.length - 1 ? `1px solid ${T.border}` : 'none' }}>
+                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: T.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: T.accent, flexShrink: 0 }}>{action.rank}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <ImpactBadge impact={(action.impact || 'medium').toLowerCase()} />
+                        <span style={{ fontSize: 11, color: T.textMuted, background: T.surfaceAlt, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>{action.effort || '—'}</span>
+                      </div>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 4 }}>{action.action}</p>
+                      <p style={{ fontSize: 12, color: T.textMuted, lineHeight: 1.6 }}>{action.why}</p>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            )}
+
+            {/* ── Homepage SEO Health Score ── */}
             <Card style={{ marginBottom: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginBottom: 24 }}>
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>SEO Health Score</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Homepage SEO Score</p>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                     <span style={{ fontSize: 52, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>{totalScore}</span>
                     <span style={{ fontSize: 20, color: T.textMuted, fontWeight: 400 }}>/100</span>
                   </div>
-                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Based on on-page technical signals</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Based on 6 on-page signals</p>
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Issues to Fix</p>
@@ -1221,11 +1293,10 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   }
                 </div>
               </div>
-
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ background: T.surfaceAlt }}>
-                    {['Signal', 'Current Value', 'Score', 'Recommendation'].map(h => (
+                    {['Signal', 'Current Value', 'Score', 'What This Means'].map(h => (
                       <th key={h} style={{ padding: '8px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
                     ))}
                   </tr>
@@ -1234,21 +1305,108 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   {signals.map((s, i) => (
                     <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
                       <td style={{ padding: '10px 14px', fontWeight: 600, color: T.text }}>{s.field}</td>
-                      <td style={{ padding: '10px 14px', color: s.value === '—' ? T.textFaint : T.textSub, maxWidth: 220, wordBreak: 'break-word', fontStyle: s.value === '—' ? 'italic' : 'normal' }}>{s.value.length > 70 ? s.value.slice(0, 70) + '…' : s.value}</td>
+                      <td style={{ padding: '10px 14px', color: s.value === '—' ? T.textFaint : T.textSub, maxWidth: 200, wordBreak: 'break-word', fontStyle: s.value === '—' ? 'italic' : 'normal' }}>{s.value.length > 70 ? s.value.slice(0, 70) + '…' : s.value}</td>
                       <td style={{ padding: '10px 14px' }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, background: s.status === 'pass' ? '#d1fae5' : s.status === 'warn' ? '#fef3c7' : '#fee2e2', color: s.status === 'pass' ? '#059669' : s.status === 'warn' ? '#d97706' : '#dc2626', padding: '3px 10px', borderRadius: 12 }}>
-                          {s.pts}/{s.max}
-                        </span>
+                        <span style={{ fontSize: 12, fontWeight: 700, background: s.status === 'pass' ? '#d1fae5' : s.status === 'warn' ? '#fef3c7' : '#fee2e2', color: s.status === 'pass' ? '#059669' : s.status === 'warn' ? '#d97706' : '#dc2626', padding: '3px 10px', borderRadius: 12 }}>{s.pts}/{s.max}</span>
                       </td>
-                      <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12 }}>{s.rec || '—'}</td>
+                      <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12, lineHeight: 1.5 }}>{s.rec || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </Card>
 
+            {/* ── Multi-Page Analysis ── */}
+            {data.pageAnalyses?.length > 1 && (
+              <Card style={{ marginBottom: 20 }}>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Multi-Page SEO Analysis</h3>
+                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>
+                  We checked your homepage, category pages, and product pages. Issues appearing across multiple page types signal a site-wide problem, not just a homepage fix.
+                </p>
+                {data.pageAnalyses.map((page, i) => {
+                  const { totalScore: pgScore } = computePageSeoScore(page, brandName)
+                  const pgColor = pgScore >= 75 ? 'green' : pgScore >= 50 ? 'yellow' : 'red'
+                  const isOpen = expandedPage === i
+                  const { signals: pgSignals } = computePageSeoScore(page, brandName)
+                  const shortUrl = (page.url || '').replace(/^https?:\/\/[^/]+/, '').slice(0, 55) || '/'
+                  return (
+                    <div key={i} style={{ borderTop: `1px solid ${T.border}`, paddingTop: 12, marginTop: 12 }}>
+                      <button onClick={() => setExpandedPage(isOpen ? null : i)}
+                        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                        <Badge label={pageTypeLabel[page.pageType] || page.pageType} color={pageTypeColor[page.pageType] || 'gray'} />
+                        <span style={{ flex: 1, fontSize: 13, color: T.textSub, fontFamily: 'monospace' }}>{shortUrl || '/'}</span>
+                        {page.error ? <Badge label="Could not scrape" color="gray" /> : <Badge label={`${pgScore}/100`} color={pgColor} />}
+                        <span style={{ color: T.textFaint, fontSize: 12, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
+                      </button>
+                      {isOpen && (
+                        <div style={{ marginTop: 12 }}>
+                          {page.error
+                            ? <p style={{ fontSize: 13, color: T.textMuted, fontStyle: 'italic', padding: '8px 0' }}>Could not scrape this page — it may be JavaScript-rendered or bot-protected. Search engines may see the same empty content.</p>
+                            : (
+                              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                                <thead>
+                                  <tr style={{ background: T.surfaceAlt }}>
+                                    {['Signal', 'Value', 'Score', 'Recommendation'].map(h => (
+                                      <th key={h} style={{ padding: '6px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {pgSignals.map((s, j) => (
+                                    <tr key={j} style={{ borderTop: `1px solid ${T.border}` }}>
+                                      <td style={{ padding: '8px 12px', fontWeight: 600, color: T.text, whiteSpace: 'nowrap' }}>{s.field}</td>
+                                      <td style={{ padding: '8px 12px', color: s.value === '—' ? T.textFaint : T.textSub, maxWidth: 180, wordBreak: 'break-word', fontStyle: s.value === '—' ? 'italic' : 'normal' }}>{s.value.length > 60 ? s.value.slice(0, 60) + '…' : s.value}</td>
+                                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                                        <span style={{ fontSize: 11, fontWeight: 700, background: s.status === 'pass' ? '#d1fae5' : s.status === 'warn' ? '#fef3c7' : '#fee2e2', color: s.status === 'pass' ? '#059669' : s.status === 'warn' ? '#d97706' : '#dc2626', padding: '2px 8px', borderRadius: 12 }}>{s.pts}/{s.max}</span>
+                                      </td>
+                                      <td style={{ padding: '8px 12px', color: T.textMuted, lineHeight: 1.4 }}>{s.rec || '—'}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            )
+                          }
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </Card>
+            )}
+
+            {/* ── Sitemap Analysis ── */}
+            {data.sitemapAnalysis && (
+              <Card style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: data.sitemapAnalysis.issues?.length ? 16 : 0 }}>
+                  <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Sitemap</h3>
+                  <Badge label={data.sitemapAnalysis.found ? 'Found' : 'Missing'} color={data.sitemapAnalysis.found ? 'green' : 'red'} />
+                  {data.sitemapAnalysis.found && data.sitemapAnalysis.totalUrls > 0 && (
+                    <span style={{ fontSize: 12, color: T.textMuted }}>
+                      {data.sitemapAnalysis.totalUrls} URLs
+                      {data.sitemapAnalysis.byType?.product > 0 && ` · ${data.sitemapAnalysis.byType.product} products`}
+                      {data.sitemapAnalysis.byType?.collection > 0 && ` · ${data.sitemapAnalysis.byType.collection} categories`}
+                    </span>
+                  )}
+                </div>
+                {data.sitemapAnalysis.issues?.length > 0 && (
+                  <div>
+                    {data.sitemapAnalysis.issues.map((issue, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+                        <span style={{ color: data.sitemapAnalysis.found ? '#d97706' : '#dc2626', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{data.sitemapAnalysis.found ? '!' : '✗'}</span>
+                        <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>{issue}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {data.sitemapAnalysis.found && !data.sitemapAnalysis.issues?.length && (
+                  <p style={{ fontSize: 13, color: '#059669', marginTop: 4 }}>Sitemap looks healthy — all major URL types present and listed in robots.txt.</p>
+                )}
+              </Card>
+            )}
+
+            {/* ── Competitor SEO Comparison ── */}
             {data.competitors?.length > 0 && (
-              <Card>
+              <Card style={{ marginBottom: 20 }}>
                 <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Competitor SEO Comparison</h3>
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -1279,6 +1437,35 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                     </tbody>
                   </table>
                 </div>
+              </Card>
+            )}
+
+            {/* ── Competitor Benchmarks ── */}
+            {data.competitorBenchmarks?.length > 0 && (
+              <Card>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Where Competitors Outperform You</h3>
+                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>Real examples from your competitors showing what better SEO looks like — and what it costs you to fall behind.</p>
+                {data.competitorBenchmarks.map((b, i) => (
+                  <div key={i} style={{ paddingBottom: 20, marginBottom: 20, borderBottom: i < data.competitorBenchmarks.length - 1 ? `1px solid ${T.border}` : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                      <Badge label={b.signal} color="yellow" />
+                      <span style={{ fontSize: 12, color: T.textMuted }}>→</span>
+                      <Badge label={b.competitorName} color="blue" />
+                      <span style={{ fontSize: 12, color: T.textMuted }}>does this better</span>
+                    </div>
+                    <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6, marginBottom: 12 }}>{b.callout}</p>
+                    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                      <div>
+                        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 3 }}>Their Value</p>
+                        <p style={{ fontSize: 13, color: '#059669', fontWeight: 600 }}>{b.competitorValue || '—'}</p>
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 3 }}>Your Value</p>
+                        <p style={{ fontSize: 13, color: b.targetValue ? '#d97706' : '#dc2626', fontWeight: 600, fontStyle: b.targetValue ? 'normal' : 'italic' }}>{b.targetValue || 'Missing'}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </Card>
             )}
           </div>
