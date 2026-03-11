@@ -255,6 +255,18 @@ const TAXONOMY_SHOPIFY_KEYS = [
   'clasp-type',       // jewelry
 ];
 
+// Template IDs: TaxonomyAttribute GID numeric + 10000 (community-verified formula).
+// Used as fallback when namespace+key approach returns no result.
+const TAXONOMY_TEMPLATE_IDS = {
+  'fabric':             'gid://shopify/StandardMetafieldDefinitionTemplate/12777',
+  'neckline':           'gid://shopify/StandardMetafieldDefinitionTemplate/13243',
+  'sleeve-length-type': 'gid://shopify/StandardMetafieldDefinitionTemplate/13242',
+  'care-instructions':  'gid://shopify/StandardMetafieldDefinitionTemplate/12336',
+  'heel-style':         'gid://shopify/StandardMetafieldDefinitionTemplate/13267',
+  'stone-type':         'gid://shopify/StandardMetafieldDefinitionTemplate/15032',
+  'clasp-type':         'gid://shopify/StandardMetafieldDefinitionTemplate/10108',
+};
+
 // Enable store-level standard metafield definitions for Shopify taxonomy attribute keys.
 // Must be called once per run (before attempting to write values). Calling on an already-
 // enabled definition is a no-op (Shopify returns ALREADY_ENABLED or empty createdDefinition).
@@ -263,6 +275,7 @@ const TAXONOMY_SHOPIFY_KEYS = [
 async function ensureTaxonomyDefinitionsEnabled() {
   for (const key of TAXONOMY_SHOPIFY_KEYS) {
     try {
+      // First attempt: namespace + key (cleaner, no hardcoded IDs)
       const data = await shopifyGraphQL(`
         mutation enableDef($key: String!, $namespace: String!) {
           standardMetafieldDefinitionEnable(
@@ -286,15 +299,80 @@ async function ensureTaxonomyDefinitionsEnabled() {
       );
 
       if (def) {
-        log(`    Taxonomy definition enabled: shopify.${key}`);
-      } else if (alreadyEnabled || !errors.length) {
-        // Already enabled or silently succeeded — fine
+        log(`    enabled: shopify.${key} (${def.id})`);
+        continue;
+      } else if (alreadyEnabled) {
+        log(`    shopify.${key}: already enabled ✓`);
+        continue;
+      } else if (errors.length) {
+        log(`    WARN shopify.${key} (namespace+key attempt): ${errors.map(e => `[${e.code}] ${e.message}`).join('; ')}`);
       } else {
-        log(`    WARN enabling shopify.${key}: ${errors.map(e => `[${e.code}] ${e.message}`).join('; ')}`);
+        // No definition created and no errors — namespace+key approach may not work for this type.
+        // Try ID-based fallback.
+        log(`    shopify.${key}: namespace+key returned no result — trying template ID fallback`);
+      }
+
+      // Fallback: template ID approach
+      const templateId = TAXONOMY_TEMPLATE_IDS[key];
+      if (!templateId) {
+        log(`    WARN: no template ID for shopify.${key} — definition may need manual activation`);
+        continue;
+      }
+
+      const data2 = await shopifyGraphQL(`
+        mutation enableDefById($id: ID!) {
+          standardMetafieldDefinitionEnable(
+            id: $id
+            ownerType: PRODUCT
+            pin: true
+          ) {
+            createdDefinition { id name key namespace }
+            userErrors { field message code }
+          }
+        }
+      `, { id: templateId });
+
+      const errors2 = data2?.standardMetafieldDefinitionEnable?.userErrors || [];
+      const def2 = data2?.standardMetafieldDefinitionEnable?.createdDefinition;
+      const alreadyEnabled2 = errors2.some(e =>
+        e.code === 'ALREADY_ENABLED' ||
+        e.message?.toLowerCase().includes('already') ||
+        e.message?.toLowerCase().includes('exists')
+      );
+
+      if (def2) {
+        log(`    enabled (by ID): shopify.${key} (${def2.id})`);
+      } else if (alreadyEnabled2) {
+        log(`    shopify.${key}: already enabled ✓ (ID-based check)`);
+      } else if (errors2.length) {
+        log(`    WARN shopify.${key} (ID fallback): ${errors2.map(e => `[${e.code}] ${e.message}`).join('; ')}`);
+      } else {
+        log(`    shopify.${key}: ID fallback also returned no result — may need manual activation`);
       }
     } catch (err) {
       log(`    WARN: could not enable shopify.${key}: ${err.message}`);
     }
+  }
+}
+
+// Query and log all product metafield definitions in the store.
+// Reveals: (1) which shopify.* taxonomy attribute definitions exist, (2) actual custom.* keys
+// for GEO fields (so we can confirm fit_logic/customer_qa definition keys match our push keys).
+async function logMetafieldDefinitions() {
+  try {
+    const data = await shopifyGraphQL(`{
+      metafieldDefinitions(first: 100, ownerType: PRODUCT) {
+        edges { node { namespace key name type { name } } }
+      }
+    }`);
+    const defs = (data?.metafieldDefinitions?.edges || []).map(e => e.node);
+    const shopifyDefs = defs.filter(d => d.namespace === 'shopify').map(d => `${d.key}(${d.type.name})`);
+    const customDefs  = defs.filter(d => d.namespace === 'custom').map(d => `${d.key}→"${d.name}"`);
+    if (shopifyDefs.length) log(`  shopify.* defs: ${shopifyDefs.join(', ')}`);
+    else log(`  shopify.* defs: none found`);
+    if (customDefs.length) log(`  custom.* defs: ${customDefs.join(', ')}`);
+  } catch (err) {
+    log(`  WARN: could not query metafield definitions: ${err.message}`);
   }
 }
 
@@ -327,17 +405,32 @@ const SEO_FIELDS = new Set([
   'why_it_works', 'compatibility', 'care_notes', 'fit_logic', 'customer_qa', 'use_cases',
 ]);
 
-// Mapping from our analyzed field keys → Shopify shopify.* namespace category metafield keys.
-// Merchant metaobject fields (list.metaobject_reference) — from metaobject cache:
-//   material → 'material', closure_type → 'closure-type'
-// Taxonomy attribute fields (list.taxonomy_reference) — from taxonomy attribute cache:
-//   neckline, sleeve_length, care_instructions, fabric — populated when category GID is known
-const SHOPIFY_CATEGORY_FIELD_MAP = {
-  material:          'material',
-  closure_type:      'closure-type',
-  neckline:          'neckline',
-  sleeve_length:     'sleeve-length-type',
-  care_instructions: 'care-instructions',
+// Per-category field maps: our analyzed key → Shopify shopify.* namespace key.
+// Each category group uses different Shopify keys (footwear-material vs jewelry-material vs material).
+// Clothing has no explicit 'material' entry — fabric is resolved via material→fabric fallback below.
+const CATEGORY_FIELD_MAPS = {
+  clothing: {
+    closure_type:      'closure-type',
+    neckline:          'neckline',
+    sleeve_length:     'sleeve-length-type',
+    care_instructions: 'care-instructions',
+    // material → fabric handled by fallback logic in pushShopifyTaxonomyMetafields
+  },
+  shoes: {
+    material:          'footwear-material',   // shopify.footwear-material for shoes
+    closure_type:      'closure-type',
+    heel_style:        'heel-style',
+    toe_style:         'toe-style',
+  },
+  jewelry: {
+    material:          'jewelry-material',    // shopify.jewelry-material for jewelry
+    clasp_type:        'clasp-type',
+    stone_type:        'stone-type',
+  },
+  handbags: {
+    material:          'material',            // shopify.material for handbags
+    closure_type:      'closure-type',
+  },
 };
 
 // All product category groups that get Shopify taxonomy metafields pushed.
@@ -354,7 +447,7 @@ const CLOTHING_CATEGORY_GROUPS = new Set(['clothing', 'shoes', 'jewelry', 'handb
 // Confirmed actual values from live store diagnostic:
 //   age-group: "Adults" (NOT "Adult")
 //   target-gender: "Female" (NOT "Women")
-async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
+async function pushShopifyTaxonomyMetafields(productGid, suggested, cache, categoryGroup) {
   if (!cache || !Object.keys(cache).length) {
     log('    SKIP taxonomy metafields — metaobject cache unavailable');
     return { ok: true, count: 0 };
@@ -374,16 +467,32 @@ async function pushShopifyTaxonomyMetafields(productGid, suggested, cache) {
 
   // Analyzed taxonomy fields — Claude returned exact valid values (constrained during analysis).
   // Use getMetafieldType() to pick the correct type: taxonomy attributes use list.taxonomy_reference.
-  for (const [ourKey, shopifyKey] of Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)) {
+  const fieldMap = CATEGORY_FIELD_MAPS[categoryGroup] || {};
+  log(`    using field map for category group: ${categoryGroup || 'unknown'} (${Object.keys(fieldMap).length} field(s))`);
+
+  // Clothing: material is not in the field map (no shopify.material for clothing).
+  // Instead, try to push the analyzed material value via the taxonomy 'fabric' cache.
+  if (categoryGroup === 'clothing' && suggested.material && cache['fabric']) {
+    const fabricGid = resolveToGid(cache, 'fabric', String(suggested.material).trim());
+    if (fabricGid) {
+      const type = getMetafieldType(cache, 'fabric');
+      metafields.push({ ownerId: productGid, namespace: 'shopify', key: 'fabric', type, value: JSON.stringify([fabricGid]) });
+      log(`    clothing material "${suggested.material}" → shopify.fabric (${fabricGid})`);
+    } else {
+      log(`    WARN: material "${suggested.material}" not found in fabric taxonomy cache — skipped`);
+    }
+  }
+
+  for (const [ourKey, shopifyKey] of Object.entries(fieldMap)) {
     const val = suggested[ourKey];
     if (!val || typeof val !== 'string' || !val.trim()) continue;
 
     let gid = resolveToGid(cache, shopifyKey, val.trim());
     let resolvedKey = shopifyKey;
 
-    // Special case: 'material' in analyzed data maps to shopify 'material' (merchant metaobject).
-    // If the value isn't in the merchant metaobject cache (e.g. "Wool", "Cashmere" aren't merchant
-    // metaobjects), fall back to the taxonomy 'fabric' cache which has 48 fabric values.
+    // Special case: 'material' in analyzed data maps to a merchant metaobject key (footwear-material,
+    // jewelry-material, or material). If the value isn't in the merchant cache, fall back to the
+    // taxonomy 'fabric' cache which has 48 exact fabric values (Wool, Cashmere, Silk, etc.).
     if (!gid && ourKey === 'material' && cache['fabric']) {
       gid = resolveToGid(cache, 'fabric', val.trim());
       if (gid) {
@@ -540,9 +649,10 @@ async function pushProduct(product, metaCache) {
       log(`    custom metafields: ${catFields.map(f => `${f.key}="${f.value}"`).join(', ')}`);
     }
     if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup) && metaCache && Object.keys(metaCache).length) {
-      const taxFields = Object.entries(SHOPIFY_CATEGORY_FIELD_MAP)
+      const fieldMap = CATEGORY_FIELD_MAPS[categoryGroup] || {};
+      const taxFields = Object.entries(fieldMap)
         .map(([k, sk]) => `${sk}="${suggested[k] || '(none)'}"`).join(', ');
-      log(`    taxonomy metafields: age-group="Adults", target-gender="Female", ${taxFields}`);
+      log(`    taxonomy metafields: age-group="Adults", target-gender="Female"${taxFields ? ', ' + taxFields : ''}`);
     }
     const geoFields = GEO_FIELD_KEYS.filter(k => suggested[k]).map(k => `${k}=✓`).join(', ');
     if (geoFields) log(`    GEO metafields: ${geoFields}`);
@@ -585,7 +695,7 @@ async function pushProduct(product, metaCache) {
   // Only for clothing products. Uses list.metaobject_reference type with store-specific GIDs.
   if (CLOTHING_CATEGORY_GROUPS.has(categoryGroup)) {
     try {
-      const taxResult = await pushShopifyTaxonomyMetafields(productGid, suggested, metaCache);
+      const taxResult = await pushShopifyTaxonomyMetafields(productGid, suggested, metaCache, categoryGroup);
       if (taxResult.count > 0) log(`    taxonomy metafields: ${taxResult.count} pushed`);
     } catch (err) {
       log(`    WARN taxonomy metafields: ${err.message}`);
@@ -636,6 +746,8 @@ async function run() {
   if (!DRY_RUN) {
     log('Enabling Shopify taxonomy metafield definitions…');
     await ensureTaxonomyDefinitionsEnabled();
+    log('Querying store metafield definitions…');
+    await logMetafieldDefinitions();
   }
 
   // Per-category taxonomy caches — memoized by category GID to avoid redundant API calls.
