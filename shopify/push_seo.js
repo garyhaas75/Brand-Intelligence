@@ -405,7 +405,8 @@ async function pushGeoMetafields(productGid, suggested) {
   for (const key of GEO_FIELD_KEYS) {
     const val = suggested[key];
     if (val === null || val === undefined) continue;
-    // Skip empty objects {} and empty arrays [] — means Claude returned nothing useful
+    // Skip empty strings, empty objects {}, and empty arrays [] — means Claude returned nothing useful
+    if (typeof val === 'string' && !val.trim()) continue;
     if (typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length === 0) continue;
     if (Array.isArray(val) && val.length === 0) continue;
     metafields.push({

@@ -198,10 +198,13 @@ async function buildTaxonomyAttributeCache(categoryGid) {
     }
     const parentGid = prefix + segments.join('-');
 
+    // Query up to 50 siblings so we can find the exact matching category.
+    // first:1 returned the alphabetically-first sibling (e.g. Bolero Jackets) which may
+    // have different attributes than the product's actual category (e.g. Sport Jackets).
     const data = await shopifyGraphQL(`
       query TaxonomyParentChildren($parent: ID!) {
         taxonomy {
-          categories(first: 1, childrenOf: $parent) {
+          categories(first: 50, childrenOf: $parent) {
             edges {
               node {
                 id
@@ -237,8 +240,10 @@ async function buildTaxonomyAttributeCache(categoryGid) {
       return {};
     }
 
-    const repCategory = catEdges[0].node;
-    if (verbose) console.log(`[taxonomy_cache] Using attributes from: ${repCategory.name} (${repCategory.id})`);
+    // Prefer the exact category; fall back to first sibling only if not found.
+    const exactEdge = catEdges.find(e => e.node.id === categoryGid);
+    const repCategory = (exactEdge || catEdges[0]).node;
+    if (verbose) console.log(`[taxonomy_cache] Using attributes from: ${repCategory.name} (${repCategory.id})${exactEdge ? ' [exact match]' : ' [sibling fallback]'}`);
 
     const cache = {};
     const attrEdges = repCategory.attributes?.edges || [];
