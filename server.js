@@ -702,13 +702,17 @@ app.get('/api/proxy-image', async (req, res) => {
   const url = req.query.url;
   if (!url) return res.status(400).end();
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     const response = await fetch(url, {
+      signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://www.instagram.com/',
         'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
       },
     });
+    clearTimeout(timer);
     if (!response.ok) return res.status(response.status).end();
     const ct = response.headers.get('content-type') || 'image/jpeg';
     res.setHeader('Content-Type', ct);
