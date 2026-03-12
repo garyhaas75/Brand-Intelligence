@@ -322,11 +322,44 @@ function BrandProfileTab({ slug, onRefresh, running }) {
   const [saving, setSaving] = useState(false)
   const [newCompUrl, setNewCompUrl] = useState('')
   const [newCompName, setNewCompName] = useState('')
+  const [guidelines, setGuidelines] = useState(null)
+  const [guidelinesRunning, setGuidelinesRunning] = useState(false)
+  const [guidelinesLog, setGuidelinesLog] = useState([])
 
   useEffect(() => {
     if (!slug) return
     fetch(`${API}/brands/${slug}/profile`).then(r => r.json()).then(d => { setData(d); setForm(d) }).catch(() => {})
+    fetch(`${API}/brands/${slug}/brand_guidelines`).then(r => r.json()).then(setGuidelines).catch(() => {})
   }, [slug])
+
+  async function processStyleGuide() {
+    setGuidelinesRunning(true)
+    setGuidelinesLog([])
+    const resp = await fetch(`${API}/brands/${slug}/process_style_guide`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+    const reader = resp.body.getReader()
+    const decoder = new TextDecoder()
+    let buf = ''
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buf += decoder.decode(value, { stream: true })
+      const lines = buf.split('\n')
+      buf = lines.pop()
+      lines.forEach(line => {
+        if (line.startsWith('data: ')) {
+          const msg = line.slice(6)
+          if (msg.startsWith('__DONE__')) {
+            const exitOk = msg.includes('exit=0')
+            setGuidelinesRunning(false)
+            if (exitOk) fetch(`${API}/brands/${slug}/brand_guidelines`).then(r => r.json()).then(setGuidelines).catch(() => {})
+          } else {
+            setGuidelinesLog(prev => [...prev.slice(-20), msg])
+          }
+        }
+      })
+    }
+    setGuidelinesRunning(false)
+  }
 
   async function save() {
     setSaving(true)
@@ -503,6 +536,98 @@ function BrandProfileTab({ slug, onRefresh, running }) {
           <input placeholder="https://www.competitor.com" value={newCompUrl} onChange={e => setNewCompUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCompetitorAndReanalyze()} style={{ flex: 2, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
           <button onClick={addCompetitorAndReanalyze} disabled={!newCompName || !newCompUrl || running} style={{ background: running ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: (!newCompName || !newCompUrl || running) ? 'not-allowed' : 'pointer', opacity: (!newCompName || !newCompUrl || running) ? 0.5 : 1 }}>{running ? 'Running...' : 'Add & Re-analyze'}</button>
         </div>
+      </Card>
+
+      {/* ── Brand Guidelines ── */}
+      <Card style={{ marginTop: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Brand Guidelines</h3>
+            <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>Processed from your style guide PDF — informs all audit recommendations.</p>
+          </div>
+          <button onClick={processStyleGuide} disabled={guidelinesRunning} style={{ background: guidelinesRunning ? T.surfaceAlt : T.accent, color: guidelinesRunning ? T.textMuted : '#fff', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: guidelinesRunning ? 'not-allowed' : 'pointer' }}>
+            {guidelinesRunning ? 'Processing…' : guidelines ? 'Reprocess Style Guide' : 'Process Style Guide'}
+          </button>
+        </div>
+
+        {guidelinesLog.length > 0 && (
+          <div style={{ background: T.surfaceAlt, borderRadius: 8, padding: '10px 14px', marginBottom: 14, maxHeight: 140, overflowY: 'auto', fontFamily: 'monospace', fontSize: 11, color: T.textSub }}>
+            {guidelinesLog.map((line, i) => <div key={i}>{line}</div>)}
+          </div>
+        )}
+
+        {!guidelines && !guidelinesRunning && (
+          <div style={{ background: T.surfaceAlt, borderRadius: 8, padding: '16px 18px', textAlign: 'center' }}>
+            <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 8 }}>No style guide processed yet.</p>
+            <p style={{ color: T.textFaint, fontSize: 12 }}>Place your PDF at <code style={{ background: T.border, padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>data/brands/{slug}/style_guide.pdf</code> then click "Process Style Guide" above.</p>
+            <p style={{ color: T.textFaint, fontSize: 12, marginTop: 4 }}>Or the script will check <code style={{ background: T.border, padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>~/Downloads/ToysRUs_2026_HolidayTentpoles Style Guide.pdf</code> automatically.</p>
+          </div>
+        )}
+
+        {guidelines && (
+          <div>
+            {guidelines.extractionNote && <p style={{ color: T.textFaint, fontSize: 11, marginBottom: 12, fontStyle: 'italic' }}>{guidelines.extractionNote}</p>}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {guidelines.brandVoice?.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Brand Voice</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {guidelines.brandVoice.map(v => <span key={v} style={{ background: '#ede9fe', color: '#5b21b6', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>{v}</span>)}
+                  </div>
+                </div>
+              )}
+              {guidelines.messagingPillars?.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Messaging Pillars</p>
+                  <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                    {guidelines.messagingPillars.map((p, i) => <li key={i} style={{ fontSize: 12, color: T.textSub, marginBottom: 4 }}>{p}</li>)}
+                  </ul>
+                </div>
+              )}
+              {guidelines.tentpoles?.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Campaign Tentpoles</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {guidelines.tentpoles.map(t => <span key={t.name} style={{ background: '#fef3c7', color: '#92400e', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>{t.name}</span>)}
+                  </div>
+                </div>
+              )}
+              {guidelines.targetAudience && guidelines.targetAudience !== 'Not specified' && (
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Target Audience</p>
+                  <p style={{ fontSize: 12, color: T.textSub }}>{guidelines.targetAudience}</p>
+                </div>
+              )}
+              {(guidelines.doList?.length > 0 || guidelines.dontList?.length > 0) && (
+                <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {guidelines.doList?.length > 0 && (
+                    <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#065f46', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Always Do</p>
+                      <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                        {guidelines.doList.map((d, i) => <li key={i} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>{d}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  {guidelines.dontList?.length > 0 && (
+                    <div style={{ background: '#fff1f2', borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#9f1239', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Never Do</p>
+                      <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
+                        {guidelines.dontList.map((d, i) => <li key={i} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>{d}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+              {guidelines.visualDirection && guidelines.visualDirection !== 'Not specified' && (
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Visual Direction</p>
+                  <p style={{ fontSize: 12, color: T.textSub }}>{guidelines.visualDirection}</p>
+                </div>
+              )}
+            </div>
+            <p style={{ fontSize: 11, color: T.textFaint, marginTop: 14 }}>Processed from {guidelines.sourceFile} on {new Date(guidelines.processedAt).toLocaleDateString()}</p>
+          </div>
+        )}
       </Card>
     </div>
   )
@@ -755,18 +880,60 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
     return <svg width={width} height={height} style={{ overflow: 'visible', display: 'block' }}><polyline points={pts} fill="none" stroke={T.accent} strokeWidth={2} strokeLinejoin="round" /></svg>
   }
 
-  function PostCard({ post }) {
+  function relativeTime(iso) {
+    if (!iso) return ''
+    const diff = Date.now() - new Date(iso).getTime()
+    const m = Math.floor(diff / 60000)
+    if (m < 60) return `${m || 1}m ago`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `${h}h ago`
+    const d = Math.floor(h / 24)
+    if (d < 30) return `${d}d ago`
+    const mo = Math.floor(d / 30)
+    if (mo < 12) return `${mo}mo ago`
+    return `${Math.floor(mo / 12)}y ago`
+  }
+
+  const GRAD_PAIRS = [
+    ['#f97316', '#ec4899'], ['#6366f1', '#8b5cf6'], ['#0ea5e9', '#14b8a6'],
+    ['#f59e0b', '#ef4444'], ['#10b981', '#3b82f6'], ['#a855f7', '#ec4899'],
+    ['#06b6d4', '#6366f1'], ['#84cc16', '#0ea5e9'],
+  ]
+
+  function InstagramCard({ post, brandName, handle, brandIdx = 0 }) {
     const engagement = (post.likes || 0) + (post.comments || 0)
+    const initial = (brandName || handle || 'B')[0].toUpperCase()
+    const [g1, g2] = GRAD_PAIRS[brandIdx % GRAD_PAIRS.length]
     return (
-      <div style={{ background: T.surface, borderRadius: 8, padding: 12, border: `1px solid ${T.border}` }}>
-        <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, marginBottom: 8, minHeight: 36 }}>
-          {post.caption ? `"${post.caption.slice(0, 120)}${post.caption.length > 120 ? '…' : ''}"` : <span style={{ color: T.textFaint, fontStyle: 'italic' }}>No caption</span>}
-        </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 11, color: T.textMuted }}>♥ {(post.likes || 0).toLocaleString()}</span>
-          <span style={{ fontSize: 11, color: T.textMuted }}>💬 {(post.comments || 0).toLocaleString()}</span>
-          {engagement > 0 && <span style={{ fontSize: 11, background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: 10, fontWeight: 600, marginLeft: 'auto' }}>{engagement.toLocaleString()}</span>}
-          {post.postUrl && <a href={post.postUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none' }}>View ↗</a>}
+      <div style={{ width: 240, minWidth: 240, background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderBottom: `1px solid ${T.border}` }}>
+          <div style={{ width: 28, height: 28, borderRadius: '50%', background: `linear-gradient(135deg, ${g1}, ${g2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{initial}</div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: T.text, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{handle ? `@${handle}` : brandName}</span>
+          <span style={{ fontSize: 16, color: T.textFaint, letterSpacing: 1 }}>···</span>
+        </div>
+        {/* Image area */}
+        <div style={{ width: '100%', aspectRatio: '1/1', background: `linear-gradient(135deg, ${g1}22, ${g2}22)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          {post.imageUrl
+            ? <img src={post.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+            : <span style={{ fontSize: 52, fontWeight: 900, color: `${g1}55`, userSelect: 'none' }}>{initial}</span>
+          }
+          {engagement > 0 && <span style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 12 }}>{engagement >= 1000 ? `${(engagement/1000).toFixed(1)}k` : engagement}</span>}
+        </div>
+        {/* Engagement row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px 4px' }}>
+          <span style={{ fontSize: 12, color: T.text }}>♥ {(post.likes || 0).toLocaleString()}</span>
+          <span style={{ fontSize: 12, color: T.text }}>💬 {(post.comments || 0).toLocaleString()}</span>
+          <span style={{ marginLeft: 'auto', fontSize: 11, color: T.textFaint }}>{relativeTime(post.timestamp)}</span>
+        </div>
+        {/* Caption */}
+        <div style={{ padding: '0 12px 10px' }}>
+          <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, margin: 0 }}>
+            {post.caption
+              ? <>{brandName && <strong style={{ color: T.text }}>{handle || brandName} </strong>}{post.caption.slice(0, 100)}{post.caption.length > 100 ? '…' : ''}</>
+              : <span style={{ color: T.textFaint, fontStyle: 'italic' }}>No caption</span>}
+          </p>
+          {post.postUrl && <a href={post.postUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none', display: 'block', marginTop: 4 }}>View post ↗</a>}
         </div>
       </div>
     )
@@ -980,8 +1147,8 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                       {postsToShow.length > 0 ? (
                         <>
                           <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Top Posts</p>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
-                            {postsToShow.slice(0, 3).map((post, i) => <PostCard key={i} post={post} />)}
+                          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
+                            {postsToShow.slice(0, 3).map((post, i) => <InstagramCard key={i} post={post} brandName={b.name} handle={getPlatformHandle(b, platformTab)?.label?.replace('@', '')} brandIdx={idx} />)}
                           </div>
                         </>
                       ) : (
@@ -1073,7 +1240,103 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
         </Card>
       )}
 
-      {/* ── Section 5: Your Brand Deep Dive ── */}
+      {/* ── Section 5: Competitive Theme Heatmap ── */}
+      {allBrands.length > 0 && allBrands.some(b => b.contentThemes?.length > 0) && (() => {
+        const ALL_THEMES = ['Product Showcase', 'Lifestyle', 'User Generated', 'Promotional', 'Behind the Scenes', 'Seasonal', 'Brand Story']
+        const brandsWithData = allBrands.filter(b => b.contentThemes?.length > 0)
+        if (brandsWithData.length === 0) return null
+        // Build lookup: brand.id → theme → count
+        const themeMap = {}
+        brandsWithData.forEach(b => {
+          themeMap[b.id] = {}
+          b.contentThemes.forEach(t => { themeMap[b.id][t.theme] = t.count })
+        })
+        return (
+          <Card style={{ marginBottom: 24 }}>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Content Theme Coverage</h3>
+            <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>How many posts each brand publishes per theme. Darker = more content.</p>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', minWidth: 150 }}>Theme</th>
+                    {brandsWithData.map(b => (
+                      <th key={b.id} style={{ padding: '8px 8px', textAlign: 'center', color: b.role === 'target' ? T.accent : T.textMuted, fontSize: 11, fontWeight: b.role === 'target' ? 800 : 600, maxWidth: 80 }}>
+                        {b.name.slice(0, 10)}{b.role === 'target' ? ' ★' : ''}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {ALL_THEMES.map(theme => (
+                    <tr key={theme} style={{ borderTop: `1px solid ${T.border}` }}>
+                      <td style={{ padding: '8px 12px', color: T.textSub, fontSize: 12 }}>{theme}</td>
+                      {brandsWithData.map(b => {
+                        const count = themeMap[b.id]?.[theme] || 0
+                        const isTarget = b.role === 'target'
+                        const bg = count === 0 ? 'transparent' : count <= 5 ? (isTarget ? '#ede9fe' : '#dbeafe') : count <= 15 ? (isTarget ? '#c4b5fd' : '#93c5fd') : (isTarget ? '#7c3aed' : '#2563eb')
+                        const textColor = count === 0 ? T.textFaint : count <= 15 ? T.text : '#fff'
+                        return (
+                          <td key={b.id} style={{ padding: '8px 8px', textAlign: 'center', background: bg, fontWeight: count > 0 ? 700 : 400, color: textColor, borderLeft: isTarget ? `2px solid ${T.accent}22` : 'none' }}>
+                            {count > 0 ? count : <span style={{ color: T.border }}>—</span>}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )
+      })()}
+
+      {/* ── Section 6: White Space Opportunities ── */}
+      {data.whiteSpaceOpportunities?.length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Untapped Territory</h3>
+          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>Content areas with low competition where you can own the conversation.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
+            {data.whiteSpaceOpportunities.map((opp, i) => (
+              <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: '3px solid #059669' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: T.text, flex: 1 }}>{opp.theme}</span>
+                  {opp.priority === 'high' && <span style={{ fontSize: 10, fontWeight: 700, background: '#dcfce7', color: '#065f46', padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase' }}>High Priority</span>}
+                  {opp.suggestedFormat && <span style={{ fontSize: 10, fontWeight: 700, background: FORMAT_COLORS[opp.suggestedFormat] || '#f3f4f6', color: FORMAT_TEXT[opp.suggestedFormat] || '#374151', padding: '2px 8px', borderRadius: 10 }}>{opp.suggestedFormat}</span>}
+                </div>
+                {opp.description && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, marginBottom: 6 }}>{opp.description}</p>}
+                {opp.brandAlignment && <p style={{ fontSize: 11, color: '#059669', fontStyle: 'italic' }}>Brand fit: {opp.brandAlignment}</p>}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* ── Section 7: Competitive Playbook ── */}
+      {data.competitionStrategy?.length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Your Competitive Playbook</h3>
+          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>Tactical moves to carve out a distinct lane — informed by what competitors are doing and your brand direction.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
+            {data.competitionStrategy.map((s, i) => (
+              <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${T.accent}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: T.text, flex: 1 }}>{s.tactic}</span>
+                  {s.priority === 'high' && <span style={{ fontSize: 10, fontWeight: 700, background: '#fee2e2', color: '#991b1b', padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase' }}>High</span>}
+                  {s.priority === 'medium' && <span style={{ fontSize: 10, fontWeight: 700, background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase' }}>Medium</span>}
+                </div>
+                {s.rationale && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, marginBottom: 6 }}>{s.rationale}</p>}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {s.competitorInspiration && <span style={{ fontSize: 11, background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: 10 }}>Inspired by: {s.competitorInspiration}</span>}
+                  {s.brandAlignment && <span style={{ fontSize: 11, color: T.accent, fontStyle: 'italic' }}>Brand fit: {s.brandAlignment}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* ── Section 8: Your Brand Deep Dive ── */}
       {target && (
         <Card style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
@@ -1164,9 +1427,9 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
           {(target.topPosts || target.recentPosts)?.filter(p => p.caption || p.likes > 0).length > 0 && (
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Top Performing Posts</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
                 {(target.topPosts?.length > 0 ? target.topPosts : target.recentPosts).slice(0, 3).filter(p => p.caption || p.likes > 0).map((post, i) => (
-                  <PostCard key={i} post={post} />
+                  <InstagramCard key={i} post={post} brandName={target.name} handle={target.handle} brandIdx={0} />
                 ))}
               </div>
             </div>
@@ -1174,7 +1437,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
         </Card>
       )}
 
-      {/* ── Section 6: Content Gap Opportunities ── */}
+      {/* ── Section 9: Content Gap Opportunities ── */}
       {target?.contentGaps?.length > 0 && (
         <Card>
           <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Content Gap Opportunities</h3>

@@ -696,6 +696,56 @@ app.get('/api/settings', (req, res) => {
   res.json({ serpApiEnabled: !!process.env.SERP_API_KEY });
 });
 
+// ─── Brand Guidelines Routes ──────────────────────────────────────────────────
+
+// GET /api/brands/:slug/brand_guidelines
+app.get('/api/brands/:slug/brand_guidelines', (req, res) => {
+  const data = loadBrandData(req.params.slug, 'brand_guidelines.json');
+  res.json(data || null);
+});
+
+// PUT /api/brands/:slug/brand_guidelines — save manual edits
+app.put('/api/brands/:slug/brand_guidelines', (req, res) => {
+  const { slug } = req.params;
+  const existing = loadBrandData(slug, 'brand_guidelines.json') || {};
+  const updated = { ...existing, ...req.body, updatedAt: new Date().toISOString() };
+  saveBrandData(slug, 'brand_guidelines.json', updated);
+  res.json({ ok: true });
+});
+
+// POST /api/brands/:slug/process_style_guide — spawn script, SSE stream stdout
+app.post('/api/brands/:slug/process_style_guide', (req, res) => {
+  const { slug } = req.params;
+  const fileArg = req.body.file ? `--file=${req.body.file}` : null;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const nodeArgs = [path.join(__dirname, 'analysis/process_style_guide.js'), `--slug=${slug}`];
+  if (fileArg) nodeArgs.push(fileArg);
+
+  const child = spawn('node', nodeArgs, {
+    env: { ...process.env },
+    cwd: __dirname,
+  });
+
+  child.stdout.on('data', chunk => {
+    const lines = chunk.toString().split('\n').filter(Boolean);
+    lines.forEach(line => res.write(`data: ${line}\n\n`));
+  });
+  child.stderr.on('data', chunk => {
+    const lines = chunk.toString().split('\n').filter(Boolean);
+    lines.forEach(line => res.write(`data: [stderr] ${line}\n\n`));
+  });
+  child.on('close', code => {
+    res.write(`data: __DONE__ exit=${code}\n\n`);
+    res.end();
+  });
+  req.on('close', () => child.kill());
+});
+
 // ─── Static dashboard ─────────────────────────────────────────────────────────
 const distPath = path.join(__dirname, 'dashboard', 'dist');
 if (fs.existsSync(distPath)) {

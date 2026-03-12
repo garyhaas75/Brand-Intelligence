@@ -349,7 +349,113 @@ function buildPlatformData(normalizedPosts) {
 
 // ─── Content Gap Analysis (Claude) ───────────────────────────────────────────
 
-async function generateContentGapAnalysis(anthropic, targetBrand, targetData, competitorBrandsData) {
+function buildGuidelinesContext(guidelines) {
+  if (!guidelines) return '';
+  const parts = [];
+  if (guidelines.brandVoice?.length) parts.push(`Voice: ${guidelines.brandVoice.join(', ')}`);
+  if (guidelines.messagingPillars?.length) parts.push(`Pillars: ${guidelines.messagingPillars.slice(0, 3).join(' | ')}`);
+  if (guidelines.tentpoles?.length) parts.push(`Campaigns: ${guidelines.tentpoles.map(t => t.name).join(', ')}`);
+  if (guidelines.doList?.length) parts.push(`Always: ${guidelines.doList.slice(0, 3).join('; ')}`);
+  if (guidelines.dontList?.length) parts.push(`Avoid: ${guidelines.dontList.slice(0, 3).join('; ')}`);
+  if (!parts.length) return '';
+  return `\nBrand guidelines (use for brand-appropriate direction — not strict rules):\n${parts.join('\n')}\n`;
+}
+
+async function generateWhiteSpaceOpportunities(anthropic, allBrandsData, guidelines) {
+  const ALL_THEMES = ['Product Showcase', 'Lifestyle', 'User Generated', 'Promotional', 'Behind the Scenes', 'Seasonal', 'Brand Story'];
+
+  // Build theme → brand coverage map
+  const themeCoverage = {};
+  ALL_THEMES.forEach(t => { themeCoverage[t] = []; });
+  allBrandsData.forEach(b => {
+    (b.contentThemes || []).forEach(({ theme, count }) => {
+      if (themeCoverage[theme] !== undefined && count > 2) themeCoverage[theme].push(b.name);
+    });
+  });
+
+  const lowCoverageThemes = ALL_THEMES
+    .filter(t => themeCoverage[t].length <= 1)
+    .map(t => `${t} (used by: ${themeCoverage[t].join(', ') || 'nobody'})`);
+
+  const target = allBrandsData.find(b => b.role === 'target');
+  const targetThemes = (target?.contentThemes || []).map(t => t.theme);
+
+  const prompt = `You are a social media strategist. Identify untapped content opportunities for ${target?.name || 'this brand'} in the toy retail market in Lebanon.
+
+Market theme coverage (how many brands post about each theme significantly):
+${ALL_THEMES.map(t => `  ${t}: ${themeCoverage[t].length > 0 ? themeCoverage[t].join(', ') : 'nobody doing this well'}`).join('\n')}
+
+Target brand current themes: ${targetThemes.join(', ') || 'none'}
+Low-coverage themes (white space): ${lowCoverageThemes.join(', ')}
+${buildGuidelinesContext(guidelines)}
+Identify 4-5 white space opportunities — content areas with low competition that would work well for this brand.
+Return ONLY a JSON array:
+[{"theme": "theme name", "description": "what this content looks like in practice", "rationale": "why this is an opportunity", "brandAlignment": "how this fits the brand voice/guidelines", "suggestedFormat": "Reels|Carousel|Story|Video|Post", "priority": "high|medium"}]`;
+
+  try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1200,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = msg.content[0].text;
+    const start = raw.indexOf('[');
+    const end = raw.lastIndexOf(']');
+    if (start !== -1 && end !== -1) {
+      const parsed = JSON.parse(raw.slice(start, end + 1));
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (err) { log(`  White space analysis error: ${err.message}`); }
+  return null;
+}
+
+async function generateCompetitionStrategy(anthropic, targetData, competitorData, guidelines) {
+  const target = targetData;
+  const compSummaries = competitorData
+    .filter(c => c.summary?.postCount > 0)
+    .map(c => {
+      const topTheme = c.contentThemes?.[0]?.theme || 'unknown';
+      const eng = c.summary?.avgEngagement || 0;
+      return `${c.name}: avg ${eng} eng, ${c.summary?.postingFrequencyPerWeek || 0}/wk, top theme: ${topTheme}`;
+    })
+    .join('\n');
+
+  const targetSummary = `${target.name}: avg ${target.summary?.avgEngagement || 0} eng, ${target.summary?.postingFrequencyPerWeek || 0}/wk`;
+  const topCompetitor = competitorData
+    .filter(c => c.summary?.avgEngagement > 0)
+    .sort((a, b) => b.summary.avgEngagement - a.summary.avgEngagement)[0];
+
+  const prompt = `You are a competitive social media strategist for a toy retailer in Lebanon.
+
+Target brand: ${targetSummary}
+Competitors:
+${compSummaries || 'No competitor data available'}
+
+${topCompetitor ? `Market leader: ${topCompetitor.name} with ${topCompetitor.summary.avgEngagement} avg engagement` : ''}
+${buildGuidelinesContext(guidelines)}
+Design 4-5 specific tactical moves to help the target brand carve out a distinct, ownable lane on social media. Focus on differentiation, not imitation.
+
+Return ONLY a JSON array:
+[{"tactic": "short tactic title", "rationale": "why this works given the competitive landscape", "competitorInspiration": "competitor name or null", "brandAlignment": "how this fits brand voice/direction", "priority": "high|medium"}]`;
+
+  try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1200,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = msg.content[0].text;
+    const start = raw.indexOf('[');
+    const end = raw.lastIndexOf(']');
+    if (start !== -1 && end !== -1) {
+      const parsed = JSON.parse(raw.slice(start, end + 1));
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (err) { log(`  Competition strategy error: ${err.message}`); }
+  return null;
+}
+
+async function generateContentGapAnalysis(anthropic, targetBrand, targetData, competitorBrandsData, guidelines) {
   const targetThemes = (targetData.contentThemes || []).map(t => t.theme).slice(0, 5);
 
   // Build top post context from competitors for richer prompt
@@ -379,7 +485,7 @@ TARGET BRAND (${targetBrand}):
 COMPETITOR THEMES NOT USED BY TARGET: ${gaps.join(', ') || 'none identified'}
 
 ${competitorContext ? `COMPETITOR TOP POSTS (what's working for them):\n${competitorContext}` : ''}
-
+${buildGuidelinesContext(guidelines)}
 Identify the 4-5 most impactful content opportunities. Return ONLY a JSON array:
 [{ "headline": "short action title", "detail": "plain English explanation of why this matters and how to do it", "competitor": "competitor name who does this well or null", "platform": "instagram|tiktok|facebook|all", "contentFormat": "Reels|Carousel|Story|Video|Post" }]`;
 
@@ -558,6 +664,10 @@ async function run() {
 
   const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
 
+  // Load brand guidelines if available
+  const guidelines = loadBrandData(slug, 'brand_guidelines.json');
+  if (guidelines) log(`Loaded brand guidelines (voice: ${(guidelines.brandVoice || []).join(', ')})`);
+
   const brandsToAudit = [
     {
       slug,
@@ -609,7 +719,7 @@ async function run() {
   const competitorResults = brandResults.filter(b => b.role === 'competitor');
   if (targetResult && anthropic) {
     log('Generating content gap analysis...');
-    targetResult.contentGaps = await generateContentGapAnalysis(anthropic, profile.name, targetResult, competitorResults).catch(() => []);
+    targetResult.contentGaps = await generateContentGapAnalysis(anthropic, profile.name, targetResult, competitorResults, guidelines).catch(() => []);
   }
 
   // Write all discovered handles back to profile.json
@@ -636,8 +746,24 @@ async function run() {
     log(`  Wrote ${handleWritebacks} discovered handles back to profile.json`);
   }
 
+  // White space + competition strategy analysis
+  let whiteSpaceOpportunities = null;
+  let competitionStrategy = null;
+  if (anthropic) {
+    log('Generating white space opportunities...');
+    whiteSpaceOpportunities = await generateWhiteSpaceOpportunities(anthropic, brandResults, guidelines).catch(() => null);
+    log('Generating competition strategy...');
+    competitionStrategy = await generateCompetitionStrategy(anthropic, targetResult, competitorResults, guidelines).catch(() => null);
+  }
+
   const now = new Date().toISOString();
-  const output = { generatedAt: now, brandSlug: slug, brands: brandResults };
+  const output = {
+    generatedAt: now,
+    brandSlug: slug,
+    brands: brandResults,
+    whiteSpaceOpportunities,
+    competitionStrategy,
+  };
 
   const existing = loadBrandData(slug, 'social_intelligence.json');
   if (existing) archiveData(slug, 'social_intelligence', existing);
