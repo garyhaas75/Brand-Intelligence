@@ -13,14 +13,18 @@
       "name": "PlayOne",
       "url": "https://playone.com.lb",
       "rationale": "Largest dedicated online toy store in Lebanon — direct ecommerce competitor.",
-      "instagramHandle": null,
+      "instagramHandle": "playone.com.lb",
+      "facebookHandle": "playone.com.lb",
+      "tiktokHandle": null,
       "manuallySet": true
     },
     {
       "name": "JouéClub Lebanon",
       "url": "https://joueclubliban.com",
       "rationale": "Lebanese branch of French JouéClub franchise — dedicated toy retail ecommerce in Lebanon.",
-      "instagramHandle": null,
+      "instagramHandle": "joueclubliban",
+      "tiktokHandle": "joueclubliban",
+      "facebookHandle": "joueclubliban",
       "manuallySet": true
     },
     {
@@ -28,13 +32,17 @@
       "url": "https://chez-les-petits.com",
       "rationale": "Lebanon's oldest toy & baby retailer (est. 1912) — omnichannel with strong brand recognition.",
       "instagramHandle": "chezlespetits_by_geahchan",
+      "tiktokHandle": null,
+      "facebookHandle": "geahchan",
       "manuallySet": true
     },
     {
       "name": "Wild Willy Toys",
       "url": "https://wildwillytoys.com",
       "rationale": "Pure-play online toy store in Lebanon with free delivery on orders over $70.",
-      "instagramHandle": null,
+      "instagramHandle": "wildwillytoystore",
+      "tiktokHandle": null,
+      "facebookHandle": "wildwillytoys",
       "manuallySet": true
     },
     {
@@ -42,26 +50,33 @@
       "url": "https://thetoystorelb.com",
       "rationale": "Online toy retailer carrying LEGO, Barbie, and major brands with Lebanon-wide delivery.",
       "instagramHandle": "thetoystorelb",
+      "tiktokHandle": "thetoystorelebanon",
+      "facebookHandle": "thetoystorelb",
       "manuallySet": true
     },
     {
       "name": "Big Fun Lebanon",
       "url": "https://bigfunlebanon.com",
       "rationale": "Online toy retailer focused on affordability and wide selection in Lebanon.",
-      "instagramHandle": null,
+      "instagramHandle": "bigfun.lb",
+      "tiktokHandle": null,
+      "facebookHandle": "bigfun.lb",
       "manuallySet": true
     },
     {
       "name": "HiCart",
       "url": "https://hicart.com",
       "rationale": "Lebanon's main general ecommerce marketplace with a large dedicated toys & baby category.",
-      "instagramHandle": null,
+      "instagramHandle": "hicartonline",
+      "tiktokHandle": "hicartonline",
+      "facebookHandle": "hicartonline",
       "manuallySet": true
     }
   ],
   "social": {
     "instagram": "toysruslb",
-    "twitter": null
+    "twitter": null,
+    "tiktok": "toysruslb"
   },
   "discoveryNotes": "The homepage data is sparse — no meta description, OG tags, or heading content was found, suggesting the site may be heavily JavaScript-rendered. The tagline is inferred from the prominent 'Geoffrey The Giraffe' branding element in the footer. The copyright year shows ©2026 which is unusual and may indicate a placeholder or forward-dated footer. This appears to be a separate Lebanese franchise/operation distinct from the toysrusme.com regional site, as indicated by the different domain and web developer credit (The Web Addicts).",
   "discoveredAt": "2026-03-11T15:43:44.814Z",

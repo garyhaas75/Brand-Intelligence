@@ -106,6 +106,40 @@ async function detectFacebookHandle(brandUrl) {
   finally { await browser.close(); }
 }
 
+// ─── Claude-Based Handle Lookup (fallback when Playwright finds nothing) ─────
+
+async function lookupHandlesViaClaude(anthropic, brandName, brandUrl, market) {
+  if (!anthropic) return {};
+  try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 200,
+      messages: [{
+        role: 'user',
+        content: `What are the official social media handles for this brand?
+
+Brand: ${brandName}
+Website: ${brandUrl}
+Market: ${market || 'Lebanon'}
+
+Return ONLY a JSON object (no explanation):
+{"instagram": "handle_without_@_or_null", "tiktok": "handle_without_@_or_null", "facebook": "page_name_or_null"}
+
+Only include handles you are highly confident are correct. Use null if unsure. Do not include @ symbols.`,
+      }],
+    });
+    const raw = msg.content[0].text;
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start !== -1 && end !== -1) {
+      const parsed = JSON.parse(raw.slice(start, end + 1));
+      log(`  Claude handle lookup for ${brandName}: IG=${parsed.instagram || 'null'}, TT=${parsed.tiktok || 'null'}, FB=${parsed.facebook || 'null'}`);
+      return parsed;
+    }
+  } catch (err) { log(`  Claude handle lookup failed for ${brandName}: ${err.message}`); }
+  return {};
+}
+
 // ─── Platform Scrapers ────────────────────────────────────────────────────────
 
 async function scrapeInstagramViaApify(handle) {
@@ -370,7 +404,7 @@ Identify the 4-5 most impactful content opportunities. Return ONLY a JSON array:
 // ─── Brand Processing ─────────────────────────────────────────────────────────
 
 async function processBrand(brandInfo, anthropic) {
-  const { slug, name, url, role, handle: existingIgHandle, tiktokHandle: existingTtHandle, facebookHandle: existingFbHandle } = brandInfo;
+  const { slug, name, url, role, handle: existingIgHandle, tiktokHandle: existingTtHandle, facebookHandle: existingFbHandle, market } = brandInfo;
 
   log(`Processing ${name} (${role})`);
   const brandData = {
@@ -397,13 +431,34 @@ async function processBrand(brandInfo, anthropic) {
     partialData: false,
   };
 
-  // ── Instagram ──────────────────────────────────────────────────────────────
-  let igHandle = existingIgHandle;
-  if (!igHandle && url) {
-    log(`  Detecting Instagram handle for ${name}...`);
-    igHandle = await detectInstagramHandle(url).catch(() => null);
-    brandData.handle = igHandle;
+  // ── Handle Discovery: Playwright → Claude fallback ─────────────────────────
+  // Detect all three platforms at once if any are missing
+  const needsDetection = (!existingIgHandle || !existingTtHandle || !existingFbHandle) && url;
+  let claudeHandles = {};
+  if (needsDetection) {
+    log(`  Detecting missing handles for ${name}...`);
+    // Playwright passes first
+    const [igDetected, ttDetected, fbDetected] = await Promise.all([
+      existingIgHandle ? Promise.resolve(null) : detectInstagramHandle(url).catch(() => null),
+      existingTtHandle ? Promise.resolve(null) : detectTikTokHandle(url).catch(() => null),
+      existingFbHandle ? Promise.resolve(null) : detectFacebookHandle(url).catch(() => null),
+    ]);
+    if (!existingIgHandle && igDetected) brandData.handle = igDetected;
+    if (!existingTtHandle && ttDetected) brandData.tiktokHandle = ttDetected;
+    if (!existingFbHandle && fbDetected) brandData.facebookHandle = fbDetected;
+
+    // Claude fallback for anything still missing
+    const stillMissingAny = (!brandData.handle && !existingIgHandle) || (!brandData.tiktokHandle && !existingTtHandle) || (!brandData.facebookHandle && !existingFbHandle);
+    if (stillMissingAny && anthropic) {
+      claudeHandles = await lookupHandlesViaClaude(anthropic, name, url, market).catch(() => ({}));
+      if (!brandData.handle && !existingIgHandle && claudeHandles.instagram) brandData.handle = claudeHandles.instagram;
+      if (!brandData.tiktokHandle && !existingTtHandle && claudeHandles.tiktok) brandData.tiktokHandle = claudeHandles.tiktok;
+      if (!brandData.facebookHandle && !existingFbHandle && claudeHandles.facebook) brandData.facebookHandle = claudeHandles.facebook;
+    }
   }
+
+  // ── Instagram ──────────────────────────────────────────────────────────────
+  const igHandle = existingIgHandle || brandData.handle;
   log(`  Instagram: ${igHandle ? '@' + igHandle : 'not found'}`);
 
   let igPosts = [];
@@ -454,7 +509,6 @@ async function processBrand(brandInfo, anthropic) {
     if (brandData.summary.followersEstimate && typeof brandData.summary.followersEstimate === 'number' && brandData.summary.avgEngagement > 0) {
       brandData.engagementRate = Math.round((brandData.summary.avgEngagement / brandData.summary.followersEstimate) * 1000) / 10;
     }
-    // Top hashtags
     const hashtagCounts = {};
     igPosts.forEach(p => {
       const text = p.caption || '';
@@ -462,44 +516,28 @@ async function processBrand(brandInfo, anthropic) {
       tags.forEach(t => { hashtagCounts[t] = (hashtagCounts[t] || 0) + 1; });
     });
     brandData.topHashtags = Object.entries(hashtagCounts).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([tag, count]) => ({ tag, count }));
-    // Recent posts (last 5 chronological)
     brandData.recentPosts = normalized.slice(0, 5);
-    // Top posts (top 3 by engagement)
     brandData.topPosts = [...normalized].sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 3);
-    log(`  ${name}: topPosts=${brandData.topPosts.length}, postingPattern bestDay=${brandData.postingPattern?.bestDay || 'none'}`);
+    log(`  ${name}: topPosts=${brandData.topPosts.length}, bestDay=${brandData.postingPattern?.bestDay || 'none'}`);
   }
 
   // ── TikTok ────────────────────────────────────────────────────────────────
-  let ttHandle = existingTtHandle;
-  if (!ttHandle && url) {
-    log(`  Detecting TikTok handle for ${name}...`);
-    ttHandle = await detectTikTokHandle(url).catch(() => null);
-    brandData.tiktokHandle = ttHandle;
-  }
+  const ttHandle = existingTtHandle || brandData.tiktokHandle;
   log(`  TikTok: ${ttHandle ? '@' + ttHandle : 'not found'}`);
   if (ttHandle) {
     try {
       const ttPosts = await scrapeTikTokViaApify(ttHandle);
-      if (ttPosts.length > 0) {
-        brandData.tiktokData = buildPlatformData(normalizePosts(ttPosts, 'tiktok'));
-      }
+      if (ttPosts.length > 0) brandData.tiktokData = buildPlatformData(normalizePosts(ttPosts, 'tiktok'));
     } catch (err) { log(`  TikTok scrape failed for ${name}: ${err.message}`); }
   }
 
   // ── Facebook ──────────────────────────────────────────────────────────────
-  let fbHandle = existingFbHandle;
-  if (!fbHandle && url) {
-    log(`  Detecting Facebook handle for ${name}...`);
-    fbHandle = await detectFacebookHandle(url).catch(() => null);
-    brandData.facebookHandle = fbHandle;
-  }
+  const fbHandle = existingFbHandle || brandData.facebookHandle;
   log(`  Facebook: ${fbHandle ? '/' + fbHandle : 'not found'}`);
   if (fbHandle) {
     try {
       const fbPosts = await scrapeFacebookViaApify(fbHandle);
-      if (fbPosts.length > 0) {
-        brandData.facebookData = buildPlatformData(normalizePosts(fbPosts, 'facebook'));
-      }
+      if (fbPosts.length > 0) brandData.facebookData = buildPlatformData(normalizePosts(fbPosts, 'facebook'));
     } catch (err) { log(`  Facebook scrape failed for ${name}: ${err.message}`); }
   }
 

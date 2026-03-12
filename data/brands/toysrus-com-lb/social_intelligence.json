@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-11T20:52:52.085Z",
+  "generatedAt": "2026-03-12T00:58:15.782Z",
   "brandSlug": "toysrus-com-lb",
   "brands": [
     {
@@ -8,7 +8,7 @@
       "role": "target",
       "handle": "toysruslb",
       "platform": "instagram",
-      "scrapedAt": "2026-03-11T20:47:46.802Z",
+      "scrapedAt": "2026-03-12T00:53:43.723Z",
       "summary": {
         "postCount": 0,
         "avgEngagement": 0,
@@ -19,13 +19,50 @@
       "contentThemes": [],
       "topHashtags": [],
       "recentPosts": [],
+      "topPosts": [],
       "monthlyTrend": [],
+      "postingPattern": null,
+      "engagementRate": null,
+      "tiktokHandle": "toysruslb",
+      "tiktokData": null,
+      "facebookHandle": null,
+      "facebookData": null,
       "contentGaps": [
-        "Add Product Showcase content to close gap vs competitors",
-        "Add Promotional content to close gap vs competitors",
-        "Add Seasonal content to close gap vs competitors",
-        "Add Lifestyle content to close gap vs competitors",
-        "Add Behind the Scenes content to close gap vs competitors"
+        {
+          "headline": "Nostalgia-Driven Product Drops",
+          "detail": "The Toy Store LB is driving massive engagement (640+ interactions) by tapping into 90s nostalgia with retro-style products and playful throwback copy. Toys R Us has an enormous nostalgia advantage as a legacy brand that millions of millennials grew up with. Create content that leans into 'remember when' storytelling paired with current products, using phrases like 'Geoffrey remembers...' or 'Then vs Now' comparisons. This emotional hook drives shares and comments far beyond standard product posts.",
+          "competitor": "The Toy Store LB",
+          "platform": "tiktok",
+          "contentFormat": "Reels"
+        },
+        {
+          "headline": "Giveaway-Anchored Brand Awareness Push",
+          "detail": "Chez Les Petits uses spend-to-win promotions to generate engagement and drive purchase intent simultaneously. Toys R Us can supercharge this format by running family-friendly prize giveaways tied to seasonal moments like back-to-school or the holidays. Ask followers to tag a friend or share their favorite toy memory to enter. This costs relatively little but generates organic reach, new followers, and emotional brand association all at once.",
+          "competitor": "Chez Les Petits",
+          "platform": "instagram",
+          "contentFormat": "Post"
+        },
+        {
+          "headline": "Weekly New Toy Showcase Carousels",
+          "detail": "None of the competitors are consistently owning the 'new arrival' content space with high production value. Toys R Us should post weekly carousels highlighting 5 to 8 new or trending toys with clean visuals, age recommendations, and price points. Parents actively search for gift ideas on Instagram and Facebook, and a reliable weekly showcase builds habitual following. Title each carousel something like 'This Week's Must-Have Toys' to create a recurring content ritual.",
+          "competitor": null,
+          "platform": "instagram",
+          "contentFormat": "Carousel"
+        },
+        {
+          "headline": "Parent and Kid Reaction Videos",
+          "detail": "TikTok's algorithm heavily rewards authentic, high-emotion moments. Film short videos of kids reacting to unboxing or discovering a new toy, with a parent's perspective woven in. This doubles as lifestyle and user-generated-style content without requiring outside creators. These videos are highly shareable because grandparents, aunts, and uncles forward them when looking for gift ideas. Even low-budget smartphone footage works well if the child's reaction is genuine and joyful.",
+          "competitor": null,
+          "platform": "tiktok",
+          "contentFormat": "Video"
+        },
+        {
+          "headline": "Seasonal Gift Guide Story Series",
+          "detail": "No competitor is currently owning seasonal content in a structured, repeatable way. Toys R Us should build out Story series around every key retail moment including holidays, birthdays, summer, and back-to-school, organizing recommendations by age group or budget. Stories with polls like 'Does your kid prefer outdoor or indoor toys?' create interactive touchpoints that also feed algorithm signals. Pin the best-performing ones as Highlights to create an evergreen gift guide resource on the profile.",
+          "competitor": null,
+          "platform": "instagram",
+          "contentFormat": "Story"
+        }
       ],
       "error": "Post data unavailable (account may be private or scraper blocked) — profile stats only",
       "partialData": true
@@ -36,7 +73,7 @@
       "role": "competitor",
       "handle": null,
       "platform": "instagram",
-      "scrapedAt": "2026-03-11T20:48:32.208Z",
+      "scrapedAt": "2026-03-12T00:55:09.740Z",
       "summary": {
         "postCount": 0,
         "avgEngagement": 0,
@@ -46,7 +83,14 @@
       "contentThemes": [],
       "topHashtags": [],
       "recentPosts": [],
+      "topPosts": [],
       "monthlyTrend": [],
+      "postingPattern": null,
+      "engagementRate": null,
+      "tiktokHandle": null,
+      "tiktokData": null,
+      "facebookHandle": null,
+      "facebookData": null,
       "contentGaps": [],
       "error": "Could not detect Instagram handle",
       "partialData": true
@@ -57,7 +101,7 @@
       "role": "competitor",
       "handle": null,
       "platform": "instagram",
-      "scrapedAt": "2026-03-11T20:48:44.225Z",
+      "scrapedAt": "2026-03-12T00:55:15.611Z",
       "summary": {
         "postCount": 0,
         "avgEngagement": 0,
@@ -67,7 +111,14 @@
       "contentThemes": [],
       "topHashtags": [],
       "recentPosts": [],
+      "topPosts": [],
       "monthlyTrend": [],
+      "postingPattern": null,
+      "engagementRate": null,
+      "tiktokHandle": null,
+      "tiktokData": null,
+      "facebookHandle": null,
+      "facebookData": null,
       "contentGaps": [],
       "error": "Could not detect Instagram handle",
       "partialData": true
@@ -78,25 +129,25 @@
       "role": "competitor",
       "handle": "chezlespetits_by_geahchan",
       "platform": "instagram",
-      "scrapedAt": "2026-03-11T20:48:52.614Z",
+      "scrapedAt": "2026-03-12T00:55:21.838Z",
       "summary": {
         "postCount": 50,
         "avgEngagement": 3,
         "followersEstimate": null,
-        "postingFrequencyPerWeek": 5.3
+        "postingFrequencyPerWeek": 5.6
       },
       "contentThemes": [
         {
           "theme": "Product Showcase",
-          "count": 50
+          "count": 16
         },
         {
           "theme": "Promotional",
-          "count": 9
+          "count": 7
         },
         {
           "theme": "Seasonal",
-          "count": 7
+          "count": 2
         },
         {
           "theme": "Lifestyle",
@@ -187,41 +238,77 @@
       ],
       "recentPosts": [
         {
-          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Wonder Grey Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9",
           "likes": 1,
           "comments": 0,
-          "timestamp": "2026-03-10T22:37:49.000Z"
+          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Monza Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – 36 kg).\n\nThe Viaggio 1-2-3 Via car seat was specifica",
+          "timestamp": "2026-03-10T22:36:54.000Z",
+          "postUrl": "https://instagram.com/p/DVuI6WuDSnY",
+          "imageUrl": "https://scontent-atl3-1.cdninstagram.com/v/t51.82787-15/649887493_18341275924245288_2523584947906303920_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-atl3-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGZ5tbsGZLFtb6aEUysRhzvhoq-wc0F_nsSdgw0_PFPENlXQCzTVJ-XyEzcfqASjpU&_nc_ohc=QplA4GdE_hoQ7kNvwF7MKJa&_nc_gid=u6nLpfUDwQM8TQO0WlR7kw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afwu6Tm2vGaTX5iaJl0j9irzrpu13jvdTkDsIjuB03BjtA&oe=69B7C5C6&_nc_sid=10d13b"
         },
         {
-          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Licorice Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – ",
           "likes": 1,
           "comments": 0,
-          "timestamp": "2026-03-10T22:36:02.000Z"
+          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Licorice Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – 36 kg).\n\nThe Viaggio 1-2-3 Via car seat was specif",
+          "timestamp": "2026-03-10T22:36:02.000Z",
+          "postUrl": "https://instagram.com/p/DVuIz-rDfnq",
+          "imageUrl": "https://scontent-dfw5-2.cdninstagram.com/v/t51.82787-15/649850863_18341275741245288_4377168421292493040_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-dfw5-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QG9F6a7Yl6BKRhpHoFo0RFTiLusqg65lE9PiKufQdtGLV6uMCcHOpFLHy4fy74ffZE&_nc_ohc=SLYg-voUA1wQ7kNvwG8kpXx&_nc_gid=uLBcC44pTzNk5jJ41R12OA&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afx6YG2ItaztsJFHolYsModKStdxEDwjBiDMlGf48BW1Rw&oe=69B7E881&_nc_sid=10d13b"
         },
         {
-          "caption": "Peg Perego’s Vivace travel system, made in Italy!\n\nWhat fun it is to zip around and explore the city together. The Vivace SLK Travel System is your pe",
+          "likes": 3,
+          "comments": 0,
+          "caption": "•Visit or Call our Shops:\n01482369 Sin El Fil\n09636017 Maameltein\n \n•Shop Online:\nwww.chez-les-petits.com\nUse Coupon Code: BABY\n(Use In Your Shopping Cart)\n \nWe Deliver All Over Lebanon.\n \nBlG Winter ",
+          "timestamp": "2026-03-03T20:29:18.000Z",
+          "postUrl": "https://instagram.com/p/DVb4VVBjXpT",
+          "imageUrl": "https://scontent-den2-1.cdninstagram.com/v/t51.82787-15/645747057_18340339942245288_3061589017178500546_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-den2-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHItKsVeFivsLim0bFbclwHnxHHtSyWF0ONbt-Xvt86rwpHDrUBnzsKN9XXhrcbqu0&_nc_ohc=7ZfhrvMkHfEQ7kNvwEdVLlw&_nc_gid=VGcmT8pbaUs33Ci1uRUeAg&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afx6fnnE8u7A2pVm4t6aoOGrLuiILEsnyVeFpbQAEYSCLQ&oe=69B7FAB9&_nc_sid=10d13b"
+        },
+        {
           "likes": 1,
           "comments": 0,
-          "timestamp": "2026-02-21T10:19:22.000Z"
+          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Wonder Grey Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat is so flexible you can use it for a longer p",
+          "timestamp": "2026-03-11T10:40:56.000Z",
+          "postUrl": "https://instagram.com/p/DVvbxSjjaAg",
+          "imageUrl": "https://scontent-lax3-2.cdninstagram.com/v/t51.82787-15/650045361_18341334847245288_4018296848258846278_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-lax3-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHWFFiQXf2Kpocz29al7GY_mUo6WhBFMQmxJU1RV5-My_uPWPobuSv9tgsZde31d9k&_nc_ohc=BmnjF2ZtDiMQ7kNvwGqicuY&_nc_gid=-Wz_FneVOlhQnGqZdaoouw&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzBFCwdSFC2uxPzTuKhzVwgEABldKdKWVMEVhRo87FWVQ&oe=69B7DB64&_nc_sid=10d13b"
         },
         {
-          "caption": "Stay Safe & Shop Online! We Deliver ALL Over Lebanon!\n\n•Visit or Call our Shop:\n01482369 (Sin el Fil)\n09636017 (Maameltein)\n\n•Order on WhatsApp:\n70217",
-          "likes": 2,
-          "comments": 0,
-          "timestamp": "2026-03-06T18:12:02.000Z"
-        },
-        {
-          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Forest Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat",
           "likes": 1,
           "comments": 0,
-          "timestamp": "2026-03-11T10:38:28.000Z"
+          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Forest Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat is so flexible you can use it for a longer period",
+          "timestamp": "2026-03-11T10:38:28.000Z",
+          "postUrl": "https://instagram.com/p/DVvbfOpjSK2",
+          "imageUrl": "https://scontent-lga3-2.cdninstagram.com/v/t51.82787-15/649928477_18341334691245288_9023466773290228488_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-lga3-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFq7nYrXZe9mgMvG_syzvSm54xjvTLsl-lUEitF7zjDxLe_AxtiIChBlltNjQK6o4c&_nc_ohc=pt7ZkaJRno8Q7kNvwEqSUZt&_nc_gid=y5PeBEV2OunF2Krnh3TiNw&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxFGbWfOo_mKREOCIGvC3KnbH6D3g2ovLp1kHjZEqJTGQ&oe=69B7C7C5&_nc_sid=10d13b"
+        }
+      ],
+      "topPosts": [
+        {
+          "likes": 7,
+          "comments": 0,
+          "caption": "Spend 50$ on ANY Tommee Tippee item(s), and Get a Chance to Win a Trip for 2 to LONDON!!!\n\nOffer Available in our Sin El Fil & Maameltein Stores and Online!\n\nHurry up!\n\n#chezlespetits #gebrangeahchan ",
+          "timestamp": "2026-01-17T09:41:29.000Z",
+          "postUrl": "https://instagram.com/p/DTm2MvCDUV4",
+          "imageUrl": "https://scontent-ord5-2.cdninstagram.com/v/t51.71878-15/617808473_908910248156050_7620801708406677550_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QE9KgxpMkh8TEpZ1SX1oL_HqIXoSxeDuaA0PxSBsDMRFMykUSK1SXgArZA0CANCEeI&_nc_ohc=Ym7VhKpqBxcQ7kNvwFm-IxZ&_nc_gid=JEKcrA8bAYAEZRBKACGAOw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afz1V10dNdzeA1nocP6yCYjd8HHYvkgH2Q4ijOc5yTjn4A&oe=69B7F0A3&_nc_sid=10d13b"
+        },
+        {
+          "likes": 5,
+          "comments": 2,
+          "caption": "Peg Perego Rialto Feeding Booster Seat Chair Fragola\n\nRialto, the booster seat to take with you when eating out.\n\nRialto is an adjustable booster seat that grows with your child and can be adapted to ",
+          "timestamp": "2026-01-22T15:23:15.000Z",
+          "postUrl": "https://instagram.com/p/DT0V6-lDdbh",
+          "imageUrl": "https://scontent-iad3-2.cdninstagram.com/v/t51.82787-15/621067821_18335067652245288_252443571197394265_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-iad3-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHJWGmCncrojwITidWTofIWIge21iieXXGbK5NxMRkCAWtMRZ5Gc_ySiVV74L5vpa0&_nc_ohc=wUg6A0MjU2MQ7kNvwHPNo0-&_nc_gid=xYc5vc4retgZkASrNIy_GQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afx8oQqe9LE57C5CDUy4sTFP20-GcSFgujZtGp_xlSK9vA&oe=69B7FAAD&_nc_sid=10d13b"
+        },
+        {
+          "likes": 7,
+          "comments": 0,
+          "caption": "Infantino’s 4m+ Magic Motion Activity Jumper Exersaucer, available in All our Stores!\n\n•Visit or Call our Shop:\n01482369 (Sin el Fil)\n09636017 (Maameltein)\n\n•Order on WhatsApp:\n70217251 (Beirut, South",
+          "timestamp": "2025-12-29T21:49:24.000Z",
+          "postUrl": "https://instagram.com/p/DS3PCOGDZFo",
+          "imageUrl": "https://scontent-mia5-2.cdninstagram.com/v/t51.82787-15/608559264_18332382394245288_3288051263653116685_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-mia5-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QEviA5NGk5KFf8lWIXKhjVO4h-0T-WOOdDNNMz7dw3blg6eTHRd8xTPqiN_UqBTRms&_nc_ohc=6Fk39JzCLEgQ7kNvwEGKQrH&_nc_gid=3b-OloA7B8cFee634KrL_Q&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afw9IwYVZxcENRAmVTDhlQ-3vNjjU7bWdvOgxGuF2DvJDw&oe=69B7F8FF&_nc_sid=10d13b"
         }
       ],
       "monthlyTrend": [
         {
           "month": "2025-12",
           "avgEngagement": 6,
-          "postCount": 3
+          "postCount": 2
         },
         {
           "month": "2026-01",
@@ -236,9 +323,26 @@
         {
           "month": "2026-03",
           "avgEngagement": 1,
-          "postCount": 10
+          "postCount": 11
         }
       ],
+      "postingPattern": {
+        "bestDay": "Tuesday",
+        "dayBreakdown": {
+          "mon": 1,
+          "tue": 21,
+          "wed": 9,
+          "thu": 5,
+          "fri": 4,
+          "sat": 10,
+          "sun": 0
+        }
+      },
+      "engagementRate": null,
+      "tiktokHandle": null,
+      "tiktokData": null,
+      "facebookHandle": null,
+      "facebookData": null,
       "contentGaps": [],
       "error": null,
       "partialData": false
@@ -249,7 +353,7 @@
       "role": "competitor",
       "handle": null,
       "platform": "instagram",
-      "scrapedAt": "2026-03-11T20:50:11.194Z",
+      "scrapedAt": "2026-03-12T00:56:23.855Z",
       "summary": {
         "postCount": 0,
         "avgEngagement": 0,
@@ -259,7 +363,14 @@
       "contentThemes": [],
       "topHashtags": [],
       "recentPosts": [],
+      "topPosts": [],
       "monthlyTrend": [],
+      "postingPattern": null,
+      "engagementRate": null,
+      "tiktokHandle": null,
+      "tiktokData": null,
+      "facebookHandle": null,
+      "facebookData": null,
       "contentGaps": [],
       "error": "Could not detect Instagram handle",
       "partialData": true
@@ -270,36 +381,36 @@
       "role": "competitor",
       "handle": "thetoystorelb",
       "platform": "instagram",
-      "scrapedAt": "2026-03-11T20:50:15.974Z",
+      "scrapedAt": "2026-03-12T00:56:30.280Z",
       "summary": {
         "postCount": 50,
-        "avgEngagement": 15,
+        "avgEngagement": 27,
         "followersEstimate": null,
         "postingFrequencyPerWeek": 6
       },
       "contentThemes": [
         {
           "theme": "Product Showcase",
-          "count": 19
-        },
-        {
-          "theme": "Behind the Scenes",
-          "count": 6
+          "count": 16
         },
         {
           "theme": "Promotional",
           "count": 5
         },
         {
+          "theme": "Behind the Scenes",
+          "count": 4
+        },
+        {
           "theme": "User Generated",
           "count": 3
         },
         {
-          "theme": "Lifestyle",
-          "count": 2
+          "theme": "Brand Story",
+          "count": 1
         },
         {
-          "theme": "Brand Story",
+          "theme": "Lifestyle",
           "count": 1
         }
       ],
@@ -321,6 +432,10 @@
           "count": 3
         },
         {
+          "tag": "#Ramadan2026",
+          "count": 2
+        },
+        {
           "tag": "#learningthroughplay",
           "count": 2
         },
@@ -330,10 +445,6 @@
         },
         {
           "tag": "#fun",
-          "count": 2
-        },
-        {
-          "tag": "#Ramadan2026",
           "count": 2
         },
         {
@@ -353,6 +464,18 @@
           "count": 2
         },
         {
+          "tag": "#RamadanGifts",
+          "count": 1
+        },
+        {
+          "tag": "#RamadanActivities",
+          "count": 1
+        },
+        {
+          "tag": "#KidsGifts",
+          "count": 1
+        },
+        {
           "tag": "#intentionalplay",
           "count": 1
         },
@@ -365,63 +488,92 @@
           "count": 1
         },
         {
-          "tag": "#toys",
+          "tag": "#MeetTheTeam",
           "count": 1
         },
         {
-          "tag": "#familyfun",
-          "count": 1
-        },
-        {
-          "tag": "#RamadanGifts",
-          "count": 1
-        },
-        {
-          "tag": "#RamadanActivities",
-          "count": 1
-        },
-        {
-          "tag": "#KidsGifts",
+          "tag": "#PoweredByPlay",
           "count": 1
         }
       ],
       "recentPosts": [
         {
-          "caption": "Lebanon’s toy stores and play destinations are coming together to bring smiles back to displaced children.\nDonate a toy in good condition and make a c",
-          "likes": 74,
-          "comments": 3,
-          "timestamp": "2026-03-10T18:24:47.000Z"
-        },
-        {
-          "caption": "Operating with extra care to keep our customers and team safe. 💙\nThank you for your patience and support.\nHoping for safer, better days ahead. 🇱🇧🧸",
           "likes": -1,
           "comments": 0,
-          "timestamp": "2026-03-04T16:18:18.000Z"
+          "caption": "Make your Ramadan gifting magical at The Toy Store! 🌙✨\nFrom building the majestic Masjid Al Haram to creating your own glowing star lanterns, find the perfect surprise to light up every little smile.",
+          "timestamp": "2026-03-04T08:03:06.000Z",
+          "postUrl": "https://instagram.com/p/DVdIJH2DZim",
+          "imageUrl": "https://scontent-ord5-2.cdninstagram.com/v/t51.82787-15/645730294_18394270006197161_6131898762479713414_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QFznrJYEa3rB8julg1JQQOtii5ppyLHBHhpIm8Y3AS3Myf4bNthQSo43dU-38kBEOU&_nc_ohc=eriXcVT5v7IQ7kNvwFa56N0&_nc_gid=zBeT6yPeHgtGT8S57RPstw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afxca6pBsXYkqWGnVRoTcXQuuqPoFzM-TC6Mgsk5gQ2jeA&oe=69B7C9AD&_nc_sid=10d13b"
         },
         {
-          "caption": "POV: You tried to punch the monkey…\nNow the whole squad pulled up 🐒👀",
-          "likes": -1,
-          "comments": 0,
-          "timestamp": "2026-02-24T10:07:02.000Z"
-        },
-        {
-          "caption": "Toy rotation هالأسبوع 🧺🤍\nكم لعبة جديدة، مختارة عن قصد،\nحتى يكون اللعب ممتع… ومفيد بنفس الوقت.\n\nI always prefer simple toys that grow with my kids,\na",
           "likes": 13,
           "comments": 0,
-          "timestamp": "2026-03-04T13:06:08.000Z"
+          "caption": "Toy rotation هالأسبوع 🧺🤍\nكم لعبة جديدة، مختارة عن قصد،\nحتى يكون اللعب ممتع… ومفيد بنفس الوقت.\n\nI always prefer simple toys that grow with my kids,\nand keep playtime meaningful ✨\n\nNew toys picked fro",
+          "timestamp": "2026-03-04T13:06:08.000Z",
+          "postUrl": "https://instagram.com/p/DVdo7mUiL1B",
+          "imageUrl": "https://scontent-dfw5-1.cdninstagram.com/v/t51.82787-15/640413957_18081998030521547_2510601734835306697_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-dfw5-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QEiWzI1dchFOxKA79n_kSXaCdy0y_Bs4zkGW32XRMRq28NQvee9_bjinjEh7dMfdZ0&_nc_ohc=hMJg5sA8VQQQ7kNvwGBEP98&_nc_gid=M2zA5kSjCjEc-YOyKdaIGA&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxULB2j8VRgB6Bkh1WX-voFvdIR2-kGTU3VwQidUeTSgw&oe=69B7E4C0&_nc_sid=10d13b"
         },
         {
-          "caption": "Your next best friend is waiting for you at The Toy Store! Come visit us and find your perfect match. 🎁\n#thetoystore #toys #kidstoys #familyfun #fun",
           "likes": -1,
           "comments": 0,
-          "timestamp": "2026-03-05T10:19:00.000Z"
+          "caption": "Operating with extra care to keep our customers and team safe. 💙\nThank you for your patience and support.\nHoping for safer, better days ahead. 🇱🇧🧸",
+          "timestamp": "2026-03-04T16:18:18.000Z",
+          "postUrl": "https://instagram.com/p/DVeA0EpCFVc",
+          "imageUrl": "https://scontent-hou1-1.cdninstagram.com/v/t51.82787-15/641844569_18394321504197161_299461657031625879_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QG1wyjfUwCRHQPZnJLpHnuX2swDQeNd6Ir9EZb7M_ijeieh9quyXi2qY8smEXrMTKY&_nc_ohc=_BY36mKhAcEQ7kNvwG2FYX7&_nc_gid=DpZWGJ4X3MkE3X2pEtyGIQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxmyAx9hEmq60Ct9y1bAzNdlZ-gnIuZz-XHmO6bSgRjEg&oe=69B7D126&_nc_sid=10d13b"
+        },
+        {
+          "likes": -1,
+          "comments": 0,
+          "caption": "POV: You tried to punch the monkey…\nNow the whole squad pulled up 🐒👀",
+          "timestamp": "2026-02-24T10:07:02.000Z",
+          "postUrl": "https://instagram.com/p/DVIv76CDQ6w",
+          "imageUrl": "https://scontent-lga3-2.cdninstagram.com/v/t51.82787-15/641753031_18393268027197161_9207385152279502056_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-lga3-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QEbFMWZjdwT3JKY9k623ZvvtYjBl1nU_AwntOql6-FMH4wXRiVPpb5pLs0dkKGK9TM&_nc_ohc=Y5-qKg_dY2oQ7kNvwEOx0xR&_nc_gid=SrYZuW0okOSeL13p9MfuKQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afzu7XuJYG9Q9P6YuSuSdY6b0kMrAVBWomE3V8pAQu5iSg&oe=69B7E2BD&_nc_sid=10d13b"
+        },
+        {
+          "likes": 69,
+          "comments": 26,
+          "caption": "Before we were running The Toy Store…\nwe were the kids walking into one. 🧸\n\nThe toy kingdom is led by children who never stopped loving toys.\nAnd that’s exactly why we get it. 💙\n\n#TheToyStore #MeetT",
+          "timestamp": "2026-02-27T19:39:34.000Z",
+          "postUrl": "https://instagram.com/p/DVRf32dDZsM",
+          "imageUrl": "https://scontent-iad3-2.cdninstagram.com/v/t51.82787-15/642984752_18393703030197161_8569907812645174436_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-iad3-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QGRMVp1Y_PRvVJwFJy5kSd6q9ila0ger4DWSYiLvSxgLA_YDZPvhIknYlNKe_S-IOM&_nc_ohc=VEesZeyZcr8Q7kNvwFH0buK&_nc_gid=ud7enTPSURRj52yOXEyLtw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afwwn3r6oDZ9opW0BrApmzVMQgM7zi1hxya-oKlNbg2yyg&oe=69B7E9FD&_nc_sid=10d13b"
+        }
+      ],
+      "topPosts": [
+        {
+          "likes": 626,
+          "comments": 14,
+          "caption": "Experience the vintage style of filming with the new Kodak charmera keychain camera! ✨️\n\nGet yours now from @thetoystorelb 👈\n\n#kodak #kodakcharmera",
+          "timestamp": "2025-12-30T16:53:43.000Z",
+          "postUrl": "https://instagram.com/p/DS5RrGljdio",
+          "imageUrl": "https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/608404758_18339840244234526_8813870367655823317_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QEsKLocbdHKF-geYDScHrn5HyiaNE3zBAqVk8waHmU6JZKsZiKZW_4HFRnSKEwOw7Y&_nc_ohc=AyDuNUICazgQ7kNvwEKrowM&_nc_gid=dJevuaj0X1kLvodcBB84XQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzUGV-SnDW7mmCtxjlKEbWV4rsnX9bYWSNOD2PJoijq6A&oe=69B7E34A&_nc_sid=10d13b"
+        },
+        {
+          "likes": 98,
+          "comments": 31,
+          "caption": "90s called… they want their vibes back 📽️🎞️ \n🥹GRAB IT before it ghosts you at the toy store👀\n\n📸✨ Mini camera, mega nostalgia!\nMeet the Kodak Charmera — the tiny keychain camera that turns everyda",
+          "timestamp": "2026-01-12T07:54:23.000Z",
+          "postUrl": "https://instagram.com/p/DTZydaBiLGZ",
+          "imageUrl": "https://instagram.fboi1-1.fna.fbcdn.net/v/t51.82787-15/613579143_18527935705065581_7008534539396620701_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=instagram.fboi1-1.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2QFNo7TAoDSP2yeruLy7Gl0aOBn07hYv9BmSQZqSxR47rXYMwakjTDiXO7TeA3KzcoU&_nc_ohc=DA_bXuUWwfYQ7kNvwFJI3UE&_nc_gid=ntc9oYpBvHQbTLQsxCB53A&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzmsxxMXHu-9IijbyV9y6GQbWAOvEClvcBnRhdaB0arjQ&oe=69B7F56B&_nc_sid=10d13b"
+        },
+        {
+          "likes": 84,
+          "comments": 32,
+          "caption": "Who said nostalgia can’t fit in your pocket?\nThe Kodak Charmera is here to prove them wrong. \n\nCapture your favorite moments with 90s-style\nOnly at The Toy Store click the link in their bio and get yo",
+          "timestamp": "2026-01-14T09:15:54.000Z",
+          "postUrl": "https://instagram.com/p/DTfFDq9DTjy",
+          "imageUrl": "https://scontent-ord5-1.cdninstagram.com/v/t51.71878-15/616023785_1495504982163503_7610701999102597977_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ord5-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QHvrFsitOVMQoRDcic2zqcoKHIckRaVcqL9zLQZrU_tCV1Ww2fWT6f_CFWaL8wRuxs&_nc_ohc=asWKUx7nzj8Q7kNvwFc-99n&_nc_gid=yHB7ZVT-lQ9P95HyVQd0Mg&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afyehr9q-tfOgdr0Gns6bjksmCDHT519i5qUfj3w9hZ1Jw&oe=69B7FCDE&_nc_sid=10d13b"
         }
       ],
       "monthlyTrend": [
         {
+          "month": "2025-12",
+          "avgEngagement": 640,
+          "postCount": 1
+        },
+        {
           "month": "2026-01",
           "avgEngagement": 20,
-          "postCount": 18
+          "postCount": 17
         },
         {
           "month": "2026-02",
@@ -434,6 +586,23 @@
           "postCount": 8
         }
       ],
+      "postingPattern": {
+        "bestDay": "Wednesday",
+        "dayBreakdown": {
+          "mon": 10,
+          "tue": 10,
+          "wed": 11,
+          "thu": 7,
+          "fri": 4,
+          "sat": 4,
+          "sun": 4
+        }
+      },
+      "engagementRate": null,
+      "tiktokHandle": "thetoystorelebanon",
+      "tiktokData": null,
+      "facebookHandle": "thetoystorelb",
+      "facebookData": null,
       "contentGaps": [],
       "error": null,
       "partialData": false
