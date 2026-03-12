@@ -1240,6 +1240,39 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
         </Card>
       )}
 
+      {/* ── Section 4.5: Competitor Showcase ── */}
+      {allBrands.filter(b => b.role === 'competitor' && b.topPosts?.length > 0).length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>What's Working for Competitors</h3>
+          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 20 }}>Top posts from each competitor — see what content is driving engagement in this market.</p>
+          {allBrands.filter(b => b.role === 'competitor' && b.topPosts?.length > 0).map((b, idx) => {
+            const brandIdx = allBrands.indexOf(b)
+            const [g1, g2] = GRAD_PAIRS[brandIdx % GRAD_PAIRS.length]
+            return (
+              <div key={b.id} style={{ marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: `linear-gradient(135deg, ${g1}, ${g2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                    {b.name.charAt(0)}
+                  </div>
+                  <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{b.name}</span>
+                  <span style={{ fontSize: 11, color: T.textMuted, background: T.surfaceAlt, padding: '2px 8px', borderRadius: 10, border: `1px solid ${T.border}` }}>@{b.handle}</span>
+                  {b.summary?.avgEngagement > 0 && (
+                    <span style={{ fontSize: 11, color: '#7c3aed', background: '#ede9fe', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
+                      avg {b.summary.avgEngagement.toLocaleString()} eng
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
+                  {b.topPosts.slice(0, 3).map((post, i) => (
+                    <InstagramCard key={i} post={post} brandName={b.name} handle={b.handle} brandIdx={brandIdx} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </Card>
+      )}
+
       {/* ── Section 5: Competitive Theme Heatmap ── */}
       {allBrands.length > 0 && allBrands.some(b => b.contentThemes?.length > 0) && (() => {
         const ALL_THEMES = ['Product Showcase', 'Lifestyle', 'User Generated', 'Promotional', 'Behind the Scenes', 'Seasonal', 'Brand Story']
@@ -1420,6 +1453,16 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                   <span key={h.tag} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{h.tag}</span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Top posts empty state */}
+          {target.partialData && !target.topPosts?.length && !target.recentPosts?.length && (
+            <div style={{ padding: '14px 16px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, marginBottom: 4 }}>
+              <p style={{ margin: 0, fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>
+                Posts couldn't be scraped for <strong>@{target.handle}</strong> — the account may be private or restricted.
+                Re-run the Social Audit from Brand Profile to retry.
+              </p>
             </div>
           )}
 
