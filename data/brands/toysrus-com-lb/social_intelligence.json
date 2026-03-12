@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-12T15:58:47.718Z",
+  "generatedAt": "2026-03-12T20:54:06.319Z",
   "brandSlug": "toysrus-com-lb",
   "brands": [
     {
@@ -8,7 +8,7 @@
       "role": "target",
       "handle": "toysruslb",
       "platform": "instagram",
-      "scrapedAt": "2026-03-12T15:46:52.890Z",
+      "scrapedAt": "2026-03-12T20:45:00.583Z",
       "summary": {
         "postCount": 0,
         "avgEngagement": 0,
@@ -67,7 +67,7 @@
       "role": "competitor",
       "handle": "playone.com.lb",
       "platform": "instagram",
-      "scrapedAt": "2026-03-12T15:47:19.350Z",
+      "scrapedAt": "2026-03-12T20:46:07.789Z",
       "summary": {
         "postCount": 50,
         "avgEngagement": 4,
@@ -126,43 +126,35 @@
           "count": 1
         },
         {
-          "tag": "#gabbysdollhouse",
+          "tag": "#disneystitch",
           "count": 1
         },
         {
-          "tag": "#christmasgifts",
+          "tag": "#unboxinglebanon",
           "count": 1
         },
         {
-          "tag": "#LEGO",
+          "tag": "#Bitzee",
           "count": 1
         },
         {
-          "tag": "#LEGONinjago",
+          "tag": "#HarryPotterToys",
           "count": 1
         },
         {
-          "tag": "#LEGOTechnic",
+          "tag": "#WizardingWorld",
           "count": 1
         },
         {
-          "tag": "#ToysLebanon",
+          "tag": "#InteractiveToys",
           "count": 1
         },
         {
-          "tag": "#BuildAndPlay",
+          "tag": "#ToyStore",
           "count": 1
         },
         {
-          "tag": "#Lego",
-          "count": 1
-        },
-        {
-          "tag": "#adventcalendar",
-          "count": 1
-        },
-        {
-          "tag": "#Christmaslebanon",
+          "tag": "#ToyLaunch",
           "count": 1
         },
         {
@@ -174,11 +166,19 @@
           "count": 1
         },
         {
-          "tag": "#ElfOnTheShelf",
+          "tag": "#legolebanon",
           "count": 1
         },
         {
-          "tag": "#FestiveFun",
+          "tag": "#lego",
+          "count": 1
+        },
+        {
+          "tag": "#LEGO",
+          "count": 1
+        },
+        {
+          "tag": "#LEGONinjago",
           "count": 1
         }
       ],
@@ -189,23 +189,23 @@
           "caption": "Keeps them moving in front of the TV! Yes please! ✅\nLeapfrog Leapmove $155\n\n#besttoys get it online!",
           "timestamp": "2025-11-29T13:16:33.000Z",
           "postUrl": "https://instagram.com/p/DRpDWl_jDJM",
-          "imageUrl": "https://scontent-phx1-1.cdninstagram.com/v/t51.71878-15/587771611_2621187051577903_8735539980597549335_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-phx1-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QG0EA0RvkdN5tnaaeAteFg-2_04Md3VBO7cpXCmyuSFEIOrJU_PDKPtBvMNHaXGyRI&_nc_ohc=IQ9cVqjtKSIQ7kNvwE7ggwI&_nc_gid=5U9f_4R_-RypYN4GOTi76g&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afyakyuh_d1U5fviRR7ywflyxEaNZ3bonn0r8Bc4MEAo3g&oe=69B89A2A&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/playone/post_0.jpg"
         },
         {
-          "likes": 1,
-          "comments": 2,
-          "caption": "💥Black Friday Deals are live!\nSave up to 70% OFF on brand toys, gifting ideas and big holiday items. ⏰ New deals every hour till Monday - don’t miss out!",
-          "timestamp": "2025-11-28T13:21:54.000Z",
-          "postUrl": "https://instagram.com/p/DRmgUJlDIBu",
-          "imageUrl": "https://scontent-iad3-1.cdninstagram.com/v/t51.82787-15/589043147_18372722461158139_7236526683495616887_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-iad3-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QE1qtAw5FiTUmqn1hxG1aPvOyR65Dc8WwyYruo4FE7pTrhfTuWoNOtH2EImhHR66DQ&_nc_ohc=v13t3atI3o0Q7kNvwGHsjOY&_nc_gid=7z-PNVdigZ4VuCeYTozXzw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afxnz-WadZ9PscHXm5veuuxD5sCyGBXDr17y_lblc-1lYQ&oe=69B8B2FC&_nc_sid=10d13b"
+          "likes": 0,
+          "comments": 0,
+          "caption": "Price: 189$. With remote-controlled locomotive, dimmable headlights and LEGO Powered Up technology, a dining car, passenger car, station platform, 24 track pieces and 6 minifigures. Additional track e",
+          "timestamp": "2025-11-24T20:58:41.000Z",
+          "postUrl": "https://instagram.com/p/DRdBaNWjJR9",
+          "imageUrl": "/api/social-image/playone/post_1.jpg"
         },
         {
           "likes": 2,
           "comments": 0,
-          "caption": "We’re counting down to Christmas with the top toys of 2025 ❤️🎅🎄",
-          "timestamp": "2025-12-08T21:58:28.000Z",
-          "postUrl": "https://instagram.com/p/DSBLYSEjNmB",
-          "imageUrl": "https://scontent-phl2-1.cdninstagram.com/v/t51.82787-15/588955021_18373820275158139_7824470484014592077_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-phl2-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QHYY80C8ZrFujHEAVIQjbZxXGFaxzSV9IOvveSNIboJZFvvHcv3yPbFteA9EC4W7FU&_nc_ohc=9OEF2kzAuwYQ7kNvwFlTpup&_nc_gid=JXxdk1cWJlFjNJJ9XmD_rg&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxdZEqhEXqCqgJoyDvXffdIEJnumwTZ2JhGyBj2uGe4qw&oe=69B8B8F4&_nc_sid=10d13b"
+          "caption": "New Gen Z Street Stitch, surprise box, can’t get cooler than that! 😎 which one will you unbox? \n\n$39 🚨LIMITED STOCK🚨\n\n#disneystitch #unboxinglebanon",
+          "timestamp": "2025-11-23T21:05:33.000Z",
+          "postUrl": "https://instagram.com/p/DRaZVzpk6BF",
+          "imageUrl": "/api/social-image/playone/post_2.jpg"
         },
         {
           "likes": 1,
@@ -213,15 +213,15 @@
           "caption": "I love you my dearest country 🇱🇧🫡❤️",
           "timestamp": "2025-11-22T18:11:09.000Z",
           "postUrl": "https://instagram.com/p/DRXkpWujJeV",
-          "imageUrl": "https://scontent-mia3-2.cdninstagram.com/v/t51.82787-15/586917660_18372174844158139_3646473472282875275_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-mia3-2.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QEDO5N8OPBty5-lYvelTctJqrctjw3F3ZkIh_jNtHzryjgjMDXcjD5TcVO35Qb5LKQ&_nc_ohc=C6RAx1d4jzIQ7kNvwEdRytb&_nc_gid=M3udHWX6s_L5WE7_S7nw0g&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyBOqwqImZAbVOgQw8r500itxAXPdB98JRqq4RWRDeonA&oe=69B8B6BD&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/playone/post_3.jpg"
         },
         {
-          "likes": 0,
-          "comments": 1,
-          "caption": "Oh what fun! Vtech Twist and play cube, for extra an extra amount of holiday cheer. $61",
-          "timestamp": "2025-12-11T19:24:45.000Z",
-          "postUrl": "https://instagram.com/p/DSIoLFpDK8V",
-          "imageUrl": "https://instagram.foma1-2.fna.fbcdn.net/v/t51.82787-15/598441119_18374112973158139_5257243602276792019_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=instagram.foma1-2.fna.fbcdn.net&_nc_cat=107&_nc_oc=Q6cZ2QEHeext0fuLwKcsj2eAEVkplcOgsGUFnKdH4IvUu2HTjsq6K_eFmaduYASlZD0KPh4&_nc_ohc=YzKeFbejG-kQ7kNvwF4Pl6H&_nc_gid=UuuvThSyUtSszv9SvLX78g&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxIemqX5m1q8X04RayMRN5iL3aw2lYTQdAbz0j9sAnwCw&oe=69B8CAF3&_nc_sid=10d13b"
+          "likes": 1,
+          "comments": 2,
+          "caption": "💥Black Friday Deals are live!\nSave up to 70% OFF on brand toys, gifting ideas and big holiday items. ⏰ New deals every hour till Monday - don’t miss out!",
+          "timestamp": "2025-11-28T13:21:54.000Z",
+          "postUrl": "https://instagram.com/p/DRmgUJlDIBu",
+          "imageUrl": "/api/social-image/playone/post_4.jpg"
         }
       ],
       "topPosts": [
@@ -231,7 +231,7 @@
           "caption": "What is your Elf on the Shelf up to today?",
           "timestamp": "2024-12-17T16:09:59.000Z",
           "postUrl": "https://instagram.com/p/DDr4gcZSiHO",
-          "imageUrl": "https://scontent-atl3-3.cdninstagram.com/v/t51.2885-15/470814182_18330869326158139_3706144921374009354_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-atl3-3.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QGZ_DUD7rbZsfdZJLDwv-c8QqZZh5OEztHuJDRvd3128HzLSjpSBlkO65wx7TPU_v0&_nc_ohc=F6PfDSKfYe0Q7kNvwFmZJjo&_nc_gid=dxpEearY1f__EI6LI5N19A&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afy9rdhwy7q4oOt0gdl0o_QsQu724cfqZT0AKyjbTVqUAA&oe=69B89BF7&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/playone/post_0.jpg"
         },
         {
           "likes": 13,
@@ -239,7 +239,7 @@
           "caption": "Guess what you’ll find at PlayOne.com.lb",
           "timestamp": "2025-05-31T17:20:06.000Z",
           "postUrl": "https://instagram.com/p/DKU3sZgy_pU",
-          "imageUrl": "https://scontent-atl3-3.cdninstagram.com/v/t51.2885-15/503105714_18349623118158139_325597572806537139_n.jpg?stp=dst-jpg_e35_s1080x1080_sh0.08_tt6&_nc_ht=scontent-atl3-3.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QGJXs_gZ_405jqG_4_22TDVwhEESJ9Q1wgqV-_d_FtRZ6L4xBbICnRROaPz0XaeFAk&_nc_ohc=eVEhEcXx48cQ7kNvwGDk0sC&_nc_gid=WiDLxWMPB1_whpEUJ34T8Q&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyBvAkX6q-iW7AstrXS4FztBW9Tru1hF1CvkdWL5aUVWw&oe=69B8BC5C&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/playone/post_1.jpg"
         },
         {
           "likes": 13,
@@ -247,7 +247,7 @@
           "caption": "A little LEGO latte art to cozy up your feed ☕️✨\n📹: @hypnomotion",
           "timestamp": "2025-02-27T21:19:09.000Z",
           "postUrl": "https://instagram.com/p/DGl1GU0Tjhy",
-          "imageUrl": "https://scontent-dfw5-1.cdninstagram.com/v/t51.2885-15/482158333_18339408850158139_8886014955680098695_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-dfw5-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QH0CCvgJtPB588-X3bl1SegoUcoSINbWWluJD3YElOyaeOq0xSbNjllWKo0ihezeOk&_nc_ohc=mmlMpS3kxQEQ7kNvwFQZrq0&_nc_gid=wnbrt7KxzS-aOwCkMJvN2Q&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzmnXBpNsKpO0-GMEj8fj0b9YdRKXrKACU_CPhyvaPn9A&oe=69B8ACAE&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/playone/post_2.jpg"
         }
       ],
       "monthlyTrend": [
@@ -334,7 +334,7 @@
       "role": "competitor",
       "handle": "joueclubliban",
       "platform": "instagram",
-      "scrapedAt": "2026-03-12T15:49:03.625Z",
+      "scrapedAt": "2026-03-12T20:47:36.680Z",
       "summary": {
         "postCount": 50,
         "avgEngagement": 24,
@@ -405,19 +405,15 @@
           "count": 2
         },
         {
+          "tag": "#Barbie",
+          "count": 2
+        },
+        {
           "tag": "#Winter",
           "count": 2
         },
         {
           "tag": "#Ski",
-          "count": 2
-        },
-        {
-          "tag": "#Barbie",
-          "count": 2
-        },
-        {
-          "tag": "#Mood",
           "count": 2
         },
         {
@@ -429,54 +425,34 @@
           "count": 2
         },
         {
-          "tag": "#Vtech",
+          "tag": "#Mood",
+          "count": 2
+        },
+        {
+          "tag": "#Stitch",
           "count": 1
         },
         {
-          "tag": "#ScreenTime",
+          "tag": "#DisneyAdventure",
           "count": 1
         },
         {
-          "tag": "#Home",
+          "tag": "#Story",
           "count": 1
         },
         {
-          "tag": "#Family",
+          "tag": "#Martinelia",
           "count": 1
         }
       ],
       "recentPosts": [
         {
-          "likes": 22,
-          "comments": 3,
-          "caption": "If you're looking to cut back on screen time without losing the \"cool factor\" of tech, Vtech is the ultimate middle ground. \n\nThey bring the lights, the music, and the interaction, but keep the focus ",
-          "timestamp": "2026-03-04T11:02:50.000Z",
-          "postUrl": "https://instagram.com/p/DVdcmSbjcmQ",
-          "imageUrl": "https://scontent-sea5-1.cdninstagram.com/v/t51.71878-15/641556156_1696493604673035_9201498075611696788_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-sea5-1.cdninstagram.com&_nc_cat=103&_nc_oc=Q6cZ2QHhZUBskQ4seBtPGg_DiHkQNNLyoNSpaRXdbr9Qk3L-A9c7sb_2nCZB-v9WofSqBKk&_nc_ohc=VC6uGC5P_tkQ7kNvwHtWtdW&_nc_gid=YuciUWfvJQpT296j_dfx4g&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzNxqq4E1LGPl9XvGpctQ2_nYq1Xo54pZUoeIM7wv1Gbw&oe=69B8BC87&_nc_sid=10d13b"
-        },
-        {
-          "likes": 25,
-          "comments": 1,
-          "caption": "Stay home, Stay safe❤️\n\nWe'll deliver the joy to you.\n\n#JoueClub #Home #Toys",
-          "timestamp": "2026-03-07T11:15:00.000Z",
-          "postUrl": "https://instagram.com/p/DVlMis0DdbI",
-          "imageUrl": "https://scontent-ord5-2.cdninstagram.com/v/t51.82787-15/646091368_18565055467048454_8182985466930870656_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QHuZ1wBW6frgYAOco1TSgkBzG3Zku0UHXQldA8AbTGJ0Ve8S4IYCr_G509ngzI29dY&_nc_ohc=I4PXiq4YjwEQ7kNvwFf5seg&_nc_gid=psIbhMBiAvYy00Wfa1srnA&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afw64FbRnShB-Bt_tXNqLQ2T8Razd4CVme274HvW_GeFSA&oe=69B8CCEA&_nc_sid=10d13b"
-        },
-        {
-          "likes": 12,
+          "likes": 21,
           "comments": 0,
-          "caption": "Stay Close, Stay Connected! 🎲✨\n\n#JoueClub #BoardGames #Friends #Family",
-          "timestamp": "2026-03-03T11:16:51.000Z",
-          "postUrl": "https://instagram.com/p/DVa5hXgjSC2",
-          "imageUrl": "https://scontent-dfw5-2.cdninstagram.com/v/t51.82787-15/645754244_18564227185048454_429460659650012142_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-dfw5-2.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QFhRTsdjRO0dPD-r__zOKzyo6iBqCwAPc82S2fb7F3ffkw6HhhRtQPKJ7vWtnR1FTI&_nc_ohc=LpYYSmlFbC8Q7kNvwFhlOC_&_nc_gid=eI2igGgyiNnFLuN3jjeccQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzBIjvemiKx0DxKxb-ok4T8GvwtYNgZl5ucNLDppTbPYA&oe=69B8BC65&_nc_sid=10d13b"
-        },
-        {
-          "likes": 17,
-          "comments": 0,
-          "caption": "Making sure the next generation has the best toys in history\n\n#JoueClub #Toys #Kids #Fun",
-          "timestamp": "2026-03-01T07:10:06.000Z",
-          "postUrl": "https://instagram.com/p/DVVTHBxjbgY",
-          "imageUrl": "https://scontent-ord5-2.cdninstagram.com/v/t51.82787-15/643595162_18564226102048454_6233756752004063458_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QH8cu5ar5C2zjo3fxraBz-YBqB2OJwNKL0MwOQY9DMrWDosDvTLZ5Fi3910BRSw9kk&_nc_ohc=FIpdInxNxYwQ7kNvwHO0lt2&_nc_gid=B24zXN9GbNdqR3OAExoh2A&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfymsOoGXLQT8NqCztIyTqQIVp8cjiIDlfWWVSaPj7BxUQ&oe=69B8AADA&_nc_sid=10d13b"
+          "caption": "Win a dream mountain getaway! 🎿\n\nSpend $80+ at JouéClub & enter our special draw for a chance to win a 2-night stay @icmzaar for the whole family!\n\n📢 Save the date: Winners will be announced on Eid ",
+          "timestamp": "2026-02-12T09:12:36.000Z",
+          "postUrl": "https://instagram.com/p/DUpwMu0DbPX",
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_0.jpg"
         },
         {
           "likes": 8,
@@ -484,7 +460,31 @@
           "caption": "Stitch is ready to share his favorite stories with you💙 \n\n#Stitch #DisneyAdventure #JoueClub #Story",
           "timestamp": "2026-03-02T09:43:26.000Z",
           "postUrl": "https://instagram.com/p/DVYJ_qcDYzh",
-          "imageUrl": "https://instagram.fhio2-2.fna.fbcdn.net/v/t51.71878-15/641768975_1436865751180600_8455055343481435222_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=instagram.fhio2-2.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2QFS2yD706P8hK9ZDSTV9GYxlXW3pLJ7bznw-OI6p5rmpha4C1SB_vhCLyDly6jqeLw&_nc_ohc=s2iRehqYKyYQ7kNvwH-lS7Q&_nc_gid=Lkj0_taZSotDN4qRIYK3Qw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afw0Fv0JTter_MAHndirvaTHVO9ZAvlrv5QwqsfmbDVuRQ&oe=69B8BD44&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_1.jpg"
+        },
+        {
+          "likes": 9,
+          "comments": 0,
+          "caption": "Unlock a world of color and sparkles! 💅🏻💄\n\n#JoueClub #Martinelia #Makeup",
+          "timestamp": "2026-03-10T10:43:08.000Z",
+          "postUrl": "https://instagram.com/p/DVs3OixDQs8",
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_2.jpg"
+        },
+        {
+          "likes": 14,
+          "comments": 0,
+          "caption": "Indoor fun, endless giggles! \n\nLet the little ones jump, grab, and play while building coordination and active skills — all from the comfort of home❤️\n\n#ActivePlay #IndoorFun #KidsActivity #JoueClub",
+          "timestamp": "2026-03-06T07:42:52.000Z",
+          "postUrl": "https://instagram.com/p/DViPatAjQDe",
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_3.jpg"
+        },
+        {
+          "likes": 22,
+          "comments": 3,
+          "caption": "If you're looking to cut back on screen time without losing the \"cool factor\" of tech, Vtech is the ultimate middle ground. \n\nThey bring the lights, the music, and the interaction, but keep the focus ",
+          "timestamp": "2026-03-04T11:02:50.000Z",
+          "postUrl": "https://instagram.com/p/DVdcmSbjcmQ",
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_4.jpg"
         }
       ],
       "topPosts": [
@@ -494,15 +494,15 @@
           "caption": "Some days we are brave. Other days, we just need a hug❤️\n\n#JoueClub #punchmonkey #japanesemonkey",
           "timestamp": "2026-02-22T08:05:00.000Z",
           "postUrl": "https://instagram.com/p/DVDYg9VCJuV",
-          "imageUrl": "https://scontent-hou1-1.cdninstagram.com/v/t51.82787-15/640178968_18562377226048454_5585918422081443244_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QGFhm72yzk955KbFmrhji5bjHPIeq3rGlgagJEGfGU4o6IoDQw5-xldpDIX8XAGiR8&_nc_ohc=aN8W0KgfjBcQ7kNvwEMpf6p&_nc_gid=FMJsSaWn951BqIC3kRyEMA&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwWW1OEokbXjr0i9nyzfGqElLam4FuPSkMYTJwSTEb20A&oe=69B8C48F&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_0.jpg"
         },
         {
-          "likes": 103,
+          "likes": 104,
           "comments": 0,
           "caption": "‼️💜💜THESE ARE THE EXACT CHARACTERS COMING TO OUR KPOP DEMON HUNTERS EVENT💜💜‼️‼️\n\n💛 Tiny Fests × 5 Stars Entertainment proudly present\n🎶👹K-POP DEMON HUNTERS (super realistic mascots) – THE STAND",
           "timestamp": "2026-02-24T11:50:00.000Z",
           "postUrl": "https://instagram.com/p/DVI7vakCjrO",
-          "imageUrl": "https://instagram.fluk1-1.fna.fbcdn.net/v/t51.82787-15/639509241_18082620251337924_3092237833228121733_n.heic?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=instagram.fluk1-1.fna.fbcdn.net&_nc_cat=100&_nc_oc=Q6cZ2QEdM2ztOt9Xr0xUvKrBxfe2vFue_duAhTckghp7uFlF_CQ3GUDgjUPAqwkWelK6lmc&_nc_ohc=CAX2xzzd8sUQ7kNvwEVbGmj&_nc_gid=10C0UIJmGhn4YFQCstQHKA&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afw3AZAuvd0ZCdt3_mONqs9D6qDRy7wfBpPTHIGPPqvHKQ&oe=69B89E4F&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_1.jpg"
         },
         {
           "likes": 84,
@@ -510,7 +510,7 @@
           "caption": "Mika shares her favorite toy picks & the secret to the best playtime ever at JouéClub! 🧸✨\n\n#JoueClub #Interview #Favorite #Toys #Playtime",
           "timestamp": "2026-02-24T09:57:34.000Z",
           "postUrl": "https://instagram.com/p/DVIuOnHDezJ",
-          "imageUrl": "https://scontent-hou1-1.cdninstagram.com/v/t51.71878-15/640351348_1472703937837682_7214395676823287509_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QHeedmfhP2ZX8u_cYpM8DyOx7_6xvd6lFGufNOUQxyGSnR68Y7wT0iENGz3dQVHOFw&_nc_ohc=8TeRGXl5FvoQ7kNvwHd-ld5&_nc_gid=xM1VQlFM0pz9t9nXMhsuuQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxIE57j0gF0m0scfOjflQOElqyy5nZb7bUGYoYP_6Pxcw&oe=69B89DC6&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/jouéclub-lebanon/post_2.jpg"
         }
       ],
       "monthlyTrend": [
@@ -557,7 +557,7 @@
       "role": "competitor",
       "handle": "chezlespetits_by_geahchan",
       "platform": "instagram",
-      "scrapedAt": "2026-03-12T15:51:45.767Z",
+      "scrapedAt": "2026-03-12T20:49:28.190Z",
       "summary": {
         "postCount": 50,
         "avgEngagement": 3,
@@ -666,28 +666,12 @@
       ],
       "recentPosts": [
         {
-          "likes": 1,
+          "likes": 2,
           "comments": 0,
-          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Wonder Grey Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – 36 kg).\n\nThe Viaggio 1-2-3 Via car seat was spe",
-          "timestamp": "2026-03-10T22:37:49.000Z",
-          "postUrl": "https://instagram.com/p/DVuJBAHjVQH",
-          "imageUrl": "https://scontent-dfw5-2.cdninstagram.com/v/t51.82787-15/651013403_18341275990245288_3166441536798682434_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-dfw5-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFHxV9jHr9eSGRDhA2uvU4MlLVCF3LSt_Xrz9JJOsInoGamoUmnycdMS9j7NXiSdJM&_nc_ohc=UFwxq2gtQ84Q7kNvwHs6UFp&_nc_gid=ofBIvlq213hvKg7-qKhvfg&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwODD6d5ESIrOr0Xh2ueH87xFUp5t7qG5sSnzq0hm2PPg&oe=69B89D22&_nc_sid=10d13b"
-        },
-        {
-          "likes": 1,
-          "comments": 0,
-          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Forest Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat is so flexible you can use it for a longer period",
-          "timestamp": "2026-03-11T10:38:28.000Z",
-          "postUrl": "https://instagram.com/p/DVvbfOpjSK2",
-          "imageUrl": "https://scontent-den2-1.cdninstagram.com/v/t51.82787-15/649928477_18341334691245288_9023466773290228488_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-den2-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFOTBv7QdaGYH-nmo1buakyuNXfZRrlO43dzRTfEOvF3y91iO0Ses-HISbK1NveYSE&_nc_ohc=pt7ZkaJRno8Q7kNvwG0RP50&_nc_gid=ST_HW-cWih-aUaNBQ4eKjQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxR3O0wdLRvmriR7FtSUzQlsFu80VB6xiFeK0n_9ThgDQ&oe=69B8A8C5&_nc_sid=10d13b"
-        },
-        {
-          "likes": 1,
-          "comments": 0,
-          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Licorice Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat is so flexible you can use it for a longer peri",
-          "timestamp": "2026-03-11T10:39:17.000Z",
-          "postUrl": "https://instagram.com/p/DVvblIpjTrB",
-          "imageUrl": "https://scontent-iad3-2.cdninstagram.com/v/t51.82787-15/650044506_18341334760245288_6104941226485310727_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-iad3-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGINDksTNhxxQDJwOxwOjSvpNXh-PFo58o12bm6VaQXx-ysh2evBRq19_Ta04GLMyihhsP7NmWWq4ZCi34FZqPT&_nc_ohc=TSnnikd7VusQ7kNvwHJyYX_&_nc_gid=Grz0O_ysw2-gsvIXR2CyCw&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyxnxhT8nvLJAyNI-LczrL8m0vmIk2osLWjvhL4ewGdgA&oe=69B8B58A&_nc_sid=10d13b"
+          "caption": "Stay Safe & Shop Online! We Deliver ALL Over Lebanon!\n\n•Visit or Call our Shop:\n01482369 (Sin el Fil)\n09636017 (Maameltein)\n\n•Order on WhatsApp:\n70217251 (Beirut, South-Lebanon)\n70131488 (Keserwan, No",
+          "timestamp": "2026-03-06T18:12:02.000Z",
+          "postUrl": "https://instagram.com/p/DVjXPt9DeFS",
+          "imageUrl": "/api/social-image/chez-les-petits/post_0.jpg"
         },
         {
           "likes": 1,
@@ -695,33 +679,49 @@
           "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Licorice Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – 36 kg).\n\nThe Viaggio 1-2-3 Via car seat was specif",
           "timestamp": "2026-03-10T22:36:02.000Z",
           "postUrl": "https://instagram.com/p/DVuIz-rDfnq",
-          "imageUrl": "https://scontent-lga3-2.cdninstagram.com/v/t51.82787-15/649850863_18341275741245288_4377168421292493040_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-lga3-2.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QG23tG9mj6zAvpDn243G6GyK86rdtNIrkm3NH9WmWuE0tIfQP0wZzbPqA_doow7PT8&_nc_ohc=SLYg-voUA1wQ7kNvwGTD1G9&_nc_gid=WOTnP_8LqOzSCA5mpIWIDg&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyeDc31upTRMiPK8c00tGj--9deVRXrtqZabZ7RNFSNbQ&oe=69B8C981&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/chez-les-petits/post_1.jpg"
         },
         {
           "likes": 1,
           "comments": 0,
-          "caption": "Peg Perego’s « Viaggio 1-2-3 Via » Fiat 500 Car Seat, made in Italy.\n\nThe Isofix car seat and Top Tether with double type approval: 1 – 12 years (9 – 36 kg).\n\nThe Viaggio 1-2-3 Via car seat was specif",
-          "timestamp": "2026-03-10T22:35:07.000Z",
-          "postUrl": "https://instagram.com/p/DVuItRLDZLE",
-          "imageUrl": "https://instagram.fagc1-2.fna.fbcdn.net/v/t51.82787-15/650837807_18341275690245288_2799339287212599144_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=instagram.fagc1-2.fna.fbcdn.net&_nc_cat=100&_nc_oc=Q6cZ2QFRkuIJAg4R0qTzzxuCkUI5svGDvpo1cOQxrdRE8POy9EseR4-JyS9j1E-ZPjui5Xg&_nc_ohc=7JHHgcYoHiQQ7kNvwFmZDI6&_nc_gid=zbuFuMBrZBuUSbwVXaPqdA&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwyJNC3J2ogEcjHQWIpfU2wtFojjvDzwww68ExhCuABPg&oe=69B8C9A5&_nc_sid=10d13b"
+          "caption": "Peg Perego’s Vivace travel system, made in Italy!\n\nWhat fun it is to zip around and explore the city together. The Vivace SLK Travel System is your perfect ally. Light and comfortable, it is entirely ",
+          "timestamp": "2026-02-21T10:19:22.000Z",
+          "postUrl": "https://instagram.com/p/DVBC_gpDU7i",
+          "imageUrl": "/api/social-image/chez-les-petits/post_2.jpg"
+        },
+        {
+          "likes": 2,
+          "comments": 0,
+          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Monza Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat is so flexible you can use it for a longer period ",
+          "timestamp": "2026-03-11T10:40:04.000Z",
+          "postUrl": "https://instagram.com/p/DVvbq-MDQ7F",
+          "imageUrl": "/api/social-image/chez-les-petits/post_3.jpg"
+        },
+        {
+          "likes": 1,
+          "comments": 0,
+          "caption": "Peg Perego’s « Viaggio 2-3 Flex » Wonder Grey Foldable Car Seat, made in Italy.\n\nProtection, safety and advanced technology.\n\nThe Viaggio 2-3 Flex car seat is so flexible you can use it for a longer p",
+          "timestamp": "2026-03-11T10:40:56.000Z",
+          "postUrl": "https://instagram.com/p/DVvbxSjjaAg",
+          "imageUrl": "/api/social-image/chez-les-petits/post_4.jpg"
         }
       ],
       "topPosts": [
-        {
-          "likes": 7,
-          "comments": 0,
-          "caption": "Spend 50$ on ANY Tommee Tippee item(s), and Get a Chance to Win a Trip for 2 to LONDON!!!\n\nOffer Available in our Sin El Fil & Maameltein Stores and Online!\n\nHurry up!\n\n#chezlespetits #gebrangeahchan ",
-          "timestamp": "2026-01-17T09:41:29.000Z",
-          "postUrl": "https://instagram.com/p/DTm2MvCDUV4",
-          "imageUrl": "https://scontent-hou1-1.cdninstagram.com/v/t51.71878-15/617808473_908910248156050_7620801708406677550_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QG15JAnGMorpu2-YtcDxDJQrtXv7BR_rh_avEyEFul1-NSSmK6U6Wo81ZLVsPuuJOE&_nc_ohc=Ym7VhKpqBxcQ7kNvwFrO0UM&_nc_gid=OweAKMA5W6SSggesg9HtlQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyJtHmzFN88WvQqzSBwRFfRX8-X8bZc0L2rpcYZq30fUg&oe=69B89963&_nc_sid=10d13b"
-        },
         {
           "likes": 5,
           "comments": 2,
           "caption": "Peg Perego Rialto Feeding Booster Seat Chair Fragola\n\nRialto, the booster seat to take with you when eating out.\n\nRialto is an adjustable booster seat that grows with your child and can be adapted to ",
           "timestamp": "2026-01-22T15:23:15.000Z",
           "postUrl": "https://instagram.com/p/DT0V6-lDdbh",
-          "imageUrl": "https://scontent-hou1-1.cdninstagram.com/v/t51.82787-15/621067821_18335067652245288_252443571197394265_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=scontent-hou1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QH8gWieXAb5TQUx4jh51UoA96qEYveWtB-Lpwg01-_h3dc5IQ3iK75Vhl0N9mqyhbY&_nc_ohc=wUg6A0MjU2MQ7kNvwFa8sgW&_nc_gid=4G1RkvfXWEFJtcJWpDiTfA&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afw-KhjEfQr2txUJiia9EOlzBxjubjnS6lJ4EqSw4FJr_g&oe=69B8A36D&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/chez-les-petits/post_0.jpg"
+        },
+        {
+          "likes": 7,
+          "comments": 0,
+          "caption": "Spend 50$ on ANY Tommee Tippee item(s), and Get a Chance to Win a Trip for 2 to LONDON!!!\n\nOffer Available in our Sin El Fil & Maameltein Stores and Online!\n\nHurry up!\n\n#chezlespetits #gebrangeahchan ",
+          "timestamp": "2026-01-17T09:41:29.000Z",
+          "postUrl": "https://instagram.com/p/DTm2MvCDUV4",
+          "imageUrl": "/api/social-image/chez-les-petits/post_1.jpg"
         },
         {
           "likes": 7,
@@ -729,7 +729,7 @@
           "caption": "Infantino’s 4m+ Magic Motion Activity Jumper Exersaucer, available in All our Stores!\n\n•Visit or Call our Shop:\n01482369 (Sin el Fil)\n09636017 (Maameltein)\n\n•Order on WhatsApp:\n70217251 (Beirut, South",
           "timestamp": "2025-12-29T21:49:24.000Z",
           "postUrl": "https://instagram.com/p/DS3PCOGDZFo",
-          "imageUrl": "https://instagram.fotp3-4.fna.fbcdn.net/v/t51.82787-15/608559264_18332382394245288_3288051263653116685_n.jpg?stp=dst-jpg_e15_fr_p1080x1080_tt6&_nc_ht=instagram.fotp3-4.fna.fbcdn.net&_nc_cat=100&_nc_oc=Q6cZ2QFEaU1i4OyV7-TteY56GV3KYcBWMn_FMMxsPTeOczoF__RuCizCuOqBMKgznLgfss4&_nc_ohc=i44GfzTS-_EQ7kNvwEPWKNI&_nc_gid=hW7vc1iBZbuZFE-uwU7zwA&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyDO22HOLckhQgGreA3A2R2Hu82VIp8YMoS-4nDLO5ByQ&oe=69B8A1BF&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/chez-les-petits/post_2.jpg"
         }
       ],
       "monthlyTrend": [
@@ -781,7 +781,7 @@
       "role": "competitor",
       "handle": "wildwillytoystore",
       "platform": "instagram",
-      "scrapedAt": "2026-03-12T15:54:51.238Z",
+      "scrapedAt": "2026-03-12T20:50:28.985Z",
       "summary": {
         "postCount": 50,
         "avgEngagement": 49,
@@ -836,11 +836,11 @@
           "count": 10
         },
         {
-          "tag": "#diecast",
+          "tag": "#Bburago",
           "count": 7
         },
         {
-          "tag": "#Bburago",
+          "tag": "#diecast",
           "count": 7
         },
         {
@@ -852,7 +852,7 @@
           "count": 6
         },
         {
-          "tag": "#toys",
+          "tag": "#ToyStore",
           "count": 5
         },
         {
@@ -860,7 +860,7 @@
           "count": 5
         },
         {
-          "tag": "#ToyStore",
+          "tag": "#toys",
           "count": 5
         },
         {
@@ -868,11 +868,11 @@
           "count": 4
         },
         {
-          "tag": "#Maisto",
+          "tag": "#diecastcollector",
           "count": 4
         },
         {
-          "tag": "#diecastcollector",
+          "tag": "#Maisto",
           "count": 4
         },
         {
@@ -888,42 +888,26 @@
           "count": 3
         },
         {
-          "tag": "#ChristmasShopping",
+          "tag": "#BlackFriday",
           "count": 3
         }
       ],
       "recentPosts": [
-        {
-          "likes": 31,
-          "comments": 7,
-          "caption": "Flowers fade… but LEGO stays forever 💐🧱\n\nThis Valentine’s, skip the ordinary 🌹\nBuild something unforgettable with LEGO® Botanicals from Wild Willy ❤️\n\nThe perfect gift: romantic, creative, and zero",
-          "timestamp": "2026-02-13T08:50:59.000Z",
-          "postUrl": "https://instagram.com/p/DUsSbqWDLR7",
-          "imageUrl": "https://scontent-iad3-1.cdninstagram.com/v/t51.71878-15/631586816_2321528155021987_1540246179764091897_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-iad3-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QFhnegNo4gvTF4YSb0C685Xj1QmglJ0cAxckyJCxq1ivJy8N31q7xRorUQeeE-wjiY&_nc_ohc=--NtDNWkPrMQ7kNvwHPsNlo&_nc_gid=t89Qh69PIXBubvfweMUe7A&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwMMPu310URwGFmLvFfaDZkDHuqjzl3ki0-FOtnInvVVQ&oe=69B8C7CF&_nc_sid=10d13b"
-        },
         {
           "likes": 12,
           "comments": 0,
           "caption": "Fresh Drops 🚨The newest and freshest 2026 LEGO Speed Champions sets are here first at Wild Willy 🏁🏎️ \n\nDM 💬 or 📲Whatsapp 71676282 to get yours before they’re gone. \n\n#Lego #lebanon #speedchampion",
           "timestamp": "2026-01-17T18:43:33.000Z",
           "postUrl": "https://instagram.com/p/DTn0nf3DFDJ",
-          "imageUrl": "https://scontent-lga3-2.cdninstagram.com/v/t51.71878-15/616175973_717025824623081_6278655786134575474_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-lga3-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QHahfhGvUrX_96RZmiz8MyQPsiZab__ecKvhfPA2uygF9BS8Zagqh1N1NqX_Ls2_28&_nc_ohc=6oiWLhgR7QUQ7kNvwHYflTS&_nc_gid=BXN63mmiVW5GIsTIIHMQ9g&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwT4me9hdKzNs7kNlM4Jy8rxZcHgqlk9er2k1He4WBpWw&oe=69B8A74E&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/wild-willy-toys/post_0.jpg"
         },
         {
           "likes": 23,
-          "comments": 1,
-          "caption": "LEWIS. FERRARI. 🔥🏁\nThe SF-25 in 1:18 by Bburago has officially landed at Wild Willy 🐎\n\n💬DM or 📲 Whatsapp 71676282 to know more\nOrder online: wildwillytoys.com \n\n#lebanon #ferrari #formula1 #dieca",
-          "timestamp": "2026-01-05T15:39:12.000Z",
-          "postUrl": "https://instagram.com/p/DTIldDRjDQ9",
-          "imageUrl": "https://scontent-ord5-1.cdninstagram.com/v/t51.71878-15/610791132_755696523641653_1022761583616530307_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ord5-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2QHemAxW9eKg30zfx61BK_v8FkCVrtkkO14N2vECJQdnQlOWF-_GLi6l76hZjAai9uU&_nc_ohc=wrLSCy_iimgQ7kNvwFh_-v-&_nc_gid=cw9hO1btIgY9BYKc2o99Mw&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxpfbvZmONykFDmiMm6f16bZBmRdVeXgcA-KNt0GtxNzQ&oe=69B8ABCD&_nc_sid=10d13b"
-        },
-        {
-          "likes": 12,
           "comments": 0,
-          "caption": "The 2026 LEGO Speed Champions lineup have just landed and you know where to find them 🚨🏁 \n\n⏱️ Back to the Future DeLorean\n🚗 Lightning McQueen\n🟥 Ferrari SF90 XX\n🟠 McLaren W1\n🔵 Bugatti Vision GT\n\n",
-          "timestamp": "2026-02-02T17:36:32.000Z",
-          "postUrl": "https://instagram.com/p/DUQpsBlDDBi",
-          "imageUrl": "https://instagram.fmem1-2.fna.fbcdn.net/v/t51.71878-15/625351068_914588721260782_5034916903735416948_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=instagram.fmem1-2.fna.fbcdn.net&_nc_cat=110&_nc_oc=Q6cZ2QHGXgs3KMuf_9pxR-aYU3Kb9VQFwMR98bHJJgvaYRXbNC4PJGO0lWsLBQNYEVjvmVQ&_nc_ohc=0n2fxd260XwQ7kNvwEOp4C7&_nc_gid=Z2sCLgv4HCYhUW7OWUjIFg&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxTNQZ6Ufz-Pdh9z7QjQ_R5kQZRvCPv-Cc7xvv41XSjKg&oe=69B89DBD&_nc_sid=10d13b"
+          "caption": "Men deserve great gifts too. ❤️\n\nThis Valentine’s, surprise him with something powerful, timeless, and built to impress. 🏎️🔥\n\nPremium die-cast collectibles, available at Wild Willy.\n\n#ValentinesForH",
+          "timestamp": "2026-02-14T08:45:14.000Z",
+          "postUrl": "https://instagram.com/p/DUu2H2ZDPkC",
+          "imageUrl": "/api/social-image/wild-willy-toys/post_1.jpg"
         },
         {
           "likes": 30,
@@ -931,7 +915,23 @@
           "caption": "Colourful, creative building with Geomag Tiles Gems! 🌈🧲\n\n60 magnetic tiles in gem-bright colours that connect to create solid structures. Build houses, towers, patterns, and more!\n\n• 60 tiles in vib",
           "timestamp": "2025-12-27T09:57:16.000Z",
           "postUrl": "https://instagram.com/p/DSwz8pilHls",
-          "imageUrl": "https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/608185749_18085612379118926_5860048676000611181_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QEsCSYQrWQwT2qEjKiAaoP8h6tTMAfObZPGvPqmBlB82SWciSJH5_7cUfWgaKNsuxM&_nc_ohc=ES1Z1iqv0DcQ7kNvwGcy6Xu&_nc_gid=y2f04MfYWzHMcnxibXHpIQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afww-P4vicn_rIUi-HP_bn_v3PgMhpDZkUjKdxFiB-bmqg&oe=69B8C3A9&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/wild-willy-toys/post_2.jpg"
+        },
+        {
+          "likes": 15,
+          "comments": 0,
+          "caption": "🇬🇧 | Ready for the countdown?\n#HappyNewYear\n#Bburago #ScaleUpYourPassion #BburagoDieCast Formula1",
+          "timestamp": "2025-12-31T15:57:51.000Z",
+          "postUrl": "https://instagram.com/p/DS7wOOWDNCf",
+          "imageUrl": "/api/social-image/wild-willy-toys/post_3.jpg"
+        },
+        {
+          "likes": 22,
+          "comments": 2,
+          "caption": "Pure 70s driving spirit and motorsport icon brought to life in this 1:18 scale die-cast 🇩🇪🔥 \n\nThe timeless BMW heritage: 2002 tii\n\n💬DM or 📲71676282 to get yours today. \n\n#diecast #Lebanon #bmw #c",
+          "timestamp": "2026-02-03T12:11:08.000Z",
+          "postUrl": "https://instagram.com/p/DUS0zlyDMk2",
+          "imageUrl": "/api/social-image/wild-willy-toys/post_4.jpg"
         }
       ],
       "topPosts": [
@@ -941,7 +941,7 @@
           "caption": "🎁 GIVEAWAY TIME! Win a $40 Wild Willy Gift Card with @mammaswishlist x @wildwillytoystore ⭐\n\nTo enter:\n1️⃣ Follow @mammaswishlist + @wildwillytoystore\n2️⃣ Like this post ❤️\n3️⃣ Tag 3 friends in the c",
           "timestamp": "2026-01-25T22:13:29.000Z",
           "postUrl": "https://instagram.com/p/DT8zNr_kgXW",
-          "imageUrl": "https://scontent-dfw5-1.cdninstagram.com/v/t51.82787-15/621123633_17923692954223859_4261651981280640705_n.jpg?stp=dst-jpg_e15_fr_s1080x1080_tt6&_nc_ht=scontent-dfw5-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QHx0BEZJGBGKSzpd1DjA3_bvPrF7A4oAbNilSzsBmYE_hJEeMnkPDB4hKw6TJN6rMQ&_nc_ohc=5xCJ07jI6boQ7kNvwGaD6xp&_nc_gid=z39cFMxiSXWuAD0DMeQ0uQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfzarAizhrOccB0kC-geuqQBLh3JSd_np5ETh8Z9k2imjw&oe=69B8AEA9&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/wild-willy-toys/post_0.jpg"
         },
         {
           "likes": 250,
@@ -949,7 +949,7 @@
           "caption": "#bburago #f1 #season2025 #verstappen #leclerc #Ferrari #rb20 #rb19 #redbullracing #oracle #norris #mclaren #amr  #mercedes #russel.#georgerussell \n#collection",
           "timestamp": "2025-06-19T05:52:53.000Z",
           "postUrl": "https://instagram.com/p/DLEjzhoNtjq",
-          "imageUrl": "https://scontent-atl3-2.cdninstagram.com/v/t51.71878-15/502350627_1477289593637453_1122446100547169739_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-atl3-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QEv18bgVMpbvRXxnRQNH1gDWZfaMTIiowSpvewYJHGbA3EzxPn3pVSathtXOht9hh0&_nc_ohc=aDdemc8MUzoQ7kNvwE5ubR3&_nc_gid=lX_iWHXuV-2qK9L2rHANnw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afxd8O2kh98HAU1zDLVndm0BygVHaVmcxZJaJ5rQm-DqqQ&oe=69B8AFF3&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/wild-willy-toys/post_1.jpg"
         },
         {
           "likes": 63,
@@ -957,7 +957,7 @@
           "caption": "Win these beauties! Thanks to @mastercarsreviewlb for the collab. Follow us and stay tuned! \n\n#Giveaway #DieCast #CarCollector #WildWilly #Lebanon #diecastcollector #Maisto #Bburago",
           "timestamp": "2025-09-15T15:51:50.000Z",
           "postUrl": "https://instagram.com/p/DOoOYKoDB62",
-          "imageUrl": "https://scontent-mia3-3.cdninstagram.com/v/t51.71878-15/548894752_1299493224997738_957680802427308528_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-mia3-3.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QH0Vffq-t8aqtnLa8FcSdQdr_4dwkIBZPT7DnrRGHzeul5q1Zx3fHrrsnIh3B-66FQ&_nc_ohc=FLzeyAp2FTMQ7kNvwGHg1u9&_nc_gid=E0vOruOgKjiknuI36D5JgA&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxIcp5cPUrsvpGBzVAzp5RVq2f8DOM-cLCplpvqQFQ10g&oe=69B8B4A4&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/wild-willy-toys/post_2.jpg"
         }
       ],
       "monthlyTrend": [
@@ -1034,7 +1034,7 @@
       "role": "competitor",
       "handle": "thetoystorelb",
       "platform": "instagram",
-      "scrapedAt": "2026-03-12T15:56:47.699Z",
+      "scrapedAt": "2026-03-12T20:51:38.761Z",
       "summary": {
         "postCount": 50,
         "avgEngagement": 15,
@@ -1085,6 +1085,10 @@
           "count": 3
         },
         {
+          "tag": "#learningthroughplay",
+          "count": 2
+        },
+        {
           "tag": "#kidstoys",
           "count": 2
         },
@@ -1094,10 +1098,6 @@
         },
         {
           "tag": "#Ramadan2026",
-          "count": 2
-        },
-        {
-          "tag": "#learningthroughplay",
           "count": 2
         },
         {
@@ -1117,6 +1117,26 @@
           "count": 2
         },
         {
+          "tag": "#intentionalplay",
+          "count": 1
+        },
+        {
+          "tag": "#toddleractivities",
+          "count": 1
+        },
+        {
+          "tag": "#preschooltoys",
+          "count": 1
+        },
+        {
+          "tag": "#MeetTheTeam",
+          "count": 1
+        },
+        {
+          "tag": "#PoweredByPlay",
+          "count": 1
+        },
+        {
           "tag": "#toys",
           "count": 1
         },
@@ -1127,60 +1147,32 @@
         {
           "tag": "#RamadanGifts",
           "count": 1
-        },
-        {
-          "tag": "#RamadanActivities",
-          "count": 1
-        },
-        {
-          "tag": "#KidsGifts",
-          "count": 1
-        },
-        {
-          "tag": "#kids",
-          "count": 1
-        },
-        {
-          "tag": "#toystore",
-          "count": 1
-        },
-        {
-          "tag": "#mom",
-          "count": 1
         }
       ],
       "recentPosts": [
         {
-          "likes": -1,
+          "likes": 13,
           "comments": 0,
-          "caption": "Your next best friend is waiting for you at The Toy Store! Come visit us and find your perfect match. 🎁\n#thetoystore #toys #kidstoys #familyfun #fun",
-          "timestamp": "2026-03-05T10:19:00.000Z",
-          "postUrl": "https://instagram.com/p/DVf8YALDdgO",
-          "imageUrl": "https://instagram.faus1-1.fna.fbcdn.net/v/t51.71878-15/645837230_1427469442508225_7667658496656895073_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=instagram.faus1-1.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2QFYoDFS1G335x1WjLM8WQXAUl3qEeCW987Ywm02OmNTdPB0YYTZSnSyNpCtOUyk0liuhhZoKxjFobZzXXkkf9nx&_nc_ohc=apq6CoirUesQ7kNvwGe0cNW&_nc_gid=Hr4SdFATZ56Q9e12W9Cwag&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwRapkU4nReOnKsgCWIGtcuYn7arg9wIX0ydqGVnL9clg&oe=69B8C723&_nc_sid=10d13b"
+          "caption": "Toy rotation هالأسبوع 🧺🤍\nكم لعبة جديدة، مختارة عن قصد،\nحتى يكون اللعب ممتع… ومفيد بنفس الوقت.\n\nI always prefer simple toys that grow with my kids,\nand keep playtime meaningful ✨\n\nNew toys picked fro",
+          "timestamp": "2026-03-04T13:06:08.000Z",
+          "postUrl": "https://instagram.com/p/DVdo7mUiL1B",
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_0.jpg"
         },
         {
-          "likes": -1,
-          "comments": 0,
-          "caption": "POV: You tried to punch the monkey…\nNow the whole squad pulled up 🐒👀",
-          "timestamp": "2026-02-24T10:07:02.000Z",
-          "postUrl": "https://instagram.com/p/DVIv76CDQ6w",
-          "imageUrl": "https://scontent-mia3-2.cdninstagram.com/v/t51.82787-15/641753031_18393268027197161_9207385152279502056_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=scontent-mia3-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QGf0tbC6mbmtu0ukXynhCtwJqOytFdJIKNpYx9fQSbBLmF_6zghoRMuJwpiS0n0G74&_nc_ohc=Y5-qKg_dY2oQ7kNvwHLPeFz&_nc_gid=Xahv-ERQT07yKu9hXcO0Jw&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwTXisdShq_2XlCnJB5YUw-XfKhFx4w0OE_IhQ4zCoM2w&oe=69B8C3BD&_nc_sid=10d13b"
+          "likes": 69,
+          "comments": 26,
+          "caption": "Before we were running The Toy Store…\nwe were the kids walking into one. 🧸\n\nThe toy kingdom is led by children who never stopped loving toys.\nAnd that’s exactly why we get it. 💙\n\n#TheToyStore #MeetT",
+          "timestamp": "2026-02-27T19:39:34.000Z",
+          "postUrl": "https://instagram.com/p/DVRf32dDZsM",
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_1.jpg"
         },
         {
-          "likes": 22,
-          "comments": 5,
-          "caption": "The Happy Box 🎁\nA small box filled with big smiles.\n\nInside: toys, snacks, and more than 20 little surprises for children.\nTogether we can bring a moment of joy to our displaced kids in Beirut during",
-          "timestamp": "2026-03-11T18:14:22.000Z",
-          "postUrl": "https://instagram.com/p/DVwPX5RiJLC",
-          "imageUrl": "https://scontent-atl3-1.cdninstagram.com/v/t51.71878-15/649236047_1489301476079784_4372458238054179553_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-atl3-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBvHHeLthBYCYvmQ0SciRh9ZystUDiTkrpBW1oXjukJQD14PysVIp0h1lFVJv1Ho0&_nc_ohc=QxWSHSL5CNYQ7kNvwGs2oxu&_nc_gid=FUK87jw3PsdnCLmM9F6qPQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afw_YOibp5DdmgrNRIXZJUTeEbQlBhyz4COGBq2XkEQOwg&oe=69B8BB80&_nc_sid=10d13b"
-        },
-        {
-          "likes": -1,
+          "likes": 18,
           "comments": 0,
-          "caption": "Stay safe at home, we’ll handle the rest.\nToys delivered across Beirut & Metn to keep the little ones smiling. 🧸",
-          "timestamp": "2026-03-11T14:32:50.000Z",
-          "postUrl": "https://instagram.com/p/DVv2FgNCPRl",
-          "imageUrl": "https://scontent-ord5-1.cdninstagram.com/v/t51.71878-15/649237707_1289954296312549_1137395683706364164_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ord5-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2QHGq6iy2uu1RK8EpIWO75HlPYbr6hEXNdSck1rLQD6IiQpQDe2oaChwK0NEdvE5GpE&_nc_ohc=6rVX-LLDRUgQ7kNvwHrSTvQ&_nc_gid=VxO_3iP7sKCIagAg-sVdUg&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afxb70yppoKy5A7BtFiBSgmHLAMDseEtBrq4OC1smVDdJQ&oe=69B8B840&_nc_sid=10d13b"
+          "caption": "لحظات هدوء وتركيز 🎨🤍\nسجادة التلوين من @thetoystorelb \nنشاط بسيط بيخلّي الطفل يعبّر، يركّز ويستمتع بوقته ✨\n\nColoring mat from The Toy Store 🎨\nA calm & creative activity kids love 🤍",
+          "timestamp": "2026-02-23T10:52:05.000Z",
+          "postUrl": "https://instagram.com/p/DVGQU-XDUCI",
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_2.jpg"
         },
         {
           "likes": -1,
@@ -1188,7 +1180,15 @@
           "caption": "Operating with extra care to keep our customers and team safe. 💙\nThank you for your patience and support.\nHoping for safer, better days ahead. 🇱🇧🧸",
           "timestamp": "2026-03-04T16:18:18.000Z",
           "postUrl": "https://instagram.com/p/DVeA0EpCFVc",
-          "imageUrl": "https://instagram.fric1-2.fna.fbcdn.net/v/t51.82787-15/641844569_18394321504197161_299461657031625879_n.jpg?stp=dst-jpg_e35_p1080x1080_sh0.08_tt6&_nc_ht=instagram.fric1-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2QGAK3W0l0QiMjK4lIpf6FweUckaVgXCgIBb1AKIRw66JPH15y1J8s0ntcGdySRYhlg&_nc_ohc=_BY36mKhAcEQ7kNvwH6eJin&_nc_gid=7odJX7u7_f0gtepuIj6bkw&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfxHeThqZoyyQXY-yTxVGVGkjkBPTZ1rPq9p2dlORNjGag&oe=69B8B226&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_3.jpg"
+        },
+        {
+          "likes": -1,
+          "comments": 0,
+          "caption": "Not every child in Lebanon still has their toys. But together, we can change that. ❤️\n\nMany children have been displaced and left behind the little things that once brought them joy.\n\nToday, Lebanon’s",
+          "timestamp": "2026-03-09T15:32:09.000Z",
+          "postUrl": "https://instagram.com/p/DVqzgdWiDWY",
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_4.jpg"
         }
       ],
       "topPosts": [
@@ -1198,7 +1198,7 @@
           "caption": "90s called… they want their vibes back 📽️🎞️ \n🥹GRAB IT before it ghosts you at the toy store👀\n\n📸✨ Mini camera, mega nostalgia!\nMeet the Kodak Charmera — the tiny keychain camera that turns everyda",
           "timestamp": "2026-01-12T07:54:23.000Z",
           "postUrl": "https://instagram.com/p/DTZydaBiLGZ",
-          "imageUrl": "https://scontent-phl2-1.cdninstagram.com/v/t51.82787-15/613579143_18527935705065581_7008534539396620701_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-phl2-1.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QFTW3dKKvTs7kgL4PG0kvH_4Se1HjvSC_zX744Oblx2Z7Ubm3txAmj8H0mPhaRorHM&_nc_ohc=DA_bXuUWwfYQ7kNvwEdZ_n8&_nc_gid=usbI24aDkXIfh0AxMEL3mQ&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afxn9WaOJvw7I3zxnumJzTfkumjWW-g4T0DfPv2XfWavXg&oe=69B89E2B&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_0.jpg"
         },
         {
           "likes": 84,
@@ -1206,7 +1206,7 @@
           "caption": "Who said nostalgia can’t fit in your pocket?\nThe Kodak Charmera is here to prove them wrong. \n\nCapture your favorite moments with 90s-style\nOnly at The Toy Store click the link in their bio and get yo",
           "timestamp": "2026-01-14T09:15:54.000Z",
           "postUrl": "https://instagram.com/p/DTfFDq9DTjy",
-          "imageUrl": "https://scontent-lga3-1.cdninstagram.com/v/t51.71878-15/616023785_1495504982163503_7610701999102597977_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QE7XsvleLSoxeXfHU4AsIAqI9eJ4rIW_a9hrbVhiGL6GJDOoBAm2frfBdz7OMhuVUs&_nc_ohc=asWKUx7nzj8Q7kNvwG9Od2y&_nc_gid=HgPICFzIxkyt2yWe768sJg&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfyGiRNgkTe74lRL7dVOh5lsmm95ptwUp98l-kwdd-fw_w&oe=69B8A59E&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_1.jpg"
         },
         {
           "likes": 69,
@@ -1214,7 +1214,7 @@
           "caption": "Before we were running The Toy Store…\nwe were the kids walking into one. 🧸\n\nThe toy kingdom is led by children who never stopped loving toys.\nAnd that’s exactly why we get it. 💙\n\n#TheToyStore #MeetT",
           "timestamp": "2026-02-27T19:39:34.000Z",
           "postUrl": "https://instagram.com/p/DVRf32dDZsM",
-          "imageUrl": "https://scontent-atl3-2.cdninstagram.com/v/t51.82787-15/642984752_18393703030197161_8569907812645174436_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-atl3-2.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QEocpx6SGvMYrIFRQNbs_FtFlkpmhtsvKiRTlVd9mzmYL8PGYW8jhv1zRpEm2JaMFQ&_nc_ohc=VEesZeyZcr8Q7kNvwHvAG5w&_nc_gid=EiBCpZc0yf-Wtgt1xwtSvg&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfwUL1X9WBDlbKUL3uis3QtYDzxehYveLhCt4MLwFHaVgw&oe=69B8CAFD&_nc_sid=10d13b"
+          "imageUrl": "/api/social-image/the-toy-store-lb/post_2.jpg"
         }
       ],
       "monthlyTrend": [
@@ -1259,79 +1259,79 @@
   "whiteSpaceOpportunities": [
     {
       "theme": "Brand Story",
-      "description": "Content that spotlights Toys R Us as a globally trusted icon now rooted in Lebanon — celebrating the brand's heritage, what it stands for, and why it belongs in Lebanese families' lives. Think milestone posts, the story behind the store, and what 'play' means to the brand.",
-      "rationale": "Zero competitors are executing this theme meaningfully. Lebanese consumers connect deeply with brand authenticity, and Toys R Us has a powerful legacy to leverage that local players simply cannot replicate.",
-      "brandAlignment": "Directly supports the 'trustworthy, authentic, bold' voice and the 'Play is for everyone' pillar. Clean, confident storytelling with toys as visual heroes and bold Toys R Us branding front and center.",
-      "suggestedFormat": "Carousel",
+      "description": "Content that brings Toys R Us's iconic global legacy to Lebanese audiences — celebrating decades of childhood magic, the return of the brand, and what it means to have Toys R Us in Lebanon. Think emotional storytelling posts anchored in nostalgia, paired with the excitement of the brand's local chapter.",
+      "rationale": "Zero competitors are doing this. Toys R Us carries unmatched brand equity and nostalgia that no local competitor can replicate. Lebanese parents who grew up with the brand are now buying for their own children — this emotional bridge is completely unclaimed territory.",
+      "brandAlignment": "Directly supports the 'authentic, trustworthy, bold' voice pillars and the 'Play is for everyone' brand pillar. Clean layouts with bold Toys R Us branding and simple, punchy copy keep it on-guidelines while maximizing emotional impact.",
+      "suggestedFormat": "Reels",
       "priority": "high"
     },
     {
       "theme": "Lifestyle",
-      "description": "Content showing toys naturally embedded in Lebanese family life — kids playing at home, outdoors in Lebanese settings, during family gatherings, or at celebrations like Eid and Christmas. Not product ads, but real-life moments where play happens.",
-      "rationale": "Only one competitor (JouéClub Lebanon) touches this theme, leaving significant white space. Lifestyle content drives emotional connection and organic reach, areas where pure product-showcase brands are weak.",
-      "brandAlignment": "Reinforces 'Inclusivity and sophistication' and 'Toys for every age' pillars. Authentic, accessible imagery reflects the brand voice while keeping toys as the visual centerpiece in everyday Lebanese contexts.",
+      "description": "Content that places toys inside real Lebanese family life — kids playing in Beirut apartments, families enjoying outdoor play in Lebanese landscapes, parents gifting during Eid or Christmas. Toys are shown as part of everyday moments rather than isolated product shots.",
+      "rationale": "Only one competitor (JouéClub Lebanon) touches lifestyle content, leaving significant white space. Lifestyle content builds emotional connection and organic reach far beyond standard product showcases, which dominate the competitive landscape.",
+      "brandAlignment": "Reinforces 'Inclusivity and sophistication' and 'Toys for every age' pillars by showing diverse family contexts. Keeps toys as the visual hero while embedding them in authentic, relatable settings — aligning with the accessible and authentic voice.",
       "suggestedFormat": "Reels",
       "priority": "high"
     },
     {
       "theme": "Play Education",
-      "description": "Short, punchy content educating Lebanese parents on age-appropriate toys, developmental benefits of play, or how to choose the right toy — framed as expert guidance rather than a sales pitch. Examples: 'What to buy a 3-year-old this Eid' or 'Why building toys matter.'",
-      "rationale": "No competitor is owning the 'expert advisor' space in Lebanese toy retail. Parents actively seek this guidance, and it positions Toys R Us as the authoritative go-to resource rather than just another toy shop.",
-      "brandAlignment": "Perfectly matches the 'authoritative, precise, clear' voice attributes and the 'Toys for every age' pillar. Straightforward messaging with clean layouts reinforces the trustworthy, knowledgeable brand identity.",
+      "description": "Authoritative, parent-facing content that explains the developmental value of specific toys — age-appropriate picks, what skills a toy builds, how to choose the right toy for a child's stage. Delivered in clean, bold carousel formats with clear and precise messaging.",
+      "rationale": "No competitor in the Lebanese market owns this space. It positions Toys R Us as the expert authority — not just a retailer — which is a significant differentiator and drives purchase confidence among parents navigating a crowded toy landscape.",
+      "brandAlignment": "Perfectly matches the 'authoritative, precise, trustworthy' voice attributes and the 'Toys for every age' pillar. Simple, intuitive messaging with toys as the visual hero aligns directly with brand guidelines.",
       "suggestedFormat": "Carousel",
       "priority": "high"
     },
     {
-      "theme": "Seasonal Campaign Storytelling",
-      "description": "Owning Lebanon-specific seasonal moments — Ramadan, Eid Al-Fitr, Christmas, and Back to School — with cohesive, story-led campaigns rather than one-off promotional posts. Each season gets a visual narrative that builds anticipation and emotional resonance before the sales push.",
-      "rationale": "Competitors running seasonal content (PlayOne, JouéClub) do so promotionally with little storytelling depth. Toys R Us can dominate seasonal share-of-voice by being the brand that makes these moments feel special, not just discounted.",
-      "brandAlignment": "Directly tied to the brand's listed campaign calendar. Bold branding, clean professional layouts, and inclusive messaging ensure each seasonal story feels premium and accessible — consistent with all brand guidelines.",
-      "suggestedFormat": "Video",
+      "theme": "Campaign-Led Seasonal Moments",
+      "description": "Owning Lebanon-specific seasonal campaigns with bold, dedicated content series — Ramadan gifting guides, Eid toy collections, Back to School essentials, and Christmas wish lists. Each campaign treated as a distinct content moment with consistent visual identity.",
+      "rationale": "Only two competitors run seasonal content and neither does it with the campaign depth or brand authority Toys R Us can bring. Lebanon has a rich, multicultural seasonal calendar — Ramadan, Eid, Christmas, Easter — and owning these gifting moments drives direct purchase intent at peak periods.",
+      "brandAlignment": "Directly mirrors the brand's listed campaigns including Ramadan & Eid Al-Fitr, Back to School, and Christmas. Bold Toys R Us branding with clean layouts and straightforward seasonal messaging is fully on-guidelines and maximizes retail impact.",
+      "suggestedFormat": "Post",
       "priority": "high"
     },
     {
-      "theme": "User Generated Content (Amplified)",
-      "description": "A structured UGC program inviting Lebanese families to share their Toys R Us play moments under a branded hashtag, with Toys R Us resharing and celebrating the best submissions. Goes beyond passive reposting — actively prompts, rewards, and features community content.",
-      "rationale": "UGC exists among competitors but is unstructured and passive. A branded, community-driven UGC initiative builds loyalty and social proof in a market where word-of-mouth among Lebanese families is highly influential.",
-      "brandAlignment": "Supports 'Play is for everyone' and the inclusive pillar by putting real Lebanese families at the center. Authentic community voices reinforce the trustworthy brand tone while user content keeps toys as the natural visual hero.",
-      "suggestedFormat": "Story",
+      "theme": "Inclusive Play Spotlights",
+      "description": "Content that actively celebrates play across ages, abilities, and backgrounds — featuring toys for toddlers through teens, spotlighting inclusive toy lines, and showing that play has no single face. Could include themed content around neurodiversity-friendly toys or multigenerational play moments.",
+      "rationale": "No competitor in the Lebanese market is speaking to inclusivity in play. This is an untapped values-driven content lane that builds brand loyalty, earns organic engagement, and differentiates Toys R Us as a brand with a genuine point of view — not just a product catalog.",
+      "brandAlignment": "The 'Play is for everyone' and 'Inclusivity and sophistication' pillars make this content a direct expression of brand identity. The inclusive, bold, and accessible voice attributes ensure messaging lands with authenticity rather than tokenism.",
+      "suggestedFormat": "Video",
       "priority": "medium"
     }
   ],
   "competitionStrategy": [
     {
-      "tactic": "Age-Stage Content Series",
-      "rationale": "Every competitor defaults to generic product showcases with no editorial structure. Toys R Us can own a recurring content format built around developmental age stages (0–2, 3–5, 6–9, 10+), giving parents a trusted, repeatable reason to follow and engage. No competitor is doing this, making it immediately ownable.",
+      "tactic": "Age-Segmented Weekly Spotlights",
+      "rationale": "Every competitor defaults to generic product showcases with no audience targeting. Toys R Us can own the 'right toy for the right age' narrative by publishing structured weekly content explicitly segmented by age group (0-2, 3-5, 6-9, 10+), making parents feel seen and reducing purchase anxiety — a gap no competitor is filling.",
       "competitorInspiration": null,
-      "brandAlignment": "Directly activates the 'Toys for every age' pillar with an authoritative, precise voice — positioning Toys R Us as the expert, not just a shelf.",
+      "brandAlignment": "Directly activates the 'Toys for every age' pillar with authoritative, precise messaging. Clean layouts keep the toy as hero while age labels add functional clarity.",
       "priority": "high"
     },
     {
-      "tactic": "Bold Single-Product Hero Posts",
-      "rationale": "Wild Willy Toys leads the market at 49 avg engagement with product showcase content but only posts 0.5x/week — a massive frequency gap to exploit. Toys R Us can post clean, high-impact single-product hero visuals at 4–5x/week, stealing the visual real estate Wild Willy leaves unoccupied while applying a more premium, editorial aesthetic.",
+      "tactic": "Bold Single-Product Statement Posts",
+      "rationale": "Wild Willy Toys leads the market at 49 avg engagement with only 0.5 posts per week, signaling that quality and visual impact beat volume. Toys R Us should adopt a similar low-frequency, high-impact format — one product, one punchy line of copy, maximum white space — to build a premium, confident aesthetic that stands apart from JouéClub's high-volume, cluttered feed.",
       "competitorInspiration": "Wild Willy Toys",
-      "brandAlignment": "Keeps toys as the hero of every visual with bold Toys R Us branding, clean layouts, and zero product-message overlap — directly in line with brand design principles.",
+      "brandAlignment": "Reinforces the bold, straightforward, trustworthy voice. Keeps toys as the unambiguous hero of every visual with clean, professional layouts and zero messaging overlap.",
       "priority": "high"
     },
     {
-      "tactic": "Inclusive Play Spotlights",
-      "rationale": "No competitor in this market is actively communicating inclusion — adaptive toys, gender-neutral play, multicultural representation. This is a wide-open whitespace that differentiates Toys R Us on values, not just product, building emotional loyalty and community advocacy that pure product posts cannot generate.",
+      "tactic": "Inclusive Play Narrative Series",
+      "rationale": "No competitor is visibly owning inclusivity as a content theme. A recurring content series showing diverse kids, different abilities, and varied play styles positions Toys R Us as the only brand in the Lebanese market that stands for 'play is for everyone' — creating emotional differentiation beyond product price or range.",
       "competitorInspiration": null,
-      "brandAlignment": "Directly embodies the 'Play is for everyone' and 'Inclusivity and sophistication' pillars, reinforcing a trustworthy and authentic brand voice that resonates beyond a transaction.",
+      "brandAlignment": "Directly anchors the 'Play is for everyone' and 'Inclusivity and sophistication' pillars. Authentic, accessible tone builds community trust and long-term brand affinity over transactional competitor posts.",
       "priority": "high"
     },
     {
-      "tactic": "Seasonal Campaign Countdown Activations",
-      "rationale": "JouéClub Lebanon posts 7.9x/week and earns 24 avg engagement — the highest volume player. However, high frequency without thematic structure creates noise. Toys R Us can counter with structured countdown formats tied to its campaign calendar (Ramadan, Christmas, Back to School, etc.), building anticipation and giving the audience a content arc to follow rather than a feed to scroll past.",
+      "tactic": "Campaign-Locked Seasonal Takeovers",
+      "rationale": "Competitors post sporadically around seasons with no consistent thematic identity. Toys R Us has a rich campaign calendar (Ramadan, Eid, Christmas, Back to School, etc.) and should execute full visual takeovers — consistent color palette, copy tone, and product curation — for each campaign window, signaling brand seriousness and planning that smaller players cannot match.",
       "competitorInspiration": "JouéClub Lebanon",
-      "brandAlignment": "Maps directly to defined campaign pillars in the brand guidelines, uses bold straightforward messaging with clear seasonal hooks, and maintains professional layout discipline throughout.",
+      "brandAlignment": "Leverages the defined campaign pillars directly. Bold Toys R Us branding remains front and center across all seasonal assets, reinforcing trustworthiness and brand recognition at high-traffic retail moments.",
       "priority": "high"
     },
     {
-      "tactic": "Geoffrey as Brand Anchor — No Endorsement",
-      "rationale": "Toys R Us holds a globally iconic asset in Geoffrey the Giraffe that zero local competitors can replicate. Used correctly — as a brand presence and tone-setter rather than a product endorser — Geoffrey can make every post instantly recognizable in a crowded feed, building brand recall that competitors simply cannot buy or copy.",
+      "tactic": "Parent-Utility Micro-Content (Gift Guides & Play Tips)",
+      "rationale": "All five competitors are purely transactional — show product, sell product. Toys R Us can break the pattern by publishing snackable, useful content like 'Top 3 gifts under $30 for a 7-year-old' or '5-minute games for a rainy day,' positioning the brand as a trusted advisor rather than just a store. This drives saves and shares, which are engagement metrics competitors are leaving on the table.",
       "competitorInspiration": null,
-      "brandAlignment": "Fully respects the brand guideline to avoid showing Geoffrey holding or endorsing specific products, while leveraging the asset for awareness, personality, and differentiation — bold, trustworthy, and authentically Toys R Us.",
+      "brandAlignment": "Embodies the authoritative and accessible voice pillars. Straightforward, jargon-free utility content is intuitive for busy Lebanese parents and reinforces the brand as a credible, inclusive resource — not just a retailer.",
       "priority": "medium"
     }
   ]

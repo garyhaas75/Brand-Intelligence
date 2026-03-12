@@ -19,7 +19,7 @@ function log(msg) { console.log(`[social_audit] [${new Date().toISOString()}] ${
 function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
 
 // Download post images immediately after scraping (CDN URLs are IP/time-bound, must fetch right away)
-async function downloadPostImages(slug, posts) {
+async function downloadPostImages(slug, posts, prefix = 'post') {
   if (!posts || posts.length === 0) return posts;
   const imgDir = path.join(DATA_DIR, 'brands', slug, 'social_images');
   ensureDir(imgDir);
@@ -33,7 +33,7 @@ async function downloadPostImages(slug, posts) {
       if (!res.ok) return post;
       const buf = await res.arrayBuffer();
       const ext = (res.headers.get('content-type') || '').includes('webp') ? 'webp' : 'jpg';
-      const filename = `post_${idx}.${ext}`;
+      const filename = `${prefix}_${idx}.${ext}`;
       fs.writeFileSync(path.join(imgDir, filename), Buffer.from(buf));
       return { ...post, imageUrl: `/api/social-image/${slug}/${filename}` };
     } catch { return post; }
@@ -655,8 +655,8 @@ async function processBrand(brandInfo, anthropic) {
     brandData.recentPosts = normalized.slice(0, 5);
     brandData.topPosts = [...normalized].sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 3);
     // Download images immediately while CDN URLs are fresh
-    brandData.topPosts = await downloadPostImages(slug, brandData.topPosts);
-    brandData.recentPosts = await downloadPostImages(slug, brandData.recentPosts);
+    brandData.topPosts = await downloadPostImages(slug, brandData.topPosts, 'top');
+    brandData.recentPosts = await downloadPostImages(slug, brandData.recentPosts, 'rec');
     log(`  ${name}: topPosts=${brandData.topPosts.length}, bestDay=${brandData.postingPattern?.bestDay || 'none'}`);
   }
 
