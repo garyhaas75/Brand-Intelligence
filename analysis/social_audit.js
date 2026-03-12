@@ -18,6 +18,31 @@ const DATA_DIR = path.join(__dirname, '../data');
 function log(msg) { console.log(`[social_audit] [${new Date().toISOString()}] ${msg}`); }
 function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
 
+// Download post images immediately after scraping (CDN URLs are IP/time-bound, must fetch right away)
+async function downloadPostImages(slug, posts) {
+  if (!posts || posts.length === 0) return posts;
+  const imgDir = path.join(DATA_DIR, 'brands', slug, 'social_images');
+  ensureDir(imgDir);
+  const updated = await Promise.all(posts.map(async (post, idx) => {
+    if (!post.imageUrl || post.imageUrl.startsWith('/')) return post; // already local
+    try {
+      const res = await fetch(post.imageUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.instagram.com/' },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!res.ok) return post;
+      const buf = await res.arrayBuffer();
+      const ext = (res.headers.get('content-type') || '').includes('webp') ? 'webp' : 'jpg';
+      const filename = `post_${idx}.${ext}`;
+      fs.writeFileSync(path.join(imgDir, filename), Buffer.from(buf));
+      return { ...post, imageUrl: `/api/social-image/${slug}/${filename}` };
+    } catch { return post; }
+  }));
+  const saved = updated.filter(p => p.imageUrl?.startsWith('/api/')).length;
+  if (saved > 0) log(`  Downloaded ${saved}/${posts.length} post images for ${slug}`);
+  return updated;
+}
+
 function loadBrandData(slug, filename) {
   const fp = path.join(DATA_DIR, 'brands', slug, filename);
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return null; }
@@ -629,6 +654,9 @@ async function processBrand(brandInfo, anthropic) {
     brandData.topHashtags = Object.entries(hashtagCounts).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([tag, count]) => ({ tag, count }));
     brandData.recentPosts = normalized.slice(0, 5);
     brandData.topPosts = [...normalized].sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 3);
+    // Download images immediately while CDN URLs are fresh
+    brandData.topPosts = await downloadPostImages(slug, brandData.topPosts);
+    brandData.recentPosts = await downloadPostImages(slug, brandData.recentPosts);
     log(`  ${name}: topPosts=${brandData.topPosts.length}, bestDay=${brandData.postingPattern?.bestDay || 'none'}`);
   }
 

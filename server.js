@@ -696,6 +696,15 @@ app.get('/api/settings', (req, res) => {
   res.json({ serpApiEnabled: !!process.env.SERP_API_KEY });
 });
 
+// ─── Locally-cached social post images ────────────────────────────────────────
+
+app.get('/api/social-image/:slug/:filename', (req, res) => {
+  const imgPath = path.join(DATA_DIR, 'brands', req.params.slug, 'social_images', req.params.filename);
+  if (!fs.existsSync(imgPath)) return res.status(404).end();
+  res.setHeader('Cache-Control', 'public, max-age=604800');
+  res.sendFile(imgPath);
+});
+
 // ─── Image Proxy (bypasses Instagram CDN hotlink protection) ──────────────────
 
 app.get('/api/proxy-image', async (req, res) => {
