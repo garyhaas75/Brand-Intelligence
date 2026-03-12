@@ -29,17 +29,15 @@ function saveBrandData(slug, filename, data) {
 }
 
 async function extractTextFromPdf(filePath) {
-  let pdfParse;
+  let PDFParse;
   try {
-    pdfParse = require('pdf-parse');
+    PDFParse = require('pdf-parse').PDFParse;
   } catch (e) {
     throw new Error('pdf-parse not installed — run: npm install pdf-parse');
   }
-  const buffer = fs.readFileSync(filePath);
-  const data = await pdfParse(buffer, {
-    // Limit pages to avoid memory issues on huge PDFs
-    max: 80,
-  });
+  const fileUrl = `file://${filePath}`;
+  const parser = new PDFParse({ url: fileUrl, max: 80 });
+  const data = await parser.getText();
   return data.text || '';
 }
 

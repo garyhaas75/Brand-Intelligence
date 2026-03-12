@@ -1,7 +1,208 @@
 {
+  "processedAt": "2026-03-12T15:29:16.384Z",
+  "sourceFile": "2025 Holiday Tentpoles Style Guide FINAL[3][13][4][77][68].pdf",
+  "extractionNote": "Extracted 79,571 chars from PDF text layer",
+  "rawExtract": "2025\t2025\nHOLIDAY\tHOLIDAY\nTENTPOLES\tTENTPOLES\n\n-- 1 of 111 --\n\nTABLE OF CONTENTS\n© 2025 WHP Global™ All rights reserved.\nSTRICTLY PRIVATE/FOR INTERNAL USE ONLY/Contents are proprietary to WHP Global™\nPOSITIONING.......................................................3\nTONE OF VOICE...................................................4\nLIFESTYLE IMAGERY................................................5\n3D GEOFFREY POSES............................................7\nTOYS”R”US HERO R’S............................................8\nFONTS..................................................................9\nGENERAL............................................................10\nSTORE OPENINGS & PROMOTIONS.....................22\nKID’S PLAY..........................................................28\nVALENTINE’S DAY...............................................31\nRAMADAN & EID AL-FITR......................................37\nEASTER/SPRING..................................................43\nOUTDOORS........................................................51\nBACK TO SCHOOL..............................................59\nDIWALI...............................................................67\nHALLOWEEN.......................................................72\nCHILDREN’S DAY.................................................80\nBLACK FRIDAY/CYBER MONDAY..........................85\nHANUKKAH........................................................92\nCHRISTMAS.........................................................98\nLUNAR NEW YEAR............................................106\n2\n\n-- 2 of 111 --\n\nAt Toys\"R\"Us, play is for everyone. It’s about kids diving into their favorite character playsets, families sharing\nmoments of joy, and adults finding new ways to unwind—whether building a LEGO set, embracing trend-driven\nplush, or exploring toys that bring back the nostalgia of their childhood. Our job is to sell toys to every age. This\nstyle guide reflects this inclusivity with a more sophisticated appr",
   "brandVoice": [
-    "playful",
-    "wonder-driven"
+    "authoritative",
+    "clear",
+    "punchy",
+    "accessible",
+    "authentic",
+    "precise",
+    "inclusive",
+    "bold",
+    "straightforward",
+    "trustworthy"
   ],
-  "updatedAt": "2026-03-12T15:20:36.141Z"
+  "messagingPillars": [
+    "Play is for everyone",
+    "Toys for every age",
+    "Inclusivity and sophistication",
+    "Wonder and excitement",
+    "Seamless shopping experience",
+    "12 Pillars of Play",
+    "Nostalgia and newness",
+    "Adventure and exploration",
+    "Family togetherness",
+    "Trend-driven play"
+  ],
+  "tentpoles": [
+    {
+      "name": "Store Openings & Promotions",
+      "theme": "Grand openings and sales events driving foot traffic and online clicks",
+      "keywords": [
+        "new store",
+        "grand opening",
+        "flash sale",
+        "promotions"
+      ]
+    },
+    {
+      "name": "Kid's Play",
+      "theme": "Toys for every kind of kid celebrating the 12 Pillars of Play",
+      "keywords": [
+        "kids",
+        "play",
+        "toys",
+        "every kind"
+      ]
+    },
+    {
+      "name": "Valentine's Day",
+      "theme": "Celebrating love, connection, and togetherness through toys",
+      "keywords": [
+        "love",
+        "connection",
+        "togetherness",
+        "gifts",
+        "share"
+      ]
+    },
+    {
+      "name": "Ramadan & Eid Al-Fitr",
+      "theme": "Celebrating faith, generosity, and unity with culturally resonant visuals",
+      "keywords": [
+        "Ramadan",
+        "Eid",
+        "faith",
+        "generosity",
+        "togetherness",
+        "unity"
+      ]
+    },
+    {
+      "name": "Easter/Spring",
+      "theme": "Renewal, joy, and discovery with vibrant playful seasonal themes",
+      "keywords": [
+        "Easter",
+        "spring",
+        "renewal",
+        "joy",
+        "discovery",
+        "playful"
+      ]
+    },
+    {
+      "name": "Outdoors",
+      "theme": "Adventure, exploration, and active outdoor play",
+      "keywords": [
+        "outdoors",
+        "adventure",
+        "exploration",
+        "active play",
+        "nature"
+      ]
+    },
+    {
+      "name": "Back to School",
+      "theme": "Back to school season toy and product promotions",
+      "keywords": [
+        "back to school",
+        "learning",
+        "new season"
+      ]
+    },
+    {
+      "name": "Diwali",
+      "theme": "Celebrating the festival of lights with culturally relevant campaigns",
+      "keywords": [
+        "Diwali",
+        "festival",
+        "lights",
+        "celebration"
+      ]
+    },
+    {
+      "name": "Halloween",
+      "theme": "Spooky seasonal fun and themed toy promotions",
+      "keywords": [
+        "Halloween",
+        "spooky",
+        "costumes",
+        "seasonal"
+      ]
+    },
+    {
+      "name": "Children's Day",
+      "theme": "Celebrating children and play with dedicated toy promotions",
+      "keywords": [
+        "Children's Day",
+        "kids",
+        "celebration",
+        "play"
+      ]
+    },
+    {
+      "name": "Black Friday / Cyber Monday",
+      "theme": "Major sales event driving high-volume toy purchases",
+      "keywords": [
+        "Black Friday",
+        "Cyber Monday",
+        "deals",
+        "sale",
+        "discounts"
+      ]
+    },
+    {
+      "name": "Hanukkah",
+      "theme": "Holiday gifting celebration with festive toy promotions",
+      "keywords": [
+        "Hanukkah",
+        "holiday",
+        "gifts",
+        "celebration"
+      ]
+    },
+    {
+      "name": "Christmas",
+      "theme": "Peak holiday season toy gifting with elevated Q4 visuals",
+      "keywords": [
+        "Christmas",
+        "holiday",
+        "gifts",
+        "Q4",
+        "festive"
+      ]
+    },
+    {
+      "name": "Lunar New Year",
+      "theme": "Celebrating the Lunar New Year with culturally resonant campaigns",
+      "keywords": [
+        "Lunar New Year",
+        "celebration",
+        "tradition",
+        "gifts"
+      ]
+    }
+  ],
+  "targetAudience": "Parents, gift-givers, kids of all ages, families, and adults including kidults — anyone who buys or enjoys toys, spanning all age groups from children to nostalgic adults",
+  "doList": [
+    "Feature bold Toys\"R\"Us branding with straightforward messaging for maximum impact",
+    "Keep layouts clean and professional",
+    "Ensure toys always take center stage as the hero of all visuals",
+    "Speak directly to adults using relevant and straightforward language focused on product details and features",
+    "Make purchasing simple and intuitive across web, social, and email",
+    "Use punchy, accessible language with bold graphics and clear calls to action",
+    "Ensure links and key information are always easy to find",
+    "Use Geoffrey across campaigns to create dynamic brand presence",
+    "Use 3D elements, drop shadows, sparkles, and metallic hues especially during Q4 and holiday season",
+    "Use lifestyle imagery featuring kids, families, and adults with toys as the central focus",
+    "Pair Futura and Futura Bold with complementary seasonal fonts",
+    "Use platform bases and stages to give toys an elevated, dynamic display",
+    "Incorporate seasonal icons, borders, and environments tailored to each holiday",
+    "Use embellishments like glows, drop shadows, and glittery bursts to add depth",
+    "Align campaigns to position holidays, promote newness, and harness trends",
+    "Use product photography creatively as iconography within 3D scenes for vendor-specific ads",
+    "Use interactive social copy such as polls to drive engagement"
+  ],
+  "dontList": [
+    "Never allow products to overlap or touch the messaging in layouts",
+    "Do not show Geoffrey holding or endorsing specific products",
+    "Avoid complex or unclear language — messaging must be simple and intuitive",
+    "Do not remove focus from toys as the central element in all visuals"
+  ],
+  "visualDirection": "Dynamic 3D aesthetic with reimagined 3D Geoffrey, icons, borders, and environments. Core palette includes bold blues, reds, greens, oranges, and yellows (#004ebc, #f01446, #66bc29, #ff7000, #ffd200) with complementary whites, blacks, and gold tones. Features drop shadows, sparkles, metallic hues, glows, and embossed textures for depth and vibrancy. Lifestyle imagery integrates kids, families, and adults with toys as hero. Futura and Futura Bold are primary fonts. Visual approach is elevated yet fun, with clean professional layouts, linear shapes, and dynamic movement across digital, print, and in-store executions.",
+  "competitivePositioning": "Toys\"R\"Us positions itself as the trusted, authoritative leader in play for all ages — not just children — embracing parents, gift-givers, and adults (including kidults). The brand differentiates through inclusivity, a sophisticated yet playful visual identity, trend-driven product curation, nostalgic brand equity via Geoffrey, and a seamless omnichannel shopping experience across in-store, web, social, and email.",
+  "campaignNotes": "2025 holiday tentpoles span the full calendar year with dedicated campaigns for Valentine's Day, Ramadan & Eid Al-Fitr, Easter/Spring, Outdoors, Back to School, Diwali, Halloween, Children's Day, Black Friday/Cyber Monday, Hanukkah, Christmas, and Lunar New Year. Q4 and the holiday season receive elevated treatment with metallic hues, sparkles, and heightened 3D visual production. The Lebanon market guide reflects cultural inclusivity by incorporating Ramadan, Eid, and Diwali alongside Western holidays. Geoffrey is introduced in 10+ new 3D poses for use year-round. A new sophisticated font has been introduced in 2025 to complement existing brand-approved fonts. The overarching 2025 brand message is: 'In 2025, we will reach everyone, every day, with an exciting opportunity to purchase toys.'"
 }
