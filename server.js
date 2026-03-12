@@ -696,6 +696,30 @@ app.get('/api/settings', (req, res) => {
   res.json({ serpApiEnabled: !!process.env.SERP_API_KEY });
 });
 
+// ─── Image Proxy (bypasses Instagram CDN hotlink protection) ──────────────────
+
+app.get('/api/proxy-image', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).end();
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://www.instagram.com/',
+        'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+      },
+    });
+    if (!response.ok) return res.status(response.status).end();
+    const ct = response.headers.get('content-type') || 'image/jpeg';
+    res.setHeader('Content-Type', ct);
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    const buf = await response.arrayBuffer();
+    res.end(Buffer.from(buf));
+  } catch (err) {
+    res.status(500).end();
+  }
+});
+
 // ─── Brand Guidelines Routes ──────────────────────────────────────────────────
 
 // GET /api/brands/:slug/brand_guidelines

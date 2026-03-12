@@ -915,7 +915,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
         {/* Image area */}
         <div style={{ width: '100%', aspectRatio: '1/1', background: `linear-gradient(135deg, ${g1}22, ${g2}22)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
           {post.imageUrl
-            ? <img src={post.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+            ? <img src={`/api/proxy-image?url=${encodeURIComponent(post.imageUrl)}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
             : <span style={{ fontSize: 52, fontWeight: 900, color: `${g1}55`, userSelect: 'none' }}>{initial}</span>
           }
           {engagement > 0 && <span style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 12 }}>{engagement >= 1000 ? `${(engagement/1000).toFixed(1)}k` : engagement}</span>}

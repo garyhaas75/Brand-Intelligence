@@ -146,11 +146,16 @@ async function scrapeInstagramViaApify(handle) {
   if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
   log(`  Scraping Instagram @${handle} via Apify...`);
-  const run = await client.actor('apify/instagram-scraper').call({
+  const igInput = {
     directUrls: [`https://www.instagram.com/${handle}/`],
     resultsType: 'posts',
     resultsLimit: 50,
-  });
+  };
+  if (process.env.IG_USERNAME && process.env.IG_PASSWORD) {
+    igInput.loginUsername = process.env.IG_USERNAME;
+    igInput.loginPassword = process.env.IG_PASSWORD;
+  }
+  const run = await client.actor('apify/instagram-scraper').call(igInput);
   log(`  Apify run status: ${run.status}, datasetId: ${run.defaultDatasetId}`);
   const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 50 });
   log(`  Apify returned ${items.length} items`);
