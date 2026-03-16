@@ -791,7 +791,7 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         {data.personas?.map((p, i) => (
-          <button key={i} onClick={() => { setActivePersona(i); setChatMessages([]) }} style={{ padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: i === activePersona ? 700 : 400, background: i === activePersona ? T.accent : T.surfaceAlt, color: i === activePersona ? '#fff' : T.textSub, border: 'none', cursor: 'pointer' }}>
+          <button key={i} onClick={() => { setActivePersona(i); setChatMessages([]) }} style={{ padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: i === activePersona ? 700 : 600, background: i === activePersona ? T.accent : T.surface, color: i === activePersona ? '#fff' : T.text, border: `1px solid ${i === activePersona ? T.accent : T.border}`, cursor: 'pointer' }}>
             {p.name}
           </button>
         ))}
@@ -1481,7 +1481,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div style={{ display: 'flex', gap: 4 }}>
           {['seo', 'keywords', 'geo'].map(v => (
-            <button key={v} onClick={() => setView(v)} style={{ padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: v === view ? 700 : 400, background: v === view ? T.accent : T.surfaceAlt, color: v === view ? '#fff' : T.textSub, border: 'none', cursor: 'pointer' }}>
+            <button key={v} onClick={() => setView(v)} style={{ padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: v === view ? 700 : 600, background: v === view ? T.accent : T.surface, color: v === view ? '#fff' : T.text, border: `1px solid ${v === view ? T.accent : T.border}`, cursor: 'pointer' }}>
               {v === 'seo' ? 'On-Page SEO' : v === 'keywords' ? `Keywords${kw.totalCount ? ` (${kw.totalCount})` : ''}` : 'GEO (AI Visibility)'}
             </button>
           ))}
@@ -1801,7 +1801,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
                     {filterBtns.map(f => (
-                      <button key={f.key} onClick={() => setKwFilter(f.key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: kwFilter === f.key ? 700 : 400, background: kwFilter === f.key ? T.accent : T.surfaceAlt, color: kwFilter === f.key ? '#fff' : T.textSub, border: kwFilter === f.key ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
+                      <button key={f.key} onClick={() => setKwFilter(f.key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: kwFilter === f.key ? 700 : 600, background: kwFilter === f.key ? T.accent : T.surface, color: kwFilter === f.key ? '#fff' : T.text, border: `1px solid ${kwFilter === f.key ? T.accent : T.border}`, cursor: 'pointer' }}>
                         {f.label}
                       </button>
                     ))}
@@ -1879,7 +1879,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                     const count = (kw[key] || []).length
                     if (!count) return null
                     return (
-                      <button key={key} onClick={() => setKwCat(key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: kwCat === key ? 700 : 400, background: kwCat === key ? T.accent : T.surfaceAlt, color: kwCat === key ? '#fff' : T.textSub, border: kwCat === key ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
+                      <button key={key} onClick={() => setKwCat(key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: kwCat === key ? 700 : 600, background: kwCat === key ? T.accent : T.surface, color: kwCat === key ? '#fff' : T.text, border: `1px solid ${kwCat === key ? T.accent : T.border}`, cursor: 'pointer' }}>
                         {label} <span style={{ opacity: 0.7 }}>({count})</span>
                       </button>
                     )
