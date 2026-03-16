@@ -1,7 +1,7 @@
 [build]
 # Install deps and build the React dashboard
 builder = "NIXPACKS"
-buildCommand = "npm install"
+buildCommand = "npm install && npx playwright install chromium --with-deps"
 
 [deploy]
 # Start server + scheduler together (same as npm run start:full minus the dashboard dev server)
