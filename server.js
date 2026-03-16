@@ -608,11 +608,13 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   const mod = BRAND_MODULES.find(m => m.name === moduleName);
   if (!mod) return res.status(400).json({ error: `Unknown module: ${moduleName}` });
 
+  const moduleLogPath = path.join(BRANDS_DIR, slug, `${moduleName}.log`);
+  const moduleLogStream = fs.createWriteStream(moduleLogPath, { flags: 'a' });
   const child = spawn('node', [path.join(__dirname, mod.script), `--slug=${slug}`], {
     env: { ...process.env },
     cwd: __dirname,
     detached: true,
-    stdio: 'ignore',
+    stdio: ['ignore', moduleLogStream, moduleLogStream],
   });
   child.unref();
   res.json({ ok: true, slug, module: moduleName, status: 'running' });
@@ -852,6 +854,12 @@ app.get('/api/settings', (req, res) => {
 
 app.get('/api/brands/:slug/discovery-log', (req, res) => {
   const logPath = path.join(DATA_DIR, 'brands', req.params.slug, 'discovery.log');
+  if (!fs.existsSync(logPath)) return res.json({ log: '' });
+  res.json({ log: fs.readFileSync(logPath, 'utf8').slice(-3000) });
+});
+
+app.get('/api/brands/:slug/module-log/:module', (req, res) => {
+  const logPath = path.join(BRANDS_DIR, req.params.slug, `${req.params.module}.log`);
   if (!fs.existsSync(logPath)) return res.json({ log: '' });
   res.json({ log: fs.readFileSync(logPath, 'utf8').slice(-3000) });
 });
