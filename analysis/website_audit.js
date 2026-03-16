@@ -36,7 +36,7 @@ function archiveData(slug, module, data) {
 }
 
 async function runLighthouse(url) {
-  const chromeLauncher = require('chrome-launcher');
+  const { default: chromeLauncher } = await import('chrome-launcher');
   let chrome;
   try {
     chrome = await chromeLauncher.launch({ chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox'] });
@@ -83,7 +83,7 @@ async function run() {
     { id: slug, name: profile.name, url: profile.url, role: 'target', takeScreenshot: true },
     ...(profile.identifiedCompetitors || []).slice(0, 6).map(c => ({
       id: c.name.toLowerCase().replace(/\s+/g, '-'),
-      name: c.name, url: c.url, role: 'competitor',
+      name: c.name, url: /^https?:\/\//i.test(c.url) ? c.url : `https://${c.url}`, role: 'competitor',
     })),
   ];
 
