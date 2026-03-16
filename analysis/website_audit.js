@@ -36,13 +36,14 @@ function archiveData(slug, module, data) {
 }
 
 async function runLighthouse(url) {
-  const { default: chromeLauncher } = await import('chrome-launcher');
   // Use Playwright's bundled Chromium (installed during Railway build) instead of system Chrome
   let chromePath;
   try { chromePath = require('playwright').chromium.executablePath(); } catch (_) {}
   let chrome;
   try {
-    chrome = await chromeLauncher.launch({
+    const cl = await import('chrome-launcher');
+    const launchFn = cl.launch || cl.default?.launch;
+    chrome = await launchFn({
       ...(chromePath ? { chromePath } : {}),
       chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox'],
     });
