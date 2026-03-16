@@ -586,11 +586,13 @@ app.post('/api/brands/:slug/refresh/all', (req, res) => {
   const bidx = reg2.brands.findIndex(b => b.slug === slug);
   if (bidx !== -1) { reg2.brands[bidx].discoveryStatus = 'running'; saveBrandsRegistry(reg2); }
 
+  const logFile = path.join(DATA_DIR, 'brands', slug, 'discovery.log');
+  const logStream = fs.openSync(logFile, 'w');
   const child = spawn('node', spawnArgs, {
     env: { ...process.env },
     cwd: __dirname,
     detached: true,
-    stdio: 'ignore',
+    stdio: ['ignore', logStream, logStream],
   });
   child.unref();
   res.json({ ok: true, slug, status: 'running' });
@@ -846,6 +848,12 @@ app.get('/api/settings', (req, res) => {
 });
 
 // ─── Social audit live progress ───────────────────────────────────────────────
+
+app.get('/api/brands/:slug/discovery-log', (req, res) => {
+  const logPath = path.join(DATA_DIR, 'brands', req.params.slug, 'discovery.log');
+  if (!fs.existsSync(logPath)) return res.json({ log: '' });
+  res.json({ log: fs.readFileSync(logPath, 'utf8').slice(-3000) });
+});
 
 app.get('/api/brands/:slug/audit-progress', (req, res) => {
   const statusPath = path.join(DATA_DIR, 'brands', req.params.slug, '_audit_status.json');
