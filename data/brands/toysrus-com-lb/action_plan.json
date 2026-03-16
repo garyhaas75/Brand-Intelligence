@@ -1,174 +1,174 @@
 {
-  "executiveSummary": "Toys R Us Lebanon holds a powerful legacy brand name and specialist toy positioning but is critically undermined by a near-dormant digital presence — zero social media activity, a website with severe SEO and UX deficiencies, and no baby/infant category to compete with Mumzworld and FirstCry for early-lifecycle customers. The competitive landscape reveals multiple rivals with non-functional websites (FirstCry, Fantasia, PlayOne), creating a rare window to capture displaced online shoppers and establish category dominance in Lebanese e-commerce for toys. The strategic imperative is a 90-day digital revival: fix foundational website and SEO issues, launch an aggressive social content engine, expand into the 0-2 age segment, and build seasonal commerce infrastructure — converting Toys R Us Lebanon from a passive storefront into the definitive omnichannel toy destination in the market.",
+  "executiveSummary": "Toys R Us Lebanon holds significant brand recognition and the broadest category assortment in the local toy market, yet it is underperforming digitally — with zero measurable social engagement, critical website navigation gaps (no 0-2 years category, no gift finder), and only 33% visibility in AI-powered shopping queries. Competitors like Mumzworld, FirstCry, and Chez Les Petits are capturing high-intent parent traffic in the baby/toddler and developmental toy segments that Toys R Us currently ignores online. The strategic opportunity is to leverage the brand's unmatched breadth and global equity to become Lebanon's definitive omnichannel toy destination by closing urgent digital experience gaps, activating a dormant social presence, and owning white-space positions in STEM education, experiential retail, and personalized gift discovery that no local competitor has claimed.",
   "immediateWins": [
     {
       "rank": 1,
-      "title": "Launch 5x Weekly Instagram Content Engine",
-      "description": "Activate @toysruslb immediately with a minimum 5 posts/week cadence featuring Reels of product demos, new arrivals, and age-based gift picks to break the zero-engagement deadlock and rebuild algorithmic presence. Within 30 days, expect 500+ new followers and baseline engagement metrics to benchmark future growth against active competitors like JouéClub and Wild Willy.",
-      "effort": "low",
-      "impact": "high",
-      "sourceModule": "social"
-    },
-    {
-      "rank": 2,
-      "title": "Convert Hero Image to Crawlable HTML Text",
-      "description": "Replace the image-embedded 'Fun for the whole family!' hero with a proper HTML H1 tag containing keyword-rich copy like 'Lebanon's Largest Toy Store — Shop by Age, Brand & Category' to unlock SEO visibility for high-intent terms like 'toys Lebanon' and 'toy store Beirut'. This single technical change can improve organic search rankings within 2-4 weeks and increase homepage crawlability for AI shopping agents.",
+      "title": "Add Live HTML H1 Hero Headline for SEO",
+      "description": "Replace the image-embedded 'Fun for the whole family!' hero text with a live HTML H1 tag reading 'Toys R Us Lebanon — Shop Toys, Games & Gifts for Every Age' to unlock organic search visibility and accessibility compliance. Expected outcome: measurable improvement in homepage indexation, keyword ranking for 'toys Lebanon,' and screen-reader accessibility within 2-4 weeks.",
       "effort": "low",
       "impact": "high",
       "sourceModule": "website"
     },
     {
+      "rank": 2,
+      "title": "Launch Baby & Toddler 0-2 Navigation Category",
+      "description": "Create a dedicated Baby & Toddler (0-2 Years) category in the main navigation populated with existing inventory and curated developmental/Montessori product tags to capture parent traffic currently lost to Mumzworld, FirstCry, and Chez Les Petits. Expected outcome: new organic landing page ranking for 'baby toys Lebanon,' reduced bounce from first-time parents, and a 10-15% increase in sessions from the 25-34 parent demographic within 60 days.",
+      "effort": "medium",
+      "impact": "high",
+      "sourceModule": "personas"
+    },
+    {
       "rank": 3,
-      "title": "Add Trust Bar with Local Payment Signals",
-      "description": "Insert an above-the-fold trust bar displaying OMT, cash on delivery, credit card icons, delivery timeframes to Lebanese regions, and a customer service WhatsApp number to address first-time visitor hesitation in the Lebanese online shopping context. Expect a measurable reduction in homepage bounce rate by 10-15% and improved add-to-cart rates within the first month.",
+      "title": "Add Above-the-Fold Category Tiles and Search Bar",
+      "description": "Insert quick-access category tiles (LEGO, Barbie, Outdoor Toys, Best Sellers, New Arrivals) and a prominent search bar directly below the hero banner to reduce clicks-to-product and improve engagement metrics. Expected outcome: lower homepage bounce rate by 15-20% and higher pages-per-session as users are routed faster to high-intent product pages.",
       "effort": "low",
       "impact": "high",
       "sourceModule": "website"
     },
     {
       "rank": 4,
-      "title": "Create Prominent Sale Section in Navigation",
-      "description": "Redesign the 'R Deals' navigation tab with high-contrast color, a live deal count badge, and a dedicated landing page featuring clearance and promotional items to capture Lebanon's price-sensitive shoppers who currently default to Mumzworld's sale-first navigation. This will increase click-through to deal pages by an estimated 25% and drive conversion among the Budget-Savvy Grandparent and Devoted Modern Mom personas.",
+      "title": "Restart Instagram with Weekly Content Calendar",
+      "description": "Immediately resume posting on @toysruslb with a minimum 4-post-per-week cadence featuring product unboxings, age-appropriate gift guides, Geoffrey mascot moments, and user-generated family content to rebuild engagement from its current zero baseline. Expected outcome: establish a measurable engagement rate within 30 days and grow follower interaction by 50%+ in the first quarter.",
       "effort": "low",
       "impact": "medium",
-      "sourceModule": "personas"
+      "sourceModule": "social"
     },
     {
       "rank": 5,
-      "title": "Build Seasonal Gift Guide for Eid/Summer",
-      "description": "Create a curated, SEO-optimized Eid and summer gift guide landing page with age-filtered product recommendations, 'Top 10' lists, and a 'Staff Picks' section to serve as a high-intent organic landing page and reduce decision fatigue for the Generous Gift-Giver persona. This page will capture seasonal search traffic that currently has no destination on the Toys R Us Lebanon site and can drive 15-20% of seasonal revenue through a single URL.",
+      "title": "Build Interactive Gift Finder Tool on Homepage",
+      "description": "Deploy a simple interactive gift finder widget (filter by age, budget, interest/occasion) on the homepage and link it from the main navigation to serve the 'Generous Gift-Giver' and 'Devoted Modern Mama' personas who cite decision paralysis as their top pain point. Expected outcome: increase conversion rate on gift-related visits by 20-25% and capture seasonal search intent for Eid, Christmas, and birthday shopping.",
       "effort": "medium",
       "impact": "high",
-      "sourceModule": "website"
+      "sourceModule": "personas"
     }
   ],
   "roadmap": {
     "day30": [
       {
-        "action": "Launch Instagram content calendar: 5 posts/week including 2 Reels (product demos, unboxings), 2 carousels (age-based gift guides, brand spotlights), and 1 story poll/quiz — prioritize Lego, Barbie, and Crayola as anchor brands",
+        "action": "Implement live HTML H1 headline on homepage, add schema markup for Product and BreadcrumbList on category pages, and fix any meta title/description gaps across top 20 landing pages",
+        "owner": "SEO Manager / Web Developer",
+        "metric": "Google Search Console indexed pages increase by 30%; homepage ranks for 'toys Lebanon' in top 10"
+      },
+      {
+        "action": "Launch Baby & Toddler (0-2 Years) category with at least 40 SKUs tagged with developmental milestones and Montessori labels; add to main navigation and mobile menu",
+        "owner": "E-Commerce Manager / Merchandising Lead",
+        "metric": "Category page live and indexing; 500+ sessions to the new category within first 30 days"
+      },
+      {
+        "action": "Deploy above-the-fold category tiles (LEGO, Barbie, Outdoor, Best Sellers, STEM) and prominent search bar on homepage; A/B test layout against current design",
+        "owner": "UX Designer / Web Developer",
+        "metric": "Homepage bounce rate decreases by 10%+; pages-per-session increases by 15%+"
+      },
+      {
+        "action": "Reactivate @toysruslb Instagram with a 4-post/week content calendar covering product spotlights, age-based gift guides, behind-the-scenes store content, and interactive polls/stories",
         "owner": "Social Media Manager",
-        "metric": "Reach 500+ followers, 2%+ engagement rate, and 15+ posts published in first 30 days"
-      },
-      {
-        "action": "Execute critical website SEO fixes: convert hero image to crawlable H1 text, add schema markup for Product and BreadcrumbList, implement alt tags on all category images, and fix site speed to achieve sub-3-second load time",
-        "owner": "Web Developer / SEO Specialist",
-        "metric": "Google PageSpeed score improvement to 60+; indexation of all category pages verified in Google Search Console"
-      },
-      {
-        "action": "Deploy above-the-fold trust bar with Lebanese payment methods (OMT, Whish, credit cards, COD), delivery zone coverage, and WhatsApp customer service link across all pages",
-        "owner": "UX Designer / E-commerce Manager",
-        "metric": "Homepage bounce rate reduction of 10%; measurable increase in add-to-cart rate tracked via GA4"
-      },
-      {
-        "action": "Redesign 'R Deals' navigation with high-visibility styling and build a dedicated sale landing page with at least 30 discounted SKUs, sortable by age, brand, and discount percentage",
-        "owner": "E-commerce Manager / Merchandising Lead",
-        "metric": "Click-through rate to deals page exceeds 8% of homepage visitors; deals page generates 10%+ of total online orders"
+        "metric": "16+ posts published in Month 1; average engagement rate reaches 1.5%+ per post; follower growth rate tracked weekly"
       }
     ],
     "day60": [
       {
-        "action": "Launch Baby & Infant (0-2 years) category with minimum 50 SKUs covering infant toys, baby gear essentials, and newborn gift sets — source from existing regional Toys R Us Middle East catalog to accelerate launch",
-        "owner": "Category Manager / Buyer",
-        "metric": "Category page live with 50+ SKUs; captures 5% of total site traffic within first 30 days of launch"
+        "action": "Build and launch interactive Gift Finder tool (filter by age, budget, occasion, interest) on homepage and as a standalone landing page optimized for 'toy gift ideas Lebanon' keywords",
+        "owner": "Product Manager / UX Designer / Developer",
+        "metric": "Gift Finder used in 10%+ of all sessions; conversion rate on gift finder users vs. non-users compared"
       },
       {
-        "action": "Build and publish three seasonal gift guide landing pages (Eid, Back-to-School, Birthday) with age-filtered recommendations, 'Most Popular' badges, and embedded social proof — optimize each for target keywords",
-        "owner": "Content Manager / SEO Specialist",
-        "metric": "Each guide page ranks in top 20 for target keywords; combined organic traffic of 500+ sessions/month"
+        "action": "Create dedicated SEO-rich brand hub pages for top 8 brands (LEGO, Barbie, Funko, Crayola, Hot Wheels, Pokémon, Disney, Peppa Pig) with buying guides, featured collections, and editorial content",
+        "owner": "Content Marketing Manager / SEO Manager",
+        "metric": "Each brand page ranks for '[Brand] toys Lebanon' within 60 days; organic traffic to brand pages increases 40%+"
       },
       {
-        "action": "Launch weekly 'Toy Spotlight' Reels series on Instagram featuring new arrivals with demo footage, age-suitability callouts, and direct shopping links in bio — partner with 3 Lebanese parenting micro-influencers for initial amplification",
-        "owner": "Social Media Manager / Brand Partnerships",
-        "metric": "Average Reel views exceed 2,000; 3 influencer collaborations published; link-in-bio clicks exceed 200/week"
+        "action": "Expand assortment to close gaps in Building Blocks, Mechanical Sets, and Playmobil categories — source minimum 25 new SKUs per gap category and create navigation entries",
+        "owner": "Buying / Merchandising Team",
+        "metric": "3 new category pages live with 75+ total new SKUs; category page sessions tracked against competitor benchmarks"
       },
       {
-        "action": "Add 'New Arrivals' section to homepage and top navigation, and implement 'About Us' and 'Contact Us' pages with store locations, operating hours, and brand story to close content gaps versus JouéClub and The Toy Store LB",
-        "owner": "Content Manager / Web Developer",
-        "metric": "New Arrivals page receives 8%+ of total site traffic; About/Contact pages reduce customer service inquiries by 15%"
+        "action": "Launch seasonal Eid/Summer landing page with curated gift bundles, countdown banners, and promotional hero content to exploit competitors' lack of visible seasonal campaigns",
+        "owner": "Marketing Manager / E-Commerce Manager",
+        "metric": "Seasonal landing page generates 2,000+ sessions in first 2 weeks; seasonal bundle AOV 20%+ higher than site average"
       }
     ],
     "day90": [
       {
-        "action": "Implement a 'Gift Finder' interactive tool on the website allowing users to filter by age, interest, budget, and occasion — addressing the decision fatigue pain point across all four customer personas and differentiating from every local competitor",
-        "owner": "UX Designer / Web Developer",
-        "metric": "Tool used by 10%+ of site visitors; users who engage with Gift Finder convert at 2x the site average"
+        "action": "Launch a STEM & EdTech pilot program — curate a 'STEM Discovery' online shop section with coding toys, robotics kits, and science sets; host first in-store STEM workshop event for kids 6-13",
+        "owner": "Category Manager / Events Coordinator / Marketing Manager",
+        "metric": "STEM category generates 800+ sessions/month; first workshop attracts 30+ attendees; social media event content generates 3x average engagement"
       },
       {
-        "action": "Launch a Playmobil and Building Blocks dedicated sub-category with curated collections to close assortment gaps versus JouéClub and Wild Willy Toys, supported by targeted Google Shopping and Meta ads",
-        "owner": "Category Manager / Digital Marketing Manager",
-        "metric": "Combined category pages generate 200+ sessions/week; ROAS on paid campaigns exceeds 4x within first month"
+        "action": "Implement a basic personalized recommendation engine on product and category pages using child age/interest data captured at account registration or via Gift Finder interactions",
+        "owner": "E-Commerce Manager / Developer / Data Analyst",
+        "metric": "Recommendation widget click-through rate of 5%+; uplift in cross-sell revenue per session measured via A/B test"
       },
       {
-        "action": "Achieve GEO visibility score of 65%+ in AI shopping queries by publishing structured FAQ content, expanding product schema markup to all SKUs, and creating 10 SEO-optimized blog posts targeting 'best toys in Lebanon' long-tail queries",
-        "owner": "SEO Specialist / Content Manager",
-        "metric": "GEO visibility score rises from 43% to 65%+; organic traffic increases 40% versus Day 1 baseline"
+        "action": "Develop an About Us page, Contact Us page with store locator/live chat, and a comprehensive FAQ/returns policy page to match competitor trust signals and close content gaps",
+        "owner": "Content Manager / Customer Service Lead",
+        "metric": "Pages live and indexed; customer service inquiry volume through proper channels increases 20%; trust-related bounce reduction on checkout pages"
       },
       {
-        "action": "Pilot a click-and-collect program connecting online orders to physical store pickup with real-time inventory visibility, positioning Toys R Us as the only omnichannel toy retailer in Lebanon",
-        "owner": "Operations Manager / E-commerce Manager",
-        "metric": "Click-and-collect orders represent 15% of total online orders within first month; NPS for click-and-collect users exceeds 70"
+        "action": "Execute a GEO (Generative Engine Optimization) content sprint — publish 12 long-form buying guides ('Best Toys for 5-Year-Olds in Lebanon,' 'Top LEGO Sets 2025,' etc.) targeting AI shopping query inclusion and featured snippet capture",
+        "owner": "Content Marketing Manager / SEO Manager",
+        "metric": "AI shopping query brand mention rate increases from 33% to 50%+; 6+ guides ranking on page 1 for target queries within 90 days"
       }
     ]
   },
   "competitiveGapsToClose": [
     {
-      "gap": "No Baby & Infant (0-2 years) product category — completely ceding the earliest and highest-LTV customer acquisition stage to competitors who dominate this space with dedicated navigation, product depth, and parenting content",
-      "competitor": "Mumzworld, FirstCry Lebanon",
+      "gap": "No Baby & Toddler (0-2 Years) category or Montessori/developmental toy navigation — a critical segment for first-time parents",
+      "competitor": "Mumzworld, FirstCry Lebanon, Chez Les Petits",
       "priority": "high"
     },
     {
-      "gap": "Zero social media activity versus competitors maintaining consistent weekly posting cadences with product showcases, seasonal campaigns, and community engagement — rendering the brand invisible in social discovery channels",
-      "competitor": "JouéClub Lebanon, Wild Willy Toys, Mumzworld",
-      "priority": "high"
-    },
-    {
-      "gap": "Missing Playmobil and Building Blocks categories that competitors prominently feature as standalone navigation items, losing share in a high-margin, gift-driven segment popular with the Generous Gift-Giver and Edutainment Dad personas",
-      "competitor": "JouéClub Lebanon, Wild Willy Toys, The Toy Store LB",
-      "priority": "medium"
-    },
-    {
-      "gap": "No visible sale-first merchandising strategy — Mumzworld leads its entire navigation with a 'SALE' tab while Toys R Us buries discounts under an unassuming 'R Deals' label, failing to capture the attention of Lebanon's price-conscious shoppers amid economic pressures",
-      "competitor": "Mumzworld",
-      "priority": "high"
-    },
-    {
-      "gap": "Absence of 'About Us', 'Contact Us', and brand story pages that competitors use to build local trust and credibility — critical in the Lebanese market where consumers value personal relationships and transparency from retailers",
+      "gap": "Missing About Us and Contact Us pages that build brand trust and provide essential customer service access",
       "competitor": "JouéClub Lebanon, The Toy Store LB",
+      "priority": "high"
+    },
+    {
+      "gap": "No Playmobil, Building Blocks, or Mechanical Sets categories despite being core toy assortment expected by construction-play enthusiasts",
+      "competitor": "JouéClub Lebanon, Wild Willy Toys",
       "priority": "medium"
+    },
+    {
+      "gap": "No gift finder, gift guide, or occasion-based shopping tool — leaving the high-value gift buyer segment underserved while competitors offer curated solutions",
+      "competitor": "Mumzworld, Hamleys Middle East",
+      "priority": "high"
+    },
+    {
+      "gap": "Zero social media engagement and posting activity versus competitors with active community-building content strategies",
+      "competitor": "PlayOne, Wild Willy Toys, Virgin Megastore Lebanon",
+      "priority": "high"
     }
   ],
   "opportunitiesRanked": [
     {
       "rank": 1,
-      "opportunity": "Capture Displaced Online Toy Shoppers from Failed Competitor Websites",
-      "rationale": "Multiple competitors (FirstCry Lebanon, Fantasia, PlayOne) have non-functional websites with DNS resolution failures, meaning their combined customer bases have nowhere to shop online. Toys R Us can run targeted Google and Meta ads against these brand names and category terms to intercept high-intent shoppers actively looking for alternatives.",
-      "estimatedImpact": "Potential to capture 20-30% of competitor lapsed customer bases within 60 days, translating to a significant uplift in new customer acquisition at below-average CAC due to existing purchase intent"
+      "opportunity": "Digital-Native Parenting Ecosystem with Gift Finder & Personalized Curation",
+      "rationale": "All four customer personas cite decision paralysis and lack of guidance as top pain points. No competitor in Lebanon offers a personalized, data-driven toy recommendation engine tied to child age and developmental milestones. Combining a Gift Finder tool with account-based personalization and content marketing creates a loyalty-driven ecosystem that transcends transactional retail and builds recurring engagement.",
+      "estimatedImpact": "20-30% increase in conversion rate among gift buyers; 15% increase in average order value through relevant cross-sells; significant organic traffic capture for seasonal and occasion-based search queries"
     },
     {
       "rank": 2,
-      "opportunity": "Own the 0-2 Baby Category to Acquire Customers at Earliest Lifecycle Stage",
-      "rationale": "The current navigation starts at age 3-5, ignoring the highest-LTV entry point where parents begin brand relationships. Mumzworld and FirstCry dominate here by default. Adding 50+ baby SKUs with nursery essentials, infant toys, and newborn gift sets creates a full-lifecycle customer journey from birth through age 12+.",
-      "estimatedImpact": "Estimated 15-20% increase in total addressable market and 30%+ improvement in customer lifetime value through earlier acquisition and repeat purchase behavior across age-up categories"
+      "opportunity": "Capture the 0-2 Years Baby & Toddler Market",
+      "rationale": "Toys R Us Lebanon's age navigation starts at 3-5 years, completely ceding the highest-frequency, highest-loyalty parenting segment to Mumzworld, FirstCry, and Chez Les Petits. First-time parents in the 25-34 demographic are searching for developmental toys, Montessori products, and baby gear — and building brand loyalty that extends for 10+ years of toy purchasing. This is the single largest addressable segment gap.",
+      "estimatedImpact": "Capture an estimated 15-20% of parent traffic currently going to niche competitors; establish lifetime customer relationships from birth; new category could represent 10-12% of total online revenue within 6 months"
     },
     {
       "rank": 3,
-      "opportunity": "Establish Dominant Social Commerce Presence in an Uncontested Window",
-      "rationale": "With zero current social activity, Toys R Us has maximum headroom to grow. The Lebanon toy retail social landscape lacks a dominant voice — no competitor has established the kind of authoritative, entertaining, and shoppable content presence that toy retail demands. First-mover advantage in Reels-driven toy content can make @toysruslb the default discovery channel for Lebanese parents.",
-      "estimatedImpact": "Projected growth to 5,000+ engaged followers within 90 days with a consistent content engine; social channel driving 8-12% of total e-commerce traffic by end of quarter"
+      "opportunity": "Dominate the 8-13 and Teen Segment with STEM, Gaming & Hobby Depth",
+      "rationale": "Competitors like PlayOne skew heavily toward younger children and books, while JouéClub and Chez Les Petits lack visible electronics, gaming, and tween/teen categories. Toys R Us has the brand equity and supplier relationships to own coding robots, gaming accessories, collectibles, and hobby kits for older kids — a segment with higher price points and growing demand.",
+      "estimatedImpact": "15-20% revenue uplift from higher-AOV categories; reduced competitive overlap with baby-focused niche players; stronger positioning as a 'full-spectrum' family retailer serving ages 0-16+"
     },
     {
       "rank": 4,
-      "opportunity": "Build Seasonal Commerce Infrastructure for Year-Round Revenue Peaks",
-      "rationale": "Intelligence reveals a total seasonal promotional blackout while competitors capitalize on Eid, Christmas, Back-to-School, and birthday spikes. Creating evergreen gift guide landing pages optimized for each season provides compounding SEO value, reduces decision fatigue for gift-givers, and creates reliable promotional hooks for email, social, and paid campaigns.",
-      "estimatedImpact": "Seasonal gift guide pages can drive 25-35% of quarterly revenue during peak periods; SEO-optimized pages compound traffic value year-over-year with minimal incremental investment"
+      "opportunity": "Premium Experiential Toy Destination with In-Store Events",
+      "rationale": "No Lebanese competitor offers Hamleys-level theatrical, immersive in-store experiences. Toys R Us can create interactive play zones, STEM workshops, birthday party hosting, and live product demonstrations that drive foot traffic, social media content, and premium brand perception — differentiating from pure e-commerce players and justifying in-store visits.",
+      "estimatedImpact": "30-50% increase in weekend foot traffic; 3-5x social media engagement from event content; new revenue stream from birthday party bookings and workshop fees; brand perception shift from 'store' to 'destination'"
     },
     {
       "rank": 5,
-      "opportunity": "Leverage Physical Store Advantage with Omnichannel Click-and-Collect",
-      "rationale": "No competitor in the Lebanon toy market offers a true omnichannel experience connecting online browsing with in-store pickup. Several key competitors have no physical presence at all. Toys R Us can exploit its retail footprint to offer click-and-collect, in-store exclusives, and experiential shopping events that pure-play e-commerce competitors cannot replicate — directly addressing the tactile, gift-buying experience that parents and grandparents value.",
-      "estimatedImpact": "Click-and-collect can increase online conversion rates by 20% by reducing delivery anxiety; in-store events can drive 2x foot traffic during activation periods and generate high-performing social content"
+      "opportunity": "Aggressive Seasonal Campaign Ownership Across Digital Channels",
+      "rationale": "Competitors show weak or broken promotional content (PlayOne's rendering issues, limited hero banners). Toys R Us can own seasonal toy moments — Eid, Christmas, Back-to-School, Summer, Black Friday — with dedicated landing pages, countdown campaigns, bundle offers, and social media activations. This exploits a clear execution gap while capturing high-intent seasonal search traffic that currently has no strong destination in Lebanon.",
+      "estimatedImpact": "Seasonal landing pages could drive 25-35% of annual traffic; seasonal campaigns expected to generate 2-3x ROAS versus always-on spending; brand visibility in AI shopping queries projected to increase from 33% to 50%+ through seasonal content depth"
     }
   ],
-  "generatedAt": "2026-03-11T20:46:02.312Z",
+  "generatedAt": "2026-03-16T15:45:45.770Z",
   "brandSlug": "toysrus-com-lb"
 }

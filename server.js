@@ -15,6 +15,7 @@ const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -905,6 +906,20 @@ app.put('/api/brands/:slug/brand_guidelines', (req, res) => {
   const updated = { ...existing, ...req.body, updatedAt: new Date().toISOString() };
   saveBrandData(slug, 'brand_guidelines.json', updated);
   res.json({ ok: true });
+});
+
+// POST /api/brands/:slug/upload_style_guide — receive PDF upload
+const pdfUpload = multer({ storage: multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(BRANDS_DIR, req.params.slug);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => cb(null, 'style_guide.pdf'),
+}) });
+app.post('/api/brands/:slug/upload_style_guide', pdfUpload.single('pdf'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  res.json({ ok: true, path: req.file.path });
 });
 
 // POST /api/brands/:slug/process_style_guide — spawn script, SSE stream stdout

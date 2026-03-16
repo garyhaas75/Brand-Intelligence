@@ -325,6 +325,8 @@ function BrandProfileTab({ slug, onRefresh, running }) {
   const [guidelines, setGuidelines] = useState(null)
   const [guidelinesRunning, setGuidelinesRunning] = useState(false)
   const [guidelinesLog, setGuidelinesLog] = useState([])
+  const [pdfUploading, setPdfUploading] = useState(false)
+  const [pendingCompetitors, setPendingCompetitors] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -376,20 +378,38 @@ function BrandProfileTab({ slug, onRefresh, running }) {
     onRefresh('social_intelligence')
   }
 
-  async function addCompetitorAndReanalyze() {
+  function addCompetitorToList() {
     if (!newCompUrl || !newCompName) return
     const newEntry = { name: newCompName, url: newCompUrl, discoveredAt: new Date().toISOString() }
     const updated = { ...form, identifiedCompetitors: [...(form.identifiedCompetitors || []), newEntry] }
-    setForm(updated); setData(updated)
+    setForm(updated)
     setNewCompUrl(''); setNewCompName('')
-    await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) })
+    setPendingCompetitors(true)
+  }
+
+  async function saveCompetitorsAndRun() {
+    setSaving(true)
+    await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    setData(form); setSaving(false); setPendingCompetitors(false)
     onRefresh('competitive_analysis')
     onRefresh('site_intelligence')
     onRefresh('social_intelligence')
   }
 
-  function removeCompetitor(url) {
-    setForm({ ...form, identifiedCompetitors: (form.identifiedCompetitors || []).filter(c => c.url !== url) })
+  async function removeCompetitor(url) {
+    const updated = { ...form, identifiedCompetitors: (form.identifiedCompetitors || []).filter(c => c.url !== url) }
+    setForm(updated)
+    await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) })
+    setData(updated)
+  }
+
+  async function uploadPdf(file) {
+    setPdfUploading(true)
+    const fd = new FormData()
+    fd.append('pdf', file)
+    await fetch(`${API}/brands/${slug}/upload_style_guide`, { method: 'POST', body: fd })
+    setPdfUploading(false)
+    processStyleGuide()
   }
 
   if (!data) return <Spinner />
@@ -533,9 +553,16 @@ function BrandProfileTab({ slug, onRefresh, running }) {
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 16, borderTop: `1px solid ${T.border}`, paddingTop: 16 }}>
           <input placeholder="Competitor name" value={newCompName} onChange={e => setNewCompName(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-          <input placeholder="https://www.competitor.com" value={newCompUrl} onChange={e => setNewCompUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCompetitorAndReanalyze()} style={{ flex: 2, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-          <button onClick={addCompetitorAndReanalyze} disabled={!newCompName || !newCompUrl || running} style={{ background: running ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: (!newCompName || !newCompUrl || running) ? 'not-allowed' : 'pointer', opacity: (!newCompName || !newCompUrl || running) ? 0.5 : 1 }}>{running ? 'Running...' : 'Add & Re-analyze'}</button>
+          <input placeholder="https://www.competitor.com" value={newCompUrl} onChange={e => setNewCompUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCompetitorToList()} style={{ flex: 2, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+          <button onClick={addCompetitorToList} disabled={!newCompName || !newCompUrl} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: (!newCompName || !newCompUrl) ? 'not-allowed' : 'pointer', opacity: (!newCompName || !newCompUrl) ? 0.5 : 1 }}>+ Add</button>
         </div>
+        {pendingCompetitors && (
+          <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+            <button onClick={saveCompetitorsAndRun} disabled={running || saving} style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              {saving ? 'Saving…' : '✓ Save & Run Analysis'}
+            </button>
+          </div>
+        )}
       </Card>
 
       {/* ── Brand Guidelines ── */}
@@ -545,9 +572,9 @@ function BrandProfileTab({ slug, onRefresh, running }) {
             <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Brand Guidelines</h3>
             <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>Processed from your style guide PDF — informs all audit recommendations.</p>
           </div>
-          <button onClick={processStyleGuide} disabled={guidelinesRunning} style={{ background: guidelinesRunning ? T.surfaceAlt : T.accent, color: guidelinesRunning ? T.textMuted : '#fff', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: guidelinesRunning ? 'not-allowed' : 'pointer' }}>
-            {guidelinesRunning ? 'Processing…' : guidelines ? 'Reprocess Style Guide' : 'Process Style Guide'}
-          </button>
+          {guidelines && <button onClick={processStyleGuide} disabled={guidelinesRunning} style={{ background: guidelinesRunning ? T.surfaceAlt : T.accent, color: guidelinesRunning ? T.textMuted : '#fff', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: guidelinesRunning ? 'not-allowed' : 'pointer' }}>
+            {guidelinesRunning ? 'Processing…' : 'Reprocess'}
+          </button>}
         </div>
 
         {guidelinesLog.length > 0 && (
@@ -557,11 +584,12 @@ function BrandProfileTab({ slug, onRefresh, running }) {
         )}
 
         {!guidelines && !guidelinesRunning && (
-          <div style={{ background: T.surfaceAlt, borderRadius: 8, padding: '16px 18px', textAlign: 'center' }}>
-            <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 8 }}>No style guide processed yet.</p>
-            <p style={{ color: T.textFaint, fontSize: 12 }}>Place your PDF at <code style={{ background: T.border, padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>data/brands/{slug}/style_guide.pdf</code> then click "Process Style Guide" above.</p>
-            <p style={{ color: T.textFaint, fontSize: 12, marginTop: 4 }}>Or the script will check <code style={{ background: T.border, padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>~/Downloads/ToysRUs_2026_HolidayTentpoles Style Guide.pdf</code> automatically.</p>
-          </div>
+          <label onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = T.accent }} onDragLeave={e => e.currentTarget.style.borderColor = T.border} onDrop={e => { e.preventDefault(); e.currentTarget.style.borderColor = T.border; const f = e.dataTransfer.files[0]; if (f) uploadPdf(f) }} style={{ display: 'block', border: `2px dashed ${T.border}`, borderRadius: 10, padding: '28px 20px', textAlign: 'center', cursor: 'pointer' }}>
+            <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => { if (e.target.files[0]) uploadPdf(e.target.files[0]) }} />
+            <p style={{ fontSize: 28, marginBottom: 8 }}>📄</p>
+            <p style={{ color: T.text, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{pdfUploading ? 'Uploading…' : 'Drop your brand guidelines PDF here'}</p>
+            <p style={{ color: T.textMuted, fontSize: 12 }}>or click to browse</p>
+          </label>
         )}
 
         {guidelines && (

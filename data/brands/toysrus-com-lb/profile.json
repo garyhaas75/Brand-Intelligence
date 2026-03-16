@@ -4,9 +4,9 @@
   "url": "https://toysrus.com.lb/",
   "industry": "Toys & Children's Retail",
   "tagline": "Geoffrey The Giraffe",
-  "positioning": "A comprehensive toy and children's product retailer in Lebanon offering a wide range of categories from preschool to 12+ years, featuring globally recognized brands like Lego, Barbie, and Crayola.",
+  "positioning": "A comprehensive toy and children's entertainment retailer in Lebanon offering a wide range of products from arts and crafts to electronics, organized by age group and popular global brands.",
   "brandArchetype": "The Innocent",
-  "brandArchetypeRationale": "The Innocent archetype fits perfectly as Toys R Us evokes childhood joy, wonder, and happiness, creating a world of play and imagination for children across all age groups.",
+  "brandArchetypeRationale": "The Innocent archetype fits perfectly as Toys R Us evokes childhood wonder, joy, and the simple happiness of play, centering its brand around Geoffrey the Giraffe and age-appropriate fun for children.",
   "market": "Lebanon",
   "identifiedCompetitors": [
     {
@@ -71,14 +71,50 @@
       "tiktokHandle": "hicartonline",
       "facebookHandle": "hicartonline",
       "manuallySet": true
+    },
+    {
+      "name": "Toys R Us Middle East",
+      "url": "https://www.toysrusme.com",
+      "rationale": "A competing regional Toys R Us ecommerce operation serving Lebanon and the broader Middle East market, directly overlapping in product range and brand identity.",
+      "discoveredAt": "2026-03-16T15:37:03.415Z",
+      "instagramHandle": null
+    },
+    {
+      "name": "Virgin Megastore Lebanon",
+      "url": "https://www.virginmegastore.me",
+      "rationale": "A major Lebanese retail presence selling toys, electronics, games, and entertainment products that overlap significantly with Toys R Us's offerings.",
+      "discoveredAt": "2026-03-16T15:37:03.415Z",
+      "instagramHandle": null
+    },
+    {
+      "name": "Hamley's Middle East",
+      "url": "https://www.hamleys.me",
+      "rationale": "An iconic toy retailer with a regional Middle Eastern ecommerce presence competing directly in the premium toys and children's products category.",
+      "discoveredAt": "2026-03-16T15:37:03.415Z",
+      "instagramHandle": null
+    },
+    {
+      "name": "Mumzworld",
+      "url": "https://www.mumzworld.com",
+      "rationale": "A leading Middle Eastern online retailer for baby and children's products including toys, serving Lebanese customers through regional ecommerce delivery.",
+      "discoveredAt": "2026-03-16T15:37:03.415Z",
+      "instagramHandle": null
+    },
+    {
+      "name": "FirstCry Lebanon",
+      "url": "https://www.firstcry.com.lb",
+      "rationale": "A dedicated Lebanese ecommerce platform for children's products including toys, clothing, and educational items, directly competing for the same parent-and-child demographic.",
+      "discoveredAt": "2026-03-16T15:37:03.415Z",
+      "instagramHandle": null
     }
   ],
   "social": {
     "instagram": "toysruslb",
     "twitter": null,
-    "tiktok": "toysruslb"
+    "tiktok": "toysruslb",
+    "facebook": "ToysRUsLB"
   },
-  "discoveryNotes": "The homepage data is sparse — no meta description, OG tags, or heading content was found, suggesting the site may be heavily JavaScript-rendered. The tagline is inferred from the prominent 'Geoffrey The Giraffe' branding element in the footer. The copyright year shows ©2026 which is unusual and may indicate a placeholder or forward-dated footer. This appears to be a separate Lebanese franchise/operation distinct from the toysrusme.com regional site, as indicated by the different domain and web developer credit (The Web Addicts).",
+  "discoveryNotes": "The homepage returned minimal metadata — no OG tags, no meta description, and no H1/H2 headings were found, suggesting either a heavily JavaScript-rendered site or limited SEO implementation. The tagline field is inferred from the prominent 'Geoffrey The Giraffe' branding mention rather than an explicit tagline. The footer copyright reads '©2026' which may be an error or forward-dated. This appears to be an independent or licensed Toys R Us operation in Lebanon (toysrus.com.lb) distinct from the broader Toys R Us Middle East platform (toysrusme.com). Site was developed by 'The Web Addicts,' a local Lebanese agency.",
   "discoveredAt": "2026-03-11T15:43:44.814Z",
-  "updatedAt": "2026-03-11T20:37:11.423Z"
+  "updatedAt": "2026-03-16T15:37:03.415Z"
 }
