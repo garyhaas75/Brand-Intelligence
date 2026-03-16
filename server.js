@@ -611,8 +611,8 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   let moduleStdio = 'ignore';
   try {
     const moduleLogPath = path.join(BRANDS_DIR, slug, `${moduleName}.log`);
-    const moduleLogStream = fs.createWriteStream(moduleLogPath, { flags: 'a' });
-    moduleStdio = ['ignore', moduleLogStream, moduleLogStream];
+    const logFd = fs.openSync(moduleLogPath, 'a');
+    moduleStdio = ['ignore', logFd, logFd];
   } catch (_) {}
   const child = spawn('node', [path.join(__dirname, mod.script), `--slug=${slug}`], {
     env: { ...process.env },
