@@ -485,69 +485,48 @@ function BrandProfileTab({ slug, onRefresh, running }) {
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Identified Competitors ({(form.identifiedCompetitors || []).length})</h3>
-          {!editing && <p style={{ color: T.textFaint, fontSize: 12 }}>Edit URLs/handles above, then click Save & Re-analyze to re-scrape with corrected data.</p>}
+          {pendingCompetitors && <button onClick={saveCompetitorsAndRun} disabled={running || saving} style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{saving ? 'Saving…' : '✓ Save & Run Analysis'}</button>}
         </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: T.surfaceAlt }}>
-                {['Competitor', 'Website URL', 'Instagram', 'TikTok', 'Facebook', editing ? 'Remove' : ''].filter(Boolean).map(h => (
+                {['Competitor', 'Website URL', 'Instagram', 'TikTok', 'Facebook', ''].map(h => (
                   <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {(editing ? form : data).identifiedCompetitors?.map((c, idx) => (
+              {form.identifiedCompetitors?.map((c, idx) => {
+                const update = (field, val) => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, [field]: val }; setForm({ ...form, identifiedCompetitors: comps }); setPendingCompetitors(true) }
+                return (
                 <tr key={c.url || idx} style={{ borderTop: `1px solid ${T.border}` }}>
-                  <td style={{ padding: '10px 12px', fontWeight: 600, color: T.text, minWidth: 140 }}>
-                    {editing
-                      ? <input value={c.name} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, name: e.target.value }; setForm({ ...form, identifiedCompetitors: comps }) }} style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-                      : c.name
-                    }
+                  <td style={{ padding: '10px 12px', minWidth: 140 }}>
+                    <input value={c.name} onChange={e => update('name', e.target.value)} style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13, fontWeight: 600 }} />
                   </td>
-                  <td style={{ padding: '10px 12px', color: T.textMuted, minWidth: 200 }}>
-                    {editing
-                      ? <input value={c.url || ''} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, url: e.target.value }; setForm({ ...form, identifiedCompetitors: comps }) }} placeholder="https://..." style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
-                      : <a href={c.url} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none', fontSize: 12 }}>{c.url?.replace(/^https?:\/\/(www\.)?/, '') || '—'}</a>
-                    }
+                  <td style={{ padding: '10px 12px', minWidth: 200 }}>
+                    <input value={c.url || ''} onChange={e => update('url', e.target.value)} placeholder="https://..." style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
                   </td>
                   <td style={{ padding: '10px 12px', minWidth: 140 }}>
-                    {editing
-                      ? <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <span style={{ color: T.textMuted, fontSize: 13 }}>@</span>
-                          <input value={c.instagramHandle || ''} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, instagramHandle: e.target.value.replace(/^@/, '') }; setForm({ ...form, identifiedCompetitors: comps }) }} placeholder="handle" style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
-                        </div>
-                      : c.instagramHandle
-                          ? <a href={`https://instagram.com/${c.instagramHandle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none', fontSize: 12 }}>@{c.instagramHandle}</a>
-                          : <span style={{ color: T.textFaint, fontSize: 12 }}>Not set</span>
-                    }
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ color: T.textMuted, fontSize: 13 }}>@</span>
+                      <input value={c.instagramHandle || ''} onChange={e => update('instagramHandle', e.target.value.replace(/^@/, ''))} placeholder="handle" style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
+                    </div>
                   </td>
                   <td style={{ padding: '10px 12px', minWidth: 130 }}>
-                    {editing
-                      ? <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <span style={{ color: T.textMuted, fontSize: 13 }}>@</span>
-                          <input value={c.tiktokHandle || ''} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, tiktokHandle: e.target.value.replace(/^@/, '') }; setForm({ ...form, identifiedCompetitors: comps }) }} placeholder="handle" style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
-                        </div>
-                      : c.tiktokHandle
-                          ? <a href={`https://tiktok.com/@${c.tiktokHandle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none', fontSize: 12 }}>@{c.tiktokHandle}</a>
-                          : <span style={{ color: T.textFaint, fontSize: 12 }}>Not set</span>
-                    }
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ color: T.textMuted, fontSize: 13 }}>@</span>
+                      <input value={c.tiktokHandle || ''} onChange={e => update('tiktokHandle', e.target.value.replace(/^@/, ''))} placeholder="handle" style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
+                    </div>
                   </td>
                   <td style={{ padding: '10px 12px', minWidth: 130 }}>
-                    {editing
-                      ? <input value={c.facebookHandle || ''} onChange={e => { const comps = [...form.identifiedCompetitors]; comps[idx] = { ...c, facebookHandle: e.target.value }; setForm({ ...form, identifiedCompetitors: comps }) }} placeholder="page handle" style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
-                      : c.facebookHandle
-                          ? <a href={`https://facebook.com/${c.facebookHandle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, textDecoration: 'none', fontSize: 12 }}>{c.facebookHandle}</a>
-                          : <span style={{ color: T.textFaint, fontSize: 12 }}>Not set</span>
-                    }
+                    <input value={c.facebookHandle || ''} onChange={e => update('facebookHandle', e.target.value)} placeholder="page handle" style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
                   </td>
-                  {editing && (
-                    <td style={{ padding: '10px 12px' }}>
-                      <button onClick={() => removeCompetitor(c.url)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: '#ef4444', cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>Remove</button>
-                    </td>
-                  )}
+                  <td style={{ padding: '10px 12px' }}>
+                    <button onClick={() => removeCompetitor(c.url)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: '#ef4444', cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>✕</button>
+                  </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
