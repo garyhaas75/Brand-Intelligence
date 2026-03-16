@@ -233,13 +233,26 @@ Rules for identifiedCompetitors:
   return result;
 }
 
+const SCRIPT_TO_MODULE = {
+  'competitive_analysis.js': 'competitive_analysis',
+  'social_audit.js': 'social_intelligence',
+  'website_audit.js': 'site_intelligence',
+  'search_seo.js': 'search_seo',
+  'personas.js': 'personas',
+  'action_plan.js': 'action_plan',
+};
+
 function spawnModule(script, slug, extraArgs = []) {
   log(`Spawning: ${script} --slug=${slug}`);
+  const moduleName = SCRIPT_TO_MODULE[script] || script.replace('.js', '');
+  const logPath = path.join(__dirname, '..', 'data', 'brands', slug, `${moduleName}.log`);
+  const fs = require('fs');
+  const logStream = fs.createWriteStream(logPath, { flags: 'a' });
   const child = spawn('node', [path.join(__dirname, script), `--slug=${slug}`, ...extraArgs], {
     env: { ...process.env },
     cwd: path.join(__dirname, '..'),
     detached: true,
-    stdio: 'ignore',
+    stdio: ['ignore', logStream, logStream],
   });
   child.unref();
 }

@@ -91,9 +91,12 @@ async function run() {
   log(`Scraping ${brandsToScrape.length} sites...`);
   const scraped = await scrapeBrands(brandsToScrape, { logFile });
 
-  // Run Lighthouse on target brand only
+  // Run Lighthouse on target brand only (90s timeout — chrome-launcher can hang on Railway)
   log(`Running Lighthouse audit for ${profile.url}...`);
-  const lighthouseAudit = await runLighthouse(profile.url);
+  const lighthouseAudit = await Promise.race([
+    runLighthouse(profile.url),
+    new Promise(resolve => setTimeout(() => { log('Lighthouse timed out after 90s — skipping'); resolve(null); }, 90000)),
+  ]);
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext(slug);
