@@ -1194,7 +1194,6 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
 
   const target = data.brands?.find(b => b.role === 'target') || {}
   const competitors = data.brands?.filter(b => b.role === 'competitor') || []
-  const lh = data.lighthouseAudit
   const cv = data.crawlerVisibility
   const na = data.navigationAnalysis
   const pcr = data.productContentReview
@@ -1207,33 +1206,6 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
         <RefreshButton onClick={() => onRefresh('site_intelligence')} loading={running} />
       </div>
 
-      {lh?.scores && (
-        <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Lighthouse Technical Audit</h3>
-            {data.hasScreenshot && <span style={{ fontSize: 12, color: '#059669', background: '#d1fae5', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>Visual analysis included</span>}
-          </div>
-          <div style={{ display: 'flex', gap: 16, marginBottom: lh.topIssues?.length ? 20 : 0 }}>
-            <LighthouseScore label="SEO" score={lh.scores.seo} />
-            <LighthouseScore label="Performance" score={lh.scores.performance} />
-            <LighthouseScore label="Accessibility" score={lh.scores.accessibility} />
-            <LighthouseScore label="Best Practices" score={lh.scores.bestPractices} />
-          </div>
-          {lh.topIssues?.length > 0 && (
-            <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Top Issues to Fix</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {lh.topIssues.slice(0, 8).map((issue, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, background: issue.score < 50 ? '#fee2e2' : '#fef3c7', color: issue.score < 50 ? '#dc2626' : '#d97706', padding: '2px 8px', borderRadius: 12, minWidth: 36, textAlign: 'center' }}>{issue.score}</span>
-                    <span style={{ fontSize: 13, color: T.textSub }}>{issue.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </Card>
-      )}
 
       {(data.topOpportunities || []).length > 0 && (
         <Card style={{ marginBottom: 24 }}>

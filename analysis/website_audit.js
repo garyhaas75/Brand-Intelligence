@@ -35,51 +35,6 @@ function archiveData(slug, module, data) {
   fs.writeFileSync(path.join(histDir, `${module}_${ts}.json`), JSON.stringify(data, null, 2));
 }
 
-async function runLighthouse(url) {
-  // Use Playwright's bundled Chromium (installed during Railway build) instead of system Chrome
-  let chromePath;
-  try { chromePath = require('playwright').chromium.executablePath(); } catch (_) {}
-  let chrome;
-  try {
-    const cl = await import('chrome-launcher');
-    const launchFn = cl.launch || cl.default?.launch;
-    chrome = await launchFn({
-      ...(chromePath ? { chromePath } : {}),
-      chromeFlags: ['--headless', '--no-sandbox', '--disable-setuid-sandbox'],
-    });
-    const { default: lighthouse } = await import('lighthouse');
-    const result = await lighthouse(url, {
-      port: chrome.port,
-      onlyCategories: ['seo', 'performance', 'accessibility', 'best-practices'],
-      output: 'json',
-      logLevel: 'error',
-    });
-    const cats = result.lhr.categories;
-    const scores = {
-      seo: Math.round((cats.seo?.score ?? 0) * 100),
-      performance: Math.round((cats.performance?.score ?? 0) * 100),
-      accessibility: Math.round((cats.accessibility?.score ?? 0) * 100),
-      bestPractices: Math.round((cats['best-practices']?.score ?? 0) * 100),
-    };
-    const topIssues = Object.values(result.lhr.audits)
-      .filter(a => a.score !== null && a.score !== undefined && a.score < 0.9 && a.scoreDisplayMode !== 'notApplicable' && a.scoreDisplayMode !== 'informative')
-      .sort((a, b) => a.score - b.score)
-      .slice(0, 12)
-      .map(a => ({ id: a.id, title: a.title, score: Math.round(a.score * 100) }));
-    // If all scores are 0, Chrome launched but couldn't evaluate the page — treat as failure
-    if (scores.seo === 0 && scores.performance === 0 && scores.accessibility === 0) {
-      log('Lighthouse returned all-zero scores — Chrome launched but could not evaluate page');
-      return null;
-    }
-    log(`Lighthouse: SEO=${scores.seo}, Perf=${scores.performance}, A11y=${scores.accessibility}, BP=${scores.bestPractices}`);
-    return { scores, topIssues };
-  } catch (err) {
-    log(`Lighthouse failed: ${err.message}`);
-    return null;
-  } finally {
-    if (chrome) try { await chrome.kill(); } catch (_) {}
-  }
-}
 
 async function run() {
   const args = process.argv.slice(2);
@@ -106,12 +61,7 @@ async function run() {
     new Promise(resolve => setTimeout(() => { log('Scraping timed out after 6min — continuing with partial results'); resolve([]); }, 360000)),
   ]);
 
-  // Run Lighthouse on target brand only (90s timeout — chrome-launcher can hang on Railway)
-  log(`Running Lighthouse audit for ${profile.url}...`);
-  const lighthouseAudit = await Promise.race([
-    runLighthouse(profile.url),
-    new Promise(resolve => setTimeout(() => { log('Lighthouse timed out after 90s — skipping'); resolve(null); }, 90000)),
-  ]);
+  const lighthouseAudit = null;
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext(slug);
