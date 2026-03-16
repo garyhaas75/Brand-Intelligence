@@ -967,7 +967,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
 
   const strategyItems = [
     ...(data.whiteSpaceOpportunities || []).slice(0, 3).map(o => ({ headline: o.theme, detail: o.description, source: 'opportunity' })),
-    ...(data.competitionStrategy || []).filter(s => s.priority === 'high').slice(0, 5).map(s => ({ headline: s.tactic, detail: s.detail, competitor: s.competitor, source: 'strategy' })),
+    ...(data.competitionStrategy || []).filter(s => s.priority === 'high').slice(0, 5).map(s => ({ headline: s.tactic, detail: s.rationale || s.detail, competitor: s.competitorInspiration || s.competitor, source: 'strategy' })),
   ]
 
   return (
@@ -1156,7 +1156,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                 <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${outcome.color}` }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: outcome.color, background: outcome.bg, padding: '2px 8px', borderRadius: 10, display: 'inline-block', marginBottom: 8 }}>{outcome.label}</span>
                   <p style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 4, lineHeight: 1.4 }}>{item.headline}</p>
-                  {item.detail && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.6 }}>{item.detail.slice(0, 200)}{item.detail.length > 200 ? '…' : ''}</p>}
+                  {item.detail && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.6 }}>{item.detail.slice(0, 320)}{item.detail.length > 320 ? '…' : ''}</p>}
                   {item.competitor && <p style={{ fontSize: 11, color: T.textMuted, marginTop: 6, fontWeight: 600 }}>See how: {item.competitor}</p>}
                 </div>
               )
