@@ -568,6 +568,22 @@ BRAND_MODULES.forEach(({ name, file }) => {
 });
 
 // POST /api/brands/:slug/refresh/:module — trigger individual module refresh
+app.post('/api/brands/:slug/refresh/all', (req, res) => {
+  const { slug } = req.params;
+  const registry = loadBrandsRegistry();
+  if (!registry.brands.find(b => b.slug === slug)) {
+    return res.status(404).json({ error: 'Brand not found' });
+  }
+  const child = spawn('node', [path.join(__dirname, 'analysis/brand_discovery.js'), `--slug=${slug}`, '--refresh-all'], {
+    env: { ...process.env },
+    cwd: __dirname,
+    detached: true,
+    stdio: 'ignore',
+  });
+  child.unref();
+  res.json({ ok: true, slug, status: 'running' });
+});
+
 app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   const { slug, module: moduleName } = req.params;
   const registry = loadBrandsRegistry();
@@ -585,23 +601,6 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   });
   child.unref();
   res.json({ ok: true, slug, module: moduleName, status: 'running' });
-});
-
-// POST /api/brands/:slug/refresh/all — trigger full pipeline
-app.post('/api/brands/:slug/refresh/all', (req, res) => {
-  const { slug } = req.params;
-  const registry = loadBrandsRegistry();
-  if (!registry.brands.find(b => b.slug === slug)) {
-    return res.status(404).json({ error: 'Brand not found' });
-  }
-  const child = spawn('node', [path.join(__dirname, 'analysis/brand_discovery.js'), `--slug=${slug}`, '--refresh-all'], {
-    env: { ...process.env },
-    cwd: __dirname,
-    detached: true,
-    stdio: 'ignore',
-  });
-  child.unref();
-  res.json({ ok: true, slug, status: 'running' });
 });
 
 // GET /api/brands/:slug/data-size — storage used by brand
