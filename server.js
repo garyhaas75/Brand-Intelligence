@@ -608,13 +608,17 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   const mod = BRAND_MODULES.find(m => m.name === moduleName);
   if (!mod) return res.status(400).json({ error: `Unknown module: ${moduleName}` });
 
-  const moduleLogPath = path.join(BRANDS_DIR, slug, `${moduleName}.log`);
-  const moduleLogStream = fs.createWriteStream(moduleLogPath, { flags: 'a' });
+  let moduleStdio = 'ignore';
+  try {
+    const moduleLogPath = path.join(BRANDS_DIR, slug, `${moduleName}.log`);
+    const moduleLogStream = fs.createWriteStream(moduleLogPath, { flags: 'a' });
+    moduleStdio = ['ignore', moduleLogStream, moduleLogStream];
+  } catch (_) {}
   const child = spawn('node', [path.join(__dirname, mod.script), `--slug=${slug}`], {
     env: { ...process.env },
     cwd: __dirname,
     detached: true,
-    stdio: ['ignore', moduleLogStream, moduleLogStream],
+    stdio: moduleStdio,
   });
   child.unref();
   res.json({ ok: true, slug, module: moduleName, status: 'running' });
