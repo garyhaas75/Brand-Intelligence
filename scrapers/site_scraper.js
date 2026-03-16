@@ -89,6 +89,20 @@ async function scrapeBrand(page, brand, logFile) {
     }
     result.promoBanners = [...promoTexts].slice(0, 10);
 
+    // SEO signals
+    try {
+      const seoData = await page.evaluate(() => ({
+        titleTag: document.title || '',
+        metaDescription: document.querySelector('meta[name="description"]')?.content || '',
+        h1: document.querySelector('h1')?.innerText?.trim() || '',
+        canonicalTag: document.querySelector('link[rel="canonical"]')?.href || '',
+        schemaMarkup: Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+          .map(s => { try { return JSON.parse(s.textContent)['@type']; } catch { return null; } })
+          .filter(Boolean),
+      }));
+      Object.assign(result, seoData);
+    } catch (_) {}
+
     if (result.navigation.length === 0) {
       result.botBlocked = true;
       result.note = 'No navigation found — site may be bot-protected';
