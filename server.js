@@ -571,10 +571,22 @@ BRAND_MODULES.forEach(({ name, file }) => {
 app.post('/api/brands/:slug/refresh/all', (req, res) => {
   const { slug } = req.params;
   const registry = loadBrandsRegistry();
-  if (!registry.brands.find(b => b.slug === slug)) {
-    return res.status(404).json({ error: 'Brand not found' });
-  }
-  const child = spawn('node', [path.join(__dirname, 'analysis/brand_discovery.js'), `--slug=${slug}`, '--refresh-all'], {
+  const brand = registry.brands.find(b => b.slug === slug);
+  if (!brand) return res.status(404).json({ error: 'Brand not found' });
+
+  const profilePath = path.join(BRANDS_DIR, slug, 'profile.json');
+  const hasProfile = fs.existsSync(profilePath);
+
+  // If profile exists, just re-run analysis modules. If not, run full discovery first.
+  const spawnArgs = hasProfile
+    ? [path.join(__dirname, 'analysis/brand_discovery.js'), `--slug=${slug}`, '--refresh-all']
+    : [path.join(__dirname, 'analysis/brand_discovery.js'), `--slug=${slug}`, `--url=${brand.url}`];
+
+  const reg2 = loadBrandsRegistry();
+  const bidx = reg2.brands.findIndex(b => b.slug === slug);
+  if (bidx !== -1) { reg2.brands[bidx].discoveryStatus = 'running'; saveBrandsRegistry(reg2); }
+
+  const child = spawn('node', spawnArgs, {
     env: { ...process.env },
     cwd: __dirname,
     detached: true,
