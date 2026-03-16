@@ -1972,12 +1972,31 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
+  const [compData, setCompData] = useState(null)
+  const [socialData, setSocialData] = useState(null)
+  const [siteData, setSiteData] = useState(null)
+  const [seoData, setSeoData] = useState(null)
+  const [personasData, setPersonasData] = useState(null)
   const [exporting, setExporting] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
 
   useEffect(() => {
     if (!slug) return
-    fetch(`${API}/brands/${slug}/action_plan`).then(r => r.json()).then(setData).catch(() => {})
+    Promise.allSettled([
+      fetch(`${API}/brands/${slug}/action_plan`).then(r => r.json()),
+      fetch(`${API}/brands/${slug}/competitive_analysis`).then(r => r.json()),
+      fetch(`${API}/brands/${slug}/social_intelligence`).then(r => r.json()),
+      fetch(`${API}/brands/${slug}/site_intelligence`).then(r => r.json()),
+      fetch(`${API}/brands/${slug}/search_seo`).then(r => r.json()),
+      fetch(`${API}/brands/${slug}/personas`).then(r => r.json()),
+    ]).then(([ap, comp, soc, site, seo, per]) => {
+      if (ap.status === 'fulfilled') setData(ap.value)
+      if (comp.status === 'fulfilled') setCompData(comp.value)
+      if (soc.status === 'fulfilled') setSocialData(soc.value)
+      if (site.status === 'fulfilled') setSiteData(site.value)
+      if (seo.status === 'fulfilled') setSeoData(seo.value)
+      if (per.status === 'fulfilled') setPersonasData(per.value)
+    })
   }, [slug, dataVersion])
 
   async function exportPdf() {
@@ -2004,44 +2023,390 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
 
   const moduleSourceColors = { competitive: 'purple', social: 'blue', website: 'yellow', search: 'green', personas: 'red' }
 
+  // Section header helper
+  function SectionHeader({ eyebrow, title }) {
+    return (
+      <div style={{ marginBottom: 18 }}>
+        <p style={{ color: T.accent, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 4 }}>{eyebrow}</p>
+        <h3 style={{ color: T.text, fontSize: 17, fontWeight: 700, margin: 0 }}>{title}</h3>
+      </div>
+    )
+  }
+
+  // Module status pills
+  const modulePills = [
+    { label: 'Competitive', has: !!compData },
+    { label: 'Social', has: !!socialData },
+    { label: 'Website', has: !!siteData },
+    { label: 'SEO', has: !!seoData },
+    { label: 'Personas', has: !!personasData },
+  ]
+
+  // Not-yet-generated placeholder
+  function NotGenerated() {
+    return <p style={{ color: T.textFaint, fontSize: 13, fontStyle: 'italic', padding: '12px 0' }}>Not yet generated for this brand.</p>
+  }
+
+  // Rank circle color
+  function rankCircleStyle(rank) {
+    const bg = rank === 1 ? T.accent : rank === 2 ? '#7c3aed' : rank === 3 ? '#2563eb' : T.surfaceAlt
+    const color = rank <= 3 ? '#fff' : T.textMuted
+    return { width: 32, height: 32, background: bg, color, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, flexShrink: 0 }
+  }
+
   return (
-    <div>
+    <div style={{ maxWidth: 900, margin: '0 auto' }}>
       {running && <RunningBanner moduleLabel="Action Plan" detail="Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes." />}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-        <div>
-          <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Action Plan</h2>
-          {data.generatedAt && <p style={{ color: T.textFaint, fontSize: 12, marginTop: 4 }}>Generated {new Date(data.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
+
+      {/* ── SECTION 1: Report Header ── */}
+      <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '28px 32px', marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <h2 style={{ color: T.text, fontSize: 24, fontWeight: 800, margin: 0 }}>{brandName || 'Brand'}</h2>
+            <p style={{ color: T.textSub, fontSize: 15, fontWeight: 500, marginTop: 4, marginBottom: 8 }}>Brand Intelligence Report</p>
+            <p style={{ color: T.textFaint, fontSize: 12 }}>
+              {data.generatedAt
+                ? `Generated ${new Date(data.generatedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+                : `Report date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
+              {exporting ? 'Generating PDF...' : '↓ Export PDF'}
+            </button>
+            <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
+              Share Link
+            </button>
+            <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label="Regenerate" />
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
-            {exporting ? 'Generating PDF...' : '↓ Export PDF'}
-          </button>
-          <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
-            🔗 Share Link
-          </button>
-          <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label="Regenerate" />
+
+        {shareUrl && (
+          <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: 8, padding: '10px 16px', marginTop: 16, fontSize: 13 }}>
+            Share link copied: <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: '#065f46', fontWeight: 600 }}>{shareUrl}</a>
+          </div>
+        )}
+
+        {/* Module status pills */}
+        <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
+          {modulePills.map(p => (
+            <span key={p.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: T.textSub }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.has ? '#10b981' : '#9ca3af', flexShrink: 0 }} />
+              {p.label}
+            </span>
+          ))}
         </div>
       </div>
 
-      {shareUrl && (
-        <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: 8, padding: '10px 16px', marginBottom: 20, fontSize: 13 }}>
-          ✓ Share link copied: <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: '#065f46', fontWeight: 600 }}>{shareUrl}</a>
-        </div>
-      )}
+      {/* ── SECTION 2: Executive Summary ── */}
+      <Card style={{ marginBottom: 24, borderLeft: `4px solid ${T.accent}`, background: T.surface }}>
+        <SectionHeader eyebrow="Overview" title="Executive Summary" />
+        {data.executiveSummary
+          ? <p style={{ color: T.text, fontSize: 15, lineHeight: 1.85, fontWeight: 400, margin: 0 }}>{data.executiveSummary}</p>
+          : <NotGenerated />}
+      </Card>
 
-      {data.executiveSummary && (
-        <Card style={{ marginBottom: 24, borderLeft: `4px solid ${T.accent}`, background: `linear-gradient(135deg, ${T.surface} 0%, ${T.surfaceAlt} 100%)` }}>
-          <h3 style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Executive Summary</h3>
-          <p style={{ color: T.text, fontSize: 16, lineHeight: 1.85, fontWeight: 400 }}>{data.executiveSummary}</p>
-        </Card>
-      )}
+      {/* ── SECTION 3: Market Position ── */}
+      <Card style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Competitive Intelligence" title="Market Position" />
+        {compData && compData.swotAnalysis ? (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              {[
+                { key: 'strengths', label: 'Strengths', bg: '#d1fae5', border: '#6ee7b7', text: '#065f46', head: '#10b981' },
+                { key: 'weaknesses', label: 'Weaknesses', bg: '#fee2e2', border: '#fca5a5', text: '#991b1b', head: '#ef4444' },
+                { key: 'opportunities', label: 'Opportunities', bg: '#dbeafe', border: '#93c5fd', text: '#1e40af', head: '#3b82f6' },
+                { key: 'threats', label: 'Threats', bg: '#fef3c7', border: '#fcd34d', text: '#92400e', head: '#f59e0b' },
+              ].map(q => (
+                <div key={q.key} style={{ background: q.bg, border: `1px solid ${q.border}`, borderRadius: 10, padding: '14px 16px' }}>
+                  <p style={{ color: q.head, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{q.label}</p>
+                  <ul style={{ margin: 0, paddingLeft: 16 }}>
+                    {(compData.swotAnalysis[q.key] || []).slice(0, 3).map((item, i) => (
+                      <li key={i} style={{ color: q.text, fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            {(compData.positioningGaps || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Positioning Gaps</p>
+                {compData.positioningGaps.slice(0, 3).map((gap, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: i < 2 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                    <span style={{ color: T.accent, fontWeight: 800, fontSize: 14, minWidth: 20 }}>{i + 1}.</span>
+                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, margin: 0 }}>{typeof gap === 'string' ? gap : gap.gap || gap.description || JSON.stringify(gap)}</p>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        ) : <NotGenerated />}
+      </Card>
 
+      {/* ── SECTION 4: Competitive Landscape ── */}
+      <Card style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Competitive Analysis" title="Competitive Landscape" />
+        {compData && (compData.competitorProfiles || []).length > 0 ? (
+          <>
+            <div style={{ overflowX: 'auto', marginBottom: 20 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: T.surfaceAlt }}>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}` }}>Competitor</th>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}` }}>Primary Strength</th>
+                    <th style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}` }}>Primary Weakness</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {compData.competitorProfiles.slice(0, 5).map((c, i) => (
+                    <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
+                      <td style={{ padding: '10px 12px', color: T.text, fontWeight: 600 }}>{c.name}</td>
+                      <td style={{ padding: '10px 12px', color: T.textSub }}>{c.primaryStrength}</td>
+                      <td style={{ padding: '10px 12px', color: T.textSub }}>{c.primaryWeakness}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {(data.competitiveGapsToClose || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Gaps to Close</p>
+                {data.competitiveGapsToClose.slice(0, 3).map((gap, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < 2 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                    <Badge label={gap.priority} color={gap.priority === 'high' ? 'red' : gap.priority === 'medium' ? 'yellow' : 'green'} />
+                    <div>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0 }}>{gap.gap}</p>
+                      {gap.competitor && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2, marginBottom: 0 }}>vs. {gap.competitor}</p>}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        ) : <NotGenerated />}
+      </Card>
+
+      {/* ── SECTION 5: Social Media ── */}
+      <Card style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Social Intelligence" title="Social Media" />
+        {socialData ? (
+          <>
+            {(socialData.brands || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Engagement Leaderboard</p>
+                <div style={{ overflowX: 'auto', marginBottom: 20 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ background: T.surfaceAlt }}>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}` }}>Brand</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'right', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}` }}>Instagram Avg Eng</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'right', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}` }}>TikTok Avg Eng</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...socialData.brands]
+                        .sort((a, b) => {
+                          const aEng = (a.instagramData && a.instagramData.summary && a.instagramData.summary.avgEngagement) || 0
+                          const bEng = (b.instagramData && b.instagramData.summary && b.instagramData.summary.avgEngagement) || 0
+                          return bEng - aEng
+                        })
+                        .map((brand, i) => {
+                          const igEng = brand.instagramData && brand.instagramData.summary && brand.instagramData.summary.avgEngagement
+                          const ttEng = brand.tiktokData && brand.tiktokData.summary && brand.tiktokData.summary.avgEngagement
+                          const isTarget = brand.role === 'target' || brand.role === 'client'
+                          return (
+                            <tr key={i} style={{ borderBottom: `1px solid ${T.border}`, background: isTarget ? `${T.accent}11` : 'transparent' }}>
+                              <td style={{ padding: '10px 12px', color: T.text, fontWeight: isTarget ? 700 : 400 }}>
+                                {brand.name}{isTarget && <span style={{ color: T.accent, fontSize: 11, marginLeft: 6, fontWeight: 700 }}>YOU</span>}
+                              </td>
+                              <td style={{ padding: '10px 12px', textAlign: 'right', color: T.textSub }}>{igEng != null ? (typeof igEng === 'number' ? igEng.toLocaleString() : igEng) : '—'}</td>
+                              <td style={{ padding: '10px 12px', textAlign: 'right', color: T.textSub }}>{ttEng != null ? (typeof ttEng === 'number' ? ttEng.toLocaleString() : ttEng) : '—'}</td>
+                            </tr>
+                          )
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+            {(socialData.whiteSpaceOpportunities || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>White Space Opportunities</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+                  {socialData.whiteSpaceOpportunities.slice(0, 2).map((opp, i) => (
+                    <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', border: `1px solid ${T.border}` }}>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{opp.theme}</p>
+                      <p style={{ color: T.textSub, fontSize: 12, lineHeight: 1.55, margin: 0 }}>{opp.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {(socialData.competitionStrategy || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>High-Priority Tactics</p>
+                {socialData.competitionStrategy
+                  .filter(s => s.priority === 'high' || s.priority === 'critical')
+                  .slice(0, 2)
+                  .map((s, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i === 0 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                      <Badge label={s.priority} color={s.priority === 'critical' ? 'red' : 'purple'} />
+                      <div>
+                        <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: '0 0 3px 0' }}>{s.tactic}</p>
+                        <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>{s.rationale}</p>
+                      </div>
+                    </div>
+                  ))}
+              </>
+            )}
+          </>
+        ) : <NotGenerated />}
+      </Card>
+
+      {/* ── SECTION 6: Website & Digital Presence ── */}
+      <Card style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Site Intelligence" title="Website & Digital Presence" />
+        {siteData ? (
+          <>
+            {siteData.crawlerVisibility && (
+              <div style={{ background: siteData.crawlerVisibility.heroTextIsLive === false ? '#fef3c7' : T.surfaceAlt, border: `1px solid ${siteData.crawlerVisibility.heroTextIsLive === false ? '#fcd34d' : T.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+                <p style={{ color: siteData.crawlerVisibility.heroTextIsLive === false ? '#92400e' : T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                  <strong>AI Readability:</strong> {siteData.crawlerVisibility.aiReadabilityNote || 'No note available.'}
+                </p>
+              </div>
+            )}
+            {(siteData.topOpportunities || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Top Opportunities</p>
+                {siteData.topOpportunities.slice(0, 3).map((opp, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < 2 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                    <span style={{ color: T.accent, fontWeight: 800, fontSize: 15, minWidth: 22 }}>{i + 1}.</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0 }}>{typeof opp === 'string' ? opp : opp.opportunity || opp.title || opp.description || JSON.stringify(opp)}</p>
+                        {opp.impact && <ImpactBadge impact={opp.impact} />}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            {siteData.navigationAnalysis && (siteData.navigationAnalysis.missingCategories || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 16, marginBottom: 10 }}>Missing Navigation Categories</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {siteData.navigationAnalysis.missingCategories.slice(0, 8).map((cat, i) => (
+                    <span key={i} style={{ background: '#fee2e2', color: '#991b1b', fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20 }}>{cat}</span>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        ) : <NotGenerated />}
+      </Card>
+
+      {/* ── SECTION 7: Search & SEO ── */}
+      <Card style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Search & SEO / GEO" title="Search & SEO" />
+        {seoData ? (
+          <>
+            {seoData.onPageSeo && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>On-Page Signals</p>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+                  {[
+                    { label: 'Title Tag', value: seoData.onPageSeo.titleTag },
+                    { label: 'H1', value: seoData.onPageSeo.h1 },
+                    { label: 'Meta Description', value: seoData.onPageSeo.metaDescription },
+                    { label: 'Schema', value: (seoData.onPageSeo.schemaMarkup || []).length > 0 },
+                  ].map((sig, i) => {
+                    const present = sig.value && sig.value !== '' && sig.value !== false && sig.value !== null
+                    return (
+                      <div key={i} style={{ background: present ? '#d1fae5' : '#fee2e2', border: `1px solid ${present ? '#6ee7b7' : '#fca5a5'}`, borderRadius: 8, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 14 }}>{present ? '✓' : '✗'}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: present ? '#065f46' : '#991b1b' }}>{sig.label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+            {(seoData.priorityActions || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Priority Actions</p>
+                {seoData.priorityActions.slice(0, 3).map((act, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < 2 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+                    <span style={{ color: T.accent, fontWeight: 800, fontSize: 15, minWidth: 22 }}>{act.rank || i + 1}.</span>
+                    <div>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 3 }}>
+                        <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0 }}>{act.action}</p>
+                        {act.impact && <ImpactBadge impact={act.impact} />}
+                        {act.effort && <Badge label={`${act.effort} effort`} color="gray" />}
+                      </div>
+                      {act.why && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>{act.why}</p>}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            {seoData.keywordUniverse && (seoData.keywordUniverse.contentGaps || []).length > 0 && (
+              <>
+                <p style={{ color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 16, marginBottom: 10 }}>
+                  Content Gaps
+                  {seoData.keywordUniverse.totalCount && <span style={{ color: T.textFaint, fontWeight: 400, textTransform: 'none', marginLeft: 6 }}>— {seoData.keywordUniverse.totalCount.toLocaleString()} keywords tracked</span>}
+                </p>
+                {seoData.keywordUniverse.contentGaps.slice(0, 2).map((gap, i) => (
+                  <div key={i} style={{ background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>{gap.title}</p>
+                      {gap.searchVolume && <span style={{ color: T.textMuted, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', marginLeft: 12 }}>{typeof gap.searchVolume === 'number' ? gap.searchVolume.toLocaleString() : gap.searchVolume} searches/mo</span>}
+                    </div>
+                    {gap.description && <p style={{ color: T.textSub, fontSize: 12, lineHeight: 1.5, marginBottom: 8 }}>{gap.description}</p>}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {(gap.keywords || []).slice(0, 3).map((kw, j) => (
+                        <span key={j} style={{ background: '#dbeafe', color: '#1e40af', fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20 }}>{kw}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        ) : <NotGenerated />}
+      </Card>
+
+      {/* ── SECTION 8: Customer Personas ── */}
+      <Card style={{ marginBottom: 24 }}>
+        <SectionHeader eyebrow="Audience Research" title="Customer Personas" />
+        {personasData && (personasData.personas || []).length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {personasData.personas.map((persona, i) => {
+              const desc = persona.description || persona.summary || ''
+              const insight = persona.keyInsight || persona.psychographic || ''
+              return (
+                <div key={i} style={{ background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 10, padding: '16px' }}>
+                  <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{persona.name}</p>
+                  {desc && <p style={{ color: T.textSub, fontSize: 12, lineHeight: 1.6, marginBottom: insight ? 8 : 0 }}>{desc.substring(0, 120)}{desc.length > 120 ? '…' : ''}</p>}
+                  {insight && (
+                    <div style={{ background: `${T.accent}18`, border: `1px solid ${T.accent}44`, borderRadius: 6, padding: '6px 10px' }}>
+                      <p style={{ color: T.accent, fontSize: 11, fontWeight: 700, margin: 0 }}>{insight}</p>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        ) : <NotGenerated />}
+      </Card>
+
+      {/* ── SECTION 9: Immediate Wins ── */}
       {(data.immediateWins || []).length > 0 && (
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Immediate Wins <span style={{ color: T.textMuted, fontWeight: 400, fontSize: 13 }}>— top 5 by impact/effort ratio</span></h3>
+          <SectionHeader eyebrow="Quick Wins" title="Immediate Wins" />
+          <p style={{ color: T.textMuted, fontSize: 13, marginTop: -10, marginBottom: 16 }}>Top actions ranked by impact-to-effort ratio</p>
           {data.immediateWins.map((win, i) => (
             <div key={i} style={{ display: 'flex', gap: 16, padding: '16px 0', borderBottom: i < data.immediateWins.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
-              <span style={{ width: 32, height: 32, background: i === 0 ? T.accent : T.surfaceAlt, color: i === 0 ? '#fff' : T.textMuted, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, flexShrink: 0 }}>{win.rank}</span>
+              <span style={rankCircleStyle(win.rank || i + 1)}>{win.rank || i + 1}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
                   <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{win.title}</span>
@@ -2049,61 +2414,55 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
                   <Badge label={`${win.effort} effort`} color="gray" />
                   {win.sourceModule && <Badge label={win.sourceModule} color={moduleSourceColors[win.sourceModule] || 'gray'} />}
                 </div>
-                <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6 }}>{win.description}</p>
+                <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{win.description}</p>
               </div>
             </div>
           ))}
         </Card>
       )}
 
+      {/* ── SECTION 10: 30/60/90 Day Roadmap ── */}
       {data.roadmap && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
-          {[['day30', '30 Days', '#6366f1', '#ede9fe', '#4c1d95'], ['day60', '60 Days', '#7c3aed', '#f5f3ff', '#5b21b6'], ['day90', '90 Days', '#8b5cf6', '#faf5ff', '#6b21a8']].map(([key, label, color, bgColor, textColor]) => (
-            <div key={key} style={{ background: bgColor, borderRadius: 12, padding: 20, border: `1px solid ${color}22` }}>
-              <h4 style={{ color, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{label}</h4>
-              {(data.roadmap[key] || []).map((item, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 8, padding: '10px 14px', marginBottom: 10, borderLeft: `3px solid ${color}` }}>
-                  <p style={{ color: textColor, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.action}</p>
-                  <p style={{ color: '#6b7280', fontSize: 11 }}>{item.owner}</p>
-                  <p style={{ color: '#6b7280', fontSize: 11, fontStyle: 'italic' }}>{item.metric}</p>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        <Card style={{ marginBottom: 24 }}>
+          <SectionHeader eyebrow="Execution Plan" title="30 / 60 / 90 Day Roadmap" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            {[['day30', '30 Days', '#6366f1', '#ede9fe', '#4c1d95'], ['day60', '60 Days', '#7c3aed', '#f5f3ff', '#5b21b6'], ['day90', '90 Days', '#8b5cf6', '#faf5ff', '#6b21a8']].map(([key, label, color, bgColor, textColor]) => (
+              <div key={key} style={{ background: bgColor, borderRadius: 12, padding: 20, border: `1px solid ${color}22` }}>
+                <h4 style={{ color, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{label}</h4>
+                {(data.roadmap[key] || []).map((item, i) => (
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 8, padding: '10px 14px', marginBottom: 10, borderLeft: `3px solid ${color}` }}>
+                    <p style={{ color: textColor, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.action}</p>
+                    <p style={{ color: '#6b7280', fontSize: 11 }}>{item.owner}</p>
+                    <p style={{ color: '#6b7280', fontSize: 11, fontStyle: 'italic' }}>{item.metric}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
-        {(data.competitiveGapsToClose || []).length > 0 && (
-          <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Competitive Gaps to Close</h3>
-            {data.competitiveGapsToClose.map((gap, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < data.competitiveGapsToClose.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
-                <Badge label={gap.priority} color={gap.priority === 'high' ? 'red' : gap.priority === 'medium' ? 'yellow' : 'green'} />
-                <div>
-                  <p style={{ color: T.text, fontSize: 13, fontWeight: 600 }}>{gap.gap}</p>
-                  {gap.competitor && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>vs. {gap.competitor}</p>}
+      {/* ── SECTION 11: Strategic Opportunities ── */}
+      {(data.opportunitiesRanked || []).length > 0 && (
+        <Card style={{ marginBottom: 24 }}>
+          <SectionHeader eyebrow="Strategy" title="Strategic Opportunities" />
+          {data.opportunitiesRanked.map((opp, i) => (
+            <div key={i} style={{ display: 'flex', gap: 16, padding: '16px 0', borderBottom: i < data.opportunitiesRanked.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: 20, fontWeight: 800, color: T.accent, minWidth: 28, lineHeight: 1.2, flexShrink: 0 }}>{opp.rank}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                  <p style={{ color: T.text, fontSize: 14, fontWeight: 700, margin: 0 }}>{opp.opportunity}</p>
+                  {opp.estimatedImpact && <ImpactBadge impact={typeof opp.estimatedImpact === 'string' && ['high','medium','low'].includes(opp.estimatedImpact.toLowerCase()) ? opp.estimatedImpact.toLowerCase() : null} />}
                 </div>
+                {opp.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, margin: 0 }}>{opp.rationale}</p>}
+                {opp.estimatedImpact && !['high','medium','low'].includes(String(opp.estimatedImpact).toLowerCase()) && (
+                  <p style={{ color: T.textMuted, fontSize: 12, marginTop: 4, marginBottom: 0 }}>{opp.estimatedImpact}</p>
+                )}
               </div>
-            ))}
-          </Card>
-        )}
-
-        {(data.opportunitiesRanked || []).length > 0 && (
-          <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Top Opportunities</h3>
-            {data.opportunitiesRanked.map((opp, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < data.opportunitiesRanked.length - 1 ? `1px solid ${T.border}` : 'none', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 18, fontWeight: 800, color: T.accent, minWidth: 24, lineHeight: 1.2 }}>{opp.rank}</span>
-                <div>
-                  <p style={{ color: T.text, fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{opp.opportunity}</p>
-                  <p style={{ color: T.textMuted, fontSize: 12, lineHeight: 1.5 }}>{opp.estimatedImpact}</p>
-                </div>
-              </div>
-            ))}
-          </Card>
-        )}
-      </div>
+            </div>
+          ))}
+        </Card>
+      )}
     </div>
   )
 }
