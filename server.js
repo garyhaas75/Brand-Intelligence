@@ -432,11 +432,17 @@ app.post('/api/brands/:slug/social-manual-import', (req, res) => {
 // GET /api/brands — list all brands
 app.get('/api/brands', (req, res) => {
   const registry = loadBrandsRegistry();
-  const brands = registry.brands.map(b => ({
-    ...b,
-    healthStatus: getHealthStatus(b.slug),
-    moduleStatus: getBrandStatus(b.slug),
-  }));
+  let dirty = false;
+  const brands = registry.brands.map(b => {
+    const moduleStatus = getBrandStatus(b.slug);
+    // Auto-clear stuck 'running' status when at least one module has completed
+    if (b.discoveryStatus === 'running' && moduleStatus.some(m => m.exists)) {
+      b.discoveryStatus = 'complete';
+      dirty = true;
+    }
+    return { ...b, healthStatus: getHealthStatus(b.slug), moduleStatus };
+  });
+  if (dirty) saveBrandsRegistry(registry);
   res.json({ brands });
 });
 
