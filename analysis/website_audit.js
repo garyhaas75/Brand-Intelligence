@@ -89,7 +89,10 @@ async function run() {
 
   const logFile = path.join(__dirname, '../logs', `website_audit_${slug}.log`);
   log(`Scraping ${brandsToScrape.length} sites...`);
-  const scraped = await scrapeBrands(brandsToScrape, { logFile });
+  const scraped = await Promise.race([
+    scrapeBrands(brandsToScrape, { logFile }),
+    new Promise(resolve => setTimeout(() => { log('Scraping timed out after 6min — continuing with partial results'); resolve([]); }, 360000)),
+  ]);
 
   // Run Lighthouse on target brand only (90s timeout — chrome-launcher can hang on Railway)
   log(`Running Lighthouse audit for ${profile.url}...`);
@@ -222,5 +225,8 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
   saveBrandData(slug, 'site_intelligence.json', output);
   log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? 'ok' : 'failed'}.`);
 }
+
+// Hard kill after 12 minutes — prevents zombie processes on Railway
+setTimeout(() => { log('TIMEOUT: website audit exceeded 12min, forcing exit'); process.exit(1); }, 12 * 60 * 1000);
 
 run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
