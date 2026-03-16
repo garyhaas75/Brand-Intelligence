@@ -66,6 +66,11 @@ async function runLighthouse(url) {
       .sort((a, b) => a.score - b.score)
       .slice(0, 12)
       .map(a => ({ id: a.id, title: a.title, score: Math.round(a.score * 100) }));
+    // If all scores are 0, Chrome launched but couldn't evaluate the page — treat as failure
+    if (scores.seo === 0 && scores.performance === 0 && scores.accessibility === 0) {
+      log('Lighthouse returned all-zero scores — Chrome launched but could not evaluate page');
+      return null;
+    }
     log(`Lighthouse: SEO=${scores.seo}, Perf=${scores.performance}, A11y=${scores.accessibility}, BP=${scores.bestPractices}`);
     return { scores, topIssues };
   } catch (err) {
