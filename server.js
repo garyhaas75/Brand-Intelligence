@@ -277,6 +277,14 @@ app.get('/share/:token', (req, res) => {
 </html>`);
 });
 
+// ─── Locally-cached social post images (public, BEFORE basicAuth) ─────────────
+app.get('/api/social-image/:slug/:filename', (req, res) => {
+  const imgPath = path.join(DATA_DIR, 'brands', req.params.slug, 'social_images', req.params.filename);
+  if (!fs.existsSync(imgPath)) return res.status(404).end();
+  res.setHeader('Cache-Control', 'public, max-age=604800');
+  res.sendFile(imgPath);
+});
+
 // ─── Auth (applied after public routes) ───────────────────────────────────────
 app.use(basicAuth({ users, challenge: true, realm: 'Brand Intelligence' }));
 
@@ -287,6 +295,136 @@ app.use('/api/', rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 }));
+
+// ─── Session Cookies Settings ─────────────────────────────────────────────────
+
+const SOCIAL_COOKIES_FILE = path.join(DATA_DIR, 'social_cookies.json');
+
+function readSocialCookies() {
+  try { return JSON.parse(fs.readFileSync(SOCIAL_COOKIES_FILE, 'utf8')); } catch { return {}; }
+}
+
+// GET /api/settings/social-cookies — returns configured status (no actual cookie values)
+app.get('/api/settings/social-cookies', (req, res) => {
+  const data = readSocialCookies();
+  res.json({
+    ok: true,
+    instagram: { configured: Array.isArray(data.instagram) && data.instagram.length > 0, count: (data.instagram || []).length },
+    facebook: { configured: Array.isArray(data.facebook) && data.facebook.length > 0, count: (data.facebook || []).length },
+  });
+});
+
+// POST /api/settings/social-cookies — saves cookie arrays
+app.post('/api/settings/social-cookies', (req, res) => {
+  const { instagram, facebook } = req.body || {};
+  const existing = readSocialCookies();
+  const updated = { ...existing };
+  if (instagram !== undefined) updated.instagram = instagram;
+  if (facebook !== undefined) updated.facebook = facebook;
+  fs.writeFileSync(SOCIAL_COOKIES_FILE, JSON.stringify(updated, null, 2));
+  res.json({ ok: true });
+});
+
+// ─── Manual Social Import ──────────────────────────────────────────────────────
+
+function normalizeImportedPosts(rawPosts, platform) {
+  return rawPosts.map(p => {
+    if (platform === 'instagram') {
+      return {
+        likes: p.likesCount || p.edge_liked_by?.count || p.likes || 0,
+        comments: p.commentsCount || p.edge_media_to_comment?.count || p.comments || 0,
+        caption: (p.caption || p.edge_media_to_caption?.edges?.[0]?.node?.text || '').slice(0, 300),
+        timestamp: p.timestamp || (p.taken_at_timestamp ? new Date(p.taken_at_timestamp * 1000).toISOString() : null),
+        postUrl: p.shortCode ? `https://instagram.com/p/${p.shortCode}` : (p.postUrl || null),
+        imageUrl: p.displayUrl || p.imageUrl || null,
+        type: p.type || 'Image',
+      };
+    }
+    if (platform === 'facebook') {
+      return {
+        likes: p.likes || 0,
+        comments: p.comments || 0,
+        caption: (p.message || p.caption || p.text || '').slice(0, 300),
+        timestamp: p.timestamp || p.time || p.created_time || null,
+        postUrl: p.postUrl || p.url || null,
+        imageUrl: p.imageUrl || null,
+      };
+    }
+    return p;
+  });
+}
+
+function buildImportedPlatformData(posts) {
+  if (!posts || posts.length === 0) return null;
+  const totalLikes = posts.reduce((s, p) => s + (p.likes || 0), 0);
+  const totalComments = posts.reduce((s, p) => s + (p.comments || 0), 0);
+  const avgEngagement = Math.round((totalLikes + totalComments) / posts.length);
+  const now = Date.now();
+  const last30 = posts.filter(p => p.timestamp && (now - new Date(p.timestamp)) < 30 * 24 * 3600 * 1000);
+  const topPosts = [...posts].sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 3);
+  const themeKeywords = {
+    'Product Showcase': ['new', 'collection', 'available', 'shop', 'now'],
+    'Lifestyle': ['lifestyle', 'mood', 'vibe', 'inspiration', 'everyday'],
+    'Promotional': ['sale', 'off', '% off', 'discount', 'deal', 'save'],
+    'Behind the Scenes': ['bts', 'behind', 'team', 'making', 'process'],
+    'Seasonal': ['fall', 'winter', 'spring', 'summer', 'holiday', 'season'],
+  };
+  const counts = {};
+  posts.forEach(p => {
+    const text = (p.caption || '').toLowerCase();
+    Object.entries(themeKeywords).forEach(([theme, kws]) => {
+      if (kws.some(k => text.includes(k))) counts[theme] = (counts[theme] || 0) + 1;
+    });
+  });
+  const contentThemes = Object.entries(counts).map(([theme, count]) => ({ theme, count })).sort((a, b) => b.count - a.count);
+  return {
+    summary: { postCount: posts.length, avgEngagement, postingFrequencyPerWeek: Math.round((last30.length / 4.3) * 10) / 10 },
+    topPosts,
+    contentThemes,
+    monthlyTrend: [],
+    manuallyImported: true,
+    importedAt: new Date().toISOString(),
+  };
+}
+
+// POST /api/brands/:slug/social-manual-import
+app.post('/api/brands/:slug/social-manual-import', (req, res) => {
+  const { slug } = req.params;
+  const { platform, posts: rawPosts } = req.body || {};
+  if (!platform || !Array.isArray(rawPosts) || rawPosts.length === 0) {
+    return res.status(400).json({ error: 'platform and posts[] are required' });
+  }
+  const siPath = path.join(DATA_DIR, 'brands', slug, 'social_intelligence.json');
+  let si;
+  try { si = JSON.parse(fs.readFileSync(siPath, 'utf8')); }
+  catch { return res.status(404).json({ error: 'social_intelligence.json not found for this brand — run the Social Audit first' }); }
+
+  const normalized = normalizeImportedPosts(rawPosts, platform);
+  const platformData = buildImportedPlatformData(normalized);
+
+  si.brands = si.brands.map(b => {
+    if (b.role !== 'target') return b;
+    if (platform === 'instagram') {
+      const summary = platformData.summary;
+      return {
+        ...b,
+        summary,
+        topPosts: platformData.topPosts,
+        contentThemes: platformData.contentThemes,
+        allPosts: normalized,
+        partialData: false,
+        manuallyImported: true,
+      };
+    }
+    if (platform === 'facebook') {
+      return { ...b, facebookData: platformData };
+    }
+    return b;
+  });
+  si.updatedAt = new Date().toISOString();
+  fs.writeFileSync(siPath, JSON.stringify(si, null, 2));
+  res.json({ ok: true, platform, postCount: normalized.length, avgEngagement: platformData.summary.avgEngagement });
+});
 
 // ─── Brand Registry Routes ─────────────────────────────────────────────────────
 
@@ -696,13 +834,13 @@ app.get('/api/settings', (req, res) => {
   res.json({ serpApiEnabled: !!process.env.SERP_API_KEY });
 });
 
-// ─── Locally-cached social post images ────────────────────────────────────────
+// ─── Social audit live progress ───────────────────────────────────────────────
 
-app.get('/api/social-image/:slug/:filename', (req, res) => {
-  const imgPath = path.join(DATA_DIR, 'brands', req.params.slug, 'social_images', req.params.filename);
-  if (!fs.existsSync(imgPath)) return res.status(404).end();
-  res.setHeader('Cache-Control', 'public, max-age=604800');
-  res.sendFile(imgPath);
+app.get('/api/brands/:slug/audit-progress', (req, res) => {
+  const statusPath = path.join(DATA_DIR, 'brands', req.params.slug, '_audit_status.json');
+  if (!fs.existsSync(statusPath)) return res.json({ running: false });
+  try { res.json(JSON.parse(fs.readFileSync(statusPath, 'utf8'))); }
+  catch { res.json({ running: false }); }
 });
 
 // ─── Image Proxy (bypasses Instagram CDN hotlink protection) ──────────────────

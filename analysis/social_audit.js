@@ -18,6 +18,13 @@ const DATA_DIR = path.join(__dirname, '../data');
 function log(msg) { console.log(`[social_audit] [${new Date().toISOString()}] ${msg}`); }
 function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
 
+function writeAuditStatus(slug, update) {
+  try {
+    const statusPath = path.join(DATA_DIR, 'brands', slug, '_audit_status.json');
+    fs.writeFileSync(statusPath, JSON.stringify({ ...update, updatedAt: new Date().toISOString() }));
+  } catch {}
+}
+
 // Download post images immediately after scraping (CDN URLs are IP/time-bound, must fetch right away)
 async function downloadPostImages(slug, posts, prefix = 'post') {
   if (!posts || posts.length === 0) return posts;
@@ -46,6 +53,11 @@ async function downloadPostImages(slug, posts, prefix = 'post') {
 function loadBrandData(slug, filename) {
   const fp = path.join(DATA_DIR, 'brands', slug, filename);
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); } catch { return null; }
+}
+
+function loadSocialCookies() {
+  const cookiePath = path.join(DATA_DIR, 'social_cookies.json');
+  try { return JSON.parse(fs.readFileSync(cookiePath, 'utf8')); } catch { return {}; }
 }
 
 function saveBrandData(slug, filename, data) {
@@ -171,14 +183,15 @@ async function scrapeInstagramViaApify(handle) {
   if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
   log(`  Scraping Instagram @${handle} via Apify...`);
+  const cookies = loadSocialCookies();
   const igInput = {
     directUrls: [`https://www.instagram.com/${handle}/`],
     resultsType: 'posts',
     resultsLimit: 50,
   };
-  if (process.env.IG_USERNAME && process.env.IG_PASSWORD) {
-    igInput.loginUsername = process.env.IG_USERNAME;
-    igInput.loginPassword = process.env.IG_PASSWORD;
+  if (cookies.instagram && cookies.instagram.length > 0) {
+    igInput.loginCookies = cookies.instagram;
+    log(`  Using ${cookies.instagram.length} session cookies for Instagram @${handle}`);
   }
   const run = await client.actor('apify/instagram-scraper').call(igInput);
   log(`  Apify run status: ${run.status}, datasetId: ${run.defaultDatasetId}`);
@@ -188,8 +201,37 @@ async function scrapeInstagramViaApify(handle) {
     item.type === 'Image' || item.type === 'Video' || item.type === 'Sidecar' ||
     item.shortCode || item.timestamp || item.taken_at_timestamp
   );
-  log(`  ${posts.length} valid Instagram posts after filtering`);
-  return posts;
+  // Handle restricted profile response: Apify returns 1 profile object with latestPosts[]
+  const restrictedPosts = items
+    .filter(item => item.isRestrictedProfile && Array.isArray(item.latestPosts))
+    .flatMap(item => {
+      log(`  Restricted profile detected for @${handle} — extracting ${item.latestPosts.length} latestPosts`);
+      return item.latestPosts;
+    });
+  const allPosts = [...posts, ...restrictedPosts];
+  log(`  ${allPosts.length} valid Instagram posts after filtering (${restrictedPosts.length} from restricted profile)`);
+
+  // If primary actor returned nothing, try apify/instagram-profile-scraper as fallback
+  if (allPosts.length === 0) {
+    log(`  Primary actor returned 0 posts for @${handle} — trying apify/instagram-profile-scraper...`);
+    try {
+      const run2 = await client.actor('apify/instagram-profile-scraper').call({
+        usernames: [handle],
+        resultsLimit: 50,
+      });
+      const { items: items2 } = await client.dataset(run2.defaultDatasetId).listItems({ limit: 50 });
+      const posts2 = items2.filter(item =>
+        item.type === 'Image' || item.type === 'Video' || item.type === 'Sidecar' ||
+        item.shortCode || item.timestamp
+      );
+      log(`  Fallback actor returned ${posts2.length} posts for @${handle}`);
+      return posts2;
+    } catch (err2) {
+      log(`  Fallback actor also failed for @${handle}: ${err2.message}`);
+    }
+  }
+
+  return allPosts;
 }
 
 async function scrapeInstagramProfileViaApify(handle) {
@@ -237,9 +279,8 @@ async function scrapeTikTokViaApify(handle) {
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
   log(`  Scraping TikTok @${handle} via Apify...`);
   const run = await client.actor('clockworks/tiktok-scraper').call({
-    type: 'user',
-    usernames: [handle],
-    resultsLimit: 30,
+    profiles: [`https://www.tiktok.com/@${handle}`],
+    resultsPerPage: 30,
   });
   const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 30 });
   const posts = items.filter(item => item.diggCount !== undefined || item.text || item.createTime);
@@ -250,14 +291,20 @@ async function scrapeTikTokViaApify(handle) {
 async function scrapeFacebookViaApify(handle) {
   if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
-  log(`  Scraping Facebook /${handle} via Apify...`);
-  const run = await client.actor('apify/facebook-pages-scraper').call({
+  log(`  Scraping Facebook /${handle} via Apify (facebook-posts-scraper)...`);
+  const fbCookies = loadSocialCookies();
+  const fbInput = {
     startUrls: [{ url: `https://www.facebook.com/${handle}` }],
-    maxPosts: 30,
-  });
+    resultsLimit: 20,
+  };
+  if (fbCookies.facebook && fbCookies.facebook.length > 0) {
+    fbInput.cookies = fbCookies.facebook;
+    log(`  Using ${fbCookies.facebook.length} session cookies for Facebook /${handle}`);
+  }
+  const run = await client.actor('apify/facebook-posts-scraper').call(fbInput);
   const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 50 });
-  // Filter to actual post items (not page info entries)
-  const posts = items.filter(item => item.message || item.text || item.story || item.postId || item.url);
+  // Filter to actual post items with real content
+  const posts = items.filter(item => item.message || item.text || item.story || item.postId);
   log(`  ${posts.length} Facebook posts for /${handle}`);
   return posts;
 }
@@ -539,7 +586,7 @@ Identify the 4-5 most impactful content opportunities. Return ONLY a JSON array:
 
 // ─── Brand Processing ─────────────────────────────────────────────────────────
 
-async function processBrand(brandInfo, anthropic) {
+async function processBrand(brandInfo, anthropic, advance = () => {}) {
   const { slug, name, url, role, handle: existingIgHandle, tiktokHandle: existingTtHandle, facebookHandle: existingFbHandle, market } = brandInfo;
 
   log(`Processing ${name} (${role})`);
@@ -599,18 +646,14 @@ async function processBrand(brandInfo, anthropic) {
 
   let igPosts = [];
   if (igHandle) {
+    advance(`Instagram @${igHandle} (${name})`);
     try {
       igPosts = await scrapeInstagramViaApify(igHandle);
       log(`  ${name}: ${igPosts.length} posts via Apify`);
     } catch (err) {
-      log(`  Apify failed for ${name}: ${err.message}. Trying Playwright fallback...`);
-      const fallback = await scrapeInstagramFallback(igHandle).catch(e => ({ error: e.message, partialData: true }));
+      log(`  Apify failed for ${name}: ${err.message}`);
       brandData.partialData = true;
-      if (fallback.error) { brandData.error = `Apify: ${err.message} | Playwright: ${fallback.error}`; }
-      else {
-        brandData.summary.estimatedPostCount = fallback.estimatedPostCount;
-        brandData.summary.followersEstimate = fallback.estimatedFollowers;
-      }
+      brandData.error = `Apify scrape failed: ${err.message}`;
     }
 
     if (igPosts.length === 0 && !brandData.partialData) {
@@ -664,6 +707,7 @@ async function processBrand(brandInfo, anthropic) {
   const ttHandle = existingTtHandle || brandData.tiktokHandle;
   log(`  TikTok: ${ttHandle ? '@' + ttHandle : 'not found'}`);
   if (ttHandle) {
+    advance(`TikTok @${ttHandle} (${name})`);
     try {
       const ttPosts = await scrapeTikTokViaApify(ttHandle);
       if (ttPosts.length > 0) brandData.tiktokData = buildPlatformData(normalizePosts(ttPosts, 'tiktok'));
@@ -674,6 +718,7 @@ async function processBrand(brandInfo, anthropic) {
   const fbHandle = existingFbHandle || brandData.facebookHandle;
   log(`  Facebook: ${fbHandle ? '/' + fbHandle : 'not found'}`);
   if (fbHandle) {
+    advance(`Facebook /${fbHandle} (${name})`);
     try {
       const fbPosts = await scrapeFacebookViaApify(fbHandle);
       if (fbPosts.length > 0) brandData.facebookData = buildPlatformData(normalizePosts(fbPosts, 'facebook'));
@@ -689,11 +734,12 @@ async function run() {
   const args = process.argv.slice(2);
   const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
   if (!slug) { log('ERROR: --slug= required'); process.exit(1); }
+  const targetOnly = args.includes('--target-only');
 
   const profile = loadBrandData(slug, 'profile.json');
   if (!profile) { log('ERROR: profile.json not found'); process.exit(1); }
 
-  log(`Starting social audit for: ${profile.name}`);
+  log(`Starting social audit for: ${profile.name}${targetOnly ? ' (target only)' : ''}`);
 
   const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
 
@@ -711,7 +757,7 @@ async function run() {
       tiktokHandle: profile.social?.tiktok || null,
       facebookHandle: profile.social?.facebook || null,
     },
-    ...(profile.identifiedCompetitors || []).slice(0, 5).map(c => ({
+    ...(targetOnly ? [] : (profile.identifiedCompetitors || []).slice(0, 5).map(c => ({
       slug: c.name.toLowerCase().replace(/\s+/g, '-'),
       name: c.name,
       url: c.url,
@@ -719,12 +765,24 @@ async function run() {
       handle: c.instagramHandle || null,
       tiktokHandle: c.tiktokHandle || null,
       facebookHandle: c.facebookHandle || null,
-    })),
+    }))),
   ];
+
+  // Progress tracking — 3 scrapes per brand + 3 Claude analysis steps
+  const totalSteps = brandsToAudit.length * 3 + 3;
+  let stepIdx = 0;
+  const startedAt = new Date().toISOString();
+  writeAuditStatus(slug, { step: `Starting audit for ${profile.name}...`, stepIdx: 0, totalSteps, done: false, startedAt });
+
+  function advance(step) {
+    stepIdx++;
+    writeAuditStatus(slug, { step, stepIdx, totalSteps, done: false, startedAt });
+    log(`[step ${stepIdx}/${totalSteps}] ${step}`);
+  }
 
   const brandResults = [];
   for (const brand of brandsToAudit) {
-    const result = await processBrand(brand, anthropic).catch(err => ({
+    const result = await processBrand(brand, anthropic, advance).catch(err => ({
       id: brand.slug,
       name: brand.name,
       role: brand.role,
@@ -751,7 +809,7 @@ async function run() {
   const targetResult = brandResults.find(b => b.role === 'target');
   const competitorResults = brandResults.filter(b => b.role === 'competitor');
   if (targetResult && anthropic) {
-    log('Generating content gap analysis...');
+    advance('Analyzing content gaps with Claude...');
     targetResult.contentGaps = await generateContentGapAnalysis(anthropic, profile.name, targetResult, competitorResults, guidelines).catch(() => []);
   }
 
@@ -783,9 +841,9 @@ async function run() {
   let whiteSpaceOpportunities = null;
   let competitionStrategy = null;
   if (anthropic) {
-    log('Generating white space opportunities...');
+    advance('Identifying white space opportunities with Claude...');
     whiteSpaceOpportunities = await generateWhiteSpaceOpportunities(anthropic, brandResults, guidelines).catch(() => null);
-    log('Generating competition strategy...');
+    advance('Building competition strategy with Claude...');
     competitionStrategy = await generateCompetitionStrategy(anthropic, targetResult, competitorResults, guidelines).catch(() => null);
   }
 
@@ -800,8 +858,28 @@ async function run() {
 
   const existing = loadBrandData(slug, 'social_intelligence.json');
   if (existing) archiveData(slug, 'social_intelligence', existing);
-  saveBrandData(slug, 'social_intelligence.json', output);
+
+  let finalOutput;
+  if (targetOnly && existing) {
+    // Patch just the target brand entry, keep existing competitor data + analysis intact
+    const patchedBrands = existing.brands.map(b => b.role === 'target' ? brandResults[0] : b);
+    finalOutput = { ...existing, brands: patchedBrands, generatedAt: new Date().toISOString() };
+    log(`  Patched target brand entry — ${existing.brands.filter(b => b.role === 'competitor').length} competitor entries preserved`);
+  } else {
+    finalOutput = output;
+  }
+
+  saveBrandData(slug, 'social_intelligence.json', finalOutput);
+  writeAuditStatus(slug, { step: 'Done', stepIdx: totalSteps, totalSteps, done: true, startedAt, completedAt: new Date().toISOString() });
   log(`Done. ${brandResults.length} brands audited. TikTok data: ${brandResults.filter(b => b.tiktokData).length} brands. Facebook data: ${brandResults.filter(b => b.facebookData).length} brands.`);
 }
 
-run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+run().catch(err => {
+  log(`FATAL: ${err.message}`);
+  // Best-effort: try to write error status (slug may not be in scope if args parsing failed)
+  try {
+    const slug = (process.argv.slice(2).find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
+    if (slug) writeAuditStatus(slug, { step: `Error: ${err.message}`, done: false, error: err.message });
+  } catch {}
+  process.exit(1);
+});

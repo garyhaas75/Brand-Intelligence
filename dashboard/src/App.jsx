@@ -304,7 +304,7 @@ function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => onSelectBrand(brand.slug)} style={{ flex: 1, background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Open</button>
-              <button onClick={() => onRefresh(brand.slug)} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>↻ Refresh All</button>
+              <button onClick={() => onRefresh(brand.slug)} disabled={brand.discoveryStatus === 'running'} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: brand.discoveryStatus === 'running' ? T.textFaint : T.textSub, cursor: brand.discoveryStatus === 'running' ? 'not-allowed' : 'pointer' }}>{brand.discoveryStatus === 'running' ? '⟳ Running…' : '↻ Refresh All'}</button>
             </div>
           </Card>
         ))}
@@ -864,647 +864,293 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
 function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
-  const [expandedBrand, setExpandedBrand] = useState(null)
-  const [platformTab, setPlatformTab] = useState('instagram')
+  const [auditProgress, setAuditProgress] = useState(null)
 
   useEffect(() => {
     if (!slug) return
     fetch(`${API}/brands/${slug}/social_intelligence`).then(r => r.json()).then(setData).catch(() => {})
   }, [slug, dataVersion])
 
-  function Sparkline({ data: points, width = 120, height = 36 }) {
-    if (!points?.length || points.length < 2) return <span style={{ color: T.textFaint, fontSize: 11 }}>—</span>
-    const values = points.map(p => p.avgEngagement)
-    const max = Math.max(...values) || 1
-    const pts = values.map((v, i) => `${(i / (values.length - 1)) * width},${height - (v / max) * (height - 4) - 2}`).join(' ')
-    return <svg width={width} height={height} style={{ overflow: 'visible', display: 'block' }}><polyline points={pts} fill="none" stroke={T.accent} strokeWidth={2} strokeLinejoin="round" /></svg>
-  }
+  useEffect(() => {
+    if (!running || !slug) { setAuditProgress(null); return }
+    const poll = () => fetch(`${API}/brands/${slug}/audit-progress`).then(r => r.json()).then(setAuditProgress).catch(() => {})
+    poll()
+    const id = setInterval(poll, 4000)
+    return () => clearInterval(id)
+  }, [running, slug])
+
+  const GRAD_PAIRS = [
+    ['#f97316', '#ec4899'], ['#6366f1', '#8b5cf6'], ['#0ea5e9', '#14b8a6'],
+    ['#f59e0b', '#ef4444'], ['#10b981', '#3b82f6'], ['#a855f7', '#ec4899'],
+  ]
+
+  const PLATFORM_ICONS = { instagram: '📸', tiktok: '🎵', facebook: '👥' }
+  const PLATFORM_LABELS = { instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook' }
 
   function relativeTime(iso) {
     if (!iso) return ''
     const diff = Date.now() - new Date(iso).getTime()
-    const m = Math.floor(diff / 60000)
-    if (m < 60) return `${m || 1}m ago`
-    const h = Math.floor(m / 60)
-    if (h < 24) return `${h}h ago`
-    const d = Math.floor(h / 24)
+    const d = Math.floor(diff / 86400000)
     if (d < 30) return `${d}d ago`
     const mo = Math.floor(d / 30)
     if (mo < 12) return `${mo}mo ago`
     return `${Math.floor(mo / 12)}y ago`
   }
 
-  const GRAD_PAIRS = [
-    ['#f97316', '#ec4899'], ['#6366f1', '#8b5cf6'], ['#0ea5e9', '#14b8a6'],
-    ['#f59e0b', '#ef4444'], ['#10b981', '#3b82f6'], ['#a855f7', '#ec4899'],
-    ['#06b6d4', '#6366f1'], ['#84cc16', '#0ea5e9'],
-  ]
-
-  function InstagramCard({ post, brandName, handle, brandIdx = 0 }) {
-    const engagement = (post.likes || 0) + (post.comments || 0)
-    const initial = (brandName || handle || 'B')[0].toUpperCase()
-    const [g1, g2] = GRAD_PAIRS[brandIdx % GRAD_PAIRS.length]
-    return (
-      <div style={{ width: 240, minWidth: 240, background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderBottom: `1px solid ${T.border}` }}>
-          <div style={{ width: 28, height: 28, borderRadius: '50%', background: `linear-gradient(135deg, ${g1}, ${g2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{initial}</div>
-          <span style={{ fontSize: 12, fontWeight: 700, color: T.text, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{handle ? `@${handle}` : brandName}</span>
-          <span style={{ fontSize: 16, color: T.textFaint, letterSpacing: 1 }}>···</span>
-        </div>
-        {/* Image area */}
-        <div style={{ width: '100%', aspectRatio: '1/1', background: `linear-gradient(135deg, ${g1}22, ${g2}22)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-          {post.imageUrl
-            ? <img src={post.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
-            : <span style={{ fontSize: 52, fontWeight: 900, color: `${g1}55`, userSelect: 'none' }}>{initial}</span>
-          }
-          {engagement > 0 && <span style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 12 }}>{engagement >= 1000 ? `${(engagement/1000).toFixed(1)}k` : engagement}</span>}
-        </div>
-        {/* Engagement row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px 4px' }}>
-          <span style={{ fontSize: 12, color: T.text }}>♥ {(post.likes || 0).toLocaleString()}</span>
-          <span style={{ fontSize: 12, color: T.text }}>💬 {(post.comments || 0).toLocaleString()}</span>
-          <span style={{ marginLeft: 'auto', fontSize: 11, color: T.textFaint }}>{relativeTime(post.timestamp)}</span>
-        </div>
-        {/* Caption */}
-        <div style={{ padding: '0 12px 10px' }}>
-          <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, margin: 0 }}>
-            {post.caption
-              ? <>{brandName && <strong style={{ color: T.text }}>{handle || brandName} </strong>}{post.caption.slice(0, 100)}{post.caption.length > 100 ? '…' : ''}</>
-              : <span style={{ color: T.textFaint, fontStyle: 'italic' }}>No caption</span>}
-          </p>
-          {post.postUrl && <a href={post.postUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none', display: 'block', marginTop: 4 }}>View post ↗</a>}
-        </div>
-      </div>
-    )
-  }
-
-  const THEME_COLORS = ['#dbeafe', '#d1fae5', '#ede9fe', '#fef3c7', '#fee2e2', '#f0fdf4', '#fdf4ff']
-  const THEME_TEXT   = ['#1e40af', '#065f46', '#5b21b6', '#92400e', '#991b1b', '#14532d', '#7e22ce']
-  const PLATFORM_LABELS = { instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook' }
-  const FORMAT_COLORS = { Reels: '#ede9fe', Carousel: '#dbeafe', Story: '#d1fae5', Video: '#fef3c7', Post: '#f0fdf4' }
-  const FORMAT_TEXT   = { Reels: '#5b21b6', Carousel: '#1e40af', Story: '#065f46', Video: '#92400e', Post: '#14532d' }
-  // Brand colors for share-of-engagement bars (target always purple)
-  const BRAND_BAR_COLORS = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316']
-
   if (!data) return <EmptyState message="Social audit not yet generated." cta="Run Social Audit" onCta={() => onRefresh('social_intelligence')} />
 
   const target = data.brands?.find(b => b.role === 'target')
-  const competitors = data.brands?.filter(b => b.role === 'competitor') || []
   const allBrands = data.brands || []
 
-  // Platform availability
-  const hasTiktok = allBrands.some(b => b.tiktokData)
-  const hasFacebook = allBrands.some(b => b.facebookData)
-  const availablePlatforms = ['instagram', hasTiktok && 'tiktok', hasFacebook && 'facebook'].filter(Boolean)
+  // Per-brand: compute best engagement across all platforms + social links
+  const brandRows = allBrands.map((b, idx) => {
+    const igEng = b.summary?.avgEngagement || 0
+    const ttEng = b.tiktokData?.summary?.avgEngagement || 0
+    const fbEng = b.facebookData?.summary?.avgEngagement || 0
+    const bestEng = Math.max(igEng, ttEng, fbEng)
+    const bestPlatform = bestEng === ttEng && ttEng > 0 ? 'tiktok' : bestEng === fbEng && fbEng > 0 ? 'facebook' : igEng > 0 ? 'instagram' : null
+    const igPosts = b.summary?.postCount || 0
+    const ttPosts = b.tiktokData?.summary?.postCount || 0
+    const fbPosts = b.facebookData?.summary?.postCount || 0
+    const totalPosts = igPosts + ttPosts + fbPosts
+    const igFreq = b.summary?.postingFrequencyPerWeek || 0
+    const ttFreq = b.tiktokData?.summary?.postingFrequencyPerWeek || 0
+    const totalFreq = Math.round((igFreq + ttFreq) * 10) / 10
+    const themes = [
+      ...(b.contentThemes || []),
+      ...(b.tiktokData?.contentThemes || []),
+    ].reduce((acc, t) => { const ex = acc.find(x => x.theme === t.theme); if (ex) ex.count += t.count; else acc.push({ ...t }); return acc; }, [])
+      .sort((a, bb) => bb.count - a.count)
+    return {
+      b, idx, isTarget: b.role === 'target',
+      igEng, ttEng, fbEng, bestEng, bestPlatform,
+      totalPosts, totalFreq, themes,
+      igHandle: b.handle ? { label: `@${b.handle}`, url: `https://instagram.com/${b.handle}` } : null,
+      ttHandle: b.tiktokHandle ? { label: `@${b.tiktokHandle}`, url: `https://tiktok.com/@${b.tiktokHandle}` } : null,
+      fbHandle: b.facebookHandle ? { label: b.facebookHandle, url: `https://facebook.com/${b.facebookHandle}` } : null,
+    }
+  }).sort((a, bb) => (bb.isTarget ? -1 : 0) - (a.isTarget ? -1 : 0) || bb.bestEng - a.bestEng)
 
-  function getPlatformData(brand, platform) {
-    if (platform === 'tiktok') return brand.tiktokData || null
-    if (platform === 'facebook') return brand.facebookData || null
-    return { summary: brand.summary, topPosts: brand.topPosts || [], contentThemes: brand.contentThemes, monthlyTrend: brand.monthlyTrend }
+  const targetRow = brandRows.find(r => r.isTarget)
+  const competitorRows = brandRows.filter(r => !r.isTarget)
+  const marketLeader = competitorRows.sort((a, b) => b.bestEng - a.bestEng)[0]
+
+  // Best posts across ALL brands and platforms, sorted by engagement
+  const allTopPosts = allBrands.flatMap((b, bi) => [
+    ...(b.topPosts || []).map(p => ({ ...p, brandName: b.name, handle: b.handle, platform: 'instagram', brandIdx: bi })),
+    ...(b.tiktokData?.topPosts || []).map(p => ({ ...p, brandName: b.name, handle: b.tiktokHandle, platform: 'tiktok', brandIdx: bi })),
+    ...(b.facebookData?.topPosts || []).filter(p => (p.likes || 0) + (p.comments || 0) > 2).map(p => ({ ...p, brandName: b.name, handle: b.facebookHandle, platform: 'facebook', brandIdx: bi })),
+  ]).filter(p => (p.likes || 0) + (p.comments || 0) > 0)
+    .sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments))
+    .slice(0, 9)
+
+  // Strategy items mapped to business outcomes
+  const OUTCOME_MAP = [
+    { key: 'discovery', label: 'Discovery', color: '#7c3aed', bg: '#ede9fe', keywords: ['hashtag', 'discover', 'reach', 'trend', 'explore', 'seo', 'search', 'new audience', 'organic'] },
+    { key: 'awareness', label: 'Brand Awareness', color: '#0369a1', bg: '#e0f2fe', keywords: ['brand', 'awareness', 'storytell', 'consistent', 'identity', 'voice', 'community', 'engag', 'follow'] },
+    { key: 'traffic', label: 'Site Traffic', color: '#065f46', bg: '#d1fae5', keywords: ['traffic', 'click', 'link', 'shop', 'product', 'website', 'convert', 'sale', 'promot', 'cta'] },
+  ]
+  function getOutcome(text) {
+    const t = (text || '').toLowerCase()
+    for (const o of OUTCOME_MAP) {
+      if (o.keywords.some(k => t.includes(k))) return o
+    }
+    return { key: 'action', label: 'Action', color: '#374151', bg: '#f3f4f6' }
   }
 
-  function getPlatformHandle(brand, platform) {
-    if (platform === 'tiktok') return brand.tiktokHandle ? { label: `@${brand.tiktokHandle}`, url: `https://tiktok.com/@${brand.tiktokHandle}` } : null
-    if (platform === 'facebook') return brand.facebookHandle ? { label: brand.facebookHandle, url: `https://facebook.com/${brand.facebookHandle}` } : null
-    return brand.handle ? { label: `@${brand.handle}`, url: `https://instagram.com/${brand.handle}` } : null
-  }
-
-  // Build leaderboard: all brands ranked by avg engagement on current platform
-  const leaderboard = allBrands
-    .map(b => ({ b, pd: getPlatformData(b, platformTab), isTarget: b.role === 'target' }))
-    .filter(x => x.pd?.summary?.avgEngagement > 0)
-    .sort((a, b) => b.pd.summary.avgEngagement - a.pd.summary.avgEngagement)
-
-  const targetRank = leaderboard.findIndex(x => x.isTarget) + 1
-  const leader = leaderboard[0]
-  const targetPd = target ? getPlatformData(target, platformTab) : null
-  const targetAvgEng = targetPd?.summary?.avgEngagement || 0
-
-  // Share of engagement: total engagement = sum of (avgEngagement * postCount) per brand
-  const engScores = allBrands.map(b => {
-    const pd = getPlatformData(b, platformTab)
-    return { b, score: (pd?.summary?.avgEngagement || 0) * (pd?.summary?.postCount || 1) }
-  }).filter(x => x.score > 0)
-  const totalEngScore = engScores.reduce((s, x) => s + x.score, 0)
-
-  // Market KPI: avg competitor posting frequency
-  const compFreqs = competitors.map(c => getPlatformData(c, platformTab)?.summary?.postingFrequencyPerWeek || 0).filter(v => v > 0)
-  const avgCompFreq = compFreqs.length > 0 ? (compFreqs.reduce((s, v) => s + v, 0) / compFreqs.length).toFixed(1) : null
-  const targetFreq = targetPd?.summary?.postingFrequencyPerWeek || 0
-
-  // Best platform for target (most engagement)
-  const platformEngScores = availablePlatforms.map(p => ({ p, eng: getPlatformData(target, p)?.summary?.avgEngagement || 0 }))
-  const bestPlatform = platformEngScores.sort((a, b) => b.eng - a.eng)[0]
-
-  function splitGapCard(text) {
-    const dashIdx = text.indexOf(' — ')
-    const colonIdx = text.search(/:\s/)
-    const periodIdx = text.indexOf('. ')
-    const splitAt = [dashIdx, colonIdx, periodIdx].filter(i => i > 10 && i < text.length - 10).sort((a, b) => a - b)[0]
-    if (splitAt !== undefined) return [text.slice(0, splitAt).replace(/[:—]\s*$/, ''), text.slice(splitAt).replace(/^[—:\s.]+/, '')]
-    return [text.slice(0, 80), text.slice(80)]
-  }
+  const strategyItems = [
+    ...(data.whiteSpaceOpportunities || []).slice(0, 3).map(o => ({ headline: o.theme, detail: o.description, source: 'opportunity' })),
+    ...(data.competitionStrategy || []).filter(s => s.priority === 'high').slice(0, 5).map(s => ({ headline: s.tactic, detail: s.detail, competitor: s.competitor, source: 'strategy' })),
+  ]
 
   return (
     <div>
-      {running && <RunningBanner moduleLabel="Social Media Audit" detail="Scraping Instagram, TikTok, and Facebook via Apify — detecting handles, analyzing themes, engagement, and gaps." />}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Social Intelligence</h2>
+      {/* Running indicator */}
+      {running && (
+        <div style={{ background: '#dbeafe', border: '1px solid #93c5fd', borderRadius: 10, padding: '14px 20px', marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <span style={{ fontSize: 22, display: 'inline-block', animation: 'spin 1.2s linear infinite', flexShrink: 0, marginTop: 2 }}>⟳</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                <p style={{ color: '#1e40af', fontSize: 14, fontWeight: 700, margin: 0 }}>Social Media Audit — Running</p>
+                {auditProgress?.stepIdx > 0 && <span style={{ color: '#1e40af', fontSize: 12, fontWeight: 600 }}>{auditProgress.stepIdx} / {auditProgress.totalSteps}</span>}
+              </div>
+              <p style={{ color: '#1e3a8a', fontSize: 13, margin: '0 0 10px' }}>{auditProgress?.step || 'Scraping Instagram, TikTok, and Facebook for all brands...'}</p>
+              {auditProgress?.stepIdx > 0 && (
+                <div style={{ height: 5, borderRadius: 3, background: '#bfdbfe', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.round((auditProgress.stepIdx / auditProgress.totalSteps) * 100)}%`, background: '#3b82f6', transition: 'width 0.6s ease' }} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div>
+          <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 2 }}>Social Intelligence</h2>
+          <p style={{ fontSize: 13, color: T.textSub }}>Competitive social landscape across all channels</p>
+        </div>
         <RefreshButton onClick={() => onRefresh('social_intelligence')} loading={running} />
       </div>
 
-      {/* Platform tabs */}
-      {availablePlatforms.length > 1 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 24 }}>
-          {availablePlatforms.map(p => (
-            <button key={p} onClick={() => { setPlatformTab(p); setExpandedBrand(null) }} style={{ padding: '7px 18px', borderRadius: 20, fontSize: 13, fontWeight: platformTab === p ? 700 : 400, background: platformTab === p ? T.accent : T.surfaceAlt, color: platformTab === p ? '#fff' : T.textSub, border: platformTab === p ? 'none' : `1px solid ${T.border}`, cursor: 'pointer' }}>
-              {PLATFORM_LABELS[p]}
-            </button>
+      {/* ── Section 1: 3 KPI cards ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
+        <Card style={{ padding: '16px 20px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Market Leader</p>
+          {marketLeader ? (
+            <>
+              <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>{marketLeader.b.name}</p>
+              <p style={{ fontSize: 13, color: T.textSub }}>{marketLeader.bestEng.toLocaleString()} avg engagement · {PLATFORM_LABELS[marketLeader.bestPlatform] || 'Social'}</p>
+              {marketLeader.igHandle && <a href={marketLeader.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.accent, textDecoration: 'none' }}>{marketLeader.igHandle.label} ↗</a>}
+            </>
+          ) : <p style={{ color: T.textFaint, fontSize: 13 }}>No data yet</p>}
+        </Card>
+
+        <Card style={{ padding: '16px 20px', background: targetRow?.bestEng > 0 ? T.surface : '#fffbeb', border: targetRow?.bestEng > 0 ? `1px solid ${T.border}` : '1px solid #fde68a' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Your Best Channel</p>
+          {targetRow?.bestEng > 0 ? (
+            <>
+              <p style={{ fontSize: 17, fontWeight: 800, color: T.accent, lineHeight: 1.2, marginBottom: 4 }}>{PLATFORM_LABELS[targetRow.bestPlatform]}</p>
+              <p style={{ fontSize: 13, color: T.textSub }}>{targetRow.bestEng.toLocaleString()} avg engagement</p>
+              {targetRow.bestPlatform === 'tiktok' && targetRow.ttHandle && <a href={targetRow.ttHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.accent, textDecoration: 'none' }}>{targetRow.ttHandle.label} ↗</a>}
+              {targetRow.bestPlatform === 'instagram' && targetRow.igHandle && <a href={targetRow.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.accent, textDecoration: 'none' }}>{targetRow.igHandle.label} ↗</a>}
+            </>
+          ) : (
+            <>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Instagram restricted</p>
+              <p style={{ fontSize: 12, color: '#78350f' }}>TikTok is your best scraped channel. Competitor Instagram data is available.</p>
+            </>
+          )}
+        </Card>
+
+        <Card style={{ padding: '16px 20px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Content Volume</p>
+          <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>
+            {allBrands.reduce((s, b) => s + (b.summary?.postCount || 0) + (b.tiktokData?.summary?.postCount || 0), 0).toLocaleString()} posts scraped
+          </p>
+          <p style={{ fontSize: 13, color: T.textSub }}>{allBrands.length} brands · {allBrands.filter(b => b.tiktokData).length} on TikTok · {allBrands.filter(b => b.summary?.postCount > 0).length} on Instagram</p>
+        </Card>
+      </div>
+
+      {/* ── Section 2: Competitive Presence ── */}
+      <Card style={{ marginBottom: 28, padding: '20px 24px' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Competitive Presence</p>
+        <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>Avg engagement per post by channel — click any handle to view the account</p>
+
+        {/* Column headers */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${T.border}` }}>
+          {['Brand', '📸 Instagram', '🎵 TikTok', '👥 Facebook', 'Top Theme'].map(h => (
+            <span key={h} style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</span>
           ))}
         </div>
-      )}
 
-      {/* ── Section 1: Market Intelligence KPIs ── */}
-      {(leader || targetRank > 0) && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
-          {/* Market Leader */}
-          <Card style={{ padding: '16px 18px' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Market Leader</p>
-            {leader ? (
-              <>
-                <p style={{ fontSize: 16, fontWeight: 800, color: leader.isTarget ? T.accent : T.text, lineHeight: 1.2 }}>{leader.b.name}{leader.isTarget ? ' ★' : ''}</p>
-                <p style={{ fontSize: 13, color: T.textSub, marginTop: 4 }}>{leader.pd.summary.avgEngagement.toLocaleString()} avg eng</p>
-                {leader.isTarget && <p style={{ fontSize: 11, color: '#059669', fontWeight: 600, marginTop: 4 }}>You lead this market</p>}
-              </>
-            ) : <p style={{ color: T.textFaint, fontSize: 13 }}>No data yet</p>}
-          </Card>
-          {/* Your Rank */}
-          <Card style={{ padding: '16px 18px', background: targetRank === 1 ? '#f0fdf4' : targetRank > 0 && targetRank <= 3 ? '#fefce8' : T.surface, border: targetRank === 1 ? '1px solid #86efac' : `1px solid ${T.border}` }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Your Rank</p>
-            {targetRank > 0 ? (
-              <>
-                <p style={{ fontSize: 28, fontWeight: 900, color: targetRank === 1 ? '#059669' : targetRank <= 3 ? '#d97706' : T.text, lineHeight: 1 }}>#{targetRank}</p>
-                <p style={{ fontSize: 12, color: T.textSub, marginTop: 4 }}>of {leaderboard.length} brands on {PLATFORM_LABELS[platformTab]}</p>
-                {leader && !leader.isTarget && targetAvgEng > 0 && <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>{(leader.pd.summary.avgEngagement / targetAvgEng).toFixed(1)}× behind leader</p>}
-              </>
-            ) : (
-              <>
-                <p style={{ fontSize: 15, fontWeight: 700, color: T.textFaint }}>Unranked</p>
-                <p style={{ fontSize: 12, color: T.textFaint, marginTop: 4 }}>No {PLATFORM_LABELS[platformTab]} data</p>
-              </>
-            )}
-          </Card>
-          {/* Best Platform for You */}
-          <Card style={{ padding: '16px 18px' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Best Platform</p>
-            {bestPlatform?.eng > 0 ? (
-              <>
-                <p style={{ fontSize: 16, fontWeight: 800, color: T.text }}>{PLATFORM_LABELS[bestPlatform.p]}</p>
-                <p style={{ fontSize: 13, color: T.textSub, marginTop: 4 }}>{bestPlatform.eng.toLocaleString()} avg engagement</p>
-              </>
-            ) : (
-              <p style={{ fontSize: 13, color: T.textFaint }}>Run audit to see</p>
-            )}
-          </Card>
-          {/* Posting Frequency vs Market */}
-          <Card style={{ padding: '16px 18px', background: avgCompFreq && targetFreq < parseFloat(avgCompFreq) ? '#fff7ed' : T.surface, border: avgCompFreq && targetFreq < parseFloat(avgCompFreq) ? '1px solid #fed7aa' : `1px solid ${T.border}` }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Posting Frequency</p>
-            {avgCompFreq ? (
-              <>
-                <p style={{ fontSize: 22, fontWeight: 800, color: T.text, lineHeight: 1 }}>{targetFreq || '—'}<span style={{ fontSize: 12, fontWeight: 400, color: T.textMuted }}>/wk</span></p>
-                <p style={{ fontSize: 12, color: T.textSub, marginTop: 4 }}>vs {avgCompFreq}/wk competitor avg</p>
-                {targetFreq > 0 && targetFreq < parseFloat(avgCompFreq) && (
-                  <p style={{ fontSize: 11, color: '#c2410c', fontWeight: 600, marginTop: 4 }}>Below market average</p>
-                )}
-              </>
-            ) : (
-              <p style={{ fontSize: 13, color: T.textFaint }}>No frequency data</p>
-            )}
-          </Card>
-        </div>
-      )}
+        {brandRows.map((row, i) => {
+          const [g1, g2] = GRAD_PAIRS[row.idx % GRAD_PAIRS.length]
+          return (
+            <div key={row.b.slug || i} style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr 1fr 1fr 1fr', gap: 8, alignItems: 'center', padding: '10px 0', borderBottom: `1px solid ${T.border}`, background: row.isTarget ? `${T.accent}08` : 'transparent', borderRadius: row.isTarget ? 8 : 0, paddingLeft: row.isTarget ? 8 : 0 }}>
+              {/* Brand */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 30, height: 30, borderRadius: '50%', background: `linear-gradient(135deg, ${g1}, ${g2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                  {row.b.name[0]}
+                </div>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: row.isTarget ? 800 : 600, color: row.isTarget ? T.accent : T.text, marginBottom: 0 }}>{row.b.name}{row.isTarget ? ' ★' : ''}</p>
+                  {row.totalFreq > 0 && <p style={{ fontSize: 11, color: T.textMuted }}>{row.totalFreq}/wk avg</p>}
+                </div>
+              </div>
+              {/* Instagram */}
+              <div>
+                {row.igEng > 0 ? (
+                  <>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 2 }}>{row.igEng.toLocaleString()}</p>
+                    {row.igHandle && <a href={row.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none' }}>{row.igHandle.label} ↗</a>}
+                  </>
+                ) : row.igHandle ? (
+                  <a href={row.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>{row.igHandle.label} ↗</a>
+                ) : <span style={{ fontSize: 13, color: T.textFaint }}>—</span>}
+              </div>
+              {/* TikTok */}
+              <div>
+                {row.ttEng > 0 ? (
+                  <>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 2 }}>{row.ttEng.toLocaleString()}</p>
+                    {row.ttHandle && <a href={row.ttHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none' }}>{row.ttHandle.label} ↗</a>}
+                  </>
+                ) : row.ttHandle ? (
+                  <a href={row.ttHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>{row.ttHandle.label} ↗</a>
+                ) : <span style={{ fontSize: 13, color: T.textFaint }}>—</span>}
+              </div>
+              {/* Facebook */}
+              <div>
+                {row.fbHandle ? (
+                  <a href={row.fbHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>{row.fbHandle.label} ↗</a>
+                ) : <span style={{ fontSize: 13, color: T.textFaint }}>—</span>}
+              </div>
+              {/* Top theme */}
+              <div>
+                {row.themes[0] ? (
+                  <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '3px 8px', borderRadius: 10, fontWeight: 600 }}>{row.themes[0].theme}</span>
+                ) : <span style={{ fontSize: 12, color: T.textFaint }}>—</span>}
+              </div>
+            </div>
+          )
+        })}
+      </Card>
 
-      {/* ── Section 2: Competitive Leaderboard ── */}
-      {leaderboard.length > 0 && (
-        <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Market Leaderboard — {PLATFORM_LABELS[platformTab]}</h3>
-          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>All brands ranked by average engagement. Click any row to see their top posts.</p>
-          <div style={{ overflowX: 'auto' }}>
-            {leaderboard.map(({ b, pd, isTarget }, idx) => {
-              const isOpen = expandedBrand === b.id
-              const postsToShow = pd?.topPosts?.length > 0 ? pd.topPosts : (platformTab === 'instagram' ? b.recentPosts || [] : [])
-              const handle = getPlatformHandle(b, platformTab)
-              const maxEng = leaderboard[0]?.pd?.summary?.avgEngagement || 1
-              const barPct = Math.round((pd.summary.avgEngagement / maxEng) * 100)
+      {/* ── Section 3: What's Working ── */}
+      {allTopPosts.length > 0 && (
+        <Card style={{ marginBottom: 28, padding: '20px 24px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>What's Working</p>
+          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>Highest performing posts across all brands and channels</p>
+          <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8 }}>
+            {allTopPosts.map((post, i) => {
+              const [g1, g2] = GRAD_PAIRS[post.brandIdx % GRAD_PAIRS.length]
+              const engagement = (post.likes || 0) + (post.comments || 0)
+              const isTikTok = post.platform === 'tiktok'
               return (
-                <div key={b.id} style={{ borderBottom: `1px solid ${T.border}` }}>
-                  <button
-                    onClick={() => setExpandedBrand(isOpen ? null : b.id)}
-                    style={{ width: '100%', background: isTarget ? (isOpen ? '#ede9fe' : '#f5f3ff') : isOpen ? T.surfaceAlt : 'transparent', border: 'none', padding: '12px 16px', cursor: 'pointer', textAlign: 'left', display: 'grid', gridTemplateColumns: '32px 160px 1fr 90px 90px 80px 24px', alignItems: 'center', gap: 12 }}
-                  >
-                    {/* Rank */}
-                    <span style={{ fontSize: 14, fontWeight: 800, color: idx === 0 ? '#d97706' : idx === 1 ? '#9ca3af' : idx === 2 ? '#b45309' : T.textMuted, textAlign: 'center' }}>
-                      {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
-                    </span>
-                    {/* Name */}
-                    <span style={{ fontWeight: isTarget ? 800 : 600, fontSize: 13, color: isTarget ? T.accent : T.text, display: 'flex', alignItems: 'center', gap: 5 }}>
-                      {b.name}{isTarget && <span style={{ fontSize: 10, background: T.accent, color: '#fff', padding: '1px 6px', borderRadius: 8, fontWeight: 700 }}>YOU</span>}
-                    </span>
-                    {/* Engagement bar */}
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ flex: 1, height: 8, background: T.border, borderRadius: 4, overflow: 'hidden' }}>
-                        <div style={{ width: `${barPct}%`, height: '100%', background: isTarget ? T.accent : '#0ea5e9', borderRadius: 4 }} />
-                      </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: T.text, minWidth: 50, textAlign: 'right' }}>{pd.summary.avgEngagement.toLocaleString()}</span>
-                    </span>
-                    {/* Posts/week */}
-                    <span style={{ fontSize: 12, color: T.textSub, textAlign: 'center' }}>
-                      {pd.summary.postingFrequencyPerWeek ? `${pd.summary.postingFrequencyPerWeek}/wk` : '—'}
-                    </span>
-                    {/* Handle */}
-                    <span>
-                      {handle
-                        ? <a href={handle.url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ color: T.accent, fontSize: 11, textDecoration: 'none' }}>{handle.label} ↗</a>
-                        : <span style={{ background: '#fef3c7', color: '#92400e', fontSize: 10, padding: '2px 7px', borderRadius: 10, fontWeight: 600 }}>No handle</span>}
-                    </span>
-                    {/* Trend sparkline */}
-                    <span><Sparkline data={pd.monthlyTrend} width={70} height={22} /></span>
-                    <span style={{ fontSize: 14, color: T.textMuted }}>{isOpen ? '▲' : '▼'}</span>
-                  </button>
-                  {/* Expanded posts panel */}
-                  {isOpen && (
-                    <div style={{ padding: '8px 16px 16px', background: isTarget ? '#f5f3ff' : T.surfaceAlt }}>
-                      {pd.contentThemes?.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-                          {pd.contentThemes.slice(0, 4).map((t, i) => (
-                            <span key={t.theme} style={{ background: THEME_COLORS[i % THEME_COLORS.length], color: THEME_TEXT[i % THEME_TEXT.length], fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>
-                              {t.theme} × {t.count}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {postsToShow.length > 0 ? (
-                        <>
-                          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Top Posts</p>
-                          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
-                            {postsToShow.slice(0, 3).map((post, i) => <InstagramCard key={i} post={post} brandName={b.name} handle={getPlatformHandle(b, platformTab)?.label?.replace('@', '')} brandIdx={idx} />)}
-                          </div>
-                        </>
-                      ) : (
-                        <p style={{ fontSize: 12, color: T.textFaint, fontStyle: 'italic' }}>
-                          {handle ? 'No post data scraped yet — re-run audit.' : `No ${PLATFORM_LABELS[platformTab]} handle set. Add it in Brand Profile → Competitors and re-run.`}
-                        </p>
-                      )}
+                <div key={i} style={{ width: 200, minWidth: 200, background: T.surface, borderRadius: 12, border: isTikTok ? '1px solid #ff2b5433' : `1px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 10px', background: isTikTok ? '#0f0f0f' : T.surface, borderBottom: `1px solid ${T.border}` }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: `linear-gradient(135deg, ${g1}, ${g2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{post.brandName[0]}</div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: isTikTok ? '#fff' : T.text, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.brandName}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, background: isTikTok ? '#ff2b54' : '#e0e7ff', color: isTikTok ? '#fff' : '#3730a3', padding: '2px 6px', borderRadius: 6 }}>{PLATFORM_ICONS[post.platform]} {PLATFORM_LABELS[post.platform]}</span>
+                  </div>
+                  <div style={{ width: '100%', aspectRatio: '1/1', background: isTikTok ? '#1a1a1a' : `linear-gradient(135deg, ${g1}22, ${g2}22)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                    {post.imageUrl
+                      ? <img src={post.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+                      : <span style={{ fontSize: isTikTok ? 28 : 36, userSelect: 'none' }}>{isTikTok ? '▶' : post.brandName[0]}</span>}
+                    <span style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>{engagement >= 1000 ? `${(engagement / 1000).toFixed(1)}k` : engagement}</span>
+                  </div>
+                  <div style={{ padding: '8px 10px' }}>
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, color: T.text }}>♥ {(post.likes || 0).toLocaleString()}</span>
+                      <span style={{ fontSize: 11, color: T.text }}>💬 {(post.comments || 0).toLocaleString()}</span>
                     </div>
-                  )}
+                    {post.caption && <p style={{ fontSize: 11, color: T.textSub, lineHeight: 1.4, margin: '0 0 4px' }}>{post.caption.slice(0, 80)}{post.caption.length > 80 ? '…' : ''}</p>}
+                    {post.postUrl && <a href={post.postUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none' }}>View post ↗</a>}
+                  </div>
                 </div>
               )
             })}
           </div>
-          <p style={{ color: T.textFaint, fontSize: 11, marginTop: 12 }}>Click any row to expand top posts. To edit handles, go to Brand Profile → Competitors.</p>
         </Card>
       )}
 
-      {/* ── Section 3: Share of Engagement ── */}
-      {engScores.length > 1 && totalEngScore > 0 && (
-        <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Share of Engagement</h3>
-          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>Estimated share based on avg engagement × post volume on {PLATFORM_LABELS[platformTab]}.</p>
-          {engScores
-            .sort((a, b) => b.score - a.score)
-            .map(({ b, score }, i) => {
-              const pct = Math.round((score / totalEngScore) * 100)
-              const isTarget = b.role === 'target'
-              const color = isTarget ? T.accent : BRAND_BAR_COLORS[(i + 1) % BRAND_BAR_COLORS.length]
+      {/* ── Section 4: Where TRU Can Win ── */}
+      {strategyItems.length > 0 && (
+        <Card style={{ marginBottom: 24, padding: '20px 24px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Where {target?.name || 'You'} Can Win</p>
+          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>Opportunities ranked by impact on discovery, brand awareness, and site traffic</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 12 }}>
+            {strategyItems.map((item, i) => {
+              const outcome = getOutcome((item.headline || '') + ' ' + (item.detail || ''))
               return (
-                <div key={b.id} style={{ display: 'grid', gridTemplateColumns: '140px 1fr 40px', gap: 12, alignItems: 'center', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: isTarget ? 700 : 400, color: isTarget ? T.accent : T.text, textAlign: 'right', paddingRight: 4 }}>
-                    {b.name}{isTarget && ' ★'}
-                  </span>
-                  <div style={{ height: 18, background: T.border, borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 4, minWidth: pct > 0 ? 4 : 0 }} />
-                  </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: T.textSub }}>{pct}%</span>
-                </div>
-              )
-            })}
-        </Card>
-      )}
-
-      {/* ── Section 4: Platform Coverage Matrix ── */}
-      {allBrands.length > 0 && (
-        <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Platform Coverage</h3>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: T.surfaceAlt }}>
-                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', width: 160 }}>Brand</th>
-                  {['instagram', 'tiktok', 'facebook'].map(p => (
-                    <th key={p} style={{ padding: '10px 16px', textAlign: 'center', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{PLATFORM_LABELS[p]}</th>
-                  ))}
-                  <th style={{ padding: '10px 16px', textAlign: 'center', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Platforms</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[target, ...competitors].filter(Boolean).map(b => {
-                  const isTarget = b.role === 'target'
-                  const hasIg = !!(b.handle || b.instagramHandle)
-                  const hasTt = !!(b.tiktokHandle)
-                  const hasFb = !!(b.facebookHandle)
-                  const count = [hasIg, hasTt, hasFb].filter(Boolean).length
-                  return (
-                    <tr key={b.id || b.name} style={{ borderTop: `1px solid ${T.border}`, background: isTarget ? '#f5f3ff' : 'transparent' }}>
-                      <td style={{ padding: '10px 16px', fontWeight: isTarget ? 700 : 400, color: isTarget ? T.accent : T.text }}>
-                        {b.name}{isTarget && ' ★'}
-                      </td>
-                      {[hasIg, hasTt, hasFb].map((has, i) => (
-                        <td key={i} style={{ padding: '10px 16px', textAlign: 'center' }}>
-                          {has
-                            ? <span style={{ fontSize: 16, color: '#059669' }}>✓</span>
-                            : <span style={{ fontSize: 14, color: T.border }}>✗</span>}
-                        </td>
-                      ))}
-                      <td style={{ padding: '10px 16px', textAlign: 'center' }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, background: count === 3 ? '#d1fae5' : count === 2 ? '#fef3c7' : '#f3f4f6', color: count === 3 ? '#065f46' : count === 2 ? '#92400e' : '#6b7280', padding: '2px 10px', borderRadius: 12 }}>
-                          {count}/3
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-
-      {/* ── Section 4.5: Competitor Showcase ── */}
-      {allBrands.filter(b => b.role === 'competitor' && b.topPosts?.length > 0).length > 0 && (
-        <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>What's Working for Competitors</h3>
-          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 20 }}>Top posts from each competitor — see what content is driving engagement in this market.</p>
-          {allBrands.filter(b => b.role === 'competitor' && b.topPosts?.length > 0).map((b, idx) => {
-            const brandIdx = allBrands.indexOf(b)
-            const [g1, g2] = GRAD_PAIRS[brandIdx % GRAD_PAIRS.length]
-            return (
-              <div key={b.id} style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: `linear-gradient(135deg, ${g1}, ${g2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
-                    {b.name.charAt(0)}
-                  </div>
-                  <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{b.name}</span>
-                  <span style={{ fontSize: 11, color: T.textMuted, background: T.surfaceAlt, padding: '2px 8px', borderRadius: 10, border: `1px solid ${T.border}` }}>@{b.handle}</span>
-                  {b.summary?.avgEngagement > 0 && (
-                    <span style={{ fontSize: 11, color: '#7c3aed', background: '#ede9fe', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
-                      avg {b.summary.avgEngagement.toLocaleString()} eng
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
-                  {b.topPosts.slice(0, 3).map((post, i) => (
-                    <InstagramCard key={i} post={post} brandName={b.name} handle={b.handle} brandIdx={brandIdx} />
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </Card>
-      )}
-
-      {/* ── Section 5: Competitive Theme Heatmap ── */}
-      {allBrands.length > 0 && allBrands.some(b => b.contentThemes?.length > 0) && (() => {
-        const ALL_THEMES = ['Product Showcase', 'Lifestyle', 'User Generated', 'Promotional', 'Behind the Scenes', 'Seasonal', 'Brand Story']
-        const brandsWithData = allBrands.filter(b => b.contentThemes?.length > 0)
-        if (brandsWithData.length === 0) return null
-        // Build lookup: brand.id → theme → count
-        const themeMap = {}
-        brandsWithData.forEach(b => {
-          themeMap[b.id] = {}
-          b.contentThemes.forEach(t => { themeMap[b.id][t.theme] = t.count })
-        })
-        return (
-          <Card style={{ marginBottom: 24 }}>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Content Theme Coverage</h3>
-            <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>How many posts each brand publishes per theme. Darker = more content.</p>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ borderCollapse: 'collapse', fontSize: 12 }}>
-                <thead>
-                  <tr>
-                    <th style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', minWidth: 150 }}>Theme</th>
-                    {brandsWithData.map(b => (
-                      <th key={b.id} style={{ padding: '8px 8px', textAlign: 'center', color: b.role === 'target' ? T.accent : T.textMuted, fontSize: 11, fontWeight: b.role === 'target' ? 800 : 600, maxWidth: 80 }}>
-                        {b.name.slice(0, 10)}{b.role === 'target' ? ' ★' : ''}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {ALL_THEMES.map(theme => (
-                    <tr key={theme} style={{ borderTop: `1px solid ${T.border}` }}>
-                      <td style={{ padding: '8px 12px', color: T.textSub, fontSize: 12 }}>{theme}</td>
-                      {brandsWithData.map(b => {
-                        const count = themeMap[b.id]?.[theme] || 0
-                        const isTarget = b.role === 'target'
-                        const bg = count === 0 ? 'transparent' : count <= 5 ? (isTarget ? '#ede9fe' : '#dbeafe') : count <= 15 ? (isTarget ? '#c4b5fd' : '#93c5fd') : (isTarget ? '#7c3aed' : '#2563eb')
-                        const textColor = count === 0 ? T.textFaint : count <= 15 ? T.text : '#fff'
-                        return (
-                          <td key={b.id} style={{ padding: '8px 8px', textAlign: 'center', background: bg, fontWeight: count > 0 ? 700 : 400, color: textColor, borderLeft: isTarget ? `2px solid ${T.accent}22` : 'none' }}>
-                            {count > 0 ? count : <span style={{ color: T.border }}>—</span>}
-                          </td>
-                        )
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        )
-      })()}
-
-      {/* ── Section 6: White Space Opportunities ── */}
-      {data.whiteSpaceOpportunities?.length > 0 && (
-        <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Untapped Territory</h3>
-          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>Content areas with low competition where you can own the conversation.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
-            {data.whiteSpaceOpportunities.map((opp, i) => (
-              <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: '3px solid #059669' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: T.text, flex: 1 }}>{opp.theme}</span>
-                  {opp.priority === 'high' && <span style={{ fontSize: 10, fontWeight: 700, background: '#dcfce7', color: '#065f46', padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase' }}>High Priority</span>}
-                  {opp.suggestedFormat && <span style={{ fontSize: 10, fontWeight: 700, background: FORMAT_COLORS[opp.suggestedFormat] || '#f3f4f6', color: FORMAT_TEXT[opp.suggestedFormat] || '#374151', padding: '2px 8px', borderRadius: 10 }}>{opp.suggestedFormat}</span>}
-                </div>
-                {opp.description && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, marginBottom: 6 }}>{opp.description}</p>}
-                {opp.brandAlignment && <p style={{ fontSize: 11, color: '#059669', fontStyle: 'italic' }}>Brand fit: {opp.brandAlignment}</p>}
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* ── Section 7: Competitive Playbook ── */}
-      {data.competitionStrategy?.length > 0 && (
-        <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Your Competitive Playbook</h3>
-          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>Tactical moves to carve out a distinct lane — informed by what competitors are doing and your brand direction.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
-            {data.competitionStrategy.map((s, i) => (
-              <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${T.accent}` }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: T.text, flex: 1 }}>{s.tactic}</span>
-                  {s.priority === 'high' && <span style={{ fontSize: 10, fontWeight: 700, background: '#fee2e2', color: '#991b1b', padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase' }}>High</span>}
-                  {s.priority === 'medium' && <span style={{ fontSize: 10, fontWeight: 700, background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase' }}>Medium</span>}
-                </div>
-                {s.rationale && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.5, marginBottom: 6 }}>{s.rationale}</p>}
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {s.competitorInspiration && <span style={{ fontSize: 11, background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: 10 }}>Inspired by: {s.competitorInspiration}</span>}
-                  {s.brandAlignment && <span style={{ fontSize: 11, color: T.accent, fontStyle: 'italic' }}>Brand fit: {s.brandAlignment}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* ── Section 8: Your Brand Deep Dive ── */}
-      {target && (
-        <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-            <div>
-              <h3 style={{ color: T.text, fontSize: 16, fontWeight: 700 }}>{target.name} — Deep Dive</h3>
-              <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
-                {target.handle && <a href={`https://instagram.com/${target.handle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, fontSize: 12, textDecoration: 'none' }}>IG: @{target.handle} ↗</a>}
-                {target.tiktokHandle && <a href={`https://tiktok.com/@${target.tiktokHandle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, fontSize: 12, textDecoration: 'none' }}>TT: @{target.tiktokHandle} ↗</a>}
-                {target.facebookHandle && <a href={`https://facebook.com/${target.facebookHandle}`} target="_blank" rel="noreferrer" style={{ color: T.accent, fontSize: 12, textDecoration: 'none' }}>FB: {target.facebookHandle} ↗</a>}
-              </div>
-              {(target.error || target.partialData) && (
-                <div style={{ background: '#fef3c7', color: '#92400e', fontSize: 12, padding: '4px 10px', borderRadius: 6, marginTop: 8, display: 'inline-block' }}>⚠ {target.error || 'Partial data — limited access'}</div>
-              )}
-            </div>
-            {target.monthlyTrend?.length > 1 && (
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 11, color: T.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>12-Month Engagement</p>
-                <Sparkline data={target.monthlyTrend} width={160} height={44} />
-              </div>
-            )}
-          </div>
-
-          {/* Key metrics */}
-          <div style={{ display: 'flex', gap: 0, marginBottom: 20, borderRadius: 10, overflow: 'hidden', border: `1px solid ${T.border}` }}>
-            {[
-              ['Avg Engagement', target.summary?.avgEngagement?.toLocaleString() || '0'],
-              ['Posts Analyzed', target.summary?.postCount || 0],
-              ['Posts / Week', target.summary?.postingFrequencyPerWeek || 0],
-              ['Followers', target.summary?.followersEstimate || '—'],
-              ...(target.engagementRate != null ? [['Eng. Rate', `${target.engagementRate}%`]] : []),
-            ].map(([label, val], i, arr) => (
-              <div key={label} style={{ flex: 1, padding: '14px 12px', borderRight: i < arr.length - 1 ? `1px solid ${T.border}` : 'none', textAlign: 'center' }}>
-                <p style={{ fontSize: 22, fontWeight: 800, color: T.text }}>{val}</p>
-                <p style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Posting pattern */}
-          {target.postingPattern && Object.values(target.postingPattern.dayBreakdown || {}).some(v => v > 0) && (
-            <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
-                Posting Pattern{target.postingPattern.bestDay ? <span style={{ color: T.text, fontWeight: 400, textTransform: 'none' }}> — Most active on {target.postingPattern.bestDay}</span> : ''}
-              </p>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 44 }}>
-                {['mon','tue','wed','thu','fri','sat','sun'].map(day => {
-                  const val = target.postingPattern.dayBreakdown[day] || 0
-                  const maxVal = Math.max(...Object.values(target.postingPattern.dayBreakdown)) || 1
-                  const h = Math.max(4, Math.round((val / maxVal) * 40))
-                  return (
-                    <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                      <div style={{ width: '100%', height: h, background: val > 0 ? T.accent : T.border, borderRadius: 3, opacity: val > 0 ? 1 : 0.3 }} />
-                      <span style={{ fontSize: 9, color: T.textMuted, textTransform: 'uppercase' }}>{day}</span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Content themes */}
-          {target.contentThemes?.length > 0 && (
-            <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Content Themes</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {target.contentThemes.map((t, i) => (
-                  <span key={t.theme} style={{ background: THEME_COLORS[i % THEME_COLORS.length], color: THEME_TEXT[i % THEME_TEXT.length], fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 20 }}>
-                    {t.theme} <span style={{ opacity: 0.7, fontWeight: 400 }}>× {t.count}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Top hashtags */}
-          {target.topHashtags?.length > 0 && (
-            <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Top Hashtags</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {target.topHashtags.slice(0, 15).map(h => (
-                  <span key={h.tag} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{h.tag}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Top posts empty state */}
-          {target.partialData && !target.topPosts?.length && !target.recentPosts?.length && (
-            <div style={{ padding: '14px 16px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, marginBottom: 4 }}>
-              <p style={{ margin: 0, fontSize: 13, color: T.textMuted, lineHeight: 1.5 }}>
-                Posts couldn't be scraped for <strong>@{target.handle}</strong> — the account may be private or restricted.
-                Re-run the Social Audit from Brand Profile to retry.
-              </p>
-            </div>
-          )}
-
-          {/* Top posts */}
-          {(target.topPosts || target.recentPosts)?.filter(p => p.caption || p.likes > 0).length > 0 && (
-            <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Top Performing Posts</p>
-              <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
-                {(target.topPosts?.length > 0 ? target.topPosts : target.recentPosts).slice(0, 3).filter(p => p.caption || p.likes > 0).map((post, i) => (
-                  <InstagramCard key={i} post={post} brandName={target.name} handle={target.handle} brandIdx={0} />
-                ))}
-              </div>
-            </div>
-          )}
-        </Card>
-      )}
-
-      {/* ── Section 9: Content Gap Opportunities ── */}
-      {target?.contentGaps?.length > 0 && (
-        <Card>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Content Gap Opportunities</h3>
-          <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 16 }}>Areas where competitors outperform you — ranked by opportunity size.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12 }}>
-            {target.contentGaps.map((gap, i) => {
-              if (gap && typeof gap === 'object') {
-                return (
-                  <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${T.accent}` }}>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                      {gap.platform && <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{PLATFORM_LABELS[gap.platform] || gap.platform}</span>}
-                      {gap.contentFormat && <span style={{ fontSize: 11, background: FORMAT_COLORS[gap.contentFormat] || '#f3f4f6', color: FORMAT_TEXT[gap.contentFormat] || '#374151', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{gap.contentFormat}</span>}
-                      {gap.competitor && <span style={{ fontSize: 11, background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: 10 }}>{gap.competitor} does this</span>}
-                    </div>
-                    <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: 6, lineHeight: 1.4 }}>{gap.headline}</p>
-                    {gap.detail && <p style={{ color: T.textSub, fontSize: 12, lineHeight: 1.6 }}>{gap.detail}</p>}
-                  </div>
-                )
-              }
-              const [headline, detail] = splitGapCard(gap)
-              return (
-                <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${T.accent}` }}>
-                  <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: 6, lineHeight: 1.4 }}>{headline}</p>
-                  {detail && <p style={{ color: T.textSub, fontSize: 12, lineHeight: 1.6 }}>{detail}</p>}
+                <div key={i} style={{ background: T.surfaceAlt, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${outcome.color}` }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: outcome.color, background: outcome.bg, padding: '2px 8px', borderRadius: 10, display: 'inline-block', marginBottom: 8 }}>{outcome.label}</span>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 4, lineHeight: 1.4 }}>{item.headline}</p>
+                  {item.detail && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.6 }}>{item.detail.slice(0, 200)}{item.detail.length > 200 ? '…' : ''}</p>}
+                  {item.competitor && <p style={{ fontSize: 11, color: T.textMuted, marginTop: 6, fontWeight: 600 }}>See how: {item.competitor}</p>}
                 </div>
               )
             })}
@@ -2532,6 +2178,8 @@ export default function App() {
 
   async function handleRefreshAll(slug) {
     await fetch(`${API}/brands/${slug}/refresh/all`, { method: 'POST' })
+    // Wait briefly so the child process has time to flip discoveryStatus to 'running'
+    await new Promise(r => setTimeout(r, 1500))
     await loadBrands()
   }
 
