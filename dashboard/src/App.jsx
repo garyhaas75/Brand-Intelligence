@@ -2729,14 +2729,6 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </>
       ) : <NoData />}
 
-      {/* ── Closing ── */}
-      <div style={{ marginTop: 48, padding: '28px 32px', background: `${T.accent}08`, border: `1px solid ${T.accent}22`, borderRadius: 12, borderLeft: `4px solid ${T.accent}` }}>
-        <p style={{ color: T.text, fontSize: 16, fontWeight: 800, marginBottom: 8 }}>The opportunity is there. The infrastructure to capture it is straightforward to build.</p>
-        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, margin: 0 }}>
-          Each chapter of this report identifies specific, actionable steps — from SEO fixes that can go live this week to social and loyalty strategies that build compounding advantage over time. Toys R Us Lebanon has the brand recognition, the product breadth, and the market position. Executing on the digital and content gaps identified here is what closes the distance between brand awareness and market leadership.
-        </p>
-      </div>
-
       <div style={{ height: 48 }} />
     </div>
   )
