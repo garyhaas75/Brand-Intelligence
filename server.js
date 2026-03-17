@@ -1048,12 +1048,8 @@ app.post('/api/brands/:slug/export/pdf', async (req, res) => {
   }
 
   try {
-    // Create a short-lived share token for Puppeteer to load
-    const token = uuidv4();
-    const tokensData = loadShareTokens();
-    const expiresAt = new Date(Date.now() + 3600000).toISOString(); // 1 hour
-    tokensData.tokens.push({ token, brandSlug: slug, createdAt: new Date().toISOString(), expiresAt });
-    saveShareTokens(tokensData);
+    // Get credentials to authenticate Puppeteer
+    const [pdfUser, pdfPass] = Object.entries(users)[0];
 
     let browser;
     try {
@@ -1075,9 +1071,24 @@ app.post('/api/brands/:slug/export/pdf', async (req, res) => {
     }
 
     const page = await browser.newPage();
-    await page.setViewport({ width: 1200, height: 900 });
-    await page.goto(`http://localhost:${PORT}/share/${token}`, { waitUntil: 'networkidle0', timeout: 45000 });
-    const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '20mm', bottom: '20mm', left: '18mm', right: '18mm' }, preferCSSPageSize: false });
+    await page.authenticate({ username: pdfUser, password: pdfPass });
+    await page.setViewport({ width: 1100, height: 900 });
+    // Load the real React app in PDF mode — shows the actual Action Plan UI
+    await page.goto(`http://localhost:${PORT}/?brand=${slug}&tab=action&pdf=1`, { waitUntil: 'networkidle2', timeout: 45000 });
+    // Wait for the action plan content to render
+    await new Promise(r => setTimeout(r, 2000));
+    // Add page-break CSS for clean pagination
+    await page.addStyleTag({ content: `
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      @media print {
+        body { background: #fff !important; }
+      }
+      /* Keep cards together across page breaks */
+      [style*="border-radius"][style*="border"] { page-break-inside: avoid; break-inside: avoid; }
+      /* Force chapter section headers to start on a new page */
+      .chapter-break { page-break-before: always; break-before: page; }
+    ` });
+    const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '16mm', bottom: '16mm', left: '14mm', right: '14mm' } });
     await browser.close();
 
     const profile = loadBrandData(slug, 'profile.json') || {};

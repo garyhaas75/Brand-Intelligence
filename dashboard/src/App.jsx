@@ -1974,7 +1974,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 }
 
 // ─── Action Plan Tab ────────────────────────────────────────────────────────────
-function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
+function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMode }) {
   const T = useT()
   const [data, setData] = useState(null)
   const [compData, setCompData] = useState(null)
@@ -2174,29 +2174,33 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
                 : `Report date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-            <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
-              {exporting ? 'Generating PDF...' : '↓ Export PDF'}
-            </button>
-            <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
-              Share Link
-            </button>
-            <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label="Regenerate" />
-          </div>
+          {!pdfMode && (
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+              <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
+                {exporting ? 'Generating PDF...' : '↓ Export PDF'}
+              </button>
+              <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
+                Share Link
+              </button>
+              <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label="Regenerate" />
+            </div>
+          )}
         </div>
-        {shareUrl && (
+        {shareUrl && !pdfMode && (
           <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: 8, padding: '10px 16px', marginTop: 16, fontSize: 13 }}>
             Share link copied: <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: '#065f46', fontWeight: 600 }}>{shareUrl}</a>
           </div>
         )}
-        <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
-          {modulePills.map(p => (
-            <span key={p.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: T.textSub }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.has ? '#10b981' : '#9ca3af', flexShrink: 0 }} />
-              {p.label}
-            </span>
-          ))}
-        </div>
+        {!pdfMode && (
+          <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
+            {modulePills.map(p => (
+              <span key={p.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: T.textSub }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.has ? '#10b981' : '#9ca3af', flexShrink: 0 }} />
+                {p.label}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── 1. EXECUTIVE SUMMARY ── */}
@@ -2736,11 +2740,16 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
 
 // ─── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
+  const params = new URLSearchParams(window.location.search)
+  const pdfMode = params.get('pdf') === '1'
+  const urlBrand = params.get('brand') || null
+  const urlTab = params.get('tab') || 'action'
+
   const [darkMode, setDarkMode] = useState(false)
   const T = darkMode ? DARK_T : LIGHT_T
-  const [tab, setTab] = useState('portfolio')
+  const [tab, setTab] = useState(urlBrand ? urlTab : 'portfolio')
   const [brands, setBrands] = useState([])
-  const [activeBrand, setActiveBrand] = useState(null)
+  const [activeBrand, setActiveBrand] = useState(urlBrand)
   const [showAddBrand, setShowAddBrand] = useState(false)
   const [refreshingAt, setRefreshingAt] = useState({})   // module → trigger timestamp
   const [moduleVersions, setModuleVersions] = useState({}) // module → version counter (increments on completion)
@@ -2833,9 +2842,9 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
       `}</style>
 
-      <div style={{ minHeight: '100vh', background: T.bg }}>
+      <div style={{ minHeight: '100vh', background: pdfMode ? '#fff' : T.bg }}>
         {/* Nav */}
-        <nav style={{ background: T.navBg, padding: '0 24px', display: 'flex', alignItems: 'center', gap: 16, height: 56, position: 'sticky', top: 0, zIndex: 100 }}>
+        <nav style={{ background: T.navBg, padding: '0 24px', display: pdfMode ? 'none' : 'flex', alignItems: 'center', gap: 16, height: 56, position: 'sticky', top: 0, zIndex: 100 }}>
           <span style={{ color: T.navText, fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', marginRight: 8 }}>Brand Intelligence</span>
 
           {/* Brand switcher */}
@@ -2864,7 +2873,7 @@ export default function App() {
         </nav>
 
         {/* Brand sub-header */}
-        {activeBrandData && (
+        {activeBrandData && !pdfMode && (
           <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ color: T.text, fontWeight: 700, fontSize: 15 }}>{activeBrandData.name}</span>
             {activeBrandData.industry && <span style={{ color: T.textMuted, fontSize: 13 }}>{activeBrandData.industry}</span>}
@@ -2874,7 +2883,7 @@ export default function App() {
         )}
 
         {/* Main content */}
-        <main style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+        <main style={{ maxWidth: pdfMode ? 900 : 1280, margin: '0 auto', padding: pdfMode ? '32px 40px' : '32px 24px' }}>
           {tab === 'portfolio' && (
             <PortfolioTab brands={brands} onSelectBrand={selectBrand} onAddBrand={() => setShowAddBrand(true)} onRefresh={handleRefreshAll} />
           )}
@@ -2884,7 +2893,7 @@ export default function App() {
           {tab === 'social' && activeBrand && <SocialAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['social_intelligence']} dataVersion={moduleVersions['social_intelligence'] || 0} />}
           {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
           {tab === 'search' && activeBrand && <SearchSeoTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['search_seo']} dataVersion={moduleVersions['search_seo'] || 0} />}
-          {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} />}
+          {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} pdfMode={pdfMode} />}
           {!activeBrand && tab !== 'portfolio' && (
             <EmptyState message="Select a brand to view this section." cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
           )}
