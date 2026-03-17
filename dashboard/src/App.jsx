@@ -2077,11 +2077,87 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
   const thSt = { padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${T.border}`, background: T.surfaceAlt }
   const tdSt = { padding: '10px 12px', color: T.textSub, fontSize: 13, borderBottom: `1px solid ${T.border}`, verticalAlign: 'top' }
 
+  // keyword category definitions with explanations
+  const KW_CATEGORIES = [
+    {
+      key: 'categoryTerms',
+      label: 'Category Keywords',
+      color: 'blue',
+      accentColor: '#1d4ed8',
+      accentBg: '#eff6ff',
+      why: 'These are the highest-opportunity keywords in your market. Shoppers who don\'t know which store to use type these — ranking here means reaching customers before your competitors do.',
+      how: 'Add these to your homepage headings, main category page titles, and meta descriptions. Each major category should have its own dedicated page optimized around these terms.',
+    },
+    {
+      key: 'ageGroupTerms',
+      label: 'Age Group Keywords',
+      color: 'blue',
+      accentColor: '#0369a1',
+      accentBg: '#f0f9ff',
+      why: 'Parents shop by age. "Toys for 3 year olds" and "gifts for 8 year old" are among the most common toy searches — parents want to know something is right for their child\'s stage.',
+      how: 'Create age-based landing pages (e.g. "Toys for 3-5 Year Olds"). Add age ranges to product descriptions and category page copy. Competitors who do this consistently outrank stores that don\'t.',
+    },
+    {
+      key: 'occasionTerms',
+      label: 'Occasion & Gift Keywords',
+      color: 'green',
+      accentColor: '#065f46',
+      accentBg: '#f0fdf4',
+      why: 'Gift-driven searches spike around birthdays, holidays, Eid, and back-to-school. Shoppers searching "birthday gift for 7 year old" are ready to buy — these are high-conversion terms.',
+      how: 'Build seasonal landing pages for key occasions (Eid gifts, Christmas toys, birthday gifts by age). Update hero banners 2-3 weeks before each occasion. These pages can rank year-round and convert strongly in-season.',
+    },
+    {
+      key: 'topBrands',
+      label: 'Brand Keywords',
+      color: 'purple',
+      accentColor: '#5b21b6',
+      accentBg: '#f5f3ff',
+      why: 'Shoppers searching for "LEGO Lebanon" or "Barbie toys Beirut" are brand-loyal and high-intent. If your site isn\'t optimized for brand names you carry, you lose these customers to competitors who are.',
+      how: 'Ensure every brand you carry has its own category page with the brand name in the title, H1, and URL. Add brand logos and descriptions. Cross-link between brand pages and product listings.',
+    },
+    {
+      key: 'brandTerms',
+      label: 'Your Brand Keywords',
+      color: 'purple',
+      accentColor: '#7c3aed',
+      accentBg: '#faf5ff',
+      why: 'Searches where people already know your name. These should be the easiest rankings to own — but if your website isn\'t properly optimized, competitors can appear above you for your own brand name.',
+      how: 'Ensure your brand name appears in the homepage title tag, H1, and meta description. Claim and fully complete your Google Business Profile. Keep your NAP (Name, Address, Phone) consistent across all platforms.',
+    },
+    {
+      key: 'localTerms',
+      label: 'Local & Lebanon-Specific Keywords',
+      color: 'gray',
+      accentColor: '#374151',
+      accentBg: '#f9fafb',
+      why: 'Shoppers in Lebanon searching "toy store Beirut" or "toys Lebanon delivery" are looking for a local option. These searches have strong purchase intent and are often underserved — a huge opportunity.',
+      how: 'Add Lebanon and city-specific language to your homepage and contact page. Set up Google Business Profile with accurate location. Create content that references local delivery, local occasions (Eid, Lebanese holidays), and local pricing.',
+    },
+    {
+      key: 'competitorGapTerms',
+      label: 'Competitor Gap Keywords',
+      color: 'red',
+      accentColor: '#b91c1c',
+      accentBg: '#fff5f5',
+      why: 'These are terms your competitors currently rank for but you don\'t. Every search on this list is a customer you\'re losing right now. They represent the fastest path to incremental traffic.',
+      how: 'Audit which competitors rank for each term, then create or improve pages that target those specific keywords. Even ranking on page 1 for 20% of these terms can meaningfully move your organic traffic.',
+    },
+    {
+      key: 'aiDiscoveryQueries',
+      label: 'AI Search Queries',
+      color: 'blue',
+      accentColor: '#0284c7',
+      accentBg: '#f0f9ff',
+      why: 'These are the questions people ask ChatGPT, Google AI Overview, and Perplexity when looking for toy recommendations. AI assistants are increasingly the first stop for shopping decisions — appearing in these answers builds brand awareness with buyers who haven\'t decided yet.',
+      how: 'Write blog posts or FAQ pages that directly answer these questions (e.g. "Best toys for a 5-year-old in Lebanon"). Clear, structured answers with your brand name are more likely to be cited by AI. This is a long-term investment that compounds over time.',
+    },
+  ]
+
   return (
     <div style={{ maxWidth: 860, margin: '0 auto' }}>
       {running && <RunningBanner moduleLabel="Action Plan" detail="Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes." />}
 
-      {/* ── 1. COVER HEADER ── */}
+      {/* ── COVER HEADER ── */}
       <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '28px 32px', marginBottom: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
@@ -2118,7 +2194,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </div>
       </div>
 
-      {/* ── 2. EXECUTIVE SUMMARY ── */}
+      {/* ── 1. EXECUTIVE SUMMARY ── */}
       <SectionHeader label="Overview" title="Executive Summary" />
       <Card style={{ borderLeft: `4px solid ${T.accent}` }}>
         {data.executiveSummary
@@ -2126,40 +2202,131 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
           : <NoData />}
       </Card>
 
-      {/* ── 3. MARKET POSITIONING ── */}
-      <SectionHeader label="Competitive Intelligence" title="Market Positioning" />
+      {/* ── 2. YOUR CUSTOMERS ── */}
+      <SectionHeader label="Chapter 1" title="Your Customers — Who You're Selling To" />
+      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+        Every decision in this report connects back to these customers. Understanding who they are — what they worry about, what drives them to buy, and where they spend their time — is the foundation for everything that follows.
+      </p>
+      {personasData && (personasData.personas || []).length > 0 ? (
+        <>
+          {personasData.summaryInsights && (
+            <Card style={{ marginBottom: 20, borderLeft: `4px solid ${T.accent}` }}>
+              <p style={{ color: T.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{personasData.summaryInsights}</p>
+            </Card>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {personasData.personas.map((persona, i) => (
+              <Card key={i}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+                  <div>
+                    <h3 style={{ color: T.text, fontSize: 18, fontWeight: 800, margin: 0 }}>{persona.name}</h3>
+                    <p style={{ color: T.textMuted, fontSize: 13, marginTop: 4, marginBottom: 0 }}>
+                      {[persona.ageRange, persona.income, persona.location].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
+                  {(persona.occupation || []).length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {(Array.isArray(persona.occupation) ? persona.occupation : [persona.occupation]).map((o, j) => <Pill key={j} text={o} color="gray" />)}
+                    </div>
+                  )}
+                </div>
+                {persona.quoteExample && (
+                  <p style={{ color: T.textMuted, fontSize: 14, fontStyle: 'italic', borderLeft: `3px solid ${T.accent}`, paddingLeft: 14, margin: '0 0 16px', lineHeight: 1.6 }}>"{persona.quoteExample}"</p>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                  {(persona.painPoints || []).length > 0 && (
+                    <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What frustrates them</p>
+                      <ul style={{ margin: 0, paddingLeft: 16 }}>
+                        {persona.painPoints.map((p, j) => <li key={j} style={{ color: '#7f1d1d', fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{p}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  {(persona.motivators || []).length > 0 && (
+                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What drives them to buy</p>
+                      <ul style={{ margin: 0, paddingLeft: 16 }}>
+                        {persona.motivators.map((m, j) => <li key={j} style={{ color: '#14532d', fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{m}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                {(persona.shoppingBehaviors || []).length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>How they shop</p>
+                    <ul style={{ margin: 0, paddingLeft: 16 }}>
+                      {persona.shoppingBehaviors.map((b, j) => <li key={j} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, marginBottom: 3 }}>{b}</li>)}
+                    </ul>
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: persona.brandFit ? 12 : 0 }}>
+                  {(persona.contentTopics || []).length > 0 && (
+                    <div>
+                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Content they engage with</p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {persona.contentTopics.map((t, j) => <Pill key={j} text={t} color="blue" />)}
+                      </div>
+                    </div>
+                  )}
+                  {(persona.preferredChannels || []).length > 0 && (
+                    <div>
+                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Where they spend time</p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {persona.preferredChannels.map((ch, j) => <Pill key={j} text={ch} color="purple" />)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {persona.brandFit && (
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginTop: 12, marginBottom: 0, padding: '10px 14px', background: `${T.accent}0a`, borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}><strong>Brand fit:</strong> {persona.brandFit}</p>
+                )}
+              </Card>
+            ))}
+          </div>
+        </>
+      ) : <NoData />}
+
+      {/* ── 3. THE COMPETITION ── */}
+      <SectionHeader label="Chapter 2" title="The Competition — Who You're Up Against" />
+      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+        These are the brands competing for the same customers described above. Understanding their positioning — what they stand for, where they're strong, and where they leave gaps — reveals exactly where you can differentiate.
+      </p>
       {compData ? (
         <>
-          {compData.positioningMap && compData.positioningMap.narrative && (
-            <Card style={{ marginBottom: 16 }}>
+          {compData.positioningMap?.narrative && (
+            <Card style={{ marginBottom: 20, borderLeft: `4px solid #7c3aed` }}>
               <p style={{ color: T.text, fontSize: 14, lineHeight: 1.8, margin: 0 }}>{compData.positioningMap.narrative}</p>
             </Card>
           )}
           {(compData.competitors || []).length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {compData.competitors.map((c, i) => (
                 <Card key={i} style={{ padding: 20 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
-                    <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0 }}>{c.name}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
+                    <div>
+                      <p style={{ color: T.text, fontSize: 16, fontWeight: 700, margin: 0 }}>{c.name}</p>
+                      {c.positioningStatement && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginTop: 4, marginBottom: 0 }}>{c.positioningStatement}</p>}
+                    </div>
                     {c.pricingTier && <Badge label={c.pricingTier} color="blue" />}
                   </div>
-                  {c.positioningStatement && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>{c.positioningStatement}</p>}
-                  {(c.strengths || []).length > 0 && (
-                    <>
-                      <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Strengths</p>
-                      <ul style={{ margin: '0 0 12px 0', paddingLeft: 18 }}>
-                        {c.strengths.map((s, j) => <li key={j} style={{ color: '#065f46', fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{s}</li>)}
-                      </ul>
-                    </>
-                  )}
-                  {(c.weaknesses || []).length > 0 && (
-                    <>
-                      <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Weaknesses</p>
-                      <ul style={{ margin: 0, paddingLeft: 18 }}>
-                        {c.weaknesses.map((w, j) => <li key={j} style={{ color: '#991b1b', fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{w}</li>)}
-                      </ul>
-                    </>
-                  )}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+                    {(c.strengths || []).length > 0 && (
+                      <div>
+                        <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Where they're strong</p>
+                        <ul style={{ margin: 0, paddingLeft: 18 }}>
+                          {c.strengths.map((s, j) => <li key={j} style={{ color: '#065f46', fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {(c.weaknesses || []).length > 0 && (
+                      <div>
+                        <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Where they're vulnerable</p>
+                        <ul style={{ margin: 0, paddingLeft: 18 }}>
+                          {c.weaknesses.map((w, j) => <li key={j} style={{ color: '#991b1b', fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{w}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </Card>
               ))}
             </div>
@@ -2167,33 +2334,37 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </>
       ) : <NoData />}
 
-      {/* ── 4. SOCIAL MEDIA AUDIT ── */}
-      <SectionHeader label="Social Intelligence" title="Social Media Audit" />
+      {/* ── 4. SOCIAL — WHAT'S WORKING ── */}
+      <SectionHeader label="Chapter 3" title="Social Media — What's Working in This Market" />
+      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+        Across Instagram and TikTok, your competitors are building audiences and driving purchase intent. Here's what's resonating with your customers right now — and where the gaps are that you can own.
+      </p>
       {socialData ? (
         <>
-          {/* Engagement table */}
           {(socialData.brands || []).length > 0 && (
-            <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
+            <Card style={{ marginBottom: 20, padding: 0, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 18px 10px', borderBottom: `1px solid ${T.border}` }}>
+                <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Engagement by Brand & Platform</p>
+                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2, marginBottom: 0 }}>Average engagement per post — the higher this number, the more the audience actively responds</p>
+              </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr>
                       <th style={thSt}>Brand</th>
                       <th style={{ ...thSt, textAlign: 'right' }}>Instagram Posts</th>
-                      <th style={{ ...thSt, textAlign: 'right' }}>Instagram Avg Eng</th>
-                      <th style={{ ...thSt, textAlign: 'right' }}>TikTok Avg Eng</th>
+                      <th style={{ ...thSt, textAlign: 'right' }}>Instagram Avg Engagement</th>
+                      <th style={{ ...thSt, textAlign: 'right' }}>TikTok Avg Engagement</th>
                     </tr>
                   </thead>
                   <tbody>
                     {socialData.brands.map((brand, i) => {
-                      const igPosts = brand.summary && brand.summary.postCount != null ? brand.summary.postCount
-                        : brand.instagramData && brand.instagramData.summary && brand.instagramData.summary.postCount != null ? brand.instagramData.summary.postCount : null
-                      const igEng = brand.summary && brand.summary.avgEngagement != null ? brand.summary.avgEngagement
-                        : brand.instagramData && brand.instagramData.summary && brand.instagramData.summary.avgEngagement != null ? brand.instagramData.summary.avgEngagement : null
-                      const ttEng = brand.tiktokData && brand.tiktokData.summary && brand.tiktokData.summary.avgEngagement != null ? brand.tiktokData.summary.avgEngagement : null
+                      const igPosts = brand.summary?.postCount ?? brand.instagramData?.summary?.postCount ?? null
+                      const igEng = brand.summary?.avgEngagement ?? brand.instagramData?.summary?.avgEngagement ?? null
+                      const ttEng = brand.tiktokData?.summary?.avgEngagement ?? null
                       const isTarget = brand.role === 'target' || brand.role === 'client'
                       return (
-                        <tr key={i} style={{ background: isTarget ? `${T.accent}18` : 'transparent' }}>
+                        <tr key={i} style={{ background: isTarget ? `${T.accent}12` : 'transparent' }}>
                           <td style={{ ...tdSt, fontWeight: isTarget ? 700 : 400, color: isTarget ? T.text : T.textSub }}>
                             {brand.name}
                             {isTarget && <span style={{ color: T.accent, fontSize: 10, marginLeft: 6, fontWeight: 700, background: `${T.accent}20`, padding: '1px 6px', borderRadius: 10 }}>YOU</span>}
@@ -2210,41 +2381,40 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
             </Card>
           )}
 
-          {/* White space opportunities — ALL 5 */}
           {(socialData.whiteSpaceOpportunities || []).length > 0 && (
             <>
-              <p style={subLabel}>White Space Opportunities</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 24 }}>Content gaps no competitor is filling</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>These are topics your customers want content about that nobody in this market is creating — first-mover advantage is available.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {socialData.whiteSpaceOpportunities.map((opp, i) => (
                   <Card key={i} style={{ padding: '16px 20px' }}>
                     <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{opp.theme}</p>
-                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: (opp.platforms || []).length > 0 ? 10 : 0 }}>{opp.description}</p>
+                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: (opp.platforms || []).length > 0 || opp.rationale ? 10 : 0 }}>{opp.description}</p>
+                    {opp.rationale && <p style={{ color: T.textMuted, fontSize: 12, lineHeight: 1.55, marginBottom: (opp.platforms || []).length > 0 ? 8 : 0 }}>{opp.rationale}</p>}
                     {(opp.platforms || []).length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {opp.platforms.map((pl, j) => <Pill key={j} text={pl} color="blue" />)}
                       </div>
                     )}
-                    {opp.rationale && <p style={{ color: T.textMuted, fontSize: 12, lineHeight: 1.55, marginTop: 8, marginBottom: 0 }}>{opp.rationale}</p>}
                   </Card>
                 ))}
               </div>
             </>
           )}
 
-          {/* Competition strategy — ALL items */}
           {(socialData.competitionStrategy || []).length > 0 && (
             <>
-              <p style={subLabel}>Competition Strategy</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 28 }}>Tactics to compete and win</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Specific moves — inspired by what's working for competitors — that are available to you right now.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {socialData.competitionStrategy.map((s, i) => (
                   <Card key={i} style={{ padding: '14px 18px' }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 6 }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: s.rationale ? 6 : 0 }}>
                       <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0, flex: 1 }}>{s.tactic}</p>
                       {s.priority && <Badge label={s.priority} color={s.priority === 'high' || s.priority === 'critical' ? 'red' : s.priority === 'medium' ? 'yellow' : 'gray'} />}
                     </div>
-                    {s.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: s.competitorInspiration || s.brandAlignment ? 8 : 0 }}>{s.rationale}</p>}
-                    {s.competitorInspiration && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: s.brandAlignment ? 4 : 0 }}><strong>Inspired by:</strong> {s.competitorInspiration}</p>}
-                    {s.brandAlignment && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 0 }}><strong>Brand alignment:</strong> {s.brandAlignment}</p>}
+                    {s.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: s.competitorInspiration ? 6 : 0 }}>{s.rationale}</p>}
+                    {s.competitorInspiration && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}><strong>Inspired by:</strong> {s.competitorInspiration}</p>}
                   </Card>
                 ))}
               </div>
@@ -2253,63 +2423,131 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </>
       ) : <NoData />}
 
-      {/* ── 5. WEBSITE & DIGITAL PRESENCE ── */}
-      <SectionHeader label="Site Intelligence" title="Website & Digital Presence" />
+      {/* ── 5. YOUR DIGITAL PRESENCE ── */}
+      <SectionHeader label="Chapter 4" title="Your Digital Presence — Where You're Losing Customers" />
+      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+        A customer who lands on your website has already found you — but the site has to convert them. This section surfaces the specific gaps that are costing you sales today: missing customer segments, content your competitors have that you don't, and messaging that isn't landing.
+      </p>
       {siteData ? (
         <>
-          {/* Crawler visibility */}
-          {siteData.crawlerVisibility && (
-            <div style={{ background: siteData.crawlerVisibility.heroTextIsLive === false ? '#fff7ed' : T.surfaceAlt, border: `1px solid ${siteData.crawlerVisibility.heroTextIsLive === false ? '#fdba74' : T.border}`, borderRadius: 10, padding: '14px 18px', marginBottom: 16 }}>
-              {siteData.crawlerVisibility.heroTextIsLive === false && (
-                <p style={{ color: '#9a3412', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>Warning: Hero text is not live-crawlable — AI agents cannot read it.</p>
-              )}
-              <p style={{ color: siteData.crawlerVisibility.heroTextIsLive === false ? '#7c2d12' : T.textSub, fontSize: 13, lineHeight: 1.65, margin: 0 }}>
-                <strong>AI Readability:</strong> {siteData.crawlerVisibility.aiReadabilityNote || 'No note available.'}
-              </p>
+          {/* Invisible to Google / AI */}
+          {siteData.crawlerVisibility?.heroTextIsLive === false && (
+            <div style={{ background: '#fff7ed', border: '1px solid #fdba74', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+              <p style={{ color: '#9a3412', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Critical: Your homepage hero is invisible to Google and AI</p>
+              <p style={{ color: '#7c2d12', fontSize: 13, lineHeight: 1.65, margin: 0 }}>{siteData.crawlerVisibility.aiReadabilityNote}</p>
             </div>
           )}
 
-          {/* Hero messaging analysis */}
-          {siteData.heroMessagingAnalysis && (
-            <Card style={{ marginBottom: 16 }}>
-              <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Hero Messaging Analysis</p>
-              {(siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 && (
-                <>
-                  <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Strengths</p>
-                  <ul style={{ margin: '0 0 12px 0', paddingLeft: 18 }}>
-                    {siteData.heroMessagingAnalysis.targetStrengths.map((s, i) => <li key={i} style={{ color: '#065f46', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{s}</li>)}
-                  </ul>
-                </>
-              )}
-              {(siteData.heroMessagingAnalysis.targetGaps || []).length > 0 && (
-                <>
-                  <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Gaps</p>
-                  <ul style={{ margin: '0 0 12px 0', paddingLeft: 18 }}>
-                    {siteData.heroMessagingAnalysis.targetGaps.map((g, i) => <li key={i} style={{ color: '#991b1b', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{g}</li>)}
-                  </ul>
-                </>
-              )}
-              {(siteData.heroMessagingAnalysis.competitorBestPractices || []).length > 0 && (
-                <>
-                  <p style={{ color: '#3b82f6', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Competitor Best Practices</p>
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {siteData.heroMessagingAnalysis.competitorBestPractices.map((b, i) => <li key={i} style={{ color: '#1e40af', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{b}</li>)}
-                  </ul>
-                </>
+          {/* Missing customer segments — the product content review reframed */}
+          {siteData.productContentReview && (
+            <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Customer segments you're not serving</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+                Your website currently covers{' '}
+                {(siteData.productContentReview.ageGroupCoverage || []).length > 0
+                  ? `ages ${siteData.productContentReview.ageGroupCoverage.join(', ')}`
+                  : 'a limited age range'}{' '}
+                and{' '}
+                {(siteData.productContentReview.brandsCovered || []).length > 0
+                  ? `${siteData.productContentReview.brandsCovered.length} featured brands`
+                  : 'a limited brand selection'}.{' '}
+                {siteData.productContentReview.priceVisibility === 'hidden'
+                  ? 'Pricing is not visible — shoppers who need to know "can I afford this?" before clicking deeper will leave without converting.'
+                  : ''}
+              </p>
+              {(siteData.productContentReview.contentGaps || []).length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {siteData.productContentReview.contentGaps.map((gap, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 14px', background: '#fff5f5', borderRadius: 8, borderLeft: '3px solid #f87171' }}>
+                      <span style={{ color: '#ef4444', fontWeight: 700, fontSize: 14, flexShrink: 0, marginTop: 1 }}>✗</span>
+                      <p style={{ color: '#7f1d1d', fontSize: 13, lineHeight: 1.55, margin: 0 }}>{gap}</p>
+                    </div>
+                  ))}
+                </div>
               )}
             </Card>
           )}
 
-          {/* All top opportunities */}
-          {(siteData.topOpportunities || []).length > 0 && (
-            <>
-              <p style={subLabel}>Top Opportunities</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
-                {siteData.topOpportunities.map((opp, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 18px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
-                    <span style={{ color: T.accent, fontWeight: 800, fontSize: 18, lineHeight: 1, minWidth: 24, flexShrink: 0 }}>{opp.rank || i + 1}</span>
+          {/* Messaging gaps — what you're not saying */}
+          {(siteData.messagingGaps || []).length > 0 && (
+            <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>What your messaging isn't saying</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>These are value messages competitors communicate that you currently don't — each one is a reason a customer might choose them over you.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {siteData.messagingGaps.map((mg, i) => (
+                  <div key={i} style={{ padding: '12px 16px', background: T.surfaceAlt, borderRadius: 8, borderLeft: `3px solid ${T.border}` }}>
+                    <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: mg.competitorExample || mg.recommendation ? 6 : 0 }}>{mg.gap}</p>
+                    {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.recommendation ? 4 : 0 }}>Competitor example: {mg.competitorExample}</p>}
+                    {mg.recommendation && <p style={{ color: T.accent, fontSize: 12, fontWeight: 600, margin: 0 }}>Fix: {mg.recommendation}</p>}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Navigation gaps */}
+          {(siteData.navGaps || []).length > 0 && (
+            <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Navigation categories your competitors have that you don't</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>When a customer arrives looking for something your navigation doesn't clearly offer, they leave. These are the specific categories where competitors are capturing traffic you're missing.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {siteData.navGaps.map((gap, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 14px', background: T.surfaceAlt, borderRadius: 8 }}>
+                    <Badge label={gap.priority || 'medium'} color={gap.priority === 'high' ? 'red' : gap.priority === 'low' ? 'green' : 'yellow'} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
+                      <span style={{ color: T.text, fontSize: 13, fontWeight: 600 }}>{gap.category}</span>
+                      {(gap.competitorsWithIt || []).length > 0 && <span style={{ color: T.textMuted, fontSize: 12, marginLeft: 8 }}>— available at {gap.competitorsWithIt.join(', ')}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Hero strengths and gaps */}
+          {siteData.heroMessagingAnalysis && ((siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 || (siteData.heroMessagingAnalysis.targetGaps || []).length > 0) && (
+            <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Homepage first impression — what's working and what's not</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                {(siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 && (
+                  <div>
+                    <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What's landing</p>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {siteData.heroMessagingAnalysis.targetStrengths.map((s, i) => <li key={i} style={{ color: '#065f46', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{s}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {(siteData.heroMessagingAnalysis.targetGaps || []).length > 0 && (
+                  <div>
+                    <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What's missing</p>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {siteData.heroMessagingAnalysis.targetGaps.map((g, i) => <li key={i} style={{ color: '#991b1b', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{g}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              {(siteData.heroMessagingAnalysis.competitorBestPractices || []).length > 0 && (
+                <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${T.border}` }}>
+                  <p style={{ color: '#3b82f6', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What competitors do better</p>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {siteData.heroMessagingAnalysis.competitorBestPractices.map((b, i) => <li key={i} style={{ color: '#1e40af', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{b}</li>)}
+                  </ul>
+                </div>
+              )}
+            </Card>
+          )}
+
+          {/* Top opportunities from site */}
+          {(siteData.topOpportunities || []).length > 0 && (
+            <Card style={{ padding: '20px 24px' }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Highest-impact site improvements</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Ranked by potential to increase traffic and conversions.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {siteData.topOpportunities.map((opp, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 14, padding: '12px 16px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
+                    <span style={rankCircleStyle(opp.rank || i + 1)}>{opp.rank || i + 1}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: opp.description ? 4 : 0 }}>
                         <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>{opp.title || opp.opportunity}</p>
                         {opp.impact && <ImpactBadge impact={opp.impact} />}
                       </div>
@@ -2318,174 +2556,58 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
                   </div>
                 ))}
               </div>
-            </>
-          )}
-
-          {/* Nav gaps */}
-          {(siteData.navGaps || []).length > 0 && (
-            <>
-              <p style={subLabel}>Navigation Gaps</p>
-              <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                  <thead>
-                    <tr>
-                      <th style={thSt}>Category</th>
-                      <th style={thSt}>Competitors With It</th>
-                      <th style={thSt}>Priority</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {siteData.navGaps.map((gap, i) => (
-                      <tr key={i}>
-                        <td style={tdSt}>{gap.category}</td>
-                        <td style={tdSt}>{(gap.competitorsWithIt || []).join(', ') || '—'}</td>
-                        <td style={{ ...tdSt, borderBottom: i < siteData.navGaps.length - 1 ? `1px solid ${T.border}` : 'none' }}>
-                          <Badge label={gap.priority || 'medium'} color={gap.priority === 'high' ? 'red' : gap.priority === 'low' ? 'green' : 'yellow'} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Card>
-            </>
-          )}
-
-          {/* Missing navigation categories */}
-          {siteData.navigationAnalysis && (siteData.navigationAnalysis.missingCategories || []).length > 0 && (
-            <>
-              <p style={subLabel}>Missing Navigation Categories</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-                {siteData.navigationAnalysis.missingCategories.map((cat, i) => (
-                  <span key={i} style={{ background: '#fee2e2', color: '#991b1b', fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20 }}>{cat}</span>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Messaging gaps */}
-          {(siteData.messagingGaps || []).length > 0 && (
-            <>
-              <p style={subLabel}>Messaging Gaps</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
-                {siteData.messagingGaps.map((mg, i) => (
-                  <Card key={i} style={{ padding: '14px 18px' }}>
-                    <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{mg.gap}</p>
-                    {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: 6 }}><strong>Competitor example:</strong> {mg.competitorExample}</p>}
-                    {mg.recommendation && <p style={{ color: T.accent, fontSize: 12, fontWeight: 600, margin: 0 }}><strong>Recommendation:</strong> {mg.recommendation}</p>}
-                  </Card>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* CTA effectiveness */}
-          {siteData.ctaEffectiveness && (
-            <>
-              <p style={subLabel}>CTA Effectiveness</p>
-              <Card style={{ marginBottom: 16, padding: '14px 18px' }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
-                  <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Rating</p>
-                  <Badge label={siteData.ctaEffectiveness.rating || 'N/A'} color={siteData.ctaEffectiveness.rating === 'strong' ? 'green' : siteData.ctaEffectiveness.rating === 'weak' ? 'red' : 'yellow'} />
-                </div>
-                {siteData.ctaEffectiveness.observations && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}>{siteData.ctaEffectiveness.observations}</p>}
-                {siteData.ctaEffectiveness.recommendation && <p style={{ color: T.textMuted, fontSize: 12, lineHeight: 1.55, margin: 0 }}><strong>Recommendation:</strong> {siteData.ctaEffectiveness.recommendation}</p>}
-              </Card>
-            </>
-          )}
-
-          {/* Product content review */}
-          {siteData.productContentReview && (
-            <>
-              <p style={subLabel}>Product Content Review</p>
-              <Card style={{ padding: '14px 18px' }}>
-                {(siteData.productContentReview.brandsCovered || []).length > 0 && (
-                  <div style={{ marginBottom: 10 }}>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Brands Covered</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {siteData.productContentReview.brandsCovered.map((b, i) => <Pill key={i} text={b} color="blue" />)}
-                    </div>
-                  </div>
-                )}
-                {(siteData.productContentReview.ageGroupCoverage || []).length > 0 && (
-                  <div style={{ marginBottom: 10 }}>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Age Group Coverage</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {siteData.productContentReview.ageGroupCoverage.map((a, i) => <Pill key={i} text={a} color="purple" />)}
-                    </div>
-                  </div>
-                )}
-                {siteData.productContentReview.priceVisibility && (
-                  <p style={{ color: T.textSub, fontSize: 13, marginBottom: (siteData.productContentReview.contentGaps || []).length > 0 ? 10 : 0 }}><strong>Price Visibility:</strong> {siteData.productContentReview.priceVisibility}</p>
-                )}
-                {(siteData.productContentReview.contentGaps || []).length > 0 && (
-                  <>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Content Gaps</p>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {siteData.productContentReview.contentGaps.map((g, i) => <li key={i} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{g}</li>)}
-                    </ul>
-                  </>
-                )}
-              </Card>
-            </>
+            </Card>
           )}
         </>
       ) : <NoData />}
 
-      {/* ── 6. SEARCH & SEO ── */}
-      <SectionHeader label="Search & SEO / GEO" title="Search & SEO" />
+      {/* ── 6. SEARCH — HOW CUSTOMERS FIND YOU ── */}
+      <SectionHeader label="Chapter 5" title="Search — How Customers Find You (and Why You're Missing Them)" />
+      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+        Search is where purchase intent meets your brand. Every keyword below is a real query someone typed looking for what you sell. The ones you don't rank for are customers going directly to a competitor. Understanding these categories is the first step to closing that gap.
+      </p>
       {seoData ? (
         <>
-          {/* On-page SEO table for all pageAnalyses */}
-          {(seoData.pageAnalyses || []).length > 0 && (
-            <>
-              <p style={subLabel}>On-Page SEO — All Pages</p>
-              <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                    <thead>
-                      <tr>
-                        <th style={thSt}>URL</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Title Tag</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>H1</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Meta</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Schema</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Speed</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {seoData.pageAnalyses.map((pg, i) => {
-                        const check = (v) => v && v !== '' && v !== null
-                        const schemaOk = (pg.schemaMarkup || []).length > 0
-                        const speedOk = pg.pageSpeedSignal && pg.pageSpeedSignal !== 'slow' && pg.pageSpeedSignal !== 'unknown'
-                        const cell = (ok) => ({ ...tdSt, textAlign: 'center', color: ok ? '#10b981' : '#ef4444', fontWeight: 700, fontSize: 14 })
-                        return (
-                          <tr key={i}>
-                            <td style={{ ...tdSt, maxWidth: 180, wordBreak: 'break-all', fontSize: 11 }}>{pg.url || pg.pageType}</td>
-                            <td style={cell(check(pg.titleTag))}>{check(pg.titleTag) ? '✓' : '✗'}</td>
-                            <td style={cell(check(pg.h1))}>{check(pg.h1) ? '✓' : '✗'}</td>
-                            <td style={cell(check(pg.metaDescription))}>{check(pg.metaDescription) ? '✓' : '✗'}</td>
-                            <td style={cell(schemaOk)}>{schemaOk ? '✓' : '✗'}</td>
-                            <td style={cell(speedOk)}>{pg.pageSpeedSignal || '—'}</td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </>
+          {/* Keyword categories — each with explanation */}
+          {seoData.keywordUniverse && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
+              {KW_CATEGORIES.map(({ key, label, accentColor, accentBg, why, how }) => {
+                const terms = seoData.keywordUniverse[key] || []
+                if (!terms.length) return null
+                return (
+                  <div key={key} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                    <div style={{ background: accentBg, borderBottom: `1px solid ${T.border}`, padding: '14px 20px' }}>
+                      <p style={{ color: accentColor, fontSize: 13, fontWeight: 800, margin: 0, marginBottom: 4 }}>{label}</p>
+                      <p style={{ color: accentColor, fontSize: 13, lineHeight: 1.65, margin: 0, opacity: 0.85 }}>{why}</p>
+                    </div>
+                    <div style={{ padding: '14px 20px' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 14 }}>
+                        {terms.map((t, i) => (
+                          <span key={i} style={{ background: accentBg, color: accentColor, fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20, border: `1px solid ${accentColor}22` }}>{t}</span>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: T.surfaceAlt, borderRadius: 8, padding: '10px 14px' }}>
+                        <span style={{ color: T.accent, fontWeight: 700, fontSize: 14, flexShrink: 0 }}>→</span>
+                        <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}><strong>How to use these:</strong> {how}</p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
 
-          {/* All priority actions */}
+          {/* Priority SEO Actions */}
           {(seoData.priorityActions || []).length > 0 && (
             <>
-              <p style={subLabel}>Priority Actions</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Priority actions to improve your search ranking</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>These are the specific technical and content changes that will have the biggest impact on how many customers find you through search.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
                 {seoData.priorityActions.map((act, i) => (
                   <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 18px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
                     <span style={rankCircleStyle(act.rank || i + 1)}>{act.rank || i + 1}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: act.why ? 6 : 0 }}>
                         <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>{act.action}</p>
                         {act.impact && <ImpactBadge impact={act.impact} />}
                         {act.effort && <Badge label={`${act.effort} effort`} color="gray" />}
@@ -2498,267 +2620,62 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
             </>
           )}
 
-          {/* Keyword Universe — all categories */}
-          {seoData.keywordUniverse && (
+          {/* On-page SEO scorecard */}
+          {(seoData.pageAnalyses || []).length > 0 && (
             <>
-              <p style={subLabel}>
-                Keyword Universe
-                {seoData.keywordUniverse.totalCount && <span style={{ color: T.textFaint, fontWeight: 400, textTransform: 'none', letterSpacing: 0, marginLeft: 8, fontSize: 12 }}>— {seoData.keywordUniverse.totalCount.toLocaleString()} total</span>}
-              </p>
-              <Card style={{ marginBottom: 16 }}>
-                {[
-                  { key: 'brandTerms', label: 'Brand Terms', color: 'purple' },
-                  { key: 'categoryTerms', label: 'Category Terms', color: 'blue' },
-                  { key: 'ageGroupTerms', label: 'Age Group Terms', color: 'blue' },
-                  { key: 'occasionTerms', label: 'Occasion Terms', color: 'green' },
-                  { key: 'topBrands', label: 'Top Brands', color: 'purple' },
-                  { key: 'localTerms', label: 'Local Terms', color: 'gray' },
-                  { key: 'competitorGapTerms', label: 'Competitor Gap Terms', color: 'red' },
-                  { key: 'aiDiscoveryQueries', label: 'AI Discovery Queries', color: 'blue' },
-                ].map(({ key, label, color }) => {
-                  const terms = seoData.keywordUniverse[key] || []
-                  if (!terms.length) return null
-                  return (
-                    <div key={key} style={{ marginBottom: 14 }}>
-                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</p>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                        {terms.map((t, i) => <Pill key={i} text={t} color={color} />)}
-                      </div>
-                    </div>
-                  )
-                })}
-              </Card>
-            </>
-          )}
-
-          {/* GEO Visibility */}
-          {seoData.geoSection && (
-            <>
-              <p style={subLabel}>GEO Visibility</p>
-              <Card style={{ marginBottom: 16 }}>
-                <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: 16 }}>
-                  <div style={{ textAlign: 'center', minWidth: 80 }}>
-                    <p style={{ fontSize: 44, fontWeight: 900, color: T.accent, lineHeight: 1, margin: 0 }}>
-                      {seoData.geoSection.combinedScore != null ? seoData.geoSection.combinedScore : (seoData.geoSection.visibilityScore != null ? seoData.geoSection.visibilityScore : '—')}
-                    </p>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>/ 100</p>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    {seoData.geoSection.queriesTested != null && (
-                      <p style={{ color: T.textSub, fontSize: 13, marginBottom: 6 }}><strong>Queries Tested:</strong> {seoData.geoSection.queriesTested}</p>
-                    )}
-                    {seoData.geoSection.byAgent && Object.keys(seoData.geoSection.byAgent).length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                        {Object.entries(seoData.geoSection.byAgent).map(([agent, val], i) => {
-                          const score = typeof val === 'object' && val !== null ? (val.visibilityScore ?? val.score) : val
-                          return (
-                            <span key={i} style={{ background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 8, padding: '4px 10px', fontSize: 12, color: T.textSub }}>
-                              <strong>{agent}:</strong> {score != null ? score : '—'}
-                            </span>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {(seoData.geoSection.gapRecommendations || []).length > 0 && (
-                  <>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Gap Recommendations</p>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {seoData.geoSection.gapRecommendations.map((r, i) => (
-                        <li key={i} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: 6 }}>{typeof r === 'string' ? r : r.recommendation || r.gap || JSON.stringify(r)}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </Card>
-            </>
-          )}
-
-          {/* Competitor benchmarks */}
-          {(seoData.competitorBenchmarks || []).length > 0 && (
-            <>
-              <p style={subLabel}>Competitor Benchmarks</p>
-              <Card style={{ padding: 0, overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                  <thead>
-                    <tr>
-                      <th style={thSt}>Signal</th>
-                      <th style={thSt}>Competitor</th>
-                      <th style={thSt}>Competitor Value</th>
-                      <th style={thSt}>Your Value</th>
-                      <th style={thSt}>Callout</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {seoData.competitorBenchmarks.map((b, i) => (
-                      <tr key={i}>
-                        <td style={tdSt}>{b.signal}</td>
-                        <td style={tdSt}>{b.competitorName}</td>
-                        <td style={tdSt}>{b.competitorValue}</td>
-                        <td style={tdSt}>{b.targetValue}</td>
-                        <td style={{ ...tdSt, color: T.textMuted }}>{b.callout}</td>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>On-page SEO scorecard</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 12 }}>Each ✗ is a missed signal Google uses to rank pages. Title tags and H1s are the single highest-impact fixes.</p>
+              <Card style={{ marginBottom: 0, padding: 0, overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr>
+                        <th style={thSt}>Page</th>
+                        <th style={{ ...thSt, textAlign: 'center' }}>Title Tag</th>
+                        <th style={{ ...thSt, textAlign: 'center' }}>H1 Heading</th>
+                        <th style={{ ...thSt, textAlign: 'center' }}>Meta Description</th>
+                        <th style={{ ...thSt, textAlign: 'center' }}>Schema</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {seoData.pageAnalyses.map((pg, i) => {
+                        const check = (v) => v && v !== '' && v !== null
+                        const cell = (ok) => ({ ...tdSt, textAlign: 'center', color: ok ? '#10b981' : '#ef4444', fontWeight: 700, fontSize: 14 })
+                        return (
+                          <tr key={i}>
+                            <td style={{ ...tdSt, maxWidth: 200, wordBreak: 'break-all', fontSize: 11 }}>{pg.url || pg.pageType}</td>
+                            <td style={cell(check(pg.titleTag))}>{check(pg.titleTag) ? '✓' : '✗'}</td>
+                            <td style={cell(check(pg.h1))}>{check(pg.h1) ? '✓' : '✗'}</td>
+                            <td style={cell(check(pg.metaDescription))}>{check(pg.metaDescription) ? '✓' : '✗'}</td>
+                            <td style={cell((pg.schemaMarkup || []).length > 0)}>{(pg.schemaMarkup || []).length > 0 ? '✓' : '✗'}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </Card>
             </>
           )}
         </>
       ) : <NoData />}
 
-      {/* ── 7. CUSTOMER PERSONAS ── */}
-      <SectionHeader label="Audience Research" title="Customer Personas" />
-      {personasData && (personasData.personas || []).length > 0 ? (
-        <>
-          {personasData.summaryInsights && (
-            <Card style={{ marginBottom: 16, borderLeft: `4px solid ${T.accent}` }}>
-              <p style={{ color: T.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{personasData.summaryInsights}</p>
-            </Card>
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {personasData.personas.map((persona, i) => (
-              <Card key={i}>
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
-                  <div>
-                    <h3 style={{ color: T.text, fontSize: 18, fontWeight: 800, margin: 0 }}>{persona.name}</h3>
-                    <p style={{ color: T.textMuted, fontSize: 13, marginTop: 4, marginBottom: 0 }}>
-                      {[persona.ageRange, persona.income].filter(Boolean).join(' · ')}
-                    </p>
-                  </div>
-                  {(persona.occupation || []).length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {(Array.isArray(persona.occupation) ? persona.occupation : [persona.occupation]).map((o, j) => <Pill key={j} text={o} color="gray" />)}
-                    </div>
-                  )}
-                </div>
-                {persona.location && <p style={{ color: T.textSub, fontSize: 13, marginBottom: 12 }}><strong>Location:</strong> {persona.location}</p>}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                  {(persona.lifestyle || []).length > 0 && (
-                    <div>
-                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Lifestyle</p>
-                      <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        {persona.lifestyle.map((l, j) => <li key={j} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, marginBottom: 3 }}>{l}</li>)}
-                      </ul>
-                    </div>
-                  )}
-                  {(persona.values || []).length > 0 && (
-                    <div>
-                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Values</p>
-                      <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        {persona.values.map((v, j) => <li key={j} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, marginBottom: 3 }}>{v}</li>)}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-                {(persona.shoppingBehaviors || []).length > 0 && (
-                  <div style={{ marginBottom: 12 }}>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Shopping Behaviors</p>
-                    <ul style={{ margin: 0, paddingLeft: 16 }}>
-                      {persona.shoppingBehaviors.map((b, j) => <li key={j} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, marginBottom: 3 }}>{b}</li>)}
-                    </ul>
-                  </div>
-                )}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                  {(persona.painPoints || []).length > 0 && (
-                    <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 14px' }}>
-                      <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Pain Points</p>
-                      <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        {persona.painPoints.map((p, j) => <li key={j} style={{ color: '#7f1d1d', fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{p}</li>)}
-                      </ul>
-                    </div>
-                  )}
-                  {(persona.motivators || []).length > 0 && (
-                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '12px 14px' }}>
-                      <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Motivators</p>
-                      <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        {persona.motivators.map((m, j) => <li key={j} style={{ color: '#14532d', fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{m}</li>)}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-                {(persona.contentTopics || []).length > 0 && (
-                  <div style={{ marginBottom: 10 }}>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Content Topics</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {persona.contentTopics.map((t, j) => <Pill key={j} text={t} color="blue" />)}
-                    </div>
-                  </div>
-                )}
-                {(persona.preferredChannels || []).length > 0 && (
-                  <div style={{ marginBottom: 12 }}>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Preferred Channels</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {persona.preferredChannels.map((ch, j) => <Pill key={j} text={ch} color="purple" />)}
-                    </div>
-                  </div>
-                )}
-                {persona.brandFit && (
-                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: persona.quoteExample ? 12 : 0 }}><strong>Brand Fit:</strong> {persona.brandFit}</p>
-                )}
-                {persona.quoteExample && (
-                  <p style={{ color: T.textMuted, fontSize: 13, fontStyle: 'italic', borderLeft: `3px solid ${T.border}`, paddingLeft: 12, margin: 0 }}>"{persona.quoteExample}"</p>
-                )}
-              </Card>
-            ))}
-          </div>
-        </>
-      ) : <NoData />}
+      {/* ── 7. YOUR OPPORTUNITIES ── */}
+      <SectionHeader label="Chapter 6" title="Where You Can Win — Your Biggest Opportunities" />
+      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+        Everything in this report points here. These are the specific moves — drawn from the competitive gaps, content voids, SEO weaknesses, and customer insights above — that represent your clearest path to growth.
+      </p>
 
-      {/* ── 8. IMMEDIATE ACTION PLAN ── */}
-      <SectionHeader label="Quick Wins" title="Immediate Action Plan" />
-      {(data.immediateWins || []).length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {data.immediateWins.map((win, i) => (
-            <div key={i} style={{ display: 'flex', gap: 16, padding: '18px 20px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, alignItems: 'flex-start' }}>
-              <span style={rankCircleStyle(win.rank || i + 1)}>{win.rank || i + 1}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{win.title}</span>
-                  <ImpactBadge impact={win.impact} />
-                  {win.effort && <Badge label={`${win.effort} effort`} color="gray" />}
-                  {win.sourceModule && <Badge label={win.sourceModule} color={moduleSourceColors[win.sourceModule] || 'gray'} />}
-                </div>
-                <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, margin: 0 }}>{win.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : <NoData />}
-
-      {/* ── 9. 30/60/90 DAY ROADMAP ── */}
-      <SectionHeader label="Execution Plan" title="30 / 60 / 90 Day Roadmap" />
-      {data.roadmap ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-          {[['day30', '30 Days', '#6366f1', '#ede9fe', '#4c1d95'], ['day60', '60 Days', '#7c3aed', '#f5f3ff', '#5b21b6'], ['day90', '90 Days', '#8b5cf6', '#faf5ff', '#6b21a8']].map(([key, label, color, bgColor, textColor]) => (
-            <div key={key} style={{ background: bgColor, borderRadius: 12, padding: 20, border: `1px solid ${color}22` }}>
-              <h4 style={{ color, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>{label}</h4>
-              {(data.roadmap[key] || []).length === 0 && <p style={{ color: textColor, fontSize: 12, fontStyle: 'italic', opacity: 0.6 }}>No items yet.</p>}
-              {(data.roadmap[key] || []).map((item, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 8, padding: '10px 14px', marginBottom: 10, borderLeft: `3px solid ${color}` }}>
-                  <p style={{ color: textColor, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.action}</p>
-                  {item.owner && <p style={{ color: '#6b7280', fontSize: 11, marginBottom: 2 }}>{item.owner}</p>}
-                  {item.metric && <p style={{ color: '#6b7280', fontSize: 11, fontStyle: 'italic', margin: 0 }}>{item.metric}</p>}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : <NoData />}
-
-      {/* ── 10. STRATEGIC OPPORTUNITIES ── */}
-      <SectionHeader label="Strategy" title="Strategic Opportunities" />
-      {(data.opportunitiesRanked || []).length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* Strategic opportunities */}
+      {(data.opportunitiesRanked || []).length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
           {data.opportunitiesRanked.map((opp, i) => (
-            <Card key={i}>
+            <Card key={i} style={{ padding: '20px 24px', borderLeft: `4px solid ${T.accent}` }}>
               <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 28, fontWeight: 900, color: T.accent, lineHeight: 1, flexShrink: 0, minWidth: 32, marginTop: 2 }}>{opp.rank}</span>
+                <span style={{ fontSize: 32, fontWeight: 900, color: T.accent, lineHeight: 1, flexShrink: 0, minWidth: 36, marginTop: 2 }}>{opp.rank}</span>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 8 }}>{opp.opportunity}</p>
-                  {opp.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: opp.estimatedImpact ? 8 : 0 }}>{opp.rationale}</p>}
+                  {opp.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.7, marginBottom: opp.estimatedImpact ? 10 : 0 }}>{opp.rationale}</p>}
                   {opp.estimatedImpact && (
                     ['high', 'medium', 'low'].includes(String(opp.estimatedImpact).toLowerCase())
                       ? <ImpactBadge impact={String(opp.estimatedImpact).toLowerCase()} />
@@ -2769,23 +2686,51 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
             </Card>
           ))}
         </div>
-      ) : <NoData />}
+      )}
 
-      {/* ── 11. COMPETITIVE GAPS TO CLOSE ── */}
-      <SectionHeader label="Competitive Intelligence" title="Competitive Gaps to Close" />
-      {(data.competitiveGapsToClose || []).length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {data.competitiveGapsToClose.map((gap, i) => (
-            <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 18px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
-              <Badge label={gap.priority || 'medium'} color={gap.priority === 'high' ? 'red' : gap.priority === 'low' ? 'green' : 'yellow'} />
-              <div style={{ flex: 1 }}>
-                <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0, marginBottom: gap.competitor ? 4 : 0 }}>{gap.gap}</p>
-                {gap.competitor && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>vs. {gap.competitor}</p>}
+      {/* Competitive gaps */}
+      {(data.competitiveGapsToClose || []).length > 0 && (
+        <>
+          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 8 }}>Competitive gaps to close</p>
+          <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Specific areas where competitors currently have an advantage — each one is an opportunity to level the playing field.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+            {data.competitiveGapsToClose.map((gap, i) => (
+              <div key={i} style={{ display: 'flex', gap: 14, padding: '12px 16px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
+                <Badge label={gap.priority || 'medium'} color={gap.priority === 'high' ? 'red' : gap.priority === 'low' ? 'green' : 'yellow'} />
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0, marginBottom: gap.competitor ? 3 : 0 }}>{gap.gap}</p>
+                  {gap.competitor && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>Currently an advantage for {gap.competitor}</p>}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : <NoData />}
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Immediate wins */}
+      {(data.immediateWins || []).length > 0 && (
+        <>
+          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Start here — immediate wins</p>
+          <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>High-impact actions that can be completed quickly with resources you already have.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {data.immediateWins.map((win, i) => (
+              <div key={i} style={{ display: 'flex', gap: 16, padding: '18px 20px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, alignItems: 'flex-start' }}>
+                <span style={rankCircleStyle(win.rank || i + 1)}>{win.rank || i + 1}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{win.title}</span>
+                    <ImpactBadge impact={win.impact} />
+                    {win.effort && <Badge label={`${win.effort} effort`} color="gray" />}
+                  </div>
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, margin: 0 }}>{win.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {(data.opportunitiesRanked || []).length === 0 && (data.competitiveGapsToClose || []).length === 0 && (data.immediateWins || []).length === 0 && <NoData />}
 
       <div style={{ height: 48 }} />
     </div>
