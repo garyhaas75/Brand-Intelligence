@@ -28,7 +28,7 @@ const TABS = [
   { id: 'personas', label: 'Personas' },
   { id: 'social', label: 'Social Audit' },
   { id: 'website', label: 'Website Audit' },
-  { id: 'search', label: 'Search & SEO / GEO' },
+  { id: 'search', label: 'Search & SEO' },
   { id: 'action', label: 'Action Plan' },
 ]
 
@@ -115,7 +115,7 @@ const PIPELINE_STEPS = [
   { key: 'competitive_analysis', label: 'Competitive Analysis', file: 'competitive_analysis' },
   { key: 'site_intelligence',    label: 'Website Audit',        file: 'site_intelligence' },
   { key: 'social_intelligence',  label: 'Social Audit',         file: 'social_intelligence' },
-  { key: 'search_seo',           label: 'Search & SEO / GEO',   file: 'search_seo' },
+  { key: 'search_seo',           label: 'Search & SEO',          file: 'search_seo' },
   { key: 'personas',             label: 'Personas',             file: 'personas' },
   { key: 'action_plan',          label: 'Action Plan',          file: 'action_plan' },
 ]
@@ -997,7 +997,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 2 }}>Social Intelligence</h2>
-          <p style={{ fontSize: 13, color: T.textSub }}>Competitive social landscape across all channels</p>
+          <p style={{ fontSize: 13, color: T.textSub }}>What competitors are doing — and where the market opportunities are</p>
         </div>
         <RefreshButton onClick={() => onRefresh('social_intelligence')} loading={running} />
       </div>
@@ -1015,29 +1015,26 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
           ) : <p style={{ color: T.textFaint, fontSize: 13 }}>No data yet</p>}
         </Card>
 
-        <Card style={{ padding: '16px 20px', background: targetRow?.bestEng > 0 ? T.surface : '#fffbeb', border: targetRow?.bestEng > 0 ? `1px solid ${T.border}` : '1px solid #fde68a' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Your Best Channel</p>
-          {targetRow?.bestEng > 0 ? (
+        <Card style={{ padding: '16px 20px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Market Opportunity</p>
+          {marketLeader && marketLeader.bestEng > 0 ? (
             <>
-              <p style={{ fontSize: 17, fontWeight: 800, color: T.accent, lineHeight: 1.2, marginBottom: 4 }}>{PLATFORM_LABELS[targetRow.bestPlatform]}</p>
-              <p style={{ fontSize: 13, color: T.textSub }}>{targetRow.bestEng.toLocaleString()} avg engagement</p>
-              {targetRow.bestPlatform === 'tiktok' && targetRow.ttHandle && <a href={targetRow.ttHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.accent, textDecoration: 'none' }}>{targetRow.ttHandle.label} ↗</a>}
-              {targetRow.bestPlatform === 'instagram' && targetRow.igHandle && <a href={targetRow.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.accent, textDecoration: 'none' }}>{targetRow.igHandle.label} ↗</a>}
+              <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>
+                {PLATFORM_LABELS[marketLeader.bestPlatform]} is most active
+              </p>
+              <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>
+                {marketLeader.b.name} leads with {marketLeader.bestEng.toLocaleString()} avg engagement — the content types and themes driving that are documented below.
+              </p>
             </>
-          ) : (
-            <>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Instagram restricted</p>
-              <p style={{ fontSize: 12, color: '#78350f' }}>TikTok is your best scraped channel. Competitor Instagram data is available.</p>
-            </>
-          )}
+          ) : <p style={{ color: T.textFaint, fontSize: 13 }}>No competitor data yet</p>}
         </Card>
 
         <Card style={{ padding: '16px 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Content Volume</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Competitor Posts Analyzed</p>
           <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>
-            {allBrands.reduce((s, b) => s + (b.summary?.postCount || 0) + (b.tiktokData?.summary?.postCount || 0), 0).toLocaleString()} posts scraped
+            {allBrands.filter(b => !b.role || b.role !== 'target').reduce((s, b) => s + (b.summary?.postCount || 0) + (b.tiktokData?.summary?.postCount || 0), 0).toLocaleString()} posts
           </p>
-          <p style={{ fontSize: 13, color: T.textSub }}>{allBrands.length} brands · {allBrands.filter(b => b.tiktokData).length} on TikTok · {allBrands.filter(b => b.summary?.postCount > 0).length} on Instagram</p>
+          <p style={{ fontSize: 13, color: T.textSub }}>{allBrands.filter(b => b.role !== 'target').length} competitors · across Instagram & TikTok</p>
         </Card>
       </div>
 
@@ -1477,12 +1474,12 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
   return (
     <div>
-      {running && <RunningBanner moduleLabel="Search & SEO / GEO" detail="Generating 200-term keyword universe, scraping on-page SEO signals, and querying AI agents for GEO visibility." />}
+      {running && <RunningBanner moduleLabel="Search & SEO" detail="Generating keyword universe, scraping on-page SEO signals, and testing AI search visibility." />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div style={{ display: 'flex', gap: 4 }}>
           {['seo', 'keywords', 'geo'].map(v => (
             <button key={v} onClick={() => setView(v)} style={{ padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: v === view ? 700 : 600, background: v === view ? T.accent : T.surface, color: v === view ? '#fff' : T.text, border: `1px solid ${v === view ? T.accent : T.border}`, cursor: 'pointer' }}>
-              {v === 'seo' ? 'On-Page SEO' : v === 'keywords' ? `Keywords${kw.totalCount ? ` (${kw.totalCount})` : ''}` : 'GEO (AI Visibility)'}
+              {v === 'seo' ? 'On-Page SEO' : v === 'keywords' ? `Keywords${kw.totalCount ? ` (${kw.totalCount})` : ''}` : 'AI Search Visibility'}
             </button>
           ))}
         </div>
@@ -1899,6 +1896,14 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
       {view === 'geo' && (
         <div>
+          {/* Context banner */}
+          <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+            <p style={{ color: '#1d4ed8', fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Why this matters: SEO is the foundation of AI search</p>
+            <p style={{ color: '#1e40af', fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+              AI assistants like ChatGPT, Claude, and Google AI Overviews pull answers from pages that rank well in traditional search. <strong>Fixing your SEO first</strong> — title tags, H1s, structured content, age/occasion pages — is the fastest path to appearing in both Google results and AI-generated recommendations. The queries below show exactly where you're being mentioned (or missed) by AI agents today.
+            </p>
+          </div>
+
           <Card style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32, flexWrap: 'wrap' }}>
               {agents.map(agent => {
@@ -1908,7 +1913,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   <div key={agent} style={{ textAlign: 'center' }}>
                     <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{agent === 'claude' ? 'Claude' : 'Perplexity'}</p>
                     <p style={{ fontSize: 48, fontWeight: 800, color: score >= 60 ? '#059669' : score >= 30 ? '#d97706' : '#dc2626', lineHeight: 1 }}>{score}%</p>
-                    <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>AI visibility</p>
+                    <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>queries mentioned</p>
                   </div>
                 )
               })}
@@ -1920,9 +1925,9 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 200 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Improvement Opportunities</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>How to improve</p>
                 <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-                  {(geo.gapRecommendations || []).slice(0, 5).map((r, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 6, lineHeight: 1.4 }}>{r}</li>)}
+                  {(geo.gapRecommendations || []).slice(0, 5).map((r, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 6, lineHeight: 1.4 }}>{typeof r === 'string' ? r : r.recommendation || r.gap || ''}</li>)}
                 </ul>
               </div>
             </div>
@@ -1930,7 +1935,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
           <Card>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Query-Level Visibility</h3>
+              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Query-by-Query AI Mention Audit</h3>
               {agents.length > 1 && (
                 <div style={{ display: 'flex', gap: 4 }}>
                   {agents.map(a => (
@@ -2337,7 +2342,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
       {/* ── 4. SOCIAL — WHAT'S WORKING ── */}
       <SectionHeader label="Chapter 3" title="Social Media — What's Working in This Market" />
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        Across Instagram and TikTok, your competitors are building audiences and driving purchase intent. Here's what's resonating with your customers right now — and where the gaps are that you can own.
+        Your competitors are active on Instagram and TikTok and building real audiences. The engagement numbers and content patterns below are based on scraped competitor data — they show exactly what resonates with your shared customer base and where gaps exist that you can be first to own.
       </p>
       {socialData ? (
         <>
@@ -2562,10 +2567,15 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
       ) : <NoData />}
 
       {/* ── 6. SEARCH — HOW CUSTOMERS FIND YOU ── */}
-      <SectionHeader label="Chapter 5" title="Search — How Customers Find You (and Why You're Missing Them)" />
-      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        Search is where purchase intent meets your brand. Every keyword below is a real query someone typed looking for what you sell. The ones you don't rank for are customers going directly to a competitor. Understanding these categories is the first step to closing that gap.
-      </p>
+      <SectionHeader label="Chapter 5" title="Search & SEO — Your Biggest Untapped Growth Channel" />
+      <div style={{ marginTop: -8, marginBottom: 24 }}>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 12 }}>
+          SEO is the highest-leverage opportunity in this report. There is significant low-hanging fruit: missing title tags, no age-group pages, no occasion landing pages, hidden pricing — each one is a fixable gap that directly drives more organic traffic.
+        </p>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 0 }}>
+          Getting SEO right also powers AI search. When ChatGPT, Google AI Overviews, or Claude answer a question about toy stores in Lebanon, they pull from pages that already rank well in traditional search. Fix your SEO now and you build the foundation for both channels at once.
+        </p>
+      </div>
       {seoData ? (
         <>
           {/* Keyword categories — each with explanation */}
