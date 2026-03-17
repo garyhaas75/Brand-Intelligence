@@ -186,94 +186,340 @@ app.get('/share/:token', (req, res) => {
   if (entry.expiresAt && new Date(entry.expiresAt) < new Date()) {
     return res.status(410).send('<h1>This link has expired</h1>');
   }
-  const profile = loadBrandData(entry.brandSlug, 'profile.json') || {};
-  const actionPlan = loadBrandData(entry.brandSlug, 'action_plan.json') || {};
-  const competitive = loadBrandData(entry.brandSlug, 'competitive_analysis.json') || {};
 
-  const wins = (actionPlan.immediateWins || []).map(w =>
-    `<div class="win-item"><span class="badge ${w.impact === 'high' ? 'badge-high' : w.impact === 'medium' ? 'badge-medium' : 'badge-low'}">${w.impact || 'medium'} impact</span><strong>${w.title}</strong><p>${w.description}</p></div>`
-  ).join('');
+  const slug = entry.brandSlug;
+  const profile = loadBrandData(slug, 'profile.json') || {};
+  const actionPlan = loadBrandData(slug, 'action_plan.json') || {};
+  const competitive = loadBrandData(slug, 'competitive_analysis.json') || {};
+  const personas = loadBrandData(slug, 'personas.json') || {};
+  const social = loadBrandData(slug, 'social_intelligence.json') || {};
+  const site = loadBrandData(slug, 'site_intelligence.json') || {};
+  const seo = loadBrandData(slug, 'search_seo.json') || {};
 
-  const roadmap30 = (actionPlan.roadmap?.day30 || []).map(r => `<li>${r.action}</li>`).join('');
-  const roadmap60 = (actionPlan.roadmap?.day60 || []).map(r => `<li>${r.action}</li>`).join('');
-  const roadmap90 = (actionPlan.roadmap?.day90 || []).map(r => `<li>${r.action}</li>`).join('');
+  const esc = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const date = new Date(actionPlan.generatedAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const competitors = (competitive.competitors || []).map(c =>
-    `<div class="competitor"><h3>${c.name}</h3><p>${c.positioningStatement || ''}</p></div>`
-  ).join('');
+  // ── Chapter 1: Personas ──
+  const personaList = (personas.personas || []);
+  const personasHtml = personaList.map(p => `
+    <div class="card avoid-break">
+      <div class="card-header" style="background:#6366f1">${esc(p.name)} &mdash; ${esc(p.ageRange || '')}</div>
+      <div class="card-body">
+        <p class="body-text">${esc(p.description || p.psychographic || '')}</p>
+        ${(p.topNeeds || p.needs || []).length ? `
+          <p class="label" style="margin-top:12px">What they need</p>
+          <ul class="bullet-list">${(p.topNeeds || p.needs || []).map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+        ${p.contentThatWins ? `<div class="how-box"><strong>Content that wins:</strong> ${esc(p.contentThatWins)}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  // ── Chapter 2: Competition ──
+  const competitorList = (competitive.competitors || []).filter(c => !c.isTarget);
+  const competitorsHtml = competitorList.map(c => `
+    <div class="card avoid-break">
+      <div class="card-header" style="background:#7c3aed">${esc(c.name)}</div>
+      <div class="card-body">
+        <p class="body-text">${esc(c.positioningStatement || '')}</p>
+        ${(c.strengths || []).length ? `<p class="label" style="margin-top:10px">Strengths</p><ul class="bullet-list">${c.strengths.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>` : ''}
+        ${(c.weaknesses || []).length ? `<p class="label" style="margin-top:10px">Weaknesses</p><ul class="bullet-list">${c.weaknesses.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>` : ''}
+      </div>
+    </div>`).join('');
+
+  // ── Chapter 3: Social ──
+  const socialBrands = (social.brands || []).filter(b => !b.isTarget);
+  const socialHtml = socialBrands.map(b => {
+    const ig = b.instagram || {};
+    const tt = b.tiktok || {};
+    const igEng = ig.summary?.avgEngagement || 0;
+    const ttEng = tt.summary?.avgEngagement || 0;
+    return `<div class="card avoid-break">
+      <div class="card-header" style="background:#0ea5e9">${esc(b.name)}</div>
+      <div class="card-body">
+        <div class="two-col">
+          <div><p class="label">Instagram</p><p class="stat">${igEng > 0 ? igEng.toLocaleString() : '—'} avg engagement</p>${ig.summary?.postCount ? `<p class="body-text">${ig.summary.postCount} posts</p>` : ''}</div>
+          <div><p class="label">TikTok</p><p class="stat">${ttEng > 0 ? ttEng.toLocaleString() : '—'} avg engagement</p>${tt.summary?.postCount ? `<p class="body-text">${tt.summary.postCount} posts</p>` : ''}</div>
+        </div>
+        ${ig.topContent?.length ? `<p class="label" style="margin-top:12px">Top content themes</p><ul class="bullet-list">${ig.topContent.slice(0,3).map(t=>`<li>${esc(t.theme||t.caption||t)}</li>`).join('')}</ul>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Chapter 4: Digital Presence ──
+  const navGaps = (site.navGaps || []).filter(g => g.priority === 'high');
+  const msgGaps = (site.messagingGaps || []);
+  const crawlerVis = site.crawlerVisibility || {};
+
+  const navGapsHtml = navGaps.map(g => `
+    <div class="row-item avoid-break">
+      <span class="badge badge-red">Missing</span>
+      <div><strong>${esc(g.category)}</strong>${g.competitorsWithIt?.length ? `<span class="muted"> — available at ${esc(g.competitorsWithIt.join(', '))}</span>` : ''}</div>
+    </div>`).join('');
+
+  const msgGapsHtml = msgGaps.map(mg => `
+    <div class="card avoid-break" style="border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:10px">
+      <p style="color:#4f46e5;font-weight:700;font-size:14px;margin-bottom:4px">${esc(mg.recommendation || mg.gap)}</p>
+      ${mg.recommendation && mg.gap ? `<p class="muted" style="font-size:12px">Currently missing: ${esc(mg.gap)}</p>` : ''}
+      ${mg.competitorExample ? `<p class="muted" style="font-size:12px;margin-top:4px">Example: ${esc(mg.competitorExample)}</p>` : ''}
+    </div>`).join('');
+
+  // ── Chapter 5: SEO — verified findings only ──
+  const onPage = seo.onPageSeo || {};
+  const pageAnalyses = seo.pageAnalyses || [];
+  const sitemap = seo.sitemapAnalysis || {};
+  const catPages = pageAnalyses.filter(p => p.pageType === 'category');
+  const allSameH1 = catPages.length > 1 && catPages.every(p => p.h1 === catPages[0].h1);
+  const allSameTitle = catPages.length > 1 && catPages.every(p => p.titleTag === catPages[0].titleTag);
+  const noMeta = pageAnalyses.length > 0 && pageAnalyses.every(p => !p.metaDescription);
+  const noH1 = !onPage.h1;
+  const noProductsInSitemap = sitemap.found && sitemap.byType?.product === 0;
+
+  const seoFindings = [];
+  if ((allSameH1 || allSameTitle) && catPages.length > 0) {
+    seoFindings.push({ severity: 'critical', title: 'Every category page has the same title and H1',
+      body: `All category pages share the same title tag "${esc(catPages[0].titleTag)}" and H1 "${esc(catPages[0].h1 || '(none)')}" — Google treats them as duplicate pages and none rank for anything.`,
+      fix: 'Give each category page a unique title and H1 containing the category name and "Lebanon." This is a single template change that applies to all pages at once.' });
+  }
+  if (noMeta) {
+    seoFindings.push({ severity: 'critical', title: 'No meta descriptions on any page',
+      body: 'Every page — homepage and all category pages — has a blank meta description. Google writes your search snippet with random body text, which looks unprofessional and gets fewer clicks.',
+      fix: 'Write 140–160 character meta descriptions for the homepage and each category page. Category pages can use a template: "Shop [Category] toys in Lebanon at Toys R Us. Huge range, trusted brands, fast delivery."' });
+  }
+  if (noH1) {
+    seoFindings.push({ severity: 'high', title: 'Homepage hero text is baked into an image — invisible to Google',
+      body: `The homepage H1 is empty. The headline "Fun for the whole family!" lives inside a banner image — Google and AI crawlers cannot read it. The page title is just "${esc(onPage.titleTag || 'Toys R Us')}".`,
+      fix: 'Add a live-text H1 overlaid on or adjacent to the hero. Example: "Lebanon\'s Favourite Toy Store — Thousands of Toys for Every Age." Update page title to "Toys R Us Lebanon — Official Toy Store | Shop Online".' });
+  }
+  if (noProductsInSitemap) {
+    seoFindings.push({ severity: 'high', title: `Sitemap has ${(sitemap.totalUrls||0).toLocaleString()} URLs — but 0 product pages`,
+      body: 'The sitemap tells Google which pages exist. Yours has no product pages listed — meaning Google may not know your entire product catalog exists. It\'s also not referenced in robots.txt.',
+      fix: 'Ask your developer to regenerate the sitemap to include all product and category URLs, then add "Sitemap: https://toysrus.com.lb/sitemap.xml" to robots.txt. Submit directly in Google Search Console.' });
+  }
+
+  const seoHtml = seoFindings.map(f => `
+    <div class="card avoid-break" style="border:1px solid ${f.severity==='critical'?'#fca5a5':'#fcd34d'};margin-bottom:16px">
+      <div style="background:${f.severity==='critical'?'#fef2f2':'#fffbeb'};padding:14px 20px;display:flex;gap:12px;align-items:center;border-bottom:1px solid ${f.severity==='critical'?'#fca5a5':'#fcd34d'}">
+        <span class="badge ${f.severity==='critical'?'badge-red':'badge-orange'}">${f.severity}</span>
+        <strong style="font-size:14px;color:${f.severity==='critical'?'#991b1b':'#78350f'}">${f.title}</strong>
+      </div>
+      <div class="card-body">
+        <p class="body-text">${f.body}</p>
+        <div class="how-box" style="margin-top:12px"><strong>Fix:</strong> ${f.fix}</div>
+      </div>
+    </div>`).join('');
 
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${profile.name || 'Brand'} Intelligence Report</title>
+<title>${esc(profile.name || 'Brand')} Intelligence Report</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #1a1a1a; }
-  .header { background: #1a1a1a; color: #fff; padding: 32px 40px; }
-  .header h1 { font-size: 28px; font-weight: 700; }
-  .header p { color: #aaa; margin-top: 6px; font-size: 14px; }
-  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
-  .section { background: #fff; border-radius: 12px; padding: 28px; margin-bottom: 24px; border: 1px solid #e5e7eb; }
-  .section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #111; }
-  .exec-summary { font-size: 16px; line-height: 1.7; color: #374151; }
-  .win-item { border-left: 3px solid #6366f1; padding: 12px 16px; margin-bottom: 12px; background: #f9fafb; border-radius: 0 8px 8px 0; }
-  .win-item strong { display: block; font-size: 15px; margin: 4px 0; }
-  .win-item p { font-size: 14px; color: #6b7280; margin-top: 4px; }
-  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .badge-high { background: #fee2e2; color: #991b1b; }
-  .badge-medium { background: #fef3c7; color: #92400e; }
-  .badge-low { background: #d1fae5; color: #065f46; }
-  .roadmap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .roadmap-col h3 { font-size: 14px; font-weight: 700; color: #6366f1; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .roadmap-col ul { padding-left: 16px; }
-  .roadmap-col li { font-size: 14px; color: #374151; margin-bottom: 6px; line-height: 1.5; }
-  .competitor { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
-  .competitor:last-child { border-bottom: none; }
-  .competitor h3 { font-size: 15px; font-weight: 600; }
-  .competitor p { font-size: 14px; color: #6b7280; margin-top: 4px; }
-  .meta { font-size: 12px; color: #9ca3af; margin-top: 32px; text-align: center; }
-  @media (max-width: 600px) { .roadmap-grid { grid-template-columns: 1fr; } }
-  @media print { body { background: #fff; } .header { background: #1a1a1a !important; -webkit-print-color-adjust: exact; } }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; font-size: 14px; line-height: 1.6; }
+
+  /* ── Cover ── */
+  .cover { background: #111; color: #fff; padding: 60px 48px; min-height: 200px; }
+  .cover h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
+  .cover .sub { color: #aaa; font-size: 16px; margin-top: 8px; }
+  .cover .date { color: #666; font-size: 13px; margin-top: 24px; }
+
+  /* ── Layout ── */
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 32px; }
+
+  /* ── Chapter headers ── */
+  .chapter { margin-top: 48px; margin-bottom: 24px; page-break-before: always; }
+  .chapter:first-of-type { page-break-before: auto; }
+  .chapter-label { font-size: 11px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .chapter-title { font-size: 22px; font-weight: 800; color: #111; }
+  .chapter-divider { height: 2px; background: #f3f4f6; margin-bottom: 16px; }
+  .chapter-intro { color: #4b5563; font-size: 14px; line-height: 1.75; margin-bottom: 24px; }
+
+  /* ── Cards ── */
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+  .card-header { padding: 14px 20px; color: #fff; font-size: 14px; font-weight: 700; }
+  .card-body { padding: 16px 20px; }
+  .avoid-break { page-break-inside: avoid; break-inside: avoid; }
+
+  /* ── Executive summary ── */
+  .exec-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 24px 28px; margin-bottom: 32px; page-break-inside: avoid; }
+  .exec-box p { font-size: 15px; line-height: 1.8; color: #374151; }
+
+  /* ── Text styles ── */
+  .body-text { color: #4b5563; font-size: 13px; line-height: 1.65; }
+  .muted { color: #9ca3af; }
+  .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin-bottom: 6px; }
+  .stat { font-size: 18px; font-weight: 800; color: #111; }
+  .bullet-list { padding-left: 18px; margin-top: 6px; }
+  .bullet-list li { font-size: 13px; color: #4b5563; margin-bottom: 4px; line-height: 1.55; }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-orange { background: #fef3c7; color: #92400e; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+
+  /* ── Row items ── */
+  .row-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; page-break-inside: avoid; }
+  .row-item strong { font-size: 13px; }
+
+  /* ── How box ── */
+  .how-box { background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 0 8px 8px 0; padding: 10px 14px; margin-top: 10px; }
+  .how-box strong { color: #065f46; font-size: 12px; }
+  .how-box, .how-box * { font-size: 12px; color: #14532d; line-height: 1.6; }
+
+  /* ── Two column ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ── Opportunity cards ── */
+  .opp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; page-break-inside: avoid; }
+  .opp-card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; page-break-inside: avoid; }
+  .opp-card-header { padding: 14px 16px; color: #fff; }
+  .opp-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.85; margin-bottom: 4px; }
+  .opp-card-title { font-size: 13px; font-weight: 800; line-height: 1.3; }
+  .opp-card-body { padding: 14px 16px; }
+  .opp-card-body p { font-size: 12px; color: #4b5563; line-height: 1.65; margin-bottom: 10px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; color: #9ca3af; font-size: 12px; page-break-inside: avoid; }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .chapter { page-break-before: always; }
+    .chapter:first-of-type { page-break-before: auto; }
+  }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>${profile.name || 'Brand'} Intelligence Report</h1>
-  <p>${profile.industry || ''} &bull; ${profile.url || ''} &bull; Generated ${new Date(actionPlan.generatedAt || Date.now()).toLocaleDateString()}</p>
+
+<!-- Cover -->
+<div class="cover">
+  <div style="max-width:900px;margin:0 auto">
+    <p style="color:#6366f1;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px">Brand Intelligence Report</p>
+    <h1>${esc(profile.name || 'Brand')}</h1>
+    <p class="sub">${esc(profile.industry || '')}${profile.url ? ` &mdash; ${esc(profile.url)}` : ''}</p>
+    <p class="date">Generated ${date} &nbsp;&bull;&nbsp; Confidential</p>
+  </div>
 </div>
+
 <div class="container">
+
+  <!-- Executive Summary -->
   ${actionPlan.executiveSummary ? `
-  <div class="section">
-    <h2>Executive Summary</h2>
-    <p class="exec-summary">${actionPlan.executiveSummary}</p>
-  </div>` : ''}
-
-  ${wins ? `
-  <div class="section">
-    <h2>Immediate Wins</h2>
-    ${wins}
-  </div>` : ''}
-
-  ${(roadmap30 || roadmap60 || roadmap90) ? `
-  <div class="section">
-    <h2>30 / 60 / 90 Day Roadmap</h2>
-    <div class="roadmap-grid">
-      <div class="roadmap-col"><h3>30 Days</h3><ul>${roadmap30}</ul></div>
-      <div class="roadmap-col"><h3>60 Days</h3><ul>${roadmap60}</ul></div>
-      <div class="roadmap-col"><h3>90 Days</h3><ul>${roadmap90}</ul></div>
+  <div style="margin-top:40px">
+    <p class="label">Executive Summary</p>
+    <div class="exec-box avoid-break">
+      <p>${esc(actionPlan.executiveSummary)}</p>
     </div>
   </div>` : ''}
 
-  ${competitors ? `
-  <div class="section">
-    <h2>Competitive Landscape</h2>
-    ${competitors}
+  <!-- Chapter 1: Customers -->
+  ${personasHtml ? `
+  <div class="chapter">
+    <div class="chapter-divider"></div>
+    <p class="chapter-label">Chapter 1</p>
+    <h2 class="chapter-title">Your Customers — Who You're Really Selling To</h2>
+  </div>
+  <p class="chapter-intro">Understanding who walks through the door (or visits the site) is the foundation of every other decision — what to stock, how to communicate, where to spend marketing budget.</p>
+  ${personasHtml}` : ''}
+
+  <!-- Chapter 2: Competition -->
+  ${competitorsHtml ? `
+  <div class="chapter">
+    <div class="chapter-divider"></div>
+    <p class="chapter-label">Chapter 2</p>
+    <h2 class="chapter-title">The Competition — Where You Win and Where You Don't</h2>
+  </div>
+  <p class="chapter-intro">These are the brands competing for the same customer in the same market. Each one has a distinct position, and understanding that position reveals where the white space is.</p>
+  ${competitorsHtml}` : ''}
+
+  <!-- Chapter 3: Social -->
+  ${socialHtml ? `
+  <div class="chapter">
+    <div class="chapter-divider"></div>
+    <p class="chapter-label">Chapter 3</p>
+    <h2 class="chapter-title">Social Media — What's Working in This Market</h2>
+  </div>
+  <p class="chapter-intro">This data is based on scraped competitor social activity — showing what content resonates with your shared customer base and where the engagement opportunities are.</p>
+  ${socialHtml}` : ''}
+
+  <!-- Chapter 4: Digital Presence -->
+  <div class="chapter">
+    <div class="chapter-divider"></div>
+    <p class="chapter-label">Chapter 4</p>
+    <h2 class="chapter-title">Your Digital Presence — Where You're Losing Customers</h2>
+  </div>
+  <p class="chapter-intro">A customer who lands on your website has already found you — but the site has to convert them.</p>
+
+  ${crawlerVis.heroTextIsLive === false ? `
+  <div class="card avoid-break" style="background:#fff7ed;border:1px solid #fdba74;margin-bottom:16px">
+    <div class="card-body">
+      <p style="color:#9a3412;font-weight:700;font-size:13px;margin-bottom:6px">Critical: Your homepage hero is invisible to Google and AI</p>
+      <p class="body-text" style="color:#7c2d12">${esc(crawlerVis.aiReadabilityNote || '')}</p>
+    </div>
   </div>` : ''}
 
-  <p class="meta">Powered by Brand Intelligence &bull; Confidential</p>
+  ${navGapsHtml ? `
+  <p style="font-weight:700;font-size:14px;margin-bottom:8px">Navigation categories your competitors have that you don't</p>
+  ${navGapsHtml}` : ''}
+
+  <!-- Revenue Opportunities -->
+  <p style="font-weight:700;font-size:14px;margin:24px 0 8px">Three revenue unlocks hiding in plain sight</p>
+  <p class="body-text" style="margin-bottom:16px">Each of these is a page or category that competitors with smaller budgets have already built.</p>
+  <div class="opp-grid">
+    <div class="opp-card avoid-break">
+      <div class="opp-card-header" style="background:#0ea5e9">
+        <p class="opp-card-label">Opportunity 1</p>
+        <p class="opp-card-title">Add an Infant &amp; Toddler Category (0–2 Years)</p>
+      </div>
+      <div class="opp-card-body">
+        <p>Chez Les Petits, Wild Willy Toys, The Toy Store LB, Mumzworld, and FirstCry Lebanon all have dedicated Baby &amp; Toddler sections. Toys R Us Lebanon doesn't — ceding the highest-spending parent demographic to every competitor.</p>
+        <div class="how-box"><strong>How:</strong> Create a dedicated "Ages 0–2" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities.</div>
+      </div>
+    </div>
+    <div class="opp-card avoid-break">
+      <div class="opp-card-header" style="background:#8b5cf6">
+        <p class="opp-card-label">Opportunity 2</p>
+        <p class="opp-card-title">Add a Gift Finder</p>
+      </div>
+      <div class="opp-card-body">
+        <p>JouéClub Lebanon, The Toy Store LB, and Hamley's all have a Gift Finder in navigation. Finding the right gift is the #1 reason people visit a toy store. Every shopper without a Gift Finder to guide them leaves to find an answer elsewhere.</p>
+        <div class="how-box"><strong>How:</strong> Build a Gift Finder page with 3 filters: age bracket, interest category, and price range. Add to main navigation. This is the single highest-converting page type in toy retail.</div>
+      </div>
+    </div>
+    <div class="opp-card avoid-break">
+      <div class="opp-card-header" style="background:#10b981">
+        <p class="opp-card-label">Opportunity 3</p>
+        <p class="opp-card-title">Build Age-Based Landing Pages</p>
+      </div>
+      <div class="opp-card-body">
+        <p>"Toys for 6-year-olds" is one of the highest-intent toy searches in every market. Parents search by age — not by brand or category. Age-based landing pages are how toy retailers capture this intent and rank for it on Google.</p>
+        <div class="how-box"><strong>How:</strong> Create 4–5 static landing pages organized by age bracket (3–5, 6–8, 9–12, Teens). Cross-link from homepage and navigation. Once indexed, they drive organic traffic indefinitely.</div>
+      </div>
+    </div>
+  </div>
+
+  ${msgGapsHtml ? `
+  <p style="font-weight:700;font-size:14px;margin:24px 0 4px">Messaging moves that will set you apart</p>
+  <p class="body-text" style="margin-bottom:16px">These are value messages your competitors are already communicating — adding them to your site is a fast, high-leverage way to increase trust and conversion.</p>
+  ${msgGapsHtml}` : ''}
+
+  <!-- Chapter 5: SEO -->
+  <div class="chapter">
+    <div class="chapter-divider"></div>
+    <p class="chapter-label">Chapter 5</p>
+    <h2 class="chapter-title">Search &amp; SEO — Your Biggest Untapped Growth Channel</h2>
+  </div>
+  <p class="chapter-intro">We crawled your site and verified these issues directly from the page data — not estimated. Fix these and you build the foundation for both organic search and AI search at once.</p>
+
+  ${seoHtml || '<p class="body-text">SEO analysis not yet generated.</p>'}
+
 </div>
+
+<div class="footer" style="max-width:900px;margin:48px auto 32px;padding:16px 32px 32px">
+  Brand Intelligence Report &bull; ${esc(profile.name || '')} &bull; ${date} &bull; Confidential
+</div>
+
 </body>
 </html>`);
 });
@@ -824,13 +1070,14 @@ app.post('/api/brands/:slug/export/pdf', async (req, res) => {
       const puppeteer = require('puppeteer-core');
       browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome',
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       });
     }
 
     const page = await browser.newPage();
-    await page.goto(`http://localhost:${PORT}/share/${token}`, { waitUntil: 'networkidle0', timeout: 30000 });
-    const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '15mm', bottom: '15mm', left: '15mm', right: '15mm' } });
+    await page.setViewport({ width: 1200, height: 900 });
+    await page.goto(`http://localhost:${PORT}/share/${token}`, { waitUntil: 'networkidle0', timeout: 45000 });
+    const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '20mm', bottom: '20mm', left: '18mm', right: '18mm' }, preferCSSPageSize: false });
     await browser.close();
 
     const profile = loadBrandData(slug, 'profile.json') || {};
