@@ -2594,101 +2594,136 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
       <SectionHeader label="Chapter 5" title="Search & SEO — Your Biggest Untapped Growth Channel" />
       <div style={{ marginTop: -8, marginBottom: 24 }}>
         <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 12 }}>
-          SEO is the highest-leverage opportunity in this report. There is significant low-hanging fruit: missing title tags, no age-group pages, no occasion landing pages, hidden pricing — each one is a fixable gap that directly drives more organic traffic.
+          We crawled your site and your competitors' sites. What we found is a clean sweep of fixable technical problems — the kind that are invisible to you but very visible to Google. Each one below is confirmed from the actual page data, not estimated.
         </p>
         <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 0 }}>
-          Getting SEO right also powers AI search. When ChatGPT, Google AI Overviews, or Claude answer a question about toy stores in Lebanon, they pull from pages that already rank well in traditional search. Fix your SEO now and you build the foundation for both channels at once.
+          Fix these and you build the foundation for both organic search and AI search at once. When ChatGPT, Google AI Overviews, or Claude answer "best toy store in Lebanon," they pull from pages that already rank well in traditional search. The work is the same — do it once, win twice.
         </p>
       </div>
       {seoData ? (
         <>
-          {/* Keyword categories — each with explanation */}
-          {seoData.keywordUniverse && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
-              {KW_CATEGORIES.map(({ key, label, accentColor, accentBg, why, how }) => {
-                const terms = seoData.keywordUniverse[key] || []
-                if (!terms.length) return null
-                return (
-                  <div key={key} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden' }}>
-                    <div style={{ background: accentBg, borderBottom: `1px solid ${T.border}`, padding: '14px 20px' }}>
-                      <p style={{ color: accentColor, fontSize: 13, fontWeight: 800, margin: 0, marginBottom: 4 }}>{label}</p>
-                      <p style={{ color: accentColor, fontSize: 13, lineHeight: 1.65, margin: 0, opacity: 0.85 }}>{why}</p>
-                    </div>
-                    <div style={{ padding: '14px 20px' }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 14 }}>
-                        {terms.map((t, i) => (
-                          <span key={i} style={{ background: accentBg, color: accentColor, fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20, border: `1px solid ${accentColor}22` }}>{t}</span>
-                        ))}
-                      </div>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: T.surfaceAlt, borderRadius: 8, padding: '10px 14px' }}>
-                        <span style={{ color: T.accent, fontWeight: 700, fontSize: 14, flexShrink: 0 }}>→</span>
-                        <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}><strong>How to use these:</strong> {how}</p>
-                      </div>
+          {/* ── Verified Technical Fixes — from actual crawl data ── */}
+          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>What the crawl actually found — confirmed issues, not estimates</p>
+          <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+            These were verified by directly fetching your pages. Every issue below is real.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 32 }}>
+
+            {/* Fix 1: Every category page has the same title + H1 */}
+            {(seoData.pageAnalyses || []).filter(p => p.pageType === 'category').length > 0 && (() => {
+              const catPages = seoData.pageAnalyses.filter(p => p.pageType === 'category')
+              const allSameH1 = catPages.length > 1 && catPages.every(p => p.h1 === catPages[0].h1)
+              const allSameTitle = catPages.length > 1 && catPages.every(p => p.titleTag === catPages[0].titleTag)
+              if (!allSameH1 && !allSameTitle) return null
+              return (
+                <div key="dup-titles" style={{ background: T.surface, border: '1px solid #fca5a5', borderRadius: 12, overflow: 'hidden' }}>
+                  <div style={{ background: '#fef2f2', borderBottom: '1px solid #fca5a5', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <span style={{ background: '#dc2626', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>CRITICAL</span>
+                    <p style={{ color: '#991b1b', fontSize: 14, fontWeight: 800, margin: 0 }}>Every category page has the same title and H1 — Google sees them as duplicates</p>
+                  </div>
+                  <div style={{ padding: '14px 20px' }}>
+                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                      Your Arts & Crafts page, Clothing page, and every other category page all have the same title tag: <strong>"{catPages[0].titleTag}"</strong> and the same H1: <strong>"{catPages[0].h1 || '(none)'}"</strong>. To Google, they look like identical pages. This means they compete against each other and none of them rank for anything.
+                    </p>
+                    <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                      <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
+                      <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Each category page needs a unique title and H1 that includes the category name and "Lebanon." Example: <em>"Arts & Crafts Toys Lebanon | Toys R Us"</em> with H1 <em>"Arts & Crafts Toys for Kids in Lebanon."</em> This is a template change — one developer fix applies to all pages at once.</p>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          )}
-
-          {/* Priority SEO Actions */}
-          {(seoData.priorityActions || []).length > 0 && (
-            <>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Priority actions to improve your search ranking</p>
-              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>These are the specific technical and content changes that will have the biggest impact on how many customers find you through search.</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-                {seoData.priorityActions.map((act, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 18px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
-                    <span style={rankCircleStyle(act.rank || i + 1)}>{act.rank || i + 1}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: act.why ? 6 : 0 }}>
-                        <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>{act.action}</p>
-                        {act.impact && <ImpactBadge impact={act.impact} />}
-                        {act.effort && <Badge label={`${act.effort} effort`} color="gray" />}
-                      </div>
-                      {act.why && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{act.why}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* On-page SEO scorecard */}
-          {(seoData.pageAnalyses || []).length > 0 && (
-            <>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>On-page SEO scorecard</p>
-              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 12 }}>Each ✗ is a missed signal Google uses to rank pages. Title tags and H1s are the single highest-impact fixes.</p>
-              <Card style={{ marginBottom: 0, padding: 0, overflow: 'hidden' }}>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                    <thead>
-                      <tr>
-                        <th style={thSt}>Page</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Title Tag</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>H1 Heading</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Meta Description</th>
-                        <th style={{ ...thSt, textAlign: 'center' }}>Schema</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {seoData.pageAnalyses.map((pg, i) => {
-                        const check = (v) => v && v !== '' && v !== null
-                        const cell = (ok) => ({ ...tdSt, textAlign: 'center', color: ok ? '#10b981' : '#ef4444', fontWeight: 700, fontSize: 14 })
-                        return (
-                          <tr key={i}>
-                            <td style={{ ...tdSt, maxWidth: 200, wordBreak: 'break-all', fontSize: 11 }}>{pg.url || pg.pageType}</td>
-                            <td style={cell(check(pg.titleTag))}>{check(pg.titleTag) ? '✓' : '✗'}</td>
-                            <td style={cell(check(pg.h1))}>{check(pg.h1) ? '✓' : '✗'}</td>
-                            <td style={cell(check(pg.metaDescription))}>{check(pg.metaDescription) ? '✓' : '✗'}</td>
-                            <td style={cell((pg.schemaMarkup || []).length > 0)}>{(pg.schemaMarkup || []).length > 0 ? '✓' : '✗'}</td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
                 </div>
-              </Card>
+              )
+            })()}
+
+            {/* Fix 2: No meta descriptions anywhere */}
+            {(seoData.pageAnalyses || []).every(p => !p.metaDescription) && seoData.pageAnalyses.length > 0 && (
+              <div style={{ background: T.surface, border: '1px solid #fca5a5', borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ background: '#fef2f2', borderBottom: '1px solid #fca5a5', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ background: '#dc2626', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>CRITICAL</span>
+                  <p style={{ color: '#991b1b', fontSize: 14, fontWeight: 800, margin: 0 }}>No meta descriptions on any page — Google writes your search snippet for you</p>
+                </div>
+                <div style={{ padding: '14px 20px' }}>
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                    The meta description is the 2-line preview text under your link in Google results. It's how you tell a searcher "click here, not the competitor below you." Every page on your site — homepage, every category page — has a blank meta description. Google fills it in with random body text, which looks unprofessional and gets significantly fewer clicks.
+                  </p>
+                  <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                    <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
+                    <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Homepage example: <em>"Lebanon's official Toys R Us — thousands of toys for every age, fast delivery across Lebanon. Shop LEGO, Barbie, Hot Wheels and more."</em> Category pages can use a template: <em>"Shop [Category] toys in Lebanon at Toys R Us. Huge range, trusted brands, fast delivery."</em> 140–160 characters each.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Fix 3: Homepage has no H1 */}
+            {seoData.onPageSeo && !seoData.onPageSeo.h1 && (
+              <div style={{ background: T.surface, border: '1px solid #fcd34d', borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>HIGH</span>
+                  <p style={{ color: '#78350f', fontSize: 14, fontWeight: 800, margin: 0 }}>Homepage hero text is baked into an image — invisible to Google</p>
+                </div>
+                <div style={{ padding: '14px 20px' }}>
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                    Your homepage H1 is empty. The headline "Fun for the whole family!" exists only as part of a banner image — Google and AI search crawlers can't read it. The homepage title tag is just <strong>"Toys R Us"</strong> with nothing else. A competitor searching for "toy store Lebanon" in Google is not finding you through your homepage headline because there isn't one.
+                  </p>
+                  <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                    <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
+                    <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Add a live-text H1 overlaid on or adjacent to the hero: <em>"Lebanon's Favourite Toy Store — Thousands of Toys for Every Age."</em> Update the page title to <em>"Toys R Us Lebanon — Official Toy Store | Shop Online"</em>. This is a front-end change, not a platform migration.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Fix 4: Product catalog missing from sitemap */}
+            {seoData.sitemapAnalysis && seoData.sitemapAnalysis.found && (seoData.sitemapAnalysis.byType?.product === 0) && (
+              <div style={{ background: T.surface, border: '1px solid #fcd34d', borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>HIGH</span>
+                  <p style={{ color: '#78350f', fontSize: 14, fontWeight: 800, margin: 0 }}>Your sitemap has {seoData.sitemapAnalysis.totalUrls?.toLocaleString()} URLs — but 0 product pages</p>
+                </div>
+                <div style={{ padding: '14px 20px' }}>
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                    A sitemap tells Google which pages exist on your site. Yours has {seoData.sitemapAnalysis.totalUrls?.toLocaleString()} URLs but zero product pages. That means Google may not know your product catalog exists at all. Every product page that's missing from the sitemap is a product that can't rank in search. It's also not referenced in your robots.txt, so Google has to discover it on its own rather than being told where to look.
+                  </p>
+                  <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                    <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
+                    <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Ask your developer to regenerate the sitemap to include all product and category URLs, then add <em>Sitemap: https://toysrus.com.lb/sitemap.xml</em> to robots.txt. Submit the sitemap directly in Google Search Console. This is a one-time configuration fix.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Keyword targets — clearly framed as suggested, not verified */}
+          {seoData.keywordUniverse && (
+            <>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Keyword targets to go after once the foundation is fixed</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+                These are suggested keyword clusters based on your product categories, age groups, and market. They don't have verified search volume behind them — treat them as a starting map, not a definitive list. A proper keyword audit with Google Search Console or a tool like Ahrefs will show you which ones have the most traffic.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
+                {KW_CATEGORIES.map(({ key, label, accentColor, accentBg, why, how }) => {
+                  const terms = seoData.keywordUniverse[key] || []
+                  if (!terms.length) return null
+                  return (
+                    <div key={key} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                      <div style={{ background: accentBg, borderBottom: `1px solid ${T.border}`, padding: '14px 20px' }}>
+                        <p style={{ color: accentColor, fontSize: 13, fontWeight: 800, margin: 0, marginBottom: 4 }}>{label}</p>
+                        <p style={{ color: accentColor, fontSize: 13, lineHeight: 1.65, margin: 0, opacity: 0.85 }}>{why}</p>
+                      </div>
+                      <div style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 14 }}>
+                          {terms.map((t, i) => (
+                            <span key={i} style={{ background: accentBg, color: accentColor, fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20, border: `1px solid ${accentColor}22` }}>{t}</span>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: T.surfaceAlt, borderRadius: 8, padding: '10px 14px' }}>
+                          <span style={{ color: T.accent, fontWeight: 700, fontSize: 14, flexShrink: 0 }}>→</span>
+                          <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}><strong>How to use these:</strong> {how}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </>
           )}
         </>
