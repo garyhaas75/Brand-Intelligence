@@ -87,14 +87,15 @@ Key pain points: ${personas.personas.flatMap(p => (p.painPoints || []).slice(0, 
 Key motivators: ${personas.personas.flatMap(p => (p.motivators || []).slice(0, 1)).join('; ')}`);
   }
 
-  // Social
+  // Social — competitor landscape only; target social data may be unavailable due to platform scraping restrictions
   if (socialIntel.brands?.length) {
-    const targetSocial = socialIntel.brands.find(b => b.role === 'target');
-    if (targetSocial) {
-      contextSections.push(`SOCIAL AUDIT:
-Engagement: ${targetSocial.summary?.avgEngagement || 0} avg per post
-Posting frequency: ${targetSocial.summary?.postingFrequencyPerWeek || 0} posts/week
-Content gaps: ${(targetSocial.contentGaps || []).slice(0, 3).join('; ')}`);
+    const competitors = socialIntel.brands.filter(b => b.role !== 'target');
+    const topComp = competitors.sort((a, b) => (b.summary?.avgEngagement || 0) - (a.summary?.avgEngagement || 0))[0];
+    if (topComp) {
+      contextSections.push(`SOCIAL AUDIT (competitor landscape):
+Market leader: ${topComp.name} with ${topComp.summary?.avgEngagement || 0} avg engagement on Instagram
+White space opportunities: ${(socialIntel.whiteSpaceOpportunities || []).slice(0, 3).map(o => o.theme).join('; ')}
+Note: Target brand social data may be limited due to platform restrictions — do NOT characterize as zero presence or dormant.`);
     }
   }
 
@@ -108,12 +109,15 @@ ${siteIntel.topOpportunities.slice(0, 5).map((o, i) => `${i + 1}. [${o.impact}] 
     if (navGapList.length) contextSections.push(`NAVIGATION GAPS: ${navGapList.join(', ')}`);
   }
 
-  // Search/SEO
-  if (searchSeo.geoSection) {
-    contextSections.push(`GEO VISIBILITY: ${searchSeo.geoSection.visibilityScore || 0}% of AI shopping queries mention this brand
-SEO speed signal: ${searchSeo.onPageSeo?.pageSpeedSignal || 'unknown'}
-Schema markup present: ${(searchSeo.onPageSeo?.schemaMarkup || []).join(', ') || 'none'}
-GEO gaps: ${(searchSeo.geoSection.gapRecommendations || []).slice(0, 3).join('; ')}`);
+  // Search/SEO — frame as the primary growth lever
+  if (searchSeo.geoSection || searchSeo.priorityActions?.length) {
+    const seoActions = (searchSeo.priorityActions || []).slice(0, 3).map(a => a.action).join('; ');
+    const kwCount = searchSeo.keywordUniverse?.totalCount || 0;
+    contextSections.push(`SEARCH & SEO (primary growth lever):
+${kwCount > 0 ? `Keyword universe: ${kwCount} identified terms across brand, category, age-group, occasion, and local searches` : ''}
+Top SEO priority actions: ${seoActions || 'fix title tags, H1s, and meta descriptions'}
+AI search visibility: ${searchSeo.geoSection?.visibilityScore || 0}% of test queries — improving SEO directly improves this score
+Note: SEO is the highest-leverage channel — fixing it builds both organic search traffic and AI search presence simultaneously.`);
   }
 
   const fullContext = contextSections.join('\n\n---\n\n');
@@ -127,9 +131,15 @@ ${brandContext}
 INTELLIGENCE SUMMARY:
 ${fullContext || 'Limited data available — base recommendations on brand profile and industry best practices.'}
 
+IMPORTANT INSTRUCTIONS:
+- The executive summary must be OPPORTUNITY-FORWARD, not deficit-focused. Lead with brand strengths and market position, then frame gaps as unrealized opportunity — not as failures.
+- Do NOT characterize social media data as "zero" or "dormant" if it may be a data collection limitation. Frame it as an untapped channel to activate.
+- Do NOT lead with or emphasize GEO/AI visibility scores as primary metrics — frame SEO as the growth lever that also powers AI search.
+- Write for a C-suite audience receiving this as a growth brief, not a performance review.
+
 Generate a strategic action plan. Return ONLY valid JSON:
 {
-  "executiveSummary": "3-4 sentence executive summary of the brand's current position, key challenges, and the strategic opportunity. Write for a C-suite audience. Be specific to ${profile.name}.",
+  "executiveSummary": "3-4 sentence executive summary. Start with the brand's strengths and market position. Then describe the opportunity — what is available to capture and why now. Close with the 2-3 strategic moves that will get there. Opportunity-forward tone, C-suite audience, specific to ${profile.name}.",
   "immediateWins": [
     {
       "rank": 1,
