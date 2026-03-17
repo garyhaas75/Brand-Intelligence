@@ -2453,7 +2453,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
                   </div>
                   <div style={{ padding: '14px 18px' }}>
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                      New-parent spending is at its peak in the 0–2 age window — strollers, bouncers, sensory toys, first books. None of your competitors in Lebanon have built a clean, curated section for this segment, which means the first retailer to do it owns it.
+                      New-parent spending is at its peak in the 0–2 age window — strollers, bouncers, sensory toys, first books. Chez Les Petits, Wild Willy Toys, The Toy Store LB, Mumzworld, and FirstCry Lebanon all have dedicated Baby & Toddler sections. Toys R Us Lebanon doesn't — meaning you're ceding the highest-spending parent demographic to every competitor at once.
                     </p>
                     <div style={{ background: '#f0f9ff', borderRadius: 8, padding: '10px 14px' }}>
                       <p style={{ color: '#0369a1', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
@@ -2465,15 +2465,15 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   <div style={{ background: '#8b5cf6', padding: '14px 18px' }}>
                     <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 2</p>
-                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Show Prices — Even "Starting From" Ranges</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Add a Gift Finder</p>
                   </div>
                   <div style={{ padding: '14px 18px' }}>
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                      Shoppers who can't see a price don't add to cart — they leave to find one. Price transparency is especially important in Lebanon where customers cross-compare across physical and online channels. Showing even a "from $X" range eliminates the biggest drop-off point in your funnel.
+                      Finding the right gift is the #1 reason people visit a toy store. JouéClub Lebanon, The Toy Store LB, and Hamley's all have a Gift Finder in their navigation — a tool that filters by age, gender, and budget. Toys R Us Lebanon doesn't. Every shopper who arrives asking "what should I buy for a 7-year-old?" leaves to find an answer somewhere else.
                     </p>
                     <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '10px 14px' }}>
                       <p style={{ color: '#5b21b6', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Add price ranges to category pages and top-selling product listings. If exact pricing is dynamic, use "Starting from" labels. A/B test: even partial price visibility typically increases add-to-cart rates by 15–30%.</p>
+                      <p style={{ color: '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Build a simple Gift Finder page with 3 filters: age bracket, interest category, and price range. It can be as simple as a filtered product grid. Add it to main navigation. This is the single highest-converting page type in toy retail — it captures intent at the exact moment of purchase decision.</p>
                     </div>
                   </div>
                 </Card>
