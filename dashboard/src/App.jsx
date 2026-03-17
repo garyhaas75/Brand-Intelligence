@@ -2549,11 +2549,14 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
                     )}
                     {seoData.geoSection.byAgent && Object.keys(seoData.geoSection.byAgent).length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                        {Object.entries(seoData.geoSection.byAgent).map(([agent, score], i) => (
-                          <span key={i} style={{ background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 8, padding: '4px 10px', fontSize: 12, color: T.textSub }}>
-                            <strong>{agent}:</strong> {score != null ? score : '—'}
-                          </span>
-                        ))}
+                        {Object.entries(seoData.geoSection.byAgent).map(([agent, val], i) => {
+                          const score = typeof val === 'object' && val !== null ? (val.visibilityScore ?? val.score) : val
+                          return (
+                            <span key={i} style={{ background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 8, padding: '4px 10px', fontSize: 12, color: T.textSub }}>
+                              <strong>{agent}:</strong> {score != null ? score : '—'}
+                            </span>
+                          )
+                        })}
                       </div>
                     )}
                   </div>
