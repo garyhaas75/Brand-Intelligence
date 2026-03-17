@@ -2652,56 +2652,13 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </>
       ) : <NoData />}
 
-      {/* ── 6. ACTION PLAN ── */}
-      <SectionHeader label="Chapter 6" title="What to Do Next — Your Action Plan" />
-      <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        Everything in the previous chapters feeds into this. Below are the strategic priorities synthesized from the full analysis, followed by specific actions you can start immediately.
-      </p>
-
-      {/* Strategic opportunities — the big bets */}
-      {(data.opportunitiesRanked || []).length > 0 && (
-        <>
-          <p style={{ color: T.text, fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: T.textMuted, marginBottom: 16 }}>Strategic priorities</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
-            {data.opportunitiesRanked.map((opp, i) => (
-              <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '18px 22px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, borderLeft: `4px solid ${T.accent}` }}>
-                <span style={{ fontSize: 28, fontWeight: 900, color: T.accent, lineHeight: 1, flexShrink: 0, minWidth: 30 }}>{opp.rank}</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: opp.rationale ? 6 : 0 }}>{opp.opportunity}</p>
-                  {opp.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, margin: 0 }}>{opp.rationale}</p>}
-                </div>
-                {opp.estimatedImpact && ['high', 'medium', 'low'].includes(String(opp.estimatedImpact).toLowerCase()) && (
-                  <ImpactBadge impact={String(opp.estimatedImpact).toLowerCase()} />
-                )}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Immediate wins — what to start this week */}
-      {(data.immediateWins || []).length > 0 && (
-        <>
-          <p style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: T.textMuted, marginBottom: 16 }}>Start this week</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {data.immediateWins.map((win, i) => (
-              <div key={i} style={{ display: 'flex', gap: 16, padding: '16px 20px', background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 10, alignItems: 'flex-start' }}>
-                <span style={rankCircleStyle(win.rank || i + 1)}>{win.rank || i + 1}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, color: T.text, fontSize: 13 }}>{win.title}</span>
-                    <ImpactBadge impact={win.impact} />
-                    {win.effort && <Badge label={`${win.effort} effort`} color="gray" />}
-                  </div>
-                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{win.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {(data.opportunitiesRanked || []).length === 0 && (data.immediateWins || []).length === 0 && <NoData />}
+      {/* ── Closing ── */}
+      <div style={{ marginTop: 48, padding: '28px 32px', background: `${T.accent}08`, border: `1px solid ${T.accent}22`, borderRadius: 12, borderLeft: `4px solid ${T.accent}` }}>
+        <p style={{ color: T.text, fontSize: 16, fontWeight: 800, marginBottom: 8 }}>The opportunity is there. The infrastructure to capture it is straightforward to build.</p>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, margin: 0 }}>
+          Each chapter of this report identifies specific, actionable steps — from SEO fixes that can go live this week to social and loyalty strategies that build compounding advantage over time. Toys R Us Lebanon has the brand recognition, the product breadth, and the market position. Executing on the digital and content gaps identified here is what closes the distance between brand awareness and market leadership.
+        </p>
+      </div>
 
       <div style={{ height: 48 }} />
     </div>
