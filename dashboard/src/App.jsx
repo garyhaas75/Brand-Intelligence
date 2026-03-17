@@ -2437,35 +2437,77 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
             </div>
           )}
 
-          {/* Content expansion opportunities — reframed as revenue unlocks */}
-          {siteData.productContentReview && (siteData.productContentReview.contentGaps || []).length > 0 && (
-            <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Revenue unlocks hiding in plain sight</p>
+          {/* Content expansion opportunities — 3 built-out opportunity cards */}
+          {siteData.productContentReview && (
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Three revenue unlocks hiding in plain sight</p>
               <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-                These are content and category additions that would directly capture shopper segments already in market — each one is a page or feature that competitors with smaller budgets have already built.
+                Each of these is a page or category that competitors with smaller budgets have already built — and that shoppers in your market are actively searching for.
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {siteData.productContentReview.contentGaps.map((gap, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 14px', background: '#f0fdf4', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
-                    <span style={{ color: '#10b981', fontWeight: 700, fontSize: 14, flexShrink: 0, marginTop: 1 }}>→</span>
-                    <p style={{ color: '#14532d', fontSize: 13, lineHeight: 1.55, margin: 0 }}>{gap}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                {/* Opportunity 1 */}
+                <Card style={{ padding: 0, overflow: 'hidden' }}>
+                  <div style={{ background: '#0ea5e9', padding: '14px 18px' }}>
+                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 1</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Add an Infant & Toddler Category (0–2 Years)</p>
                   </div>
-                ))}
+                  <div style={{ padding: '14px 18px' }}>
+                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                      New-parent spending is at its peak in the 0–2 age window — strollers, bouncers, sensory toys, first books. None of your competitors in Lebanon have built a clean, curated section for this segment, which means the first retailer to do it owns it.
+                    </p>
+                    <div style={{ background: '#f0f9ff', borderRadius: 8, padding: '10px 14px' }}>
+                      <p style={{ color: '#0369a1', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
+                      <p style={{ color: '#0c4a6e', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create a dedicated "Ages 0–2" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities on Instagram. One page, immediate SEO lift, long-term customer acquisition.</p>
+                    </div>
+                  </div>
+                </Card>
+                {/* Opportunity 2 */}
+                <Card style={{ padding: 0, overflow: 'hidden' }}>
+                  <div style={{ background: '#8b5cf6', padding: '14px 18px' }}>
+                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 2</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Show Prices — Even "Starting From" Ranges</p>
+                  </div>
+                  <div style={{ padding: '14px 18px' }}>
+                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                      Shoppers who can't see a price don't add to cart — they leave to find one. Price transparency is especially important in Lebanon where customers cross-compare across physical and online channels. Showing even a "from $X" range eliminates the biggest drop-off point in your funnel.
+                    </p>
+                    <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '10px 14px' }}>
+                      <p style={{ color: '#5b21b6', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
+                      <p style={{ color: '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Add price ranges to category pages and top-selling product listings. If exact pricing is dynamic, use "Starting from" labels. A/B test: even partial price visibility typically increases add-to-cart rates by 15–30%.</p>
+                    </div>
+                  </div>
+                </Card>
+                {/* Opportunity 3 */}
+                <Card style={{ padding: 0, overflow: 'hidden' }}>
+                  <div style={{ background: '#10b981', padding: '14px 18px' }}>
+                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 3</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Build Age-Based Landing Pages</p>
+                  </div>
+                  <div style={{ padding: '14px 18px' }}>
+                    <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
+                      "Toys for 6-year-olds" is one of the highest-intent toy searches in every market. Parents and grandparents search by age — not by brand or category. Age-based landing pages (3–5, 6–8, 9–12, Teens) are how toy retailers capture this intent and rank for it on Google.
+                    </p>
+                    <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px' }}>
+                      <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
+                      <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create 4–5 static landing pages organized by age bracket, tagged with relevant SEO keywords. Cross-link from homepage and navigation. These pages compound over time — once indexed, they drive organic traffic indefinitely.</p>
+                    </div>
+                  </div>
+                </Card>
               </div>
-            </Card>
+            </div>
           )}
 
-          {/* Messaging gaps — what you're not saying */}
+          {/* Messaging gaps — reframed as messaging opportunities */}
           {(siteData.messagingGaps || []).length > 0 && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>What your messaging isn't saying</p>
-              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>These are value messages competitors communicate that you currently don't — each one is a reason a customer might choose them over you.</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Messaging moves that will set you apart</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>These are value messages your competitors are already communicating — adding them to your site is a fast, high-leverage way to increase trust and conversion.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {siteData.messagingGaps.map((mg, i) => (
-                  <div key={i} style={{ padding: '12px 16px', background: T.surfaceAlt, borderRadius: 8, borderLeft: `3px solid ${T.border}` }}>
-                    <p style={{ color: T.text, fontSize: 13, fontWeight: 700, marginBottom: mg.competitorExample || mg.recommendation ? 6 : 0 }}>{mg.gap}</p>
-                    {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.recommendation ? 4 : 0 }}>Competitor example: {mg.competitorExample}</p>}
-                    {mg.recommendation && <p style={{ color: T.accent, fontSize: 12, fontWeight: 600, margin: 0 }}>Fix: {mg.recommendation}</p>}
+                  <div key={i} style={{ padding: '12px 16px', background: T.surfaceAlt, borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
+                    <p style={{ color: T.accent, fontSize: 13, fontWeight: 700, marginBottom: mg.gap || mg.competitorExample ? 4 : 0 }}>{mg.recommendation || mg.gap}</p>
+                    {mg.recommendation && mg.gap && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.competitorExample ? 4 : 0, margin: 0 }}>Currently missing: {mg.gap}</p>}
+                    {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 4, marginBottom: 0 }}>Competitor example: {mg.competitorExample}</p>}
                   </div>
                 ))}
               </div>

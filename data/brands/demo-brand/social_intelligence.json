@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "brandSlug": "demo-brand",
+  "brands": [
+    {
+      "id": "demo-brand",
+      "name": "Demo Brand",
+      "role": "target",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-01-01T00:00:00.000Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": ["Social presence not yet analyzed — run the Social Audit module to populate this data."]
+    },
+    {
+      "id": "competitor-a",
+      "name": "Competitor A",
+      "role": "competitor",
+      "handle": null,
+      "platform": "instagram",
+      "scrapedAt": "2026-01-01T00:00:00.000Z",
+      "summary": {
+        "postCount": 0,
+        "avgEngagement": 0,
+        "followersEstimate": null,
+        "postingFrequencyPerWeek": 0
+      },
+      "contentThemes": [],
+      "topHashtags": [],
+      "recentPosts": [],
+      "monthlyTrend": [],
+      "contentGaps": []
+    }
+  ]
+}

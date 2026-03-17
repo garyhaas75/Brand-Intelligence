@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "brandSlug": "demo-brand",
+  "competitors": [
+    {
+      "name": "Competitor A",
+      "url": "https://www.competitor-a.com",
+      "pricingTier": "mid",
+      "positioningStatement": "Classic workwear with a modern twist for the professional woman.",
+      "strengths": ["Strong brand recognition", "Wide size range", "Omnichannel presence"],
+      "opportunities": ["Weak digital content strategy", "Limited sustainability messaging", "Poor mobile UX"],
+      "navCategories": ["Dresses", "Suits", "Tops", "Pants", "Accessories"],
+      "heroHeadline": "Dress for the life you want",
+      "scrapedAt": "2026-01-01T00:00:00.000Z",
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "name": "Competitor B",
+      "url": "https://www.competitor-b.com",
+      "pricingTier": "premium",
+      "positioningStatement": "Premium contemporary fashion for ambitious women.",
+      "strengths": ["Premium brand equity", "Strong influencer presence", "Editorial content"],
+      "opportunities": ["High price barrier", "Limited inclusive sizing", "No loyalty program"],
+      "navCategories": ["New Arrivals", "Workwear", "Weekend", "Shoes", "Bags"],
+      "heroHeadline": "The new power dressing",
+      "scrapedAt": "2026-01-01T00:00:00.000Z",
+      "botBlocked": false,
+      "error": null
+    },
+    {
+      "name": "Competitor C",
+      "url": "https://www.competitor-c.com",
+      "pricingTier": "mid",
+      "positioningStatement": "Versatile everyday style at accessible prices.",
+      "strengths": ["Value pricing", "Fast fashion cycles", "Strong social media"],
+      "opportunities": ["Perceived lower quality", "No editorial voice", "Weak email program"],
+      "navCategories": ["Tops", "Bottoms", "Dresses", "Outerwear", "Sale"],
+      "heroHeadline": "New styles every week",
+      "scrapedAt": "2026-01-01T00:00:00.000Z",
+      "botBlocked": false,
+      "error": null
+    }
+  ],
+  "positioningMap": {
+    "narrative": "The competitive landscape shows Demo Brand competing primarily in the mid-market segment with an opportunity to differentiate on quality positioning versus Competitor C while offering more accessible pricing than Competitor B.",
+    "axes": {
+      "x": "Price (Budget → Luxury)",
+      "y": "Style (Classic → Contemporary)"
+    },
+    "brandPositions": [
+      { "name": "Demo Brand", "x": 45, "y": 55 },
+      { "name": "Competitor A", "x": 40, "y": 45 },
+      { "name": "Competitor B", "x": 75, "y": 70 },
+      { "name": "Competitor C", "x": 25, "y": 60 }
+    ]
+  },
+  "topAssortmentGaps": [
+    "Sustainable/eco-conscious collection missing",
+    "Extended size range (0-28) underserved",
+    "Occasion dressing (wedding guest, gala) not represented"
+  ]
+}
