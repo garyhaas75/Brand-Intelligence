@@ -2346,35 +2346,29 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
       </p>
       {socialData ? (
         <>
-          {(socialData.brands || []).length > 0 && (
+          {/* Competitor social snapshot — show only competitors with data */}
+          {(socialData.brands || []).filter(b => b.role !== 'target' && ((b.summary?.avgEngagement || 0) > 0 || (b.tiktokData?.summary?.avgEngagement || 0) > 0)).length > 0 && (
             <Card style={{ marginBottom: 20, padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px 10px', borderBottom: `1px solid ${T.border}` }}>
-                <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Engagement by Brand & Platform</p>
-                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2, marginBottom: 0 }}>Average engagement per post — the higher this number, the more the audience actively responds</p>
+                <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Competitor Engagement — What the Bar Looks Like</p>
+                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2, marginBottom: 0 }}>Average engagement per post across competitors — shows the level of audience activity you're entering</p>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr>
-                      <th style={thSt}>Brand</th>
-                      <th style={{ ...thSt, textAlign: 'right' }}>Instagram Posts</th>
+                      <th style={thSt}>Competitor</th>
                       <th style={{ ...thSt, textAlign: 'right' }}>Instagram Avg Engagement</th>
                       <th style={{ ...thSt, textAlign: 'right' }}>TikTok Avg Engagement</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {socialData.brands.map((brand, i) => {
-                      const igPosts = brand.summary?.postCount ?? brand.instagramData?.summary?.postCount ?? null
+                    {socialData.brands.filter(b => b.role !== 'target').map((brand, i) => {
                       const igEng = brand.summary?.avgEngagement ?? brand.instagramData?.summary?.avgEngagement ?? null
                       const ttEng = brand.tiktokData?.summary?.avgEngagement ?? null
-                      const isTarget = brand.role === 'target' || brand.role === 'client'
                       return (
-                        <tr key={i} style={{ background: isTarget ? `${T.accent}12` : 'transparent' }}>
-                          <td style={{ ...tdSt, fontWeight: isTarget ? 700 : 400, color: isTarget ? T.text : T.textSub }}>
-                            {brand.name}
-                            {isTarget && <span style={{ color: T.accent, fontSize: 10, marginLeft: 6, fontWeight: 700, background: `${T.accent}20`, padding: '1px 6px', borderRadius: 10 }}>YOU</span>}
-                          </td>
-                          <td style={{ ...tdSt, textAlign: 'right' }}>{igPosts != null ? igPosts.toLocaleString() : '—'}</td>
+                        <tr key={i}>
+                          <td style={{ ...tdSt, color: T.textSub }}>{brand.name}</td>
                           <td style={{ ...tdSt, textAlign: 'right' }}>{igEng != null ? (typeof igEng === 'number' ? igEng.toLocaleString() : igEng) : '—'}</td>
                           <td style={{ ...tdSt, textAlign: 'right' }}>{ttEng != null ? (typeof ttEng === 'number' ? ttEng.toLocaleString() : ttEng) : '—'}</td>
                         </tr>
@@ -2443,33 +2437,21 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
             </div>
           )}
 
-          {/* Missing customer segments — the product content review reframed */}
-          {siteData.productContentReview && (
+          {/* Content expansion opportunities — reframed as revenue unlocks */}
+          {siteData.productContentReview && (siteData.productContentReview.contentGaps || []).length > 0 && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Customer segments you're not serving</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Revenue unlocks hiding in plain sight</p>
               <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-                Your website currently covers{' '}
-                {(siteData.productContentReview.ageGroupCoverage || []).length > 0
-                  ? `ages ${siteData.productContentReview.ageGroupCoverage.join(', ')}`
-                  : 'a limited age range'}{' '}
-                and{' '}
-                {(siteData.productContentReview.brandsCovered || []).length > 0
-                  ? `${siteData.productContentReview.brandsCovered.length} featured brands`
-                  : 'a limited brand selection'}.{' '}
-                {siteData.productContentReview.priceVisibility === 'hidden'
-                  ? 'Pricing is not visible — shoppers who need to know "can I afford this?" before clicking deeper will leave without converting.'
-                  : ''}
+                These are content and category additions that would directly capture shopper segments already in market — each one is a page or feature that competitors with smaller budgets have already built.
               </p>
-              {(siteData.productContentReview.contentGaps || []).length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {siteData.productContentReview.contentGaps.map((gap, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 14px', background: '#fff5f5', borderRadius: 8, borderLeft: '3px solid #f87171' }}>
-                      <span style={{ color: '#ef4444', fontWeight: 700, fontSize: 14, flexShrink: 0, marginTop: 1 }}>✗</span>
-                      <p style={{ color: '#7f1d1d', fontSize: 13, lineHeight: 1.55, margin: 0 }}>{gap}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {siteData.productContentReview.contentGaps.map((gap, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 14px', background: '#f0fdf4', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
+                    <span style={{ color: '#10b981', fontWeight: 700, fontSize: 14, flexShrink: 0, marginTop: 1 }}>→</span>
+                    <p style={{ color: '#14532d', fontSize: 13, lineHeight: 1.55, margin: 0 }}>{gap}</p>
+                  </div>
+                ))}
+              </div>
             </Card>
           )}
 
@@ -2670,69 +2652,48 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </>
       ) : <NoData />}
 
-      {/* ── 7. YOUR OPPORTUNITIES ── */}
-      <SectionHeader label="Chapter 6" title="Where You Can Win — Your Biggest Opportunities" />
+      {/* ── 6. ACTION PLAN ── */}
+      <SectionHeader label="Chapter 6" title="What to Do Next — Your Action Plan" />
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        Everything in this report points here. These are the specific moves — drawn from the competitive gaps, content voids, SEO weaknesses, and customer insights above — that represent your clearest path to growth.
+        Everything in the previous chapters feeds into this. Below are the strategic priorities synthesized from the full analysis, followed by specific actions you can start immediately.
       </p>
 
-      {/* Strategic opportunities */}
+      {/* Strategic opportunities — the big bets */}
       {(data.opportunitiesRanked || []).length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-          {data.opportunitiesRanked.map((opp, i) => (
-            <Card key={i} style={{ padding: '20px 24px', borderLeft: `4px solid ${T.accent}` }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 32, fontWeight: 900, color: T.accent, lineHeight: 1, flexShrink: 0, minWidth: 36, marginTop: 2 }}>{opp.rank}</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 8 }}>{opp.opportunity}</p>
-                  {opp.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.7, marginBottom: opp.estimatedImpact ? 10 : 0 }}>{opp.rationale}</p>}
-                  {opp.estimatedImpact && (
-                    ['high', 'medium', 'low'].includes(String(opp.estimatedImpact).toLowerCase())
-                      ? <ImpactBadge impact={String(opp.estimatedImpact).toLowerCase()} />
-                      : <p style={{ color: T.textMuted, fontSize: 12, fontStyle: 'italic', margin: 0 }}>{opp.estimatedImpact}</p>
-                  )}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Competitive gaps */}
-      {(data.competitiveGapsToClose || []).length > 0 && (
         <>
-          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 8 }}>Competitive gaps to close</p>
-          <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Specific areas where competitors currently have an advantage — each one is an opportunity to level the playing field.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-            {data.competitiveGapsToClose.map((gap, i) => (
-              <div key={i} style={{ display: 'flex', gap: 14, padding: '12px 16px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
-                <Badge label={gap.priority || 'medium'} color={gap.priority === 'high' ? 'red' : gap.priority === 'low' ? 'green' : 'yellow'} />
+          <p style={{ color: T.text, fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: T.textMuted, marginBottom: 16 }}>Strategic priorities</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+            {data.opportunitiesRanked.map((opp, i) => (
+              <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '18px 22px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, borderLeft: `4px solid ${T.accent}` }}>
+                <span style={{ fontSize: 28, fontWeight: 900, color: T.accent, lineHeight: 1, flexShrink: 0, minWidth: 30 }}>{opp.rank}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0, marginBottom: gap.competitor ? 3 : 0 }}>{gap.gap}</p>
-                  {gap.competitor && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>Currently an advantage for {gap.competitor}</p>}
+                  <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: opp.rationale ? 6 : 0 }}>{opp.opportunity}</p>
+                  {opp.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, margin: 0 }}>{opp.rationale}</p>}
                 </div>
+                {opp.estimatedImpact && ['high', 'medium', 'low'].includes(String(opp.estimatedImpact).toLowerCase()) && (
+                  <ImpactBadge impact={String(opp.estimatedImpact).toLowerCase()} />
+                )}
               </div>
             ))}
           </div>
         </>
       )}
 
-      {/* Immediate wins */}
+      {/* Immediate wins — what to start this week */}
       {(data.immediateWins || []).length > 0 && (
         <>
-          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Start here — immediate wins</p>
-          <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>High-impact actions that can be completed quickly with resources you already have.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <p style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: T.textMuted, marginBottom: 16 }}>Start this week</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {data.immediateWins.map((win, i) => (
-              <div key={i} style={{ display: 'flex', gap: 16, padding: '18px 20px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, alignItems: 'flex-start' }}>
+              <div key={i} style={{ display: 'flex', gap: 16, padding: '16px 20px', background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 10, alignItems: 'flex-start' }}>
                 <span style={rankCircleStyle(win.rank || i + 1)}>{win.rank || i + 1}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, color: T.text, fontSize: 14 }}>{win.title}</span>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, color: T.text, fontSize: 13 }}>{win.title}</span>
                     <ImpactBadge impact={win.impact} />
                     {win.effort && <Badge label={`${win.effort} effort`} color="gray" />}
                   </div>
-                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, margin: 0 }}>{win.description}</p>
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{win.description}</p>
                 </div>
               </div>
             ))}
@@ -2740,7 +2701,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion }) {
         </>
       )}
 
-      {(data.opportunitiesRanked || []).length === 0 && (data.competitiveGapsToClose || []).length === 0 && (data.immediateWins || []).length === 0 && <NoData />}
+      {(data.opportunitiesRanked || []).length === 0 && (data.immediateWins || []).length === 0 && <NoData />}
 
       <div style={{ height: 48 }} />
     </div>
