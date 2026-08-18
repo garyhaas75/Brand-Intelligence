@@ -526,8 +526,18 @@ app.get('/share/:token', (req, res) => {
 });
 
 // ─── Locally-cached social post images (public, BEFORE basicAuth) ─────────────
+// slug/filename are attacker-controlled and this route runs BEFORE auth, so they must be
+// constrained hard. Express decodes %2e%2e%2f to ../ and path.join normalizes it away, so a
+// bare join let an unauthenticated caller climb out of the images dir and read social session
+// cookies and share tokens off the volume. Allowlist the segments, then require the resolved
+// path to stay inside the images directory.
+const _SEG_OK = /^[a-z0-9][a-z0-9._-]*$/i;
 app.get('/api/social-image/:slug/:filename', (req, res) => {
-  const imgPath = path.join(DATA_DIR, 'brands', req.params.slug, 'social_images', req.params.filename);
+  const { slug, filename } = req.params;
+  if (!_SEG_OK.test(slug) || !_SEG_OK.test(filename)) return res.status(400).end();
+  const base = path.join(BRANDS_DIR, slug, 'social_images');
+  const imgPath = path.resolve(base, filename);
+  if (!imgPath.startsWith(path.resolve(base) + path.sep)) return res.status(400).end();
   if (!fs.existsSync(imgPath)) return res.status(404).end();
   res.setHeader('Cache-Control', 'public, max-age=604800');
   res.sendFile(imgPath);
