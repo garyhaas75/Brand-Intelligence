@@ -11,6 +11,7 @@ const { chromium } = require('playwright');
 const { ApifyClient } = require('apify-client');
 const fs = require('fs');
 const path = require('path');
+const { fetchCategoriesFromSitemap } = require('./sitemap_categories');
 
 const APIFY_STALE_HOURS = 48;
 // Per-site ceiling on the Apify residential retry. Measured: a site that yields
@@ -231,7 +232,35 @@ async function scrapeBrands(brands, opts = {}) {
       // The Apify path already exists for exactly this and routes through
       // residential proxies; it was only ever reachable via an opt-in `useApify`
       // flag that nothing set, so it never ran. Retry through it automatically.
-      const shouldRetry = (brandResult.botBlocked || brandResult.error) && process.env.APIFY_API_TOKEN;
+      // Sitemap first. The analysis prompts are dominated by the category list —
+      // hero and promos are a line each — and retailers publish that taxonomy for
+      // search engines, so it is reachable with a plain GET on sites whose pages
+      // are hard-blocked. Kmart returns nothing to a residential-proxy browser
+      // after ~3 minutes but yields 2,234 category URLs here in under two seconds,
+      // at no cost. Try it before spending an Apify retry.
+      const thinCategories = (brandResult.featuredCategories || []).length < 5;
+      if (brandResult.botBlocked || brandResult.error || thinCategories) {
+        try {
+          const viaSitemap = await fetchCategoriesFromSitemap(brand.url, msg => log(msg, logFile));
+          if (viaSitemap) {
+            brandResult.featuredCategories = viaSitemap.featuredCategories;
+            brandResult.topLevelSections = viaSitemap.topLevelSections;
+            brandResult.categorySource = 'sitemap';
+            brandResult.sitemapUrl = viaSitemap.sitemapUrl;
+            // Categories recovered, so this is no longer a dead result — but keep
+            // any error visible, since hero/promo/screenshot really did fail.
+            brandResult.botBlocked = false;
+            delete brandResult.note;
+            log(`  ${brand.name}: categories recovered from sitemap (${viaSitemap.featuredCategories.length})`, logFile);
+          }
+        } catch (err) {
+          log(`  ${brand.name}: sitemap lookup failed: ${err.message}`, logFile);
+        }
+      }
+
+      // Apify is now the last resort: only when the sitemap gave us nothing either.
+      const stillNoCategories = (brandResult.featuredCategories || []).length === 0;
+      const shouldRetry = stillNoCategories && (brandResult.botBlocked || brandResult.error) && process.env.APIFY_API_TOKEN;
       if (shouldRetry) {
         log(`  ${brand.name}: ${brandResult.botBlocked ? 'bot-blocked' : 'errored'} on direct scrape — retrying via Apify residential proxy`, logFile);
         try {
