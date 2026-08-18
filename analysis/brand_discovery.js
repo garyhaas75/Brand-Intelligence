@@ -243,6 +243,57 @@ const SCRIPT_TO_MODULE = {
   'action_plan.js': 'action_plan',
 };
 
+// The output file each module writes when it finishes.
+const SCRIPT_TO_OUTPUT = {
+  'competitive_analysis.js': 'competitive_analysis.json',
+  'social_audit.js': 'social_intelligence.json',
+  'website_audit.js': 'site_intelligence.json',
+  'search_seo.js': 'search_seo.json',
+  'personas.js': 'personas.json',
+};
+
+/**
+ * Run action_plan once the modules it depends on have actually finished.
+ *
+ * This used to fire on a fixed timer five minutes after the last module was
+ * *spawned*, which is an estimate rather than a dependency: on a real run the
+ * plan was written before search_seo finished, so it was built with no SEO
+ * data. Poll for each module's output file to be rewritten instead, and fall
+ * back to running anyway if something never lands, so a single stuck module
+ * cannot block the plan forever.
+ */
+function runActionPlanWhenReady(slug, scripts, startedAt) {
+  const POLL_MS = 15 * 1000;
+  const MAX_WAIT_MS = 30 * 60 * 1000;
+  const deadline = Date.now() + MAX_WAIT_MS;
+
+  const stillPending = () => scripts.filter(script => {
+    const output = SCRIPT_TO_OUTPUT[script];
+    if (!output) return false;
+    try {
+      // Compare against run start so a stale file from a previous run doesn't
+      // read as "already done".
+      return fs.statSync(path.join(DATA_DIR, 'brands', slug, output)).mtimeMs < startedAt;
+    } catch {
+      return true; // not written yet
+    }
+  });
+
+  log(`Waiting for ${scripts.length} modules to finish before running action_plan...`);
+  const timer = setInterval(() => {
+    const pending = stillPending();
+    if (pending.length === 0) {
+      clearInterval(timer);
+      log('All upstream modules finished — running action_plan');
+      spawnModule('action_plan.js', slug);
+    } else if (Date.now() > deadline) {
+      clearInterval(timer);
+      log(`WARN: gave up waiting after 30min for: ${pending.join(', ')} — running action_plan with whatever is available`);
+      spawnModule('action_plan.js', slug);
+    }
+  }, POLL_MS);
+}
+
 function spawnModule(script, slug, extraArgs = []) {
   log(`Spawning: ${script} --slug=${slug}`);
   const moduleName = SCRIPT_TO_MODULE[script] || script.replace('.js', '');
@@ -289,9 +340,10 @@ async function run() {
   if (refreshAll) {
     log(`Re-running all modules for slug: ${slugArg}`);
     const scripts = ['competitive_analysis.js', 'social_audit.js', 'website_audit.js', 'search_seo.js', 'personas.js'];
+    const startedAt = Date.now();
     scripts.forEach(s => spawnModule(s, slugArg));
-    // action_plan runs last (depends on all others) — delay spawn
-    setTimeout(() => spawnModule('action_plan.js', slugArg), 5 * 60 * 1000);
+    // action_plan depends on all of the above, so wait for them rather than guess.
+    runActionPlanWhenReady(slugArg, scripts, startedAt);
     return;
   }
 
@@ -361,11 +413,14 @@ async function run() {
 
     // 5. Spawn downstream modules (staggered to avoid memory spikes)
     const modules = ['competitive_analysis.js', 'website_audit.js', 'social_audit.js', 'search_seo.js', 'personas.js'];
+    const startedAt = Date.now();
     modules.forEach((script, i) => {
       setTimeout(() => spawnModule(script, slugArg), i * 30000); // 30s stagger
     });
-    // action_plan runs after all others complete (rough estimate: 5 min after last module)
-    setTimeout(() => spawnModule('action_plan.js', slugArg), (modules.length * 30000) + 5 * 60 * 1000);
+    // action_plan depends on all of the above. Anchor the wait to before the first
+    // spawn: a module still sitting in the stagger queue has no fresh output yet,
+    // so it reads as pending and the poller keeps waiting for it.
+    runActionPlanWhenReady(slugArg, modules, startedAt);
 
     log('Discovery complete. Downstream modules queued.');
   } catch (err) {
@@ -375,4 +430,8 @@ async function run() {
   }
 }
 
-run();
+// Only auto-run when invoked as a script, so the scheduling helpers can be
+// required and tested without kicking off a real discovery run.
+if (require.main === module) run();
+
+module.exports = { runActionPlanWhenReady, SCRIPT_TO_OUTPUT };

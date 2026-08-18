@@ -272,6 +272,11 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
 }
 
 // Hard kill after 12 minutes — prevents zombie processes on Railway
-setTimeout(() => { log('TIMEOUT: website audit exceeded 12min, forcing exit'); process.exit(1); }, 12 * 60 * 1000);
+// .unref() so this backstop does not itself hold the process open. Without it the
+// module sits idle for the full 12 minutes after finishing its work and then exits
+// with code 1, which looks like a failed run and leaves one node process per module
+// lingering on the container. Unref'd, the timer still fires if real work is hung,
+// but a completed run exits immediately and cleanly.
+setTimeout(() => { log('TIMEOUT: website audit exceeded 12min, forcing exit'); process.exit(1); }, 12 * 60 * 1000).unref();
 
 run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
