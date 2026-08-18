@@ -134,10 +134,21 @@ async function run() {
 
   const logFile = path.join(__dirname, '../logs', `website_audit_${slug}.log`);
   log(`Scraping ${brandsToScrape.length} sites...`);
+  // Sites that block a datacentre IP now retry through Apify's residential proxy,
+  // which turns a 2-second failure into a minutes-long attempt. The old budget
+  // resolved to [] on timeout — the log claimed "partial results" while actually
+  // discarding every successful scrape. Collect brands as they land so a timeout
+  // costs only the sites that hadn't finished.
+  const SCRAPE_BUDGET_MS = 10 * 60 * 1000;
+  const partial = [];
   const scraped = await Promise.race([
-    scrapeBrands(brandsToScrape, { logFile }),
-    new Promise(resolve => setTimeout(() => { log('Scraping timed out after 6min — continuing with partial results'); resolve([]); }, 360000)),
+    scrapeBrands(brandsToScrape, { logFile, collector: partial }),
+    new Promise(resolve => setTimeout(() => {
+      log(`Scraping timed out after 10min — continuing with ${partial.length}/${brandsToScrape.length} sites that finished`);
+      resolve(partial);
+    }, SCRAPE_BUDGET_MS)),
   ]);
+  log(`Scraped ${scraped.length}/${brandsToScrape.length} sites (${scraped.filter(b => !b.botBlocked && !b.error).length} usable)`);
 
   // Timeout is a backstop only — a healthy run finishes in well under a minute.
   log(`Running Lighthouse audit for ${profile.url}...`);
@@ -277,6 +288,8 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
 // with code 1, which looks like a failed run and leaves one node process per module
 // lingering on the container. Unref'd, the timer still fires if real work is hung,
 // but a completed run exits immediately and cleanly.
-setTimeout(() => { log('TIMEOUT: website audit exceeded 12min, forcing exit'); process.exit(1); }, 12 * 60 * 1000).unref();
+// Must stay comfortably above the scrape budget (10min) plus Lighthouse (2min)
+// plus the Claude analysis call, or this kills healthy runs mid-flight.
+setTimeout(() => { log('TIMEOUT: website audit exceeded 20min, forcing exit'); process.exit(1); }, 20 * 60 * 1000).unref();
 
 run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });

@@ -13,6 +13,10 @@ const fs = require('fs');
 const path = require('path');
 
 const APIFY_STALE_HOURS = 48;
+// Per-site ceiling on the Apify residential retry. Measured: a site that yields
+// comes back in ~40s; one that is genuinely hardened (Kmart) burned 188s and
+// still returned nothing. 120s is comfortably above the former and cuts the latter.
+const APIFY_RETRY_TIMEOUT_MS = 120 * 1000;
 
 function log(msg, logFile) {
   const line = `[${new Date().toISOString()}] ${msg}`;
@@ -166,7 +170,10 @@ async function scrapeWithApifyFallback(brand, logFile) {
  * @returns {Array} scraped brand results
  */
 async function scrapeBrands(brands, opts = {}) {
-  const { logFile, existingData = {} } = opts;
+  // , when supplied, receives each brand as it completes. A caller that
+  // races this against a deadline can then still use whatever finished, instead of
+  // throwing away every successful scrape because one site was slow.
+  const { logFile, existingData = {}, collector } = opts;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   const results = [];
 
@@ -228,7 +235,13 @@ async function scrapeBrands(brands, opts = {}) {
       if (shouldRetry) {
         log(`  ${brand.name}: ${brandResult.botBlocked ? 'bot-blocked' : 'errored'} on direct scrape — retrying via Apify residential proxy`, logFile);
         try {
-          const apifyData = await scrapeWithApifyFallback(brand, logFile);
+          // Cap each retry. Apify runs its own internal retries against hostile
+          // sites and can sit there for many minutes; without a per-site ceiling a
+          // couple of stubborn competitors consume the caller's entire budget.
+          const apifyData = await Promise.race([
+            scrapeWithApifyFallback(brand, logFile),
+            new Promise((_, reject) => setTimeout(() => reject(new Error(`Apify retry exceeded ${APIFY_RETRY_TIMEOUT_MS / 1000}s`)), APIFY_RETRY_TIMEOUT_MS)),
+          ]);
           if ((apifyData.navigation || []).length > 0) {
             // Keep the screenshot from the direct attempt — Apify does not return one.
             const { screenshotBase64 } = brandResult;
@@ -257,6 +270,7 @@ async function scrapeBrands(brands, opts = {}) {
     } else {
       results.push(brandResult);
     }
+    if (Array.isArray(collector)) collector.push(results[results.length - 1]);
   }
 
   await browser.close();
