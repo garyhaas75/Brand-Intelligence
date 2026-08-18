@@ -12,6 +12,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 
 const DATA_DIR = path.join(__dirname, '..', 'data', 'brands');
 
@@ -72,12 +73,13 @@ STYLE GUIDE TEXT:
 ${truncated || '(No text extracted — document may be image-only)'}`;
 
   const msg = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2000,
+    model: MODEL_FAST,
+    max_tokens: 4000,
+    output_config: EFFORT_LOW,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const raw = msg.content[0].text;
+  const raw = extractText(msg);
   const start = raw.indexOf('{');
   const end = raw.lastIndexOf('}');
   if (start === -1 || end === -1) throw new Error('Claude did not return valid JSON');

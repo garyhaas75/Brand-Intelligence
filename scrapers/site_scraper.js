@@ -194,6 +194,11 @@ async function scrapeBrands(brands, opts = {}) {
       const context = await browser.newContext({
         userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         viewport: { width: 1440, height: 900 },
+        // Retina-density capture for the brand we run vision analysis on: 1440 x 1.75
+        // = 2520px, just under the model's 2576px long-edge limit, so the screenshot
+        // is used at full resolution instead of being downscaled. Small on-page text
+        // (CTAs, promo copy, nav labels) becomes legible to the audit.
+        ...(brand.takeScreenshot ? { deviceScaleFactor: 1.75 } : {}),
       });
       const page = await context.newPage();
       // Skip image abort for brands that need a screenshot (target brand visual audit)
@@ -204,7 +209,7 @@ async function scrapeBrands(brands, opts = {}) {
       // Capture viewport screenshot after page is loaded (only when requested)
       if (brand.takeScreenshot && !brandResult.error) {
         try {
-          const buf = await page.screenshot({ fullPage: false, type: 'jpeg', quality: 75 });
+          const buf = await page.screenshot({ fullPage: false, type: 'jpeg', quality: 85 });
           brandResult.screenshotBase64 = buf.toString('base64');
           log(`  ${brand.name}: screenshot captured (${Math.round(buf.length / 1024)}KB)`, logFile);
         } catch (err) {

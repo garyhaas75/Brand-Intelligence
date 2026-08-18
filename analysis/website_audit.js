@@ -1,13 +1,17 @@
 /**
  * Website Audit — scrapes brand + competitor sites and uses Claude to identify
  * navigation gaps, messaging gaps, CTA effectiveness, and top opportunities.
- * Includes: Playwright screenshot + Claude vision, Lighthouse technical SEO.
+ * Includes: Playwright screenshot + Claude vision.
+ * NOTE: Lighthouse technical SEO is currently DISABLED (it was removed to stop the
+ * audit hanging). lighthouseAudit is always null, so the dashboard Lighthouse
+ * scores render empty. Re-add the lighthouse dependency to restore it.
  *
  * Usage: node analysis/website_audit.js --slug=<brand-slug>
  */
 
 require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
 const path = require('path');
 const { scrapeBrands } = require('../scrapers/site_scraper');
@@ -61,6 +65,8 @@ async function run() {
     new Promise(resolve => setTimeout(() => { log('Scraping timed out after 6min — continuing with partial results'); resolve([]); }, 360000)),
   ]);
 
+  // Lighthouse is disabled — see the note at the top of this file. Kept as an
+  // explicit null so the saved shape and the dashboard component stay stable.
   const lighthouseAudit = null;
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -145,12 +151,12 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
     : prompt;
 
   const msg = await anthropic.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 4096,
+    model: MODEL_DEEP,
+    max_tokens: 8000,
     messages: [{ role: 'user', content: visionContent }],
   });
 
-  const raw = msg.content[0].text;
+  const raw = extractText(msg);
   let analysis = {
     navGaps: [], messagingGaps: [], ctaEffectiveness: {}, topOpportunities: [],
     heroMessagingAnalysis: {}, crawlerVisibility: {}, navigationAnalysis: {}, productContentReview: {},
@@ -185,7 +191,7 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
   const existing = loadBrandData(slug, 'site_intelligence.json');
   if (existing) archiveData(slug, 'site_intelligence', existing);
   saveBrandData(slug, 'site_intelligence.json', output);
-  log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? 'ok' : 'failed'}.`);
+  log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? 'ok' : 'disabled'}.`);
 }
 
 // Hard kill after 12 minutes — prevents zombie processes on Railway

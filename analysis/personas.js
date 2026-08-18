@@ -7,6 +7,7 @@
 
 require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
 const path = require('path');
 const { getBrandContext } = require('../utils/brand_context');
@@ -145,12 +146,12 @@ Return ONLY valid JSON:
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const msg = await anthropic.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 8192,
+    model: MODEL_DEEP,
+    max_tokens: 12000,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const raw = msg.content[0].text;
+  const raw = extractText(msg);
   const jsonStr = extractBraces(raw);
   if (!jsonStr) { log('ERROR: Could not extract JSON from Claude response'); process.exit(1); }
 

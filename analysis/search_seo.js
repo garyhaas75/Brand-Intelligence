@@ -15,6 +15,7 @@
 require('dotenv').config();
 const { chromium } = require('playwright');
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
@@ -311,11 +312,12 @@ Each category should have 15-30 terms. Prioritize local/market-specific terms wh
 
   try {
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 3000,
+      model: MODEL_FAST,
+      max_tokens: 5000,
+      output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: prompt }],
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
     if (start !== -1 && end !== -1) {
@@ -408,11 +410,12 @@ Rules:
 
   try {
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 7000,
+      model: MODEL_FAST,
+      max_tokens: 9000,
+      output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: prompt }],
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
     if (start !== -1 && end !== -1) {
@@ -477,11 +480,12 @@ Return a JSON array only:
   let queries = [];
   try {
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1200,
+      model: MODEL_FAST,
+      max_tokens: 3000,
+      output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: queryGenPrompt }],
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('[');
     const end = raw.lastIndexOf(']');
     if (start !== -1 && end !== -1) queries = JSON.parse(raw.slice(start, end + 1));
@@ -506,12 +510,12 @@ Return a JSON array only:
     log(`  Query: "${q.query.slice(0, 50)}"`);
     try {
       const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 400,
+        model: MODEL_FAST,
+        max_tokens: 2500,
         system: 'You are a helpful shopping assistant. Give honest, specific recommendations mentioning real brands.',
         messages: [{ role: 'user', content: q.query }],
       });
-      const analysis = analyzeAgentResponse(msg.content[0].text, brandName, competitorNames);
+      const analysis = analyzeAgentResponse(extractText(msg), brandName, competitorNames);
       claudeResults.push({ ...q, agent: 'claude', ...analysis });
       log(`    Claude: ${brandName} ${analysis.brandMentioned ? 'mentioned' : 'NOT mentioned'}`);
     } catch (err) {
@@ -599,11 +603,12 @@ Return ONLY a JSON array:
 
   try {
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1500,
+      model: MODEL_FAST,
+      max_tokens: 3000,
+      output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: prompt }],
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('[');
     const end = raw.lastIndexOf(']');
     if (start !== -1 && end !== -1) {
@@ -696,11 +701,12 @@ Valid values: impact = "High" | "Medium" | "Low", effort = "Quick Win" | "1-2 we
 
   try {
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      model: MODEL_FAST,
+      max_tokens: 4000,
+      output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: prompt }],
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('[');
     const end = raw.lastIndexOf(']');
     if (start !== -1 && end !== -1) {

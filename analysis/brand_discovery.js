@@ -15,6 +15,7 @@
 require('dotenv').config();
 const { chromium } = require('playwright');
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -102,8 +103,8 @@ async function researchLocalCompetitors(anthropic, brandName, industry, market) 
   log(`  Pre-researching local ${industry} ecommerce competitors in ${market}...`);
   try {
     const msg = await anthropic.messages.create({
-      model: 'claude-opus-4-6',
-      max_tokens: 1500,
+      model: MODEL_DEEP,
+      max_tokens: 3000,
       messages: [{ role: 'user', content:
         `List all known ${industry} retailers that have an ACTIVE ECOMMERCE WEBSITE serving customers in ${market}.
 Brand context: This research is for a brand named "${brandName}" in the ${industry} industry.
@@ -127,7 +128,7 @@ Return ONLY a JSON array with no other text:
 If you are not confident about a URL, omit that entry rather than guess.
 List up to 12 businesses.` }]
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('[');
     const end = raw.lastIndexOf(']');
     if (start !== -1 && end !== -1) {
@@ -207,12 +208,12 @@ Rules for identifiedCompetitors:
 
   log('Calling Claude for brand profile extraction...');
   const msg = await anthropic.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 2000,
+    model: MODEL_DEEP,
+    max_tokens: 4000,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const raw = msg.content[0].text;
+  const raw = extractText(msg);
   log(`Claude response length: ${raw.length} chars`);
 
   // Extract JSON from response

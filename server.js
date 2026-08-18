@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('./utils/models');
 const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -942,8 +943,9 @@ Rules:
 
   try {
     const stream = anthropic.messages.stream({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 512,
+      model: MODEL_FAST,
+      max_tokens: 2500,
+      output_config: EFFORT_LOW,
       system,
       messages,
     });
@@ -998,11 +1000,12 @@ Return JSON with this exact structure:
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1500,
+      model: MODEL_FAST,
+      max_tokens: 3000,
+      output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: prompt }],
     });
-    const raw = msg.content[0].text;
+    const raw = extractText(msg);
     const start = raw.indexOf('{');
     let result = { suggestions: [] };
     if (start !== -1) {

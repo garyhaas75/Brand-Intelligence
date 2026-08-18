@@ -7,6 +7,7 @@
 
 require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
+const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
 const path = require('path');
 const { scrapeBrands } = require('../scrapers/site_scraper');
@@ -64,12 +65,13 @@ Return JSON with this exact structure:
 }`;
 
   const msg = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 800,
+    model: MODEL_FAST,
+    max_tokens: 2500,
+    output_config: EFFORT_LOW,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const raw = msg.content[0].text;
+  const raw = extractText(msg);
   const start = raw.indexOf('{');
   if (start === -1) return { pricingTier: 'mid', positioningStatement: '', strengths: [], opportunities: [], assortmentHighlights: [] };
   let depth = 0, end = -1;
@@ -109,12 +111,12 @@ Return JSON with this structure:
 For brandPositions, include the target brand AND all competitors. x/y values are 0-100.`;
 
   const msg = await anthropic.messages.create({
-    model: 'claude-opus-4-6',
-    max_tokens: 1500,
+    model: MODEL_DEEP,
+    max_tokens: 3000,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const raw = msg.content[0].text;
+  const raw = extractText(msg);
   const start = raw.indexOf('{');
   if (start === -1) return { narrative: raw, axes: { x: 'Price (Budget → Luxury)', y: 'Style (Classic → Contemporary)' }, brandPositions: [], whiteSpaceOpportunities: [] };
   let depth = 0, end = -1;
