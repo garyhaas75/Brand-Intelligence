@@ -1104,22 +1104,8 @@ app.post('/api/brands/:slug/export/pdf', async (req, res) => {
   }
 });
 
-// ─── SerpAPI Key Management ─────────────────────────────────────────────────────
-app.post('/api/settings/serp-api-key', (req, res) => {
-  const { apiKey } = req.body || {};
-  if (!apiKey) return res.status(400).json({ error: 'apiKey is required' });
-  // Store in .env.local (not committed to git)
-  const envLocalPath = path.join(__dirname, '.env.local');
-  const existing = fs.existsSync(envLocalPath) ? fs.readFileSync(envLocalPath, 'utf8') : '';
-  const updated = existing.replace(/^SERP_API_KEY=.*/m, '').trim() + `\nSERP_API_KEY=${apiKey}\n`;
-  fs.writeFileSync(envLocalPath, updated);
-  process.env.SERP_API_KEY = apiKey;
-  res.json({ ok: true, serpApiEnabled: true });
-});
-
-app.get('/api/settings', (req, res) => {
-  res.json({ serpApiEnabled: !!process.env.SERP_API_KEY });
-});
+// SerpAPI key management removed — search visibility is measured through Claude
+// only, so there is no third-party search key to store or report on.
 
 // ─── Social audit live progress ───────────────────────────────────────────────
 
@@ -1240,8 +1226,13 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   app.get('/{*splat}', (req, res) => {
     if (!req.path.startsWith('/api') && !req.path.startsWith('/share')) {
-      res.sendFile(path.join(distPath, 'index.html'));
+      return res.sendFile(path.join(distPath, 'index.html'));
     }
+    // This catch-all matches /api paths too. Falling through without answering
+    // leaves the request open until the client times out, so a typo'd or removed
+    // endpoint shows up in the UI as a spinner that never resolves rather than
+    // an error. Answer explicitly instead.
+    res.status(404).json({ error: 'Not found', path: req.path });
   });
 }
 

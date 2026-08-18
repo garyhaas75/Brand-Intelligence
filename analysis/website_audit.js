@@ -1,10 +1,7 @@
 /**
  * Website Audit — scrapes brand + competitor sites and uses Claude to identify
  * navigation gaps, messaging gaps, CTA effectiveness, and top opportunities.
- * Includes: Playwright screenshot + Claude vision.
- * NOTE: Lighthouse technical SEO is currently DISABLED (it was removed to stop the
- * audit hanging). lighthouseAudit is always null, so the dashboard Lighthouse
- * scores render empty. Re-add the lighthouse dependency to restore it.
+ * Includes: Playwright screenshot + Claude vision, Lighthouse technical SEO.
  *
  * Usage: node analysis/website_audit.js --slug=<brand-slug>
  */
@@ -13,7 +10,9 @@ require('dotenv').config();
 const Anthropic = require('@anthropic-ai/sdk');
 const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
+const net = require('net');
 const path = require('path');
+const { chromium } = require('playwright');
 const { scrapeBrands } = require('../scrapers/site_scraper');
 const { getBrandContext } = require('../utils/brand_context');
 
@@ -37,6 +36,81 @@ function archiveData(slug, module, data) {
   ensureDir(histDir);
   const ts = new Date().toISOString().slice(0, 10);
   fs.writeFileSync(path.join(histDir, `${module}_${ts}.json`), JSON.stringify(data, null, 2));
+}
+
+// Ask the OS for an unused port rather than guessing a fixed one, so two audits
+// running back to back can't collide on the debugging port.
+function findFreePort() {
+  return new Promise((resolve, reject) => {
+    const srv = net.createServer();
+    srv.on('error', reject);
+    srv.listen(0, () => {
+      const { port } = srv.address();
+      srv.close(() => resolve(port));
+    });
+  });
+}
+
+/**
+ * Lighthouse technical SEO audit.
+ *
+ * This previously used chrome-launcher, which hung on Railway because it hunts
+ * for a system Chrome install that isn't there. Instead we launch the Chromium
+ * that Playwright already installs during the Railway build, expose its CDP
+ * endpoint on a free port, and point Lighthouse at that port. Same audit, no
+ * system Chrome dependency — and it completes in seconds rather than hanging.
+ */
+async function runLighthouse(url) {
+  let browser;
+  try {
+    const port = await findFreePort();
+    browser = await chromium.launch({
+      args: [
+        `--remote-debugging-port=${port}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage', // container /dev/shm is small; avoids crashes
+      ],
+    });
+
+    const { default: lighthouse } = await import('lighthouse');
+    const result = await lighthouse(url, {
+      port,
+      onlyCategories: ['seo', 'performance', 'accessibility', 'best-practices'],
+      output: 'json',
+      logLevel: 'error',
+    });
+
+    const cats = result.lhr.categories;
+    const scores = {
+      seo: Math.round((cats.seo?.score ?? 0) * 100),
+      performance: Math.round((cats.performance?.score ?? 0) * 100),
+      accessibility: Math.round((cats.accessibility?.score ?? 0) * 100),
+      bestPractices: Math.round((cats['best-practices']?.score ?? 0) * 100),
+    };
+
+    // Chromium can launch, fail to actually render the page, and still report a
+    // full set of zeros. That is a failure, not a site scoring zero everywhere.
+    if (scores.seo === 0 && scores.performance === 0 && scores.accessibility === 0) {
+      log('Lighthouse returned all-zero scores — Chromium launched but could not evaluate the page');
+      return null;
+    }
+
+    const topIssues = Object.values(result.lhr.audits)
+      .filter(a => a.score !== null && a.score !== undefined && a.score < 0.9
+        && a.scoreDisplayMode !== 'notApplicable' && a.scoreDisplayMode !== 'informative')
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 12)
+      .map(a => ({ id: a.id, title: a.title, score: Math.round(a.score * 100) }));
+
+    log(`Lighthouse: SEO=${scores.seo}, Perf=${scores.performance}, A11y=${scores.accessibility}, BP=${scores.bestPractices} (${topIssues.length} issues)`);
+    return { scores, topIssues, lighthouseVersion: result.lhr.lighthouseVersion };
+  } catch (err) {
+    log(`Lighthouse failed: ${err.message}`);
+    return null;
+  } finally {
+    if (browser) { try { await browser.close(); } catch (_) {} }
+  }
 }
 
 
@@ -65,9 +139,12 @@ async function run() {
     new Promise(resolve => setTimeout(() => { log('Scraping timed out after 6min — continuing with partial results'); resolve([]); }, 360000)),
   ]);
 
-  // Lighthouse is disabled — see the note at the top of this file. Kept as an
-  // explicit null so the saved shape and the dashboard component stay stable.
-  const lighthouseAudit = null;
+  // Timeout is a backstop only — a healthy run finishes in well under a minute.
+  log(`Running Lighthouse audit for ${profile.url}...`);
+  const lighthouseAudit = await Promise.race([
+    runLighthouse(profile.url),
+    new Promise(resolve => setTimeout(() => { log('Lighthouse timed out after 120s — skipping'); resolve(null); }, 120000)),
+  ]);
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext(slug);
@@ -191,7 +268,7 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
   const existing = loadBrandData(slug, 'site_intelligence.json');
   if (existing) archiveData(slug, 'site_intelligence', existing);
   saveBrandData(slug, 'site_intelligence.json', output);
-  log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? 'ok' : 'disabled'}.`);
+  log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? `SEO ${lighthouseAudit.scores.seo}` : 'failed'}.`);
 }
 
 // Hard kill after 12 minutes — prevents zombie processes on Railway

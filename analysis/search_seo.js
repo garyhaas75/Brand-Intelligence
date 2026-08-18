@@ -5,7 +5,7 @@
  *   - Scrapes homepage + category pages + product pages (multi-page audit)
  *   - Sitemap analysis (robots.txt + sitemap.xml)
  * Keyword Universe: ~200 terms across 8 structured categories.
- * GEO: queries Claude + Perplexity as AI shopping assistants, measures brand visibility.
+ * GEO: queries Claude as an AI shopping assistant, measures brand visibility.
  * Competitor Benchmarks: Claude-generated plain-English callouts where competitors outperform target.
  * Priority Actions: Claude-ranked executive action list with impact + effort.
  *
@@ -429,21 +429,6 @@ Rules:
 
 // ─── GEO analysis ─────────────────────────────────────────────────────────────
 
-async function queryPerplexity(query) {
-  const key = process.env.PERPLEXITY_API_KEY;
-  if (!key) return null;
-  try {
-    const res = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'sonar', messages: [{ role: 'user', content: query }], max_tokens: 600 }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || null;
-  } catch { return null; }
-}
-
 function analyzeAgentResponse(response, brandName, competitorNames) {
   if (!response) return { brandMentioned: false, mentionPosition: null, sentiment: 'not_mentioned', competitorMentions: [], snippet: '' };
   const lower = response.toLowerCase();
@@ -468,7 +453,6 @@ async function runGeoAnalysis(anthropic, profile, keywordUniverse) {
   const brandName = profile.name;
   const competitorNames = (profile.identifiedCompetitors || []).slice(0, 8).map(c => c.name);
   const aiQueries = (keywordUniverse.aiDiscoveryQueries || []).slice(0, 10);
-  const hasPerplexity = !!process.env.PERPLEXITY_API_KEY;
 
   const queryGenPrompt = `Generate 20 realistic search queries that a customer might use when looking for a ${profile.industry} brand like ${profile.name} (${profile.market || ''}).
 
@@ -501,10 +485,9 @@ Return a JSON array only:
     );
   }
 
-  log(`Running GEO analysis: ${allQueries.length} queries × ${hasPerplexity ? '2 agents (Claude + Perplexity)' : '1 agent (Claude)'}`);
+  log(`Running GEO analysis: ${allQueries.length} queries via Claude`);
 
   const claudeResults = [];
-  const perplexityResults = [];
 
   for (const q of allQueries) {
     log(`  Query: "${q.query.slice(0, 50)}"`);
@@ -521,18 +504,12 @@ Return a JSON array only:
     } catch (err) {
       claudeResults.push({ ...q, agent: 'claude', brandMentioned: false, sentiment: 'not_mentioned', competitorMentions: [], snippet: '', error: err.message });
     }
-
-    if (hasPerplexity) {
-      const response = await queryPerplexity(q.query);
-      const analysis = analyzeAgentResponse(response, brandName, competitorNames);
-      perplexityResults.push({ ...q, agent: 'perplexity', ...analysis });
-      log(`    Perplexity: ${brandName} ${analysis.brandMentioned ? 'mentioned' : 'NOT mentioned'}`);
-    }
   }
 
   const claudeScore = allQueries.length > 0 ? Math.round((claudeResults.filter(r => r.brandMentioned).length / allQueries.length) * 100) : 0;
-  const perplexityScore = perplexityResults.length > 0 ? Math.round((perplexityResults.filter(r => r.brandMentioned).length / perplexityResults.length) * 100) : null;
-  const combinedScore = perplexityScore !== null ? Math.round((claudeScore + perplexityScore) / 2) : claudeScore;
+  // Single-agent measurement. combinedScore is retained as the field the dashboard
+  // reads, and now simply equals the Claude score.
+  const combinedScore = claudeScore;
 
   const missedCategories = [...new Set(claudeResults.filter(r => !r.brandMentioned).map(r => r.category))];
   const gapRecommendations = [
@@ -547,7 +524,6 @@ Return a JSON array only:
     queriesTested: allQueries.length,
     byAgent: {
       claude: { visibilityScore: claudeScore, queries: claudeResults },
-      ...(hasPerplexity ? { perplexity: { visibilityScore: perplexityScore, queries: perplexityResults } } : {}),
     },
     combinedScore,
     gapRecommendations,
