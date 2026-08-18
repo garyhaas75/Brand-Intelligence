@@ -217,6 +217,37 @@ async function scrapeBrands(brands, opts = {}) {
         }
       }
       await context.close();
+
+      // Direct Playwright hits these sites from a datacentre IP with no proxy, so
+      // Cloudflare and friends serve a challenge page instead of the storefront —
+      // which shows up as zero nav items (botBlocked) or a hard navigation error.
+      // The Apify path already exists for exactly this and routes through
+      // residential proxies; it was only ever reachable via an opt-in `useApify`
+      // flag that nothing set, so it never ran. Retry through it automatically.
+      const shouldRetry = (brandResult.botBlocked || brandResult.error) && process.env.APIFY_API_TOKEN;
+      if (shouldRetry) {
+        log(`  ${brand.name}: ${brandResult.botBlocked ? 'bot-blocked' : 'errored'} on direct scrape — retrying via Apify residential proxy`, logFile);
+        try {
+          const apifyData = await scrapeWithApifyFallback(brand, logFile);
+          if ((apifyData.navigation || []).length > 0) {
+            // Keep the screenshot from the direct attempt — Apify does not return one.
+            const { screenshotBase64 } = brandResult;
+            Object.assign(brandResult, apifyData, {
+              botBlocked: false,
+              error: null,
+              recoveredViaApify: true,
+              ...(screenshotBase64 ? { screenshotBase64 } : {}),
+            });
+            delete brandResult.note;
+            log(`  ${brand.name}: recovered via Apify — ${brandResult.navigation.length} nav items`, logFile);
+          } else {
+            log(`  ${brand.name}: Apify returned no navigation either — leaving as blocked`, logFile);
+          }
+        } catch (err) {
+          // Leave the original blocked/errored result intact rather than masking it.
+          log(`  ${brand.name}: Apify retry failed: ${err.message}`, logFile);
+        }
+      }
     }
 
     // Preserve prior good data if this run errored
