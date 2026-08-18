@@ -245,16 +245,32 @@ const SCRIPT_TO_MODULE = {
 function spawnModule(script, slug, extraArgs = []) {
   log(`Spawning: ${script} --slug=${slug}`);
   const moduleName = SCRIPT_TO_MODULE[script] || script.replace('.js', '');
-  const logPath = path.join(__dirname, '..', 'data', 'brands', slug, `${moduleName}.log`);
-  const fs = require('fs');
-  const logStream = fs.createWriteStream(logPath, { flags: 'a' });
-  const child = spawn('node', [path.join(__dirname, script), `--slug=${slug}`, ...extraArgs], {
-    env: { ...process.env },
-    cwd: path.join(__dirname, '..'),
-    detached: true,
-    stdio: ['ignore', logStream, logStream],
-  });
-  child.unref();
+
+  // stdio needs a real file descriptor. A freshly created WriteStream still has
+  // fd === null, which makes spawn() throw ERR_INVALID_ARG_VALUE, so open the fd
+  // synchronously. Logging must never be able to stop a module from running.
+  let stdio = 'ignore';
+  try {
+    const brandDir = path.join(DATA_DIR, 'brands', slug);
+    ensureDir(brandDir);
+    const logFd = fs.openSync(path.join(brandDir, `${moduleName}.log`), 'a');
+    stdio = ['ignore', logFd, logFd];
+  } catch (err) {
+    log(`WARN: could not open log file for ${moduleName}, running without logs: ${err.message}`);
+  }
+
+  try {
+    const child = spawn('node', [path.join(__dirname, script), `--slug=${slug}`, ...extraArgs], {
+      env: { ...process.env },
+      cwd: path.join(__dirname, '..'),
+      detached: true,
+      stdio,
+    });
+    child.unref();
+  } catch (err) {
+    // One module failing to spawn must not take down the remaining queued modules.
+    log(`ERROR: failed to spawn ${script} for ${slug}: ${err.message}`);
+  }
 }
 
 async function run() {
