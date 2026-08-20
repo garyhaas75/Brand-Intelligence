@@ -2012,6 +2012,8 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
   const [personasData, setPersonasData] = useState(null)
   const [exporting, setExporting] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
+  const [shareExpires, setShareExpires] = useState(null)
+  const [shareDays, setShareDays] = useState(7)      // 30 is the ceiling the server enforces
 
   useEffect(() => {
     if (!slug) return
@@ -2046,9 +2048,14 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
   }
 
   async function copyShareLink() {
-    const res = await fetch(`${API}/brands/${slug}/export/share-link`, { method: 'POST' })
+    const res = await fetch(`${API}/brands/${slug}/export/share-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expiresInDays: shareDays }),
+    })
     const d = await res.json()
     setShareUrl(d.shareUrl)
+    setShareExpires(d.expiresAt)
     await navigator.clipboard.writeText(d.shareUrl).catch(() => {})
   }
 
@@ -2207,6 +2214,14 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
               <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
                 {exporting ? 'Generating PDF...' : '↓ Export PDF'}
               </button>
+              <select value={shareDays} onChange={e => setShareDays(Number(e.target.value))}
+                title="How long the share link stays alive"
+                style={{ border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: T.textSub, background: 'none', cursor: 'pointer' }}>
+                <option value={1}>1 day</option>
+                <option value={7}>7 days</option>
+                <option value={14}>14 days</option>
+                <option value={30}>30 days</option>
+              </select>
               <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
                 Share Link
               </button>
@@ -2217,6 +2232,9 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
         {shareUrl && !pdfMode && (
           <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: 8, padding: '10px 16px', marginTop: 16, fontSize: 13 }}>
             Share link copied: <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: '#065f46', fontWeight: 600 }}>{shareUrl}</a>
+            {shareExpires && <span style={{ display: 'block', marginTop: 4, fontWeight: 600 }}>
+              Stops working on {new Date(shareExpires).toLocaleDateString()}. Anyone with this link can read the full report until then.
+            </span>}
           </div>
         )}
         {!pdfMode && (

@@ -1051,17 +1051,57 @@ app.post('/api/brands/:slug/export/share-link', (req, res) => {
   if (!registry.brands.find(b => b.slug === slug)) {
     return res.status(404).json({ error: 'Brand not found' });
   }
+  // How long the link should live, chosen when it is created. Previously every link was
+  // created with expiresAt: null, so a report sent to one person kept working forever,
+  // including after they left or forwarded it on. The expiry check below already existed and
+  // simply never had a date to check against.
+  // Capped at 30 days, and there is no way to opt out of expiry. A link with no end date is
+  // one you have to remember to revoke, and nobody ever does. Anything longer or absent is
+  // clamped rather than refused, so a bad value cannot quietly create a permanent link.
+  const MAX_DAYS = 30;
+  const asked = Number(req.body?.expiresInDays);
+  const days = Number.isFinite(asked) && asked > 0 ? Math.min(asked, MAX_DAYS) : MAX_DAYS;
+  const expiresAt = new Date(Date.now() + days * 86400000).toISOString();
+
   const token = uuidv4();
   const tokensData = loadShareTokens();
   tokensData.tokens.push({
     token,
     brandSlug: slug,
     createdAt: new Date().toISOString(),
-    expiresAt: null,
+    expiresAt,
   });
   saveShareTokens(tokensData);
   const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
-  res.json({ ok: true, shareUrl: `${baseUrl}/share/${token}`, token });
+  res.json({ ok: true, shareUrl: `${baseUrl}/share/${token}`, token, expiresAt });
+});
+
+// ─── Share links: list and revoke ──────────────────────────────────────────────
+// There was no way to see which links existed or to kill one short of editing the file by
+// hand, which meant a link sent to the wrong person could not be taken back.
+app.get('/api/brands/:slug/share-links', (req, res) => {
+  const { tokens } = loadShareTokens();
+  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+  res.json({
+    ok: true,
+    links: tokens
+      .filter(t => t.brandSlug === req.params.slug)
+      .map(t => ({
+        token: t.token,
+        url: `${baseUrl}/share/${t.token}`,
+        createdAt: t.createdAt,
+        expiresAt: t.expiresAt,
+        expired: !!(t.expiresAt && new Date(t.expiresAt) < new Date()),
+      })),
+  });
+});
+
+app.delete('/api/brands/:slug/share-links/:token', (req, res) => {
+  const data = loadShareTokens();
+  const before = data.tokens.length;
+  data.tokens = data.tokens.filter(t => t.token !== req.params.token);
+  saveShareTokens(data);
+  res.json({ ok: true, revoked: before !== data.tokens.length });
 });
 
 // ─── Export: PDF ───────────────────────────────────────────────────────────────
