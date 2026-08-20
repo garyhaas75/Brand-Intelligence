@@ -1,3 +1,5 @@
+> **Follows [whp-standards](https://github.com/garyhaas75/whp-standards).** Three-role review before every commit (enforced by `.githooks/`), git-only deploys verified live, whp-auth + fail closed, no committed secrets, no em dashes. Exceptions for this repo are listed below.
+
 # Development Protocol — Anne Klein Intel
 
 ## Before EVERY push: test end-to-end locally

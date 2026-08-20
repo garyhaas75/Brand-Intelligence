@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# WHP three-role review, enforced. Part of whp-standards.
+#
+# Every commit message must carry three lines with real content (>= 20 chars after the label):
+#   Designer:  <user outcome + why the current one fails>
+#   Developer: <exact input that breaks + what specifically fixes it>
+#   QA:        <the actual check run + what was observed>
+#
+# This hook checks the SHAPE. The pre-push critic checks the TRUTH of the QA line.
+#
+# Exempt: merge and revert commits carry the roles of the commits under them, not fresh work.
+# Never pass --no-verify. Doing the review is the point.
+set -u
+MSG_FILE="$1"
+BODY=$(grep -v '^#' "$MSG_FILE" | sed -e 's/[[:space:]]*$//')
+FIRST=$(printf '%s\n' "$BODY" | head -1)
+
+case "$FIRST" in
+  "Merge branch "*|"Merge remote-tracking "*|"Merge tag "*|"Merge pull request "*|"Revert \""*)
+    exit 0 ;;
+esac
+
+fail=0
+for role in Designer Developer QA; do
+  line=$(printf '%s\n' "$BODY" | grep -iE "^${role}:" | head -1)
+  content=$(printf '%s\n' "$line" | sed -E "s/^${role}:[[:space:]]*//I")
+  if [ -z "$line" ]; then
+    echo "  ✗ missing '${role}:' line" >&2; fail=1
+  elif [ "${#content}" -lt 20 ]; then
+    echo "  ✗ '${role}:' line is too thin (needs real content, not a label)" >&2; fail=1
+  fi
+done
+
+# The one hard content rule that is cheap to check here: no em dashes anywhere.
+if printf '%s' "$BODY" | grep -q '—'; then
+  echo "  ✗ commit message contains an em dash (banned fleet-wide)" >&2; fail=1
+fi
+
+if [ "$fail" -ne 0 ]; then
+  cat >&2 <<'EOF'
+
+Commit blocked: the three-role review is missing or thin. See whp-standards section 1.
+Your message must include, each with real content:
+
+  Designer:  what user outcome changes and why the current one fails
+  Developer: the exact input that breaks today + what specifically fixes it
+  QA:        the actual check you RAN and what you observed (not "syntax OK")
+
+EOF
+  exit 1
+fi
+exit 0

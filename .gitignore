@@ -32,3 +32,4 @@ credentials/
 # Editor
 .vscode/
 .idea/
+.githooks/qa-critic.log

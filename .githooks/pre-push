@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# WHP adversarial QA critic, enforced at push. Part of whp-standards.
+#
+# For every commit being pushed, an AI reviewer reads the diff + message and asks whether the
+# QA line is supported by evidence of a check that was actually run, or is theater. Blocks the
+# push on any commit whose QA claim is text-shaped but substance-empty.
+#
+# This exists because plausible-sounding QA lines kept getting written for checks that were
+# never run. The commit-msg hook enforces the shape; this enforces the truth.
+#
+# Break-glass (requires a reason, logged):
+#   QA_OVERRIDE="fixing the hook itself, cannot self-verify" git push ...
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+LOG="$ROOT/.githooks/qa-critic.log"
+
+if [ -n "${QA_OVERRIDE:-}" ]; then
+  echo "⚠ QA_OVERRIDE set, bypassing the adversarial critic." >&2
+  echo "  Reason: $QA_OVERRIDE" >&2
+  echo "$(date -Iseconds)  OVERRIDE  $QA_OVERRIDE  $(git log -1 --oneline)" >> "$LOG" 2>/dev/null || true
+  exit 0
+fi
+
+# The critic needs a key and Node. If neither is present, do not silently pass: tell the human
+# how to proceed. A missing key is not a reason to skip the check.
+if ! command -v node >/dev/null 2>&1; then
+  echo "⚠ node not found; cannot run the QA critic. Install node, or QA_OVERRIDE=\"reason\" to push." >&2
+  exit 1
+fi
+
+exec node "$ROOT/.githooks/qa-critic.js" "$@"
