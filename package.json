@@ -38,6 +38,8 @@
     "express-basic-auth": "^1.2.1",
     "express-rate-limit": "^8.3.0",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^4.1.0",
     "lighthouse": "^13.4.1",
     "multer": "^2.1.1",
     "node-cron": "^4.2.1",

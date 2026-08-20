@@ -12,7 +12,6 @@ const path = require('path');
 const { spawn } = require('child_process');
 const Anthropic = require('@anthropic-ai/sdk');
 const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('./utils/models');
-const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { v4: uuidv4 } = require('uuid');
@@ -91,11 +90,6 @@ function mergeBrandSeedData(slug) {
 
 // ─── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
-
-const rawUsers = process.env.DASHBOARD_USERS || '';
-const users = rawUsers
-  ? Object.fromEntries(rawUsers.split(',').map(pair => pair.trim().split(':')))
-  : { admin: process.env.DASHBOARD_PASSWORD || 'changeme' };
 
 app.use(cors());
 app.use(express.json());
@@ -544,7 +538,25 @@ app.get('/api/social-image/:slug/:filename', (req, res) => {
 });
 
 // ─── Auth (applied after public routes) ───────────────────────────────────────
-app.use(basicAuth({ users, challenge: true, realm: 'Brand Intelligence' }));
+// Sign-in is whp-auth's job. People are individual accounts there, granted this tool by name,
+// with two-factor and an audit trail.
+//
+// What this replaced: shared basic-auth credentials, and a `|| 'changeme'` fallback that made
+// the live password the literal string "changeme" whenever the env var was missing.
+//
+// The routes deliberately registered ABOVE this line stay public and are unchanged: the health
+// check, /share/:token, and the cached social images. Share links are meant to be openable by
+// people with no account, which is the whole point of them.
+const { requireUser } = require('./whpAuth');
+
+// What the login box needs. No secrets, and outside the gate so the login page can load.
+app.get('/api/config', (_req, res) => res.json({
+  whp_auth_url: (process.env.WHP_AUTH_URL || '').replace(/\/$/, ''),
+  app: (process.env.WHP_AUTH_APP || 'brand-intelligence'),
+}));
+
+app.use('/api', requireUser);
+app.get('/api/me', (req, res) => res.json({ ok: true, user: req.user }));
 
 // ─── Rate limiting ─────────────────────────────────────────────────────────────
 app.use('/api/', rateLimit({
