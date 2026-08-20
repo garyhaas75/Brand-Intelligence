@@ -17,7 +17,9 @@ const path = require('path');
 const ROOT = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
 const LOG_PATH = path.join(ROOT, '.githooks', 'qa-critic.log');
 
-// Load ANTHROPIC_API_KEY from the environment or a .env at the repo root (KEY=value lines).
+// Find ANTHROPIC_API_KEY, in order: the environment, the repo's own .env, then the shared
+// scoped file ~/.config/whp/anthropic-key. The scoped file is why a local push works in a repo
+// that has no key of its own: one file outside every repo, owner-only, never committed.
 function loadKey() {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
   try {
@@ -25,6 +27,10 @@ function loadKey() {
       const m = line.match(/^\s*ANTHROPIC_API_KEY\s*=\s*(.+?)\s*$/);
       if (m) return m[1].replace(/^["']|["']$/g, '');
     }
+  } catch {}
+  try {
+    const shared = fs.readFileSync(path.join(require('os').homedir(), '.config', 'whp', 'anthropic-key'), 'utf8').trim();
+    if (shared) return shared;
   } catch {}
   return '';
 }
