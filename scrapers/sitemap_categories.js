@@ -26,6 +26,10 @@ const CHILD_EXCLUDE = [/product/i, /storelocation/i, /store-/i, /blog/i, /articl
 
 const CANDIDATE_PATHS = ['/sitemap.xml', '/sitemap_index.xml', '/sitemap-index.xml', '/sitemap/sitemap.xml'];
 
+// Internal identifiers that leak into sitemap URLs, such as Target's "w1045680".
+// A category name is words, not a serial number.
+const LOOKS_LIKE_ID = /^[a-z]{0,3}\d{3,}[a-z0-9]*$/i;
+
 // Slugs that are navigation chrome or legal boilerplate, not merchandising.
 const NON_CATEGORY = /^(home|index|search|cart|bag|account|login|sign-?in|register|wishlist|checkout|contact|about|help|faq|terms|privacy|returns|shipping|careers|sitemap|store-?locator|gift-?card)s?$/i;
 
@@ -147,14 +151,42 @@ async function fetchCategoriesFromSitemap(baseUrl, log = () => {}) {
     .map(slugToName)
     .filter(Boolean);
 
-  // Leaf categories, most specific segment, deduped and capped.
-  const leaves = [...new Set(allSegs.map(s => s[s.length - 1]))]
-    .filter(s => !NON_CATEGORY.test(s))
+  // Leaf categories, most specific segment of each path.
+  //
+  // Order matters as much as the filter. Sitemaps list URLs alphabetically, so
+  // taking the first N leaves yields a taxonomy that stops at the letter "a":
+  // Kmart produced action figures, action toys, activity games, adult lego, air
+  // hockey and nothing else, from 2,248 URLs. Rank by path depth instead, so the
+  // shallow structural categories a merchandiser cares about outrank deep niche
+  // ones, and break ties by how often a segment appears.
+  const depthOf = new Map();
+  const freqOf = new Map();
+  for (const segs of allSegs) {
+    const leaf = segs[segs.length - 1];
+    if (!depthOf.has(leaf) || segs.length < depthOf.get(leaf)) depthOf.set(leaf, segs.length);
+    freqOf.set(leaf, (freqOf.get(leaf) || 0) + 1);
+  }
+  const leaves = [...depthOf.keys()]
+    .filter(sl => !NON_CATEGORY.test(sl))
+    .sort((a, b) => (depthOf.get(a) - depthOf.get(b)) || (freqOf.get(b) - freqOf.get(a)) || a.localeCompare(b))
     .map(slugToName)
-    .filter(n => n.length > 1 && n.length < 45 && !/^\d+$/.test(n));
+    .filter(n => n.length > 1 && n.length < 45 && !LOOKS_LIKE_ID.test(n));
 
-  // Lead with the structural sections, then fill with leaves for texture.
-  const featuredCategories = [...new Set([...topLevel, ...leaves])].slice(0, MAX_CATEGORIES);
+  // Lead with the structural sections, then fill the remaining slots with leaves.
+  //
+  // Take an even sample of the deep leaves rather than the first N. Within a depth
+  // band the order is alphabetical, so slicing the head returns only the start of
+  // the alphabet: Kmart's toy categories came back as action figures, action toys,
+  // activity games, adult lego, air hockey, which then became the entire assortment
+  // gap list. An even sample gives the model a view of the whole taxonomy.
+  const structural = leaves.filter(n => (depthOf.get(n.replace(/ /g, '-')) || 99) <= 2);
+  const deep = leaves.filter(n => !structural.includes(n));
+  const slots = Math.max(0, MAX_CATEGORIES - new Set([...topLevel, ...structural]).size);
+  const step = deep.length > slots && slots > 0 ? deep.length / slots : 1;
+  const sampledDeep = slots > 0
+    ? Array.from({ length: Math.min(slots, deep.length) }, (_, i) => deep[Math.floor(i * step)])
+    : [];
+  const featuredCategories = [...new Set([...topLevel, ...structural, ...sampledDeep])].slice(0, MAX_CATEGORIES);
   if (featuredCategories.length === 0) return null;
 
   log(`  sitemap: ${locs.length} URLs -> ${topLevel.length} top-level sections, ${featuredCategories.length} categories`);
