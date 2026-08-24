@@ -127,6 +127,55 @@ For brandPositions, include the target brand AND all competitors. x/y values are
   try { return JSON.parse(raw.slice(start, end + 1)); } catch { return { narrative: raw, axes: { x: 'Price', y: 'Style' }, brandPositions: [], whiteSpaceOpportunities: [] }; }
 }
 
+/**
+ * Keep only the assortment gaps that are genuinely comparable.
+ *
+ * Stated as a principle rather than a blocklist, so it holds for any brand in any
+ * vertical instead of hard-coding "drop men/beauty/christmas" for this one. Falls
+ * back to the unfiltered ranking if the call fails, since a noisy list beats none.
+ */
+async function filterAssortmentGaps(anthropic, profile, targetCategories, candidates) {
+  if (candidates.length === 0) return [];
+  try {
+    const prompt = [
+      `${profile.name} is a ${profile.industry || 'retailer'}${profile.market ? ' in ' + profile.market : ''}.`,
+      '',
+      `Its own categories: ${targetCategories.slice(0, 60).join(', ') || 'unknown'}`,
+      '',
+      'Candidate gaps found at competitors:',
+      candidates.map((c, i) => `${i}. ${c.category} (at: ${c.seenAt.join(', ')})`).join('\n'),
+      '',
+      'Return the indices of candidates that are a genuine, actionable assortment gap:',
+      'a product category this brand could credibly stock and does not appear to.',
+      '',
+      'Exclude:',
+      "- categories belonging to a different line of business than this brand (a general merchant's departments outside this brand's vertical)",
+      '- seasonal or promotional campaign pages rather than product categories',
+      '- broader or generic labels for what the brand already sells',
+      '- duplicates and near-synonyms of each other',
+      '',
+      'Order by commercial relevance to this brand, most valuable first.',
+      'Return a JSON array of indices only, e.g. [3,7,1]',
+    ].join('\n');
+
+    const msg = await anthropic.messages.create({
+      model: MODEL_FAST,
+      max_tokens: 2000,
+      output_config: EFFORT_LOW,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = extractText(msg);
+    const picked = JSON.parse(raw.slice(raw.indexOf('['), raw.lastIndexOf(']') + 1))
+      .map(i => candidates[i])
+      .filter(Boolean);
+    log(`Assortment gaps: ${candidates.length} candidates -> ${picked.length} relevant`);
+    return picked.length ? picked : candidates;
+  } catch (err) {
+    log(`Gap relevance filter failed (${err.message}), using unfiltered list`);
+    return candidates;
+  }
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
@@ -202,8 +251,18 @@ async function run() {
       }
     });
   });
-  const topAssortmentGaps = Object.values(assortmentGapMap)
+  // The raw set difference is recall only. It cannot tell a real gap from a
+  // department belonging to a different business: general merchants like Kmart and
+  // Target publish their whole taxonomy, so a toy retailer gets told it is missing
+  // "men", "beauty" and "women". It also surfaces seasonal campaign pages
+  // ("black friday", "christmas") that are marketing rather than assortment, and
+  // trips on broader labels for what the brand already sells, so "toys" reads as a
+  // gap for a toy shop whose own categories are age bands and product lines.
+  const gapCandidates = Object.values(assortmentGapMap)
     .sort((a, b) => b.seenAt.length - a.seenAt.length)
+    .slice(0, 60);
+  const relevantGaps = await filterAssortmentGaps(anthropic, profile, [...targetCategories], gapCandidates);
+  const topAssortmentGaps = relevantGaps
     .slice(0, 10)
     .map(g => `${g.category} (seen at: ${g.seenAt.join(', ')})`);
 
@@ -223,4 +282,9 @@ async function run() {
   log(`Done. ${analyzedCompetitors.length} competitors analyzed, ${topAssortmentGaps.length} assortment gaps found.`);
 }
 
-run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+// Only auto-run as a script, so helpers can be required and tested in isolation.
+if (require.main === module) {
+  run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+}
+
+module.exports = { filterAssortmentGaps };
