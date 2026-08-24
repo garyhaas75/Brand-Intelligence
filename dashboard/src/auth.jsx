@@ -71,6 +71,10 @@ export function Login({ onDone }) {
       })
       const data = await res.json().catch(() => ({}))
       if (data.mfa_setup_required && data.setup_url) { window.location.href = data.setup_url; return }
+      // A temp or expired password. whp-auth refuses the session and hands back a
+      // one-time link to set a real one, the same shape as the two-factor handoff
+      // above. Without this the person is told to open a link that is not on screen.
+      if (data.password_change_required && data.change_url) { window.location.href = data.change_url; return }
       if (data.mfa_required) { setNeedCode(true); setCode(''); setErr(''); return }
       if (!res.ok || !data.token) throw new Error(data.detail || 'Sign in failed')
       auth.set(data.token)
