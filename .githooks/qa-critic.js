@@ -61,6 +61,7 @@ TWO jobs:
    - blanking stored data on a failed fetch, or auto-granting new access to everyone
    - an em dash anywhere in the diff or message
    - a Python import added with no evidence the server was started locally (see standards section 6)
+   - browser code that merges request headers with object spread ({ ...init.headers }) or reads them by index (init.headers?.['X-Thing']): a Headers instance spreads to {} and indexes to undefined, so this silently drops the Authorization the auth client sets (see standards section 3). Merging via new Headers() + .has()/.set() is the correct form and is NOT a violation.
 
 Be strict but fair. A genuinely trivial, verifiable change (a doc typo, a comment) with an honest QA line passes. When the QA line is empty theater, FAIL.
 
