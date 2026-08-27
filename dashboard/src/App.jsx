@@ -1404,10 +1404,17 @@ function computePageSeoScore(seoPage, brandName) {
   } else {
     const bn = (brandName || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
     const tl = seo.titleTag.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
-    const isBrandOnly = seo.titleTag.length < 35 && bn && tl === bn
-    if (isBrandOnly) {
+    // Length alone said nothing about whether the title works. "Brand – Brand" is 41 characters,
+    // lands inside the ideal 50-60 window on a permissive check, and used to score a clean 25/25
+    // while the competitor comparison correctly called the same title out as the weakest signal
+    // on the page. Judge the words, then the length.
+    const brandRepeats = bn && tl.split(bn).length - 1 >= 2
+    const isBrandOnly = bn && (tl === bn || tl.replace(new RegExp(bn, 'g'), '').trim() === '')
+    if (isBrandOnly || brandRepeats) {
       totalScore += 10
-      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: `Your title just says the brand name — shoppers who don't already know you will scroll past. Add what you sell and where: e.g. "${seo.titleTag} Lebanon | Toys, LEGO, Barbie & More"` })
+      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: brandRepeats
+        ? `Your title is your brand name twice over and nothing else, so it spends every one of Google's ~60 visible characters saying something a searcher already knew. Replace the duplicate with what you sell: "${brandName} | Toys, Games and Gifts for Every Age".`
+        : `Your title is only your brand name, so shoppers who don't already know you scroll past it. Say what you sell alongside the name: "${brandName} | Toys, Games and Gifts for Every Age".` })
     } else if (seo.titleTag.length < 30) {
       totalScore += 5
       signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 5, max: 25, status: 'warn', rec: `Title is too short (${seo.titleTag.length} chars) — aim for 50–60 characters that describe what you sell and where you operate` })
@@ -1433,8 +1440,27 @@ function computePageSeoScore(seoPage, brandName) {
     signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 12, max: 20, status: 'warn', rec: `Too long (${seo.metaDescription.length} chars) — Google will cut it off; trim to 160 characters` })
   }
   // H1 (20 pts)
-  if (!seo.h1) {
-    signals.push({ field: 'H1 Heading', value: '—', pts: 0, max: 20, status: 'fail', rec: 'No H1 heading — every page should have one main headline containing your key topic. Search engines use it to understand what the page is about; missing it wastes a prime ranking opportunity.' })
+  //
+  // Any non-empty H1 used to score a perfect 20/20 with a blank recommendation, so a seasonal
+  // campaign line like "Get Book Week ready!" passed clean here while the competitor section
+  // named it as a problem on the same screen. Presence is the floor, not the standard: Google
+  // reads the H1 as the page's subject, so a headline that will be swapped out in three weeks
+  // leaves the page with no stable statement of what the business sells.
+  const h1 = (seo.h1 || '').trim()
+  const h1Lower = h1.toLowerCase()
+  const bnForH1 = (brandName || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
+  const SEASONAL_H1 = /\b(sale|% ?off|clearance|black friday|cyber monday|christmas|xmas|holiday|easter|halloween|eid|ramadan|back to school|book week|mother'?s day|father'?s day|valentine|new year|boxing day|deal of the|ends (soon|today|sunday)|shop now|get .* ready|limited time|this week(end)?|save up to)\b/i
+  if (!h1) {
+    signals.push({ field: 'H1 Heading', value: '—', pts: 0, max: 20, status: 'fail', rec: 'No H1 heading. Every page should have one main headline naming its subject. Search engines lean on it to understand what the page is about, so leaving it out wastes the strongest on-page signal you own.' })
+  } else if (SEASONAL_H1.test(h1)) {
+    totalScore += 12
+    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 12, max: 20, status: 'warn', rec: `"${h1}" is a campaign headline, not a statement of what this page is. It will be replaced at the end of the promotion, so Google never gets a stable read on the page's subject. Make the H1 permanent, for example "Toys, Games and Gifts for Every Age", and run the seasonal message as an H2 or a banner above it.` })
+  } else if (bnForH1 && h1Lower.replace(/[^a-z0-9 ]/g, '').trim() === bnForH1) {
+    totalScore += 14
+    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 14, max: 20, status: 'warn', rec: `Your H1 repeats the brand name and nothing else. Google already knows the brand from the title and domain. Use the headline to say what you sell, which is the part it cannot infer.` })
+  } else if (h1.split(/\s+/).length < 3) {
+    totalScore += 14
+    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 14, max: 20, status: 'warn', rec: `"${h1}" is too thin to describe the page. Expand it to name the products and the audience, for example "Toys and Games for Kids of Every Age".` })
   } else {
     totalScore += 20
     signals.push({ field: 'H1 Heading', value: seo.h1, pts: 20, max: 20, status: 'pass', rec: '' })
@@ -1702,7 +1728,17 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                         <td style={{ padding: '10px 14px', color: T.textSub }}>{seo.schemaMarkup?.join(', ') || '—'}</td>
                         <td style={{ padding: '10px 14px' }}><Badge label={seo.pageSpeedSignal || 'unknown'} color={speedColors[seo.pageSpeedSignal] || 'gray'} /></td>
                       </tr>
-                      {data.competitors.map((c, i) => (
+                      {/* A site behind a bot wall gave us its interstitial, not its SEO. Showing
+                          "Just a moment..." as a title tag and "Missing" as an H1 invents facts about
+                          a competitor nobody read, so a blocked row says so and claims nothing. */}
+                      {data.competitors.map((c, i) => c.blocked ? (
+                        <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
+                          <td style={{ padding: '10px 14px', color: T.text }}>{c.name}</td>
+                          <td colSpan={4} style={{ padding: '10px 14px', color: T.textFaint, fontStyle: 'italic' }}>
+                            Site blocked our scan, so no signals were read. Nothing here counts for or against them.
+                          </td>
+                        </tr>
+                      ) : (
                         <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
                           <td style={{ padding: '10px 14px', color: T.text }}>{c.name}</td>
                           <td style={{ padding: '10px 14px', color: c.titleTag ? T.textSub : T.textFaint, fontStyle: c.titleTag ? 'normal' : 'italic' }}>{c.titleTag?.slice(0, 40) || 'Not found'}</td>
@@ -1741,6 +1777,16 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                         <p style={{ fontSize: 13, color: b.targetValue ? '#d97706' : '#dc2626', fontWeight: 600, fontStyle: b.targetValue ? 'normal' : 'italic' }}>{b.targetValue || 'Missing'}</p>
                       </div>
                     </div>
+                    {/* A comparison that stops at the diagnosis leaves the reader to invent the fix. */}
+                    {b.recommendation && (
+                      <div style={{ marginTop: 14, background: T.surfaceAlt, borderLeft: '3px solid #059669', borderRadius: 6, padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                          <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>What to do</p>
+                          {b.effort && <Badge label={b.effort} color={b.effort === 'Quick Win' ? 'green' : b.effort === 'Large' ? 'red' : 'yellow'} />}
+                        </div>
+                        <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{b.recommendation}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </Card>
@@ -2143,8 +2189,8 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
       color: 'green',
       accentColor: '#065f46',
       accentBg: '#f0fdf4',
-      why: 'Gift-driven searches spike around birthdays, holidays, Eid, and back-to-school. Shoppers searching "birthday gift for 7 year old" are ready to buy — these are high-conversion terms.',
-      how: 'Build seasonal landing pages for key occasions (Eid gifts, Christmas toys, birthday gifts by age). Update hero banners 2-3 weeks before each occasion. These pages can rank year-round and convert strongly in-season.',
+      why: 'Gift-driven searches spike around birthdays, the holidays your market observes, and back to school. Someone searching "birthday gift for 7 year old" is ready to buy, so these convert well.',
+      how: 'Build a landing page per key occasion, such as christmas toys or birthday gifts by age, and keep the URL live year-round so it accrues authority. Update hero banners 2 to 3 weeks before each occasion.',
     },
     {
       key: 'topBrands',
@@ -2152,7 +2198,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
       color: 'purple',
       accentColor: '#5b21b6',
       accentBg: '#f5f3ff',
-      why: 'Shoppers searching for "LEGO Lebanon" or "Barbie toys Beirut" are brand-loyal and high-intent. If your site isn\'t optimized for brand names you carry, you lose these customers to competitors who are.',
+      why: 'Shoppers searching for a brand you stock, such as "lego duplo" or "barbie dreamhouse", are brand-loyal and high-intent. If your site is not optimized for the brand names you carry, you lose these customers to retailers who are.',
       how: 'Ensure every brand you carry has its own category page with the brand name in the title, H1, and URL. Add brand logos and descriptions. Cross-link between brand pages and product listings.',
     },
     {
@@ -2166,12 +2212,12 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
     },
     {
       key: 'localTerms',
-      label: 'Local & Lebanon-Specific Keywords',
+      label: 'Local Keywords',
       color: 'gray',
       accentColor: '#374151',
       accentBg: '#f9fafb',
-      why: 'Shoppers in Lebanon searching "toy store Beirut" or "toys Lebanon delivery" are looking for a local option. These searches have strong purchase intent and are often underserved — a huge opportunity.',
-      how: 'Add Lebanon and city-specific language to your homepage and contact page. Set up Google Business Profile with accurate location. Create content that references local delivery, local occasions (Eid, Lebanese holidays), and local pricing.',
+      why: 'Searches like "toy store near me", "toy shop open now" or a city name plus your category come from someone ready to buy today. Note that locals rarely add their own country to a search, so the terms that matter are "near me", delivery and collection phrasing, and city or suburb names.',
+      how: 'Name your cities and suburbs on the homepage, contact page and any store pages. Set up Google Business Profile with accurate locations and hours. Publish content covering local delivery and collection options, local holidays and local pricing.',
     },
     {
       key: 'competitorGapTerms',
@@ -2189,7 +2235,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
       accentColor: '#0284c7',
       accentBg: '#f0f9ff',
       why: 'These are the questions people ask ChatGPT, Google AI Overview, and Perplexity when looking for toy recommendations. AI assistants are increasingly the first stop for shopping decisions — appearing in these answers builds brand awareness with buyers who haven\'t decided yet.',
-      how: 'Write blog posts or FAQ pages that directly answer these questions (e.g. "Best toys for a 5-year-old in Lebanon"). Clear, structured answers with your brand name are more likely to be cited by AI. This is a long-term investment that compounds over time.',
+      how: 'Write blog posts or FAQ pages that answer these questions directly, for example "the best toys for a 5 year old". Clear, structured answers that name your brand are more likely to be cited by an AI assistant. This is a long-term investment that compounds.',
     },
   ]
 

@@ -66,6 +66,27 @@ function fetchText(url, timeoutMs = 10000) {
   });
 }
 
+// ─── URL shape helpers ────────────────────────────────────────────────────────
+//
+// Shared so the sitemap classifier and the product-page discovery below cannot drift apart.
+// Both used to carry /\/product[^s\/]/, which excludes Shopify's own /products/ path and so
+// found zero product pages on every Shopify store we audit.
+const COLLECTION_URL = /\/collections\/|\/category\/|\/categories\/|\/c\/|\/shop\//i;
+const PRODUCT_URL = /\/products?\/|\/p\/[^/]|\/item\/|\/dp\/|\/sku\//i;
+const CONTENT_URL = /\/pages\/|\/blogs\/|\/blog\//i;
+
+// A page that answers with a bot wall tells us nothing about its owner's SEO. Recording the
+// interstitial as their title tag is worse than recording nothing, because it flows into the
+// competitor comparison as though it were a real finding.
+const BLOCK_TITLES = /just a moment|attention required|access denied|are you a robot|checking your browser|pardon our interruption|captcha|cloudflare|403 forbidden|request unsuccessful|bot detection/i;
+function detectBlocked(seo) {
+  if (!seo || seo.error) return true;
+  if (seo.titleTag && BLOCK_TITLES.test(seo.titleTag)) return true;
+  // Nothing at all came back: no title, no H1, no schema, no canonical. A real homepage has
+  // at least one of these.
+  return !seo.titleTag && !seo.h1 && !(seo.schemaMarkup || []).length && !seo.canonicalTag;
+}
+
 // ─── Sitemap analysis ─────────────────────────────────────────────────────────
 
 async function analyzeSitemap(baseUrl) {
@@ -76,6 +97,8 @@ async function analyzeSitemap(baseUrl) {
     sitemapInRobots: false,
     totalUrls: 0,
     byType: { product: 0, collection: 0, page: 0, other: 0 },
+    childSitemapsFound: 0,
+    childSitemapsRead: 0,
     issues: [],
   };
 
@@ -113,43 +136,73 @@ async function analyzeSitemap(baseUrl) {
   }
 
   // 3. Handle sitemap index (contains child sitemaps)
+  //
+  // Two bugs used to live here. The child list was capped at 3, so an 11-part Shopify product
+  // sitemap was read as "2002 URLs" and the other 9 parts, the collections sitemap and the pages
+  // sitemap were never seen. And child <loc> values carry XML-escaped query strings
+  // (?from=1&amp;to=2), which have to be decoded or the fetch asks for a URL the server does not
+  // recognise. Read every child now, bounded by MAX_CHILD_SITEMAPS, and say so when the bound bites.
+  const MAX_CHILD_SITEMAPS = 30;
+  const decodeXml = (s) => s
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'");
+  const locsIn = (xml) => [...xml.matchAll(/<loc>\s*(https?[^<]+)\s*<\/loc>/gi)].map(m => decodeXml(m[1].trim()));
+
   let allUrls = [];
   if (sitemapXml.includes('<sitemapindex')) {
-    const childLocs = [...sitemapXml.matchAll(/<loc>\s*(https?[^<]+)\s*<\/loc>/gi)]
-      .map(m => m[1].trim())
-      .slice(0, 3); // cap at 3 child sitemaps
-    for (const childUrl of childLocs) {
-      try {
-        const childXml = await fetchText(childUrl, 8000);
-        const childUrls = [...childXml.matchAll(/<loc>\s*(https?[^<]+)\s*<\/loc>/gi)].map(m => m[1].trim());
-        allUrls.push(...childUrls);
-      } catch (_) {
-        result.issues.push('Could not read all sitemap sections — partial data shown.');
-      }
+    const childLocs = locsIn(sitemapXml);
+    result.childSitemapsFound = childLocs.length;
+    const toRead = childLocs.slice(0, MAX_CHILD_SITEMAPS);
+    if (childLocs.length > toRead.length) {
+      log(`Sitemap index lists ${childLocs.length} children, reading the first ${toRead.length}`);
+      result.issues.push(`Your sitemap index lists ${childLocs.length} sections and this audit read the first ${toRead.length}, so the counts below are a floor, not a total.`);
+    }
+    let failed = 0;
+    // Small parallel batches: 15 sequential fetches of a half-megabyte each is slow enough to
+    // trip the module timeout on a large catalogue.
+    for (let i = 0; i < toRead.length; i += 5) {
+      const batch = toRead.slice(i, i + 5);
+      const results = await Promise.all(batch.map(u =>
+        fetchText(u, 15000).then(locsIn).catch(() => { failed++; return null; })
+      ));
+      results.forEach(urls => { if (urls) allUrls.push(...urls); });
+    }
+    result.childSitemapsRead = toRead.length - failed;
+    if (failed > 0) {
+      result.issues.push(`${failed} of ${toRead.length} sitemap sections could not be read, so the counts below are incomplete.`);
     }
   } else {
-    allUrls = [...sitemapXml.matchAll(/<loc>\s*(https?[^<]+)\s*<\/loc>/gi)].map(m => m[1].trim());
+    allUrls = locsIn(sitemapXml);
   }
 
   result.totalUrls = allUrls.length;
 
   // 4. Classify URLs by type
+  //
+  // Collections are tested before products because Shopify collection URLs (/collections/x) and
+  // product URLs (/products/x) both contain the word "product" in some themes. The old product
+  // test was /\/product[^s\/]/, which required the next character NOT to be an "s" and therefore
+  // never matched Shopify's own /products/ format: every PDP on the platform counted as zero and
+  // the store was told its catalogue was missing from its sitemap.
   for (const u of allUrls) {
-    if (/\/product[^s/]|\/p\/[^/]|\/item\//i.test(u)) result.byType.product++;
-    else if (/\/products\/all|\/collections\/|\/category\//i.test(u)) result.byType.collection++;
-    else if (/\/pages\//i.test(u)) result.byType.page++;
+    if (COLLECTION_URL.test(u)) result.byType.collection++;
+    else if (PRODUCT_URL.test(u)) result.byType.product++;
+    else if (CONTENT_URL.test(u)) result.byType.page++;
     else result.byType.other++;
   }
 
   // 5. Issues
   if (result.totalUrls < 10) {
-    result.issues.push(`Your sitemap only lists ${result.totalUrls} URL${result.totalUrls === 1 ? '' : 's'} — this seems incomplete for an ecommerce store. A full sitemap helps Google find all your product and category pages.`);
+    result.issues.push(`Your sitemap only lists ${result.totalUrls} URL${result.totalUrls === 1 ? '' : 's'}, which looks incomplete for an ecommerce store. A full sitemap helps Google find all your product and category pages.`);
   }
-  if (result.byType.product === 0 && result.totalUrls > 0) {
-    result.issues.push('Your sitemap contains no product page URLs — Google may be missing your entire product catalog. Ask your developer to ensure product pages are included.');
+  // Only claim the catalogue is missing when the whole sitemap was actually read. On a partial
+  // read, zero products means "not in the part we saw", which is not a finding.
+  const fullyRead = result.childSitemapsFound === 0 || result.childSitemapsRead === result.childSitemapsFound;
+  if (result.byType.product === 0 && result.totalUrls > 0 && fullyRead) {
+    result.issues.push('Your sitemap contains no product page URLs, so Google may be missing your entire product catalog. Ask your developer to ensure product pages are included.');
   }
-  if (result.byType.collection === 0 && result.totalUrls > 5) {
-    result.issues.push('No category/collection pages found in your sitemap — these are high-traffic pages that help shoppers and Google navigate your range by topic.');
+  if (result.byType.collection === 0 && result.totalUrls > 5 && fullyRead) {
+    result.issues.push('No category or collection pages found in your sitemap. These are high-traffic pages that help shoppers and Google navigate your range by topic.');
   }
 
   log(`Sitemap: found=${result.found}, ${result.totalUrls} URLs (product:${result.byType.product}, collection:${result.byType.collection})`);
@@ -190,17 +243,17 @@ async function discoverMultiPageUrls(profile) {
         const page = await context.newPage();
         await page.goto(categoryUrls[0], { waitUntil: 'domcontentloaded', timeout: 20000 });
         await page.waitForTimeout(2000);
-        const productHrefs = await page.$$eval('a[href]', (els, hostname) =>
-          [...new Set(els.map(e => e.href))]
+        const productHrefs = await page.$$eval('a[href]', (els, args) => {
+          const re = new RegExp(args.pattern, 'i');
+          return [...new Set(els.map(e => e.href))]
             .filter(h => {
               try {
                 const u = new URL(h);
-                return u.hostname === hostname && /\/product[^s/]|\/p\/[^/]|\/item\//i.test(h);
+                return u.hostname === args.hostname && re.test(h);
               } catch { return false; }
             })
-            .slice(0, 2),
-          baseHostname
-        ).catch(() => []);
+            .slice(0, 2);
+        }, { hostname: baseHostname, pattern: PRODUCT_URL.source }).catch(() => []);
         result.productUrls = productHrefs;
         log(`Discovered product URLs: ${productHrefs.join(', ') || 'none'}`);
       } catch (err) {
@@ -243,9 +296,12 @@ async function scrapeOnPageSeoWithBrowser(url, browser) {
       scripts.map(s => { try { return JSON.parse(s.textContent)['@type']; } catch { return null; } }).filter(Boolean)
     ).catch(() => []);
     result.schemaMarkup = [...new Set(schemas.flat())];
-    log(`  ${url}: title="${result.titleTag.slice(0, 40)}", speed=${result.pageSpeedSignal}, schema=[${result.schemaMarkup.join(',')}]`);
+    result.blocked = detectBlocked(result);
+    if (result.blocked) log(`  ${url}: BLOCKED by bot protection (title="${result.titleTag.slice(0, 40)}") — excluded from comparisons`);
+    else log(`  ${url}: title="${result.titleTag.slice(0, 40)}", speed=${result.pageSpeedSignal}, schema=[${result.schemaMarkup.join(',')}]`);
   } catch (err) {
     result.error = err.message;
+    result.blocked = true;
     log(`  Error scraping ${url}: ${err.message}`);
   }
   await context.close();
@@ -300,15 +356,19 @@ Return ONLY valid JSON with this exact structure (no other text):
 {
   "brandTerms": ["brand name variants, misspellings, brand + category combos"],
   "categoryTerms": ["main product category keywords from the nav/site"],
-  "ageGroupTerms": ["gifts/products for different ages — 'toys for 2 year olds', 'gifts for 8 year old boy', etc."],
-  "occasionTerms": ["occasion-based queries — Christmas, birthday, Eid, back-to-school, Valentine's Day, etc. + market location"],
-  "topBrands": ["carried or competing brands — 'LEGO ${market}', 'Barbie ${market}', etc."],
-  "localTerms": ["local market queries — '${profile.industry} ${market}', 'toy store near me', 'online delivery ${market}', etc."],
+  "ageGroupTerms": ["gifts and products for different ages, for example 'toys for 2 year olds', 'gifts for 8 year old boy'"],
+  "occasionTerms": ["occasion-based queries, for example 'christmas toy sale', 'birthday gifts for kids', 'back to school'"],
+  "topBrands": ["carried or competing brands as a shopper types them, for example 'lego duplo', 'barbie dreamhouse'"],
+  "localTerms": ["how someone physically nearby searches: 'toy store near me', 'toy shop open now', and city or suburb names, for example 'toy store sydney'"],
   "competitorGapTerms": ["terms competitors likely rank for that this brand should also target"],
-  "aiDiscoveryQueries": ["natural-language questions a shopper asks an AI assistant — 'what are the best toy stores in ${market}?', 'where can I buy LEGO in ${market}?', etc."]
+  "aiDiscoveryQueries": ["natural-language questions a shopper asks an AI assistant, for example 'what is the best toy store for a 5 year old', 'where can I buy lego near me'"]
 }
 
-Each category should have 15-30 terms. Prioritize local/market-specific terms where relevant.`;
+Each category should have 15-30 terms.
+
+IMPORTANT, how people in ${market} actually search:
+Do NOT append "${market}" to terms. Someone in ${market} searching for LEGO types "lego", not "lego ${market}". Adding the country name is how a person OUTSIDE the market searches, or how an export site is found, and those terms carry almost no domestic volume. This site already targets ${market} through its domain and Google's own location signals.
+Express local intent the way locals do instead: "near me", "open now", "delivery", "click and collect", and city, state or suburb names. A country name belongs in a term only when a shopper would genuinely type it, such as a query about shipping or availability from abroad. Keep at most 2 such terms in total across every category.`;
 
   try {
     const msg = await anthropic.messages.create({
@@ -537,13 +597,26 @@ Return a JSON array only:
 async function generateCompetitorBenchmarks(anthropic, profile, onPageSeo, competitorSeos) {
   if (!competitorSeos.length) return [];
 
+  // A competitor behind Cloudflare returns "Just a moment..." as its title and nothing else.
+  // Feeding that to the model produced confident findings about competitors we never actually
+  // read, including the reassuring and false "all competitors have weak or missing H1s too".
+  // Blocked sites are excluded here and reported separately so the gap in coverage is visible
+  // rather than disguised as data.
+  const usable = competitorSeos.filter(c => !c.blocked);
+  const blocked = competitorSeos.filter(c => c.blocked).map(c => c.name);
+  if (blocked.length) log(`Competitor benchmarks: excluding ${blocked.join(', ')} (bot-blocked or unreadable)`);
+  if (!usable.length) {
+    log('Competitor benchmarks: no readable competitor sites, skipping');
+    return [];
+  }
+
   // Build a structured comparison table for the prompt
   const signals = ['titleTag', 'metaDescription', 'h1', 'schemaMarkup', 'canonicalTag', 'pageSpeedSignal'];
   const signalLabels = { titleTag: 'Title Tag', metaDescription: 'Meta Description', h1: 'H1 Heading', schemaMarkup: 'Schema Markup', canonicalTag: 'Canonical Tag', pageSpeedSignal: 'Page Speed' };
 
   const rows = signals.map(sig => {
     const targetVal = Array.isArray(onPageSeo[sig]) ? onPageSeo[sig].join(', ') : (onPageSeo[sig] || '');
-    const compVals = competitorSeos.map(c => ({
+    const compVals = usable.map(c => ({
       name: c.name,
       value: Array.isArray(c[sig]) ? c[sig].join(', ') : (c[sig] || ''),
     }));
@@ -556,15 +629,18 @@ async function generateCompetitorBenchmarks(anthropic, profile, onPageSeo, compe
 
   const prompt = `You are an SEO consultant preparing a plain-English briefing for a non-technical executive.
 
-Below is a comparison of on-page SEO signals between ${profile.name} (the target brand) and its competitors.
+Below is a comparison of on-page SEO signals between ${profile.name} (the target brand) and the competitors whose sites we could read.
 
 ${table}
 
-Identify 3–5 specific signals where a competitor clearly outperforms ${profile.name}. For each, write a concise callout that:
-1. Names the specific competitor and what they do better
-2. Shows the concrete example (their actual value vs the target's value)
-3. Explains in plain business terms WHY this hurts ${profile.name} in search results
-4. Avoids all technical jargon — write as if explaining to a CEO who has never heard of SEO
+Identify the signals where a competitor clearly outperforms ${profile.name}. Return between 0 and 5 of them: return only the ones that are genuinely true from the values above, and return an empty array if there are none. Do not pad the list.
+
+Rules:
+- Compare only against the competitors listed. Do not comment on competitors that are not in the table, and never claim something about "all competitors".
+- Every claim must be supported by the actual values shown. Do not infer anything the values do not say.
+- Avoid technical jargon. Write as if explaining to a CEO who has never heard of SEO.
+
+For each one, give the concrete fix, not just the diagnosis. The recommendation must be specific enough to hand to whoever owns the site: for a title or description, write the replacement text out in full.
 
 Return ONLY a JSON array:
 [
@@ -573,7 +649,9 @@ Return ONLY a JSON array:
     "competitorName": "Competitor name",
     "competitorValue": "Their actual value",
     "targetValue": "Target's value or 'Missing'",
-    "callout": "Plain English explanation (2-3 sentences max)"
+    "callout": "Plain English explanation of what they do better and why it costs ${profile.name} (2-3 sentences max)",
+    "recommendation": "The specific change to make, written out ready to use",
+    "effort": "Quick Win|Medium|Large"
   }
 ]`;
 
@@ -589,7 +667,7 @@ Return ONLY a JSON array:
     const end = raw.lastIndexOf(']');
     if (start !== -1 && end !== -1) {
       const benchmarks = JSON.parse(raw.slice(start, end + 1));
-      log(`Competitor benchmarks: ${benchmarks.length} callouts generated`);
+      log(`Competitor benchmarks: ${benchmarks.length} callouts generated from ${usable.length} readable competitor(s)`);
       return benchmarks;
     }
   } catch (err) { log(`Competitor benchmarks error: ${err.message}`); }
@@ -604,7 +682,7 @@ function buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, pageAnalyses) 
     actions.push({ rank: 1, action: 'Write a meta description for every page — 140–160 characters summarizing what you sell and why shoppers should choose you.', impact: 'High', why: 'This is the text Google shows under your link in search results. Without it, Google picks random page text, which looks unprofessional and gets far fewer clicks.', effort: 'Quick Win' });
   }
   if (!onPageSeo.h1) {
-    actions.push({ rank: actions.length + 1, action: 'Add an H1 heading to your homepage — a clear, keyword-rich headline like "Lebanon\'s #1 Online Toy Store for Kids of All Ages."', impact: 'High', why: 'The H1 is the most important on-page signal Google uses to understand what a page is about. Every page should have exactly one.', effort: 'Quick Win' });
+    actions.push({ rank: actions.length + 1, action: `Add an H1 heading to your homepage: one clear headline naming what you sell and who for, such as "Toys, Games and Gifts for Every Age".`, impact: 'High', why: 'The H1 is the most important on-page signal Google uses to understand what a page is about. Every page should have exactly one.', effort: 'Quick Win' });
   }
   if (onPageSeo.pageSpeedSignal === 'slow') {
     actions.push({ rank: actions.length + 1, action: 'Improve page load speed — work with your developer to compress images and reduce JavaScript bundle size.', impact: 'High', why: 'Google uses speed as a direct ranking factor. Slow pages also lose roughly 7% of visitors per second of delay before they even see your products.', effort: '1-2 weeks' });
@@ -751,7 +829,7 @@ async function run() {
   const competitorSeos = [];
   for (const comp of competitorUrls) {
     log(`Scraping competitor SEO: ${comp.url}`);
-    const seo = await scrapeOnPageSeo(comp.url).catch(err => ({ url: comp.url, error: err.message }));
+    const seo = await scrapeOnPageSeo(comp.url).catch(err => ({ url: comp.url, error: err.message, blocked: true }));
     competitorSeos.push({ name: comp.name, ...seo });
   }
 
