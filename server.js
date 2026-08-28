@@ -19,6 +19,12 @@ const multer = require('multer');
 
 const app = express();
 app.set('trust proxy', 1);
+// Express matches routes case-insensitively by default, so /API/thing reaches a handler
+// registered as /api/thing. The gate below filters on a lowercase '/api' prefix, so a
+// single capital letter walked straight past authentication. Verified against production
+// on a sibling app: /api/brand-guidelines returned 401 and /API/brand-guidelines returned
+// 200 with no token. With this on, a case variant cannot reach a handler at all.
+app.set('case sensitive routing', true);
 const PORT = process.env.PORT || 3001;
 const DATA_DIR = path.join(__dirname, 'data');
 const BRANDS_DIR = path.join(DATA_DIR, 'brands');
@@ -548,6 +554,8 @@ app.get('/api/social-image/:slug/:filename', (req, res) => {
 // check, /share/:token, and the cached social images. Share links are meant to be openable by
 // people with no account, which is the whole point of them.
 const { requireUser } = require('./whpAuth');
+const { publishCatalog, pushCatalog } = require('./modules/whp_catalog');
+const { TAB_CATALOG, tabsForPath, userAllowed } = require('./modules/tab_catalog');
 
 // What the login box needs. No secrets, and outside the gate so the login page can load.
 app.get('/api/config', (_req, res) => res.json({
@@ -555,8 +563,92 @@ app.get('/api/config', (_req, res) => res.json({
   app: (process.env.WHP_AUTH_APP || 'brand-intelligence'),
 }));
 
-app.use('/api', requireUser);
+// ─── Authorization: identity, then the area ───────────────────────────────────
+// Two steps, in this order. Identity is whp-auth's, verified locally against its
+// JWKS. Authorization is this app's: the request path resolves to a set of tabs
+// and the caller must hold one of them. Those tabs travel in the token's `perms`
+// claim, granted per person in the whp-auth console. Admins and superadmins
+// bypass. Anything unreadable is refused, never waved through.
+//
+// Open to the world, and nothing here carries data or a secret: /api/status is
+// the healthcheck, /api/config tells the login screen where whp-auth lives, and
+// /api/tab-catalog is how whp-auth learns which areas this app has. That last
+// one is the trap: leave it inside the gate and whp-auth reads the 401 as "app
+// unreachable" and never learns the catalog at all.
+const OPEN_PATHS = new Set(['/api/status', '/api/config', '/api/tab-catalog']);
+
+// The signed-in person, in the shape the gate and the dashboard both read.
+function localUser(u) {
+  return {
+    id: u.id,
+    email: u.email || '',
+    username: (u.email || '').split('@')[0] || u.email || '',
+    role: u.role || '',
+    // A whp-auth superadmin, or someone holding the admin role on this app.
+    isAdmin: !!u.isSuperadmin || u.role === 'admin',
+    isSuperadmin: !!u.isSuperadmin,
+    permissions: u.permissions || {},
+  };
+}
+
+// Case-insensitive on purpose. Routing is now strict, so this should never see a variant,
+// but if one ever reaches here it must be GATED rather than waved through. The (\/|$) is
+// what keeps /apixyz from being falsely gated: only a real /api segment counts.
+const API_PREFIX = /^\/api(\/|$)/i;
+
+app.use((req, res, next) => {
+  // Only the API is gated. The SPA shell, its assets and /share/:token must load
+  // without a token: the login screen has to render, and a share link is meant
+  // to be openable by someone with no account at all.
+  if (!API_PREFIX.test(req.path)) return next();
+  // Lowercase before the lookup: OPEN_PATHS holds lowercase keys, and a mixed-case
+  // variant of a gated path must never miss this set in a way that changes the outcome.
+  // The METHOD is part of the open check, not just the path. A bare set of paths
+  // opens every verb on them, so a write handler landing on one of these later would
+  // be anonymously callable. Only GET is open.
+  if (req.method === 'GET' && OPEN_PATHS.has(req.path.toLowerCase())) return next();
+
+  requireUser(req, res, () => {
+    req.user = localUser(req.user);
+    // The METHOD matters as well as the path: GET /api/brands is the nav's
+    // brand switcher and stays open, while POST and DELETE on the same prefix
+    // create and destroy brands.
+    // Lowercase before the lookup: a mixed-case path must resolve to the same tabs,
+    // never to null, which the map would treat as ungated.
+    const required = tabsForPath(req.path.toLowerCase(), req.method);
+    if (!userAllowed(req.user, required)) {
+      return res.status(403).json({ error: "You don't have access to this section" });
+    }
+    next();
+  });
+});
+
 app.get('/api/me', (req, res) => res.json({ ok: true, user: req.user }));
+
+// What the dashboard asks for on load to learn who it is talking to and which
+// tabs to render. Claims off the token, never a database lookup.
+app.get('/api/auth/me', (req, res) => {
+  res.json({
+    ...req.user,
+    is_admin: req.user.isAdmin,
+    catalog: TAB_CATALOG,
+    // Where the account menu sends someone to change a password or manage
+    // access. Both are whp-auth's job now, so the menu links out rather than
+    // pretending either still happens here.
+    authUrl: (process.env.WHP_AUTH_URL || '').replace(/\/$/, ''),
+  });
+});
+
+// ─── Tab catalog ──────────────────────────────────────────────────────────────
+// The areas a person can be granted, published for the whp-auth console. Read
+// unauthenticated, on registration and on a daily poll, and it lists area names
+// only. See modules/whp_catalog.js.
+app.get('/api/tab-catalog', (_req, res) => res.json(publishCatalog(TAB_CATALOG)));
+
+// Push the same catalog at boot so the console is never left holding a stale
+// copy after a deploy. Deliberately not awaited: whp-auth being slow or asleep
+// must not delay this app's healthcheck, and pushCatalog never throws.
+pushCatalog(TAB_CATALOG);
 
 // ─── Rate limiting ─────────────────────────────────────────────────────────────
 app.use('/api/', rateLimit({
@@ -1283,11 +1375,16 @@ app.post('/api/brands/:slug/process_style_guide', (req, res) => {
 });
 
 // ─── Static dashboard ─────────────────────────────────────────────────────────
+const SHARE_PREFIX = /^\/share(\/|$)/i;
 const distPath = path.join(__dirname, 'dashboard', 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   app.get('/{*splat}', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/share')) {
+    // Same case-insensitive tests as the gate above, for the same reason: whatever the
+    // gate treated as API must get the API's 404 here, not a 200 HTML shell a fetch()
+    // would try to JSON.parse. /share gets the boundary too so /SHARE/<token>, which
+    // strict routing no longer sends to the share handler, does not silently become the app.
+    if (!API_PREFIX.test(req.path) && !SHARE_PREFIX.test(req.path)) {
       return res.sendFile(path.join(distPath, 'index.html'));
     }
     // This catch-all matches /api paths too. Falling through without answering

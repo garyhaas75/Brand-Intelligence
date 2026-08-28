@@ -2849,6 +2849,31 @@ export default function App() {
   const pollRef = useRef(null)
   const modulePollRefs = useRef({}) // module → intervalId
 
+  // Who is signed in, and which areas they hold. Presentation only: the API
+  // enforces the same rules independently, so hiding a tab is never the line of
+  // defence, it is just not showing people doors that 403.
+  const [me, setMe] = useState(null)
+  useEffect(() => {
+    fetch(`${API}/auth/me`).then(r => (r.ok ? r.json() : null)).then(setMe).catch(() => {})
+  }, [])
+
+  const isAdmin = !!(me && (me.isAdmin || me.is_admin))
+  const granted = !me || isAdmin ? null : new Set(me.permissions?.tabs || [])
+  const canSee = id => granted === null || granted.has(id)
+  const visibleTabs = TABS.filter(t => canSee(t.id))
+  // Where a brand selection lands. 'profile' unless that is not granted.
+  const firstBrandTab = () => (visibleTabs.find(t => t.id !== 'portfolio') || {}).id || null
+
+  // The landing tab and any ?tab= in the URL are chosen before the grant is
+  // known, so a person could otherwise open straight onto a section they do not
+  // hold and sit on a wall of failed requests. Correct it once the grant lands.
+  useEffect(() => {
+    if (!me || tab === null || canSee(tab)) return
+    const next = visibleTabs[0] ? visibleTabs[0].id : null
+    if (next === 'portfolio') setActiveBrand(null)
+    setTab(next)
+  }, [me, tab])
+
   async function loadBrands() {
     const res = await fetch(`${API}/brands`)
     const d = await res.json()
@@ -2873,13 +2898,13 @@ export default function App() {
   }, [brands])
 
   function selectBrand(slug) {
-    setActiveBrand(slug); setTab('profile')
+    setActiveBrand(slug); setTab(firstBrandTab())
   }
 
   async function handleBrandAdded(slug) {
     setShowAddBrand(false)
     await loadBrands()
-    setActiveBrand(slug); setTab('profile')
+    setActiveBrand(slug); setTab(firstBrandTab())
   }
 
   async function handleRefreshAll(slug) {
@@ -2921,7 +2946,7 @@ export default function App() {
   }
 
   const activeBrandData = brands.find(b => b.slug === activeBrand)
-  const nonPortfolioTabs = TABS.filter(t => t.id !== 'portfolio')
+  const nonPortfolioTabs = visibleTabs.filter(t => t.id !== 'portfolio')
 
   return (
     <ThemeContext.Provider value={T}>
@@ -2942,20 +2967,24 @@ export default function App() {
           {/* Brand switcher */}
           <select
             value={activeBrand || ''}
-            onChange={e => { if (e.target.value) { setActiveBrand(e.target.value); setTab('profile') } else { setActiveBrand(null); setTab('portfolio') } }}
+            onChange={e => { if (e.target.value) { selectBrand(e.target.value) } else { setActiveBrand(null); setTab(canSee('portfolio') ? 'portfolio' : firstBrandTab()) } }}
             style={{ background: 'rgba(255,255,255,0.1)', color: T.navText, border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', fontSize: 13, cursor: 'pointer' }}
           >
             <option value="">All Brands</option>
             {brands.map(b => <option key={b.slug} value={b.slug}>{b.name}</option>)}
           </select>
 
-          <button onClick={() => setShowAddBrand(true)} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add Brand</button>
+          {canSee('portfolio') && (
+            <button onClick={() => setShowAddBrand(true)} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add Brand</button>
+          )}
 
           <div style={{ flex: 1 }} />
 
           {/* Tab nav (only show brand tabs when a brand is selected) */}
           <div style={{ display: 'flex', gap: 2 }}>
-            <button onClick={() => { setActiveBrand(null); setTab('portfolio') }} style={{ background: tab === 'portfolio' && !activeBrand ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === 'portfolio' ? 1 : 0.6 }}>Portfolio</button>
+            {canSee('portfolio') && (
+              <button onClick={() => { setActiveBrand(null); setTab('portfolio') }} style={{ background: tab === 'portfolio' && !activeBrand ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === 'portfolio' ? 1 : 0.6 }}>Portfolio</button>
+            )}
             {activeBrand && nonPortfolioTabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{ background: tab === t.id ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === t.id ? 1 : 0.6 }}>{t.label}</button>
             ))}
@@ -2986,8 +3015,13 @@ export default function App() {
           {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
           {tab === 'search' && activeBrand && <SearchSeoTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['search_seo']} dataVersion={moduleVersions['search_seo'] || 0} />}
           {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} pdfMode={pdfMode} />}
-          {!activeBrand && tab !== 'portfolio' && (
-            <EmptyState message="Select a brand to view this section." cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
+          {me && visibleTabs.length === 0 && (
+            <EmptyState message="Your account has access to this tool but not to any section of it yet. Ask an admin to grant you one." />
+          )}
+          {visibleTabs.length > 0 && !activeBrand && tab !== 'portfolio' && (
+            canSee('portfolio')
+              ? <EmptyState message="Select a brand to view this section." cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
+              : <EmptyState message="Select a brand to view this section." />
           )}
         </main>
       </div>
