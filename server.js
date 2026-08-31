@@ -574,8 +574,10 @@ app.get('/api/config', (_req, res) => res.json({
 // the healthcheck, /api/config tells the login screen where whp-auth lives, and
 // /api/tab-catalog is how whp-auth learns which areas this app has. That last
 // one is the trap: leave it inside the gate and whp-auth reads the 401 as "app
-// unreachable" and never learns the catalog at all.
-const OPEN_PATHS = new Set(['/api/status', '/api/config', '/api/tab-catalog']);
+// Deliberately NOT open: /api/tab-catalog names every screen this tool has, which is
+// free reconnaissance. whp-auth learns the areas from the authenticated push this
+// app makes at boot, so nothing needs to read it anonymously.
+const OPEN_PATHS = new Set(['/api/status', '/api/config']);
 
 // The signed-in person, in the shape the gate and the dashboard both read.
 function localUser(u) {

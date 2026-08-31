@@ -80,7 +80,7 @@ async function askClaude(diff, message) {
     },
     body: JSON.stringify({
       model: 'claude-opus-4-8',
-      max_tokens: 512,
+      max_tokens: 2000,
       system: SYSTEM,
       messages: [{ role: 'user',
         content: `Commit message:\n\`\`\`\n${message}\n\`\`\`\n\nDiff (first 8000 chars):\n\`\`\`\n${diff.slice(0, 8000)}\n\`\`\`` }],
