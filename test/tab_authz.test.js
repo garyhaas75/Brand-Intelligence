@@ -35,13 +35,28 @@ test('two-segment key wins over one, and the one-segment floor still catches', (
 });
 
 test('collection versus detail: the read is chrome, the writes are pinned', () => {
-  assert.strictEqual(tabsForPath('/api/brands', 'GET'), null);
-  assert.strictEqual(tabsForPath('/api/brands/anne-klein', 'GET'), null);
+  // The registry read is chrome for every section, so it resolves to the whole
+  // area list rather than to one tab. userAllowed passes on any one of them,
+  // which is how "holds at least one area" is expressed here.
+  eq(tabsForPath('/api/brands', 'GET'), ALL_TABS);
+  eq(tabsForPath('/api/brands/anne-klein', 'GET'), ALL_TABS);
   eq(tabsForPath('/api/brands', 'POST'), ['portfolio']);
   eq(tabsForPath('/api/brands/anne-klein', 'DELETE'), ['portfolio']);
   // The rule must not swallow the detail paths underneath it.
   eq(tabsForPath('/api/brands/anne-klein/personas', 'DELETE'), ['personas', 'action']);
   eq(tabsForPath('/api/brands/anne-klein/share-links/tok-123', 'DELETE'), ['action']);
+});
+
+test('the brand switcher is readable by any area holder, and by nobody with none', () => {
+  const registry = tabsForPath('/api/brands', 'GET');
+  const socialOnly = { permissions: { tabs: ['social'] } };
+  const nothing = { permissions: { tabs: [] } };
+  assert.strictEqual(userAllowed(socialOnly, registry), true);
+  assert.strictEqual(userAllowed({ isAdmin: true }, registry), true);
+  assert.strictEqual(userAllowed(nothing, registry), false);
+  // The same holds for the brand summary the switcher links to.
+  assert.strictEqual(userAllowed(nothing, tabsForPath('/api/brands/anne-klein', 'GET')), false);
+  assert.strictEqual(userAllowed(socialOnly, tabsForPath('/api/brands/anne-klein', 'GET')), true);
 });
 
 test('refresh/all is Portfolio, not the union of the analysis tabs', () => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
+import { auth } from './auth.jsx'
 
 const API = '/api'
 
@@ -79,6 +80,33 @@ function EmptyState({ message, cta, onCta }) {
       <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
       <p style={{ fontSize: 15, marginBottom: 16 }}>{message}</p>
       {cta && <button onClick={onCta} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>{cta}</button>}
+    </div>
+  )
+}
+
+// The label a person would read in the nav for a tab id, so a message about a
+// section can name it instead of saying "this section".
+const tabLabel = id => (TABS.find(t => t.id === id) || {}).label || 'this section'
+
+// Signed in, granted nothing. A card rather than the centred icon-and-a-line of
+// EmptyState, because this is not an empty dataset and must not look like one.
+// Neutral colours on purpose: no red, no amber. Nobody has hit a fault.
+function NoAccessCard({ email }) {
+  const T = useT()
+  return (
+    <div style={{ maxWidth: 520, margin: '48px auto', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: 28 }}>
+      <div style={{ fontSize: 28, marginBottom: 10 }}>🔑</div>
+      <h2 style={{ color: T.text, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>No sections assigned yet</h2>
+      <p style={{ color: T.textMuted, fontSize: 14, lineHeight: 1.6 }}>
+        Your account can sign in to Brand Intelligence but has not been given access to any
+        section of it yet. Ask an administrator to grant you the sections you need in the WHP
+        sign-in console, then sign in again. Nothing is missing or broken.
+      </p>
+      {email && (
+        <p style={{ color: T.textFaint, fontSize: 12, marginTop: 14 }}>
+          Signed in as {email}. Use Sign out above to switch accounts.
+        </p>
+      )}
     </div>
   )
 }
@@ -2853,14 +2881,32 @@ export default function App() {
   // enforces the same rules independently, so hiding a tab is never the line of
   // defence, it is just not showing people doors that 403.
   const [me, setMe] = useState(null)
+  // Separate from `me` on purpose. `me` null means either "still asking" or
+  // "the ask failed", and those must not read the same: until the answer is in,
+  // nothing may conclude that somebody holds nothing.
+  const [meLoaded, setMeLoaded] = useState(false)
   useEffect(() => {
-    fetch(`${API}/auth/me`).then(r => (r.ok ? r.json() : null)).then(setMe).catch(() => {})
+    fetch(`${API}/auth/me`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(setMe)
+      .catch(() => {})
+      .finally(() => setMeLoaded(true))
   }, [])
 
   const isAdmin = !!(me && (me.isAdmin || me.is_admin))
   const granted = !me || isAdmin ? null : new Set(me.permissions?.tabs || [])
   const canSee = id => granted === null || granted.has(id)
   const visibleTabs = TABS.filter(t => canSee(t.id))
+  // Signed in and holding no section of this tool. Only ever true once the
+  // grant has actually landed.
+  const noAreas = meLoaded && !!me && !isAdmin && visibleTabs.length === 0
+
+  function signOut() {
+    auth.clear()
+    // Gate holds signedIn in state above this component, so a reload is what
+    // returns to the sign-in screen.
+    window.location.reload()
+  }
   // Where a brand selection lands. 'profile' unless that is not granted.
   const firstBrandTab = () => (visibleTabs.find(t => t.id !== 'portfolio') || {}).id || null
 
@@ -2881,7 +2927,10 @@ export default function App() {
     return d.brands || []
   }
 
-  useEffect(() => { loadBrands() }, [])
+  // Wait for the grant before asking. The registry is now gated to people who
+  // hold at least one area, so for a no-areas account this call is a guaranteed
+  // 403 and the answer is one they should not have anyway.
+  useEffect(() => { if (meLoaded && !noAreas) loadBrands() }, [meLoaded, noAreas])
 
   // Poll if any brand is in 'running' state
   useEffect(() => {
@@ -2964,17 +3013,21 @@ export default function App() {
         <nav style={{ background: T.navBg, padding: '0 24px', display: pdfMode ? 'none' : 'flex', alignItems: 'center', gap: 16, height: 56, position: 'sticky', top: 0, zIndex: 100 }}>
           <span style={{ color: T.navText, fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', marginRight: 8 }}>Brand Intelligence</span>
 
-          {/* Brand switcher */}
-          <select
-            value={activeBrand || ''}
-            onChange={e => { if (e.target.value) { selectBrand(e.target.value) } else { setActiveBrand(null); setTab(canSee('portfolio') ? 'portfolio' : firstBrandTab()) } }}
-            style={{ background: 'rgba(255,255,255,0.1)', color: T.navText, border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', fontSize: 13, cursor: 'pointer' }}
-          >
-            <option value="">All Brands</option>
-            {brands.map(b => <option key={b.slug} value={b.slug}>{b.name}</option>)}
-          </select>
+          {/* Brand switcher. Not rendered for an account that holds no section:
+              every brand WHP tracks is a list they have no screen to open, and
+              an enabled control that only 403s is worse than no control. */}
+          {!noAreas && (
+            <select
+              value={activeBrand || ''}
+              onChange={e => { if (e.target.value) { selectBrand(e.target.value) } else { setActiveBrand(null); setTab(canSee('portfolio') ? 'portfolio' : firstBrandTab()) } }}
+              style={{ background: 'rgba(255,255,255,0.1)', color: T.navText, border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', fontSize: 13, cursor: 'pointer' }}
+            >
+              <option value="">All Brands</option>
+              {brands.map(b => <option key={b.slug} value={b.slug}>{b.name}</option>)}
+            </select>
+          )}
 
-          {canSee('portfolio') && (
+          {canSee('portfolio') && !noAreas && (
             <button onClick={() => setShowAddBrand(true)} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add Brand</button>
           )}
 
@@ -2985,12 +3038,29 @@ export default function App() {
             {canSee('portfolio') && (
               <button onClick={() => { setActiveBrand(null); setTab('portfolio') }} style={{ background: tab === 'portfolio' && !activeBrand ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === 'portfolio' ? 1 : 0.6 }}>Portfolio</button>
             )}
-            {activeBrand && nonPortfolioTabs.map(t => (
+            {/* Without Portfolio there is no brand-less screen, so before a brand
+                is picked this person used to see no nav at all and a message
+                about a section nothing on screen named. Their sections render
+                either way; picking a brand is what fills them. */}
+            {(activeBrand || (meLoaded && !canSee('portfolio'))) && nonPortfolioTabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{ background: tab === t.id ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === t.id ? 1 : 0.6 }}>{t.label}</button>
             ))}
           </div>
 
           <button onClick={() => setDarkMode(d => !d)} style={{ background: 'none', border: 'none', color: T.navText, fontSize: 18, cursor: 'pointer', opacity: 0.7, padding: 4 }}>{darkMode ? '☀' : '🌙'}</button>
+
+          {/* There was no way out of this app at all: the token sat in
+              localStorage and nothing on screen cleared it, so somebody on the
+              wrong account, above all somebody granted nothing, was stuck. */}
+          {/* Gated on meLoaded, not on me: an identity call that comes back
+              anything other than a 401 leaves me null, and that is exactly the
+              state somebody most needs a way out of. */}
+          {meLoaded && (
+            <>
+              {me && <span style={{ color: T.navText, fontSize: 12, opacity: 0.75 }}>{me.email || me.username}</span>}
+              <button onClick={signOut} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.3)', color: T.navText, borderRadius: 6, padding: '5px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Sign out</button>
+            </>
+          )}
         </nav>
 
         {/* Brand sub-header */}
@@ -3015,13 +3085,19 @@ export default function App() {
           {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
           {tab === 'search' && activeBrand && <SearchSeoTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['search_seo']} dataVersion={moduleVersions['search_seo'] || 0} />}
           {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} pdfMode={pdfMode} />}
-          {me && visibleTabs.length === 0 && (
-            <EmptyState message="Your account has access to this tool but not to any section of it yet. Ask an admin to grant you one." />
-          )}
-          {visibleTabs.length > 0 && !activeBrand && tab !== 'portfolio' && (
+          {/* Deliberately NOT the shared EmptyState. This is a permissions
+              answer, not an empty dataset, and the two used to render with the
+              same chart icon and the same one-line layout, so a person could
+              not tell "nothing selected" from "nothing granted". */}
+          {noAreas && <NoAccessCard email={me.email || me.username} />}
+          {meLoaded && !noAreas && visibleTabs.length > 0 && !activeBrand && tab !== 'portfolio' && (
+            // Name the section. "this section" was a section the reader had no
+            // way to see named: without Portfolio the nav renders no tabs until
+            // a brand is picked, so nothing on screen said which one they were
+            // being asked to pick a brand for.
             canSee('portfolio')
-              ? <EmptyState message="Select a brand to view this section." cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
-              : <EmptyState message="Select a brand to view this section." />
+              ? <EmptyState message={`Select a brand to view ${tabLabel(tab)}.`} cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
+              : <EmptyState message={`Select a brand to view ${tabLabel(tab)}.`} />
           )}
         </main>
       </div>

@@ -91,6 +91,14 @@ const API_ROUTE_RULES = [
   { method: 'POST',   path: /^\/api\/brands\/?(?:[?#]|$)/,          tabs: ['portfolio'] },
   { method: 'DELETE', path: /^\/api\/brands\/[^/]+\/?(?:[?#]|$)/,   tabs: ['portfolio'] },
 
+  // Reading the registry stays broad, but it is not open to everyone who can
+  // merely sign in. ALL_TABS here means "holds at least one area of this tool",
+  // because userAllowed passes on any one of the required tabs. Someone granted
+  // nothing has no screen that needs the switcher, and the switcher was handing
+  // them the name of every brand WHP is tracking. Anyone holding any section
+  // keeps the switcher exactly as before.
+  { method: 'GET', path: /^\/api\/brands(?:\/[^/]+)?\/?(?:[?#]|$)/, tabs: ALL_TABS },
+
   // --- Whole-brand re-discovery -------------------------------------------
   // Spawns every analysis module at once. That is the Portfolio screen's
   // "Refresh All", not any single analysis tab: the cost and the blast radius
@@ -197,10 +205,6 @@ for (const [module, tabs] of Object.entries(MODULE_READERS)) {
 
 // Intentionally left ungated for any signed-in user:
 //
-//   'brands'      GET only, and only the collection and the brand summary. The
-//                 nav's brand switcher reads it on every screen, so gating it
-//                 would blank the switcher for everyone without Portfolio. The
-//                 writes underneath it are pinned by rule above.
 //   'status'      polled by the app shell on every tab while a refresh runs.
 //   'me'          identity, and it is what tells the client who it is.
 //   'proxy-image' a generic image proxy no screen calls today.
