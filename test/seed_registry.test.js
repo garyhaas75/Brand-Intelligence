@@ -66,3 +66,11 @@ test('a seeded brand that was deleted on purpose is not re-registered on the nex
   const src = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
   assert.match(src, /deletedSeeds/);
 });
+
+test('seeded competitor descriptions are client-readable: no verification notes, status codes or URLs', () => {
+  const prof = require('../seed_data/brands/toysrus-jp/profile.json');
+  for (const c of prof.identifiedCompetitors) {
+    assert.ok(c.rationale && c.rationale.length > 10, `${c.name} has no description`);
+    assert.doesNotMatch(c.rationale, /curl|chromium|akamai|cloudflare|https?:|status|byte|node=|\/category|\b[45]\d\d\b/i, `${c.name}: ${c.rationale}`);
+  }
+});
