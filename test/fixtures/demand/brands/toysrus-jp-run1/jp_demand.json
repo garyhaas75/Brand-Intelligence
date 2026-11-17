@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-11-16T21:54:00.562Z",
+  "market": "JP",
+  "trends": [
+    {
+      "term": "タカラトミー(TAKARA TOMY)",
+      "termEn": null,
+      "interestOverTime": null,
+      "topRelated": []
+    },
+    {
+      "term": "ベイブレードX",
+      "termEn": null,
+      "interestOverTime": null,
+      "topRelated": []
+    },
+    {
+      "term": "おもちゃ",
+      "termEn": "toys",
+      "interestOverTime": null,
+      "topRelated": []
+    },
+    {
+      "term": "知育玩具",
+      "termEn": "educational toys",
+      "interestOverTime": null,
+      "topRelated": []
+    },
+    {
+      "term": "プレゼント 子供",
+      "termEn": "gifts for kids",
+      "interestOverTime": null,
+      "topRelated": []
+    }
+  ],
+  "demographics": {
+    "source": null,
+    "omitted": true,
+    "reason": "ESTAT_APP_ID is not set, so e-Stat baseline demographics were omitted."
+  },
+  "notes": [
+    "Google Trends call failed: Input is not valid: Field input.timeRange must be equal to one of the allowed values: \"\", \"now 1-H\", \"now 4-H\", \"now 1-d\", \"now 7-d\", \"today 1-m\", \"today 3-m\", \"today 5-y\", \"all\"",
+    "ESTAT_APP_ID is not set, so e-Stat baseline demographics were omitted."
+  ]
+}

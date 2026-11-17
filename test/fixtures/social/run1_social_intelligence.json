@@ -1,0 +1,1914 @@
+{
+ "generatedAt": "2026-11-16T22:03:57.441Z",
+ "brandSlug": "toysrus-jp",
+ "note": "Trimmed copy of data/brands/toysrus-jp/social_intelligence.json from run 1 (2026-11-16). Em dashes in captions replaced with hyphens.",
+ "brands": [
+  {
+   "id": "toysrus-jp",
+   "name": "Toys R Us Japan",
+   "role": "target",
+   "handle": "toysrus_jp",
+   "scrapedAt": "2026-11-16T21:54:00.879Z",
+   "summary": {
+    "postCount": 50,
+    "avgEngagement": 106,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0.9
+   },
+   "topPosts": [
+    {
+     "likes": 749,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n映画公開の一足先にトイ・ストーリーのおもちゃがいよいよ6/20（土）発売✨ \nおなじみのキャラクターたちがリアルサイズフィギュアやおしゃべりフレンズ、洗えるぬいぐるみ、トミカ・プラレールとさまざまな形で登場🤠🚀 \n気になった商品は、店頭またはオンラインストアで",
+     "timestamp": "2026-06-18T09:31:39.000Z",
+     "postUrl": "https://instagram.com/p/DZuOeKsGStH",
+     "imageUrl": "/api/social-image/toysrus-jp/top_0.jpg"
+    },
+    {
+     "likes": 340,
+     "comments": 2,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n今年ももちろんやります♥\nトイザらス・ベビーザらス ブラックフライデー🛒✨\n\n今年は11/20(金)よりスタート📣（※１）\nトイザらス・ベビーザらスで同時開催いたします🙌🌈\nトイザらスでは超お買い得価格のおもちゃが勢ぞろい！\nベビーザらスでは日用品のほか、",
+     "timestamp": "2026-11-12T04:00:52.000Z",
+     "postUrl": "https://instagram.com/p/DfoJfFSnyLE",
+     "imageUrl": "/api/social-image/toysrus-jp/top_1.jpg"
+    },
+    {
+     "likes": 342,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\nこの夏注目の映画「トイ・ストーリー５」関連の最新アイテムが予約受付中！⭐\nなんと！ご予約期間だけの限定価格で展開中🛒✨\n早めのチェックがおすすめです。\nおなじみのキャラクターが大集合！\nみんな並べるとお部屋がまるで映画のワンシーンに🎬🌈\n「可愛い！」と思った",
+     "timestamp": "2026-05-21T08:46:00.000Z",
+     "postUrl": "https://instagram.com/p/DYmDDLYkn5o",
+     "imageUrl": "/api/social-image/toysrus-jp/top_2.jpg"
+    }
+   ],
+   "recentPosts": [
+    {
+     "likes": 46,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n9月25日の中秋の名月に合わせて、宇宙と月をモチーフにしたアイテムを集めました🌙\n気になった商品は、店頭またはオンラインストアでチェックを✔️\n秋の夜長のお供に、ぜひチェックしてみてください🍂🌙\n\n───────────\n\n#中秋の名月 #お月見 #宇宙 #",
+     "timestamp": "2026-09-25T09:01:19.000Z",
+     "postUrl": "https://instagram.com/p/DdtFwYeAXq4",
+     "imageUrl": "/api/social-image/toysrus-jp/rec_0.jpg"
+    },
+    {
+     "likes": 61,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n今夜、家族で何して遊ぶ？🌙\n電池を用意しなくてもすぐ遊べる、アナログゲームはいかがですか？\nバランスゲームからボードゲーム、迷路パズルまで幅広い年齢向けにご紹介しています。\n気になるアイテムはコメントで教えてね💬✨\n\n───────────\n\n#トイザらス #",
+     "timestamp": "2026-09-21T09:02:06.000Z",
+     "postUrl": "https://instagram.com/p/Ddiym8Zj-az",
+     "imageUrl": "/api/social-image/toysrus-jp/rec_1.jpg"
+    },
+    {
+     "likes": 48,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n＼対象の商品が10/15(木)までお買い得！／\nこの秋、どのLEGO®シリーズで遊ぶ?🧱\n街をつくるシティシリーズ、冒険が広がるニンジャゴー、はじめての組み立てにぴったりなデュプロ、憧れの物語が詰まったディズニープリンセスまで勢ぞろい👀✨\n気になるシリーズ、コ",
+     "timestamp": "2026-10-13T09:04:38.000Z",
+     "postUrl": "https://instagram.com/p/DebcYxIgdBA",
+     "imageUrl": "/api/social-image/toysrus-jp/rec_2.jpg"
+    },
+    {
+     "likes": 95,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n今日のリカちゃん、どんな衣装にする?🎀\nみんなの憧れ♥衣装特集👗\nカラフルでかわいい衣装をたっぷりご紹介します💄👠✨\n一番好きな衣装はどれ?コメントで教えてね💬\n\n───────────\n\n#リカちゃん #リカちゃん衣装 #着せ替え人形 #ドール #お人",
+     "timestamp": "2026-10-21T09:01:05.000Z",
+     "postUrl": "https://instagram.com/p/DewCZijkqKL",
+     "imageUrl": "/api/social-image/toysrus-jp/rec_3.jpg"
+    },
+    {
+     "likes": 68,
+     "comments": 0,
+     "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n見ているだけで気分が上がる、そんなユニコーンアイテムが勢ぞろい🦄💫 \nどれにしようか迷いがいのあるラインナップ、スワイプしてチェックしてみて👆✨\n\n気になった商品は、店頭またはオンラインストアでチェックを✔️\nお気に入りの一点、ぜひ見つけてみてください🌟\ud83c",
+     "timestamp": "2026-09-10T09:01:47.000Z",
+     "postUrl": "https://instagram.com/p/DdGd1G7FBwm",
+     "imageUrl": "/api/social-image/toysrus-jp/rec_4.jpg"
+    }
+   ],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": "ToysRUsJapan",
+   "facebookData": null,
+   "xHandle": "ToysRUs_jp",
+   "xData": {
+    "summary": {
+     "postCount": 48,
+     "avgEngagement": 81,
+     "postingFrequencyPerWeek": 11.2
+    },
+    "topPosts": [
+     {
+      "likes": 1134,
+      "comments": 4,
+      "caption": "/／\nもちろん今年もやります🦒✨\nトイザらス・ベビーザらス\nブラックフライデー🖤\n\\＼\n今年はトイザらス・ベビーザらス同時開催🙌🌈\n11/20(金)(※)からスタート！\nまずは紙面をチェックして準備📱！\n※オンラインストアは11/19(木)12:00～ https://t.co/yK6fTo8osT",
+      "timestamp": "2026-11-12T04:00:28.000Z",
+      "postUrl": "https://x.com/TOYSRUS_JP/status/2120728410121294262",
+      "imageUrl": "https://pbs.twimg.com/media/HW5XPpjaIAAkAmo.jpg",
+      "shares": 135,
+      "views": 525035
+     },
+     {
+      "likes": 1066,
+      "comments": 3,
+      "caption": "/／\nトイザらス クリスマスセール🎅🎄\n11/20(金)からスタート📣✨\n\\＼\nみんな大好きクリスマスカタログをちょい見せ！\n今年注目のおもちゃや\nお買い得アイテムが盛りだくさん👍✨\nクリスマスプレゼントはトイザらスで🦒💓 https://t.co/uCh7LXNxTe",
+      "timestamp": "2026-11-12T04:15:09.000Z",
+      "postUrl": "https://x.com/TOYSRUS_JP/status/2120732102820081713",
+      "imageUrl": "https://pbs.twimg.com/media/HW5amuIbIAAsPbE.jpg",
+      "shares": 178,
+      "views": 741885
+     },
+     {
+      "likes": 913,
+      "comments": 9,
+      "caption": "＼気が早すぎるクリスマスセール／\n本日（11/5）よりスタート🎄🎅🔔\n\nたまごっちパラダイスをはじめ人気のおもちゃや、ベビー服などのベビー用品もお買い得🛒✨\n今年のクリスマス準備はトイザらスからスタートしよう🦒💓 https://t.co/H1zjQh8usK",
+      "timestamp": "2026-11-05T01:00:32.000Z",
+      "postUrl": "https://x.com/TOYSRUS_JP/status/2118146409849671782",
+      "imageUrl": "https://pbs.twimg.com/media/HWUq7GXbQAA8rOg.jpg",
+      "shares": 164,
+      "views": 313601
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Product Showcase",
+      "count": 12
+     },
+     {
+      "theme": "Promotional",
+      "count": 12
+     },
+     {
+      "theme": "Seasonal",
+      "count": 6
+     },
+     {
+      "theme": "Brand Story",
+      "count": 1
+     },
+     {
+      "theme": "Behind the Scenes",
+      "count": 1
+     },
+     {
+      "theme": "User Generated",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-10",
+      "avgEngagement": 6,
+      "postCount": 4
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 87,
+      "postCount": 44
+     }
+    ],
+    "followers": 259861
+   },
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {
+    "instagram": "claude",
+    "facebook": "claude",
+    "x": "claude"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "ok",
+     "reason": null,
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": null,
+   "partialData": false
+  },
+  {
+   "id": "amazon.co.jp-toys",
+   "name": "Amazon.co.jp Toys",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T21:55:13.029Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": null,
+   "facebookData": null,
+   "xHandle": null,
+   "xData": null,
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {},
+   "platformStatus": {
+    "x": {
+     "status": "not-applicable",
+     "reason": "No X account found"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  },
+  {
+   "id": "rakuten-ichiba-toys",
+   "name": "Rakuten Ichiba Toys",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T21:55:18.303Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": null,
+   "facebookData": null,
+   "xHandle": null,
+   "xData": null,
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {},
+   "platformStatus": {
+    "x": {
+     "status": "not-applicable",
+     "reason": "No X account found"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  },
+  {
+   "id": "yahoo!-shopping-games-and-toys",
+   "name": "Yahoo! Shopping Games and Toys",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T21:55:48.361Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": null,
+   "facebookData": null,
+   "xHandle": "yahoo_shopping",
+   "xData": {
+    "summary": {
+     "postCount": 49,
+     "avgEngagement": 475,
+     "postingFrequencyPerWeek": 11.4
+    },
+    "topPosts": [
+     {
+      "likes": 5433,
+      "comments": 16286,
+      "caption": "／ 10,000円分PayPayポイント\n＼ ​抽選でその場で当たる✨\n\nフォロー＆この投稿に\n『 #リュウジがヤフショ限定新商品をガチ審査 』とコメントで参加！\n11/16(月) 9:59まで​\n\n詳細：https://t.co/P6FNX8uFj0 https://t.co/Jvs2mE01jT",
+      "timestamp": "2026-11-13T01:00:01.000Z",
+      "postUrl": "https://x.com/yahoo_shopping/status/2121045384843903146",
+      "imageUrl": "https://pbs.twimg.com/media/HWRRQ0mWoAALlPG.jpg",
+      "shares": 15962,
+      "views": 346494
+     },
+     {
+      "likes": 142,
+      "comments": 1,
+      "caption": "抽選で20名様に🎁\n#ZOZOTOWNYahoo店 で使える最大1万円OFFクーポンが当たるチャンス✨\n\nリポストとフォローで簡単応募！\nZOZOTOWN Yahoo!店のフォロワーが増えるほどクーポン金額がアップ！\n詳しくは元投稿まで🙌\n#PR\n\n 締切は11/15(日)23:59！💣\nまだの方はぜひご参加ください👇",
+      "timestamp": "2026-11-04T03:26:57.000Z",
+      "postUrl": "https://x.com/yahoo_shopping/status/2117820871574507994",
+      "imageUrl": null,
+      "shares": 133,
+      "views": 32890
+     },
+     {
+      "likes": 58,
+      "comments": 1,
+      "caption": "【対象商品購入で20%OFF】クーポン配布中！\n※条件・上限あり\n\nヤフショ認定グルメ詳細はこちら👇\nhttps://t.co/z4rls70FCa",
+      "timestamp": "2026-11-13T01:03:06.000Z",
+      "postUrl": "https://x.com/yahoo_shopping/status/2121046159976431820",
+      "imageUrl": null,
+      "shares": 6,
+      "views": 22068
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 23
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 4
+     },
+     {
+      "theme": "Lifestyle",
+      "count": 2
+     },
+     {
+      "theme": "Brand Story",
+      "count": 1
+     },
+     {
+      "theme": "Seasonal",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-10",
+      "avgEngagement": 29,
+      "postCount": 16
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 692,
+      "postCount": 33
+     }
+    ],
+    "followers": 535325
+   },
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": "@nid1195r",
+   "handleSources": {
+    "x": "page-scan",
+    "line": "page-scan"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "ok",
+     "reason": null,
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "presence-only",
+     "reason": "Badge not shown on the public add-friend page"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  },
+  {
+   "id": "kiddy-land",
+   "name": "Kiddy Land",
+   "role": "competitor",
+   "handle": "kiddyland_official",
+   "scrapedAt": "2026-11-16T21:56:11.880Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0,
+    "estimatedPostCount": null
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": "kiddyland.official",
+   "facebookData": {
+    "summary": {
+     "postCount": 20,
+     "avgEngagement": 5,
+     "postingFrequencyPerWeek": 0
+    },
+    "topPosts": [
+     {
+      "likes": 28,
+      "comments": 5,
+      "caption": "❤️‍🔥 𝙿𝚛𝚘𝚖𝚘𝚝𝚒𝚘𝚗 ❤️‍🔥ลดราคา 20% ‼️ - สิ้นปี (31 ธ.ค.66)\n.\n.\n                   **** มีบริการเก็บเงินปลายทาง ****\n.\n📣 ร้าน Kiddy's Land ขายของเล่นเด็กราคาถูก 👧🏻👶🏻🎪🤹🏻🎉 #สินค้าพร้อมส่ง ",
+      "timestamp": "2023-11-16T11:35:32.000Z",
+      "postUrl": "https://www.facebook.com/kiddyland.official/posts/pfbid02T7QxsEC4f217Z2L1qzNgn6YX2iF6WUUHvbtE8WTWgChJqNpLXarVisJ7ekqN148al",
+      "imageUrl": null
+     },
+     {
+      "likes": 8,
+      "comments": 0,
+      "caption": "พี่ๆซื้อของเล่นไปบริจาคน้องๆวันเด็ก 150 ชิ้น 💗💗 ขอบคุณนะคะ #ซื้อเยอะ #มีราคาพิเศษน้าา #แวะได้เลยค่าบบบ",
+      "timestamp": "2024-01-11T13:48:20.000Z",
+      "postUrl": "https://www.facebook.com/kiddyland.official/posts/pfbid02H1cPW7nxtGKSPvcbJ1eQfpYjNsE1K9PRAEb1ivSFJ6btWdVsw1UvktaXSsohYjS5l",
+      "imageUrl": null
+     },
+     {
+      "likes": 6,
+      "comments": 0,
+      "caption": "💜💙💛🧡❤️💚",
+      "timestamp": "2023-11-18T23:47:23.000Z",
+      "postUrl": "https://www.facebook.com/kiddyland.official/posts/pfbid02HV2GazEPuVEmnmLXVK9HxozsCZkV31aL6TaeFU2DksQGrT8EequaeNiCkHugRsJpl",
+      "imageUrl": null
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2023-10",
+      "avgEngagement": 2,
+      "postCount": 4
+     },
+     {
+      "month": "2023-11",
+      "avgEngagement": 9,
+      "postCount": 6
+     },
+     {
+      "month": "2023-12",
+      "avgEngagement": 3,
+      "postCount": 2
+     },
+     {
+      "month": "2024-01",
+      "avgEngagement": 4,
+      "postCount": 5
+     },
+     {
+      "month": "2024-02",
+      "avgEngagement": 3,
+      "postCount": 2
+     },
+     {
+      "month": "2024-04",
+      "avgEngagement": 5,
+      "postCount": 1
+     }
+    ]
+   },
+   "xHandle": "kiddyland_jp",
+   "xData": null,
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {
+    "instagram": "claude",
+    "facebook": "claude",
+    "x": "claude"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "no-data",
+     "reason": "X scrape returned no original posts",
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Post data unavailable (account may be private or scraper blocked) - profile stats only",
+   "partialData": true
+  },
+  {
+   "id": "nishimatsuya",
+   "name": "Nishimatsuya",
+   "role": "competitor",
+   "handle": "24028.jp",
+   "scrapedAt": "2026-11-16T21:57:12.860Z",
+   "summary": {
+    "postCount": 50,
+    "avgEngagement": 606,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 7.4
+   },
+   "topPosts": [
+    {
+     "likes": 2292,
+     "comments": 1,
+     "caption": "冬に着せたい！新生児ロンパース特集❄️✨\r\n\r\n寒くなるこれからの季節にぴったりな、長袖ロンパースを集めました♪\r\n\r\nふわふわのくまさんや、リボン、どうぶつモチーフ、いちご柄など、1枚でかわいく着られるデザインがいろいろ🌟\r\n\r\n裏起毛や裏シャギー、ふわふわ素材など、冬にうれしいアイテムも💖\r\n\r\nお気に入りのデザインを見つけて、冬のコーデを楽しんでみてください♪\r\n\r\n気になるアイテムは、",
+     "timestamp": "2026-10-10T01:01:09.000Z",
+     "postUrl": "https://instagram.com/p/DeS2tWpAUku",
+     "imageUrl": "/api/social-image/nishimatsuya/top_0.jpg"
+    },
+    {
+     "likes": 1469,
+     "comments": 5,
+     "caption": "大人気すぎるこれ…🥹👇🏻\n⁡\nこんにちは！てんです🧸♡\n⁡\n西松屋公式アンバサダー3回目\nまたかわいいの見つけてきたよ🐿️🍂ˎˊ˗\n⁡\n去年も大人気だった花柄ボアワンピ🐏🤍\n⁡\n去年は買えなくて今年はGETできたー🥹✨\nミニ丈でかわいいすぎる！\n⁡\nそして万能なジャガードトップスも🫰🏻\nワンピにもスカートとかにも合わせやすい🫧\n⁡\nどっちも秋冬に絶対使えるから\n近くの西松屋",
+     "timestamp": "2026-10-22T01:00:45.000Z",
+     "postUrl": "https://instagram.com/p/DexwOxGE4CY",
+     "imageUrl": "/api/social-image/nishimatsuya/top_1.jpg"
+    },
+    {
+     "likes": 1299,
+     "comments": 15,
+     "caption": "＼どのキャラにする？冬のキャラクタートレーナー✨／\r\n\r\n人気キャラクターが大集合！\r\nこれからの季節に活躍する、キャラクタートレーナーをご紹介♪\r\n\r\nトミカやスヌーピー、ポケモン、サンリオキャラクターズ、ディズニープリンセスなど、\r\nいろいろなキャラクター＆デザインが勢ぞろい😍\r\n\r\nかわいい＆かっこいいデザインがそろっているので、きっとお気に入りが見つかるはず♪\r\n\r\nしかも、どれも各88",
+     "timestamp": "2026-10-18T01:01:00.000Z",
+     "postUrl": "https://instagram.com/p/DendEt6gfue",
+     "imageUrl": "/api/social-image/nishimatsuya/top_2.jpg"
+    }
+   ],
+   "recentPosts": [
+    {
+     "likes": 993,
+     "comments": 1,
+     "caption": "男の子と女の子で違う？《七五三はいつ祝う？》\r\n\r\n「七五三って何歳でお祝いするの？」「お参りはいつ行けばいい？」と迷っているパパ・ママも多いのではないでしょうか？🤔\r\n\r\n七五三は、お子さまのこれまでの成長に感謝し、これからの健やかな成長や幸せを願う日本の伝統行事です。\r\n\r\n一般的には、男の子は3歳と5歳、女の子は3歳と7歳でお祝いしますが、地域やご家庭によっても違いがあります💡\r\nまた、",
+     "timestamp": "2026-11-13T01:01:13.000Z",
+     "postUrl": "https://instagram.com/p/DfqZvp6H90d",
+     "imageUrl": "/api/social-image/nishimatsuya/rec_0.jpg"
+    },
+    {
+     "likes": 384,
+     "comments": 0,
+     "caption": "初めての育児、これってどうするの？🍼\r\n\r\n哺乳びんや除菌器、お手入れに便利なブラシや洗剤など、授乳まわりのアイテムから、赤ちゃんの肌着洗いやボディケアに使えるアイテムまで集めました🌟\r\n\r\n毎日使うものだからこそ、使いやすさやお手入れのしやすさにも注目◎\r\n\r\nこれから出産準備を始める方も、ぜひチェックしてみてください👀\r\n\r\n━━━━━━━━━━━━━━━\r\n画像２枚目：\r\n広口哺乳びん",
+     "timestamp": "2026-11-11T01:01:06.000Z",
+     "postUrl": "https://instagram.com/p/DflQJGKD1w_",
+     "imageUrl": "/api/social-image/nishimatsuya/rec_1.jpg"
+    },
+    {
+     "likes": 701,
+     "comments": 0,
+     "caption": "寒くなる前に揃えたい！冬のあったかベスト10選⛄❄️\r\n\r\n朝晩の冷え込みが気になり始める季節🍂\r\nお子さまの寒さ対策、準備はできていますか？\r\n\r\nそんな時におすすめなのが、サッと羽織れるベスト♪\r\nいつもの服にプラスするだけで、気温に合わせた服装調整がしやすいのがうれしいポイント◎\r\n\r\n今回は、さるや恐竜、くま、シマエナガなど、かわいい柄のベストを10種類ご紹介します✨\r\n\r\nスナップボタ",
+     "timestamp": "2026-11-05T01:00:58.000Z",
+     "postUrl": "https://instagram.com/p/DfVzW5mD-MR",
+     "imageUrl": "/api/social-image/nishimatsuya/rec_2.jpg"
+    },
+    {
+     "likes": 576,
+     "comments": 0,
+     "caption": "＼雨の日も雪の日も、お気に入りと一緒に☔️❄️／\r\n\r\n雨の日のお出かけも楽しくなりそう♪\r\nかわいいキャラクターのレイングッズをご紹介✨\r\n\r\n『アナと雪の女王』やサンリオキャラクターズ、ブルーイ、パペットスンスンなど、人気キャラクターが大集合😍\r\n\r\nお気に入りのキャラクターと一緒なら、雨の日のお出かけもワクワクしちゃう💕\r\n\r\nレインブーツや傘など、かわいいデザインがいろいろ♪\r\nお気に",
+     "timestamp": "2026-11-14T01:00:37.000Z",
+     "postUrl": "https://instagram.com/p/Dfs-faaH6tZ",
+     "imageUrl": "/api/social-image/nishimatsuya/rec_3.jpg"
+    },
+    {
+     "likes": 838,
+     "comments": 0,
+     "caption": "赤ちゃんの冬のねんね、何を揃える？💤\r\n\r\n寒い季節に向けて、赤ちゃんの寝具を準備しませんか？❄️\r\n\r\n今回は、冬のねんねに向けて揃えておきたいアイテムと、寝具選びのポイントをご紹介♪\r\n\r\n毎日使う敷布団は、硬さやサイズに注目して選ぶのがポイント◎\r\n敷布団やシーツ、スリーパーがまとめて揃う便利な4点セットも🌟\r\n\r\nほかにも、寝返り防止クッションやかわいいベビー枕など、さまざまなアイテム",
+     "timestamp": "2026-11-07T01:01:00.000Z",
+     "postUrl": "https://instagram.com/p/Dfa898TklBA",
+     "imageUrl": "/api/social-image/nishimatsuya/rec_4.jpg"
+    }
+   ],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": "nishimatsuya24028",
+   "facebookData": null,
+   "xHandle": "nishimatsuya_PR",
+   "xData": null,
+   "youtubeHandle": "https://www.youtube.com/channel/UCPc1yG6UsVnA1rI-ZKcYa0g",
+   "youtubeChannel": {
+    "id": "UCPc1yG6UsVnA1rI-ZKcYa0g",
+    "title": "西松屋公式channel",
+    "customUrl": "@nishimatsuyachannel",
+    "country": "JP",
+    "subscriberCount": 10800,
+    "hiddenSubscriberCount": false,
+    "videoCount": 248,
+    "viewCount": 21738322
+   },
+   "youtubeData": {
+    "summary": {
+     "postCount": 25,
+     "avgEngagement": 19,
+     "postingFrequencyPerWeek": 3
+    },
+    "topPosts": [
+     {
+      "likes": 119,
+      "comments": 0,
+      "caption": "【西松屋公式】 ２０２６　大創業祭　録音・カキクケ古希篇　【CM】",
+      "timestamp": "2026-09-25T08:00:42Z",
+      "postUrl": "https://www.youtube.com/watch?v=V9t_gcwYtro",
+      "imageUrl": "https://i.ytimg.com/vi/V9t_gcwYtro/hqdefault.jpg",
+      "views": 1196277
+     },
+     {
+      "likes": 41,
+      "comments": 0,
+      "caption": "【西松屋公式】２０２６冬衣料　キッズ・トレーナー篇【CM】",
+      "timestamp": "2026-10-01T10:15:29Z",
+      "postUrl": "https://www.youtube.com/watch?v=rpDZrhNNEAM",
+      "imageUrl": "https://i.ytimg.com/vi/rpDZrhNNEAM/hqdefault.jpg",
+      "views": 940107
+     },
+     {
+      "likes": 32,
+      "comments": 0,
+      "caption": "【西松屋】２０２６　冬の大感謝祭　録音・後ろ後ろ篇　【CM】",
+      "timestamp": "2026-11-16T05:56:55Z",
+      "postUrl": "https://www.youtube.com/watch?v=MD6yZ276TzM",
+      "imageUrl": "https://i.ytimg.com/vi/MD6yZ276TzM/hqdefault.jpg",
+      "views": 782670
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Product Showcase",
+      "count": 1
+     },
+     {
+      "theme": "Behind the Scenes",
+      "count": 1
+     },
+     {
+      "theme": "Brand Story",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-09",
+      "avgEngagement": 57,
+      "postCount": 3
+     },
+     {
+      "month": "2026-10",
+      "avgEngagement": 14,
+      "postCount": 15
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 11,
+      "postCount": 7
+     }
+    ]
+   },
+   "lineId": "@nishimatsuya",
+   "handleSources": {
+    "instagram": "page-scan",
+    "youtube": "page-scan",
+    "facebook": "claude",
+    "x": "claude",
+    "line": "claude"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "no-data",
+     "reason": "X scrape returned no original posts",
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "ok",
+     "reason": null,
+     "source": "youtube-data-api"
+    },
+    "line": {
+     "status": "presence-only",
+     "reason": "LINE page returned 404; account not confirmed"
+    }
+   },
+   "error": null,
+   "partialData": false
+  },
+  {
+   "id": "akachan-honpo",
+   "name": "Akachan Honpo",
+   "role": "competitor",
+   "handle": "akachanhonpo_smile",
+   "scrapedAt": "2026-11-16T21:58:06.620Z",
+   "summary": {
+    "postCount": 50,
+    "avgEngagement": 233,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 10.5
+   },
+   "topPosts": [
+    {
+     "likes": 1445,
+     "comments": 382,
+     "caption": "🎁＼アカチャンホンポ＆マックス／🎁\n\n「お風呂いやー！😫」\nそんな日も、ちょっと楽しい時間に変えられるかも？！\n\n今回はアカチャンホンポとマックスのコラボで、\nプレゼントキャンペーンを開催します🎁✨\n\n子どもの「自分でやりたい！」\n「こんなの作ってみたい！」を応援📣\n\nお風呂で楽しく遊んで洗えるボディソープ🛁💕\n\n🫧 泡を好きな形に自由にこねこね♪\n🫧 遊んだあとは、そのまま体を",
+     "timestamp": "2026-10-26T02:00:02.000Z",
+     "postUrl": "https://instagram.com/p/De8KS3gn-FR",
+     "imageUrl": "/api/social-image/akachan-honpo/top_0.jpg"
+    },
+    {
+     "likes": 1183,
+     "comments": 0,
+     "caption": "❤️🖤 \nアカチャンホンポのレッドフライデー開催！\n\nおトクがいっぱいのレッドフライデーが、\nいよいよ10/30（金）スタート🔥\n\nベビー・キッズ用品など、\n見逃せないお買い得商品が盛りだくさん✨\n\n📣 チラシでCHECK！\n🔴 第1弾｜10/30（金）〜11/5（木）\n🔴 第2弾｜11/6（金）〜11/12（木）\n🔴 通期｜10/30（金）〜11/12（木）\n\n気になる商品や欲しかっ",
+     "timestamp": "2026-10-27T03:04:49.000Z",
+     "postUrl": "https://instagram.com/p/De-2CTvzCvr",
+     "imageUrl": "/api/social-image/akachan-honpo/top_1.jpg"
+    },
+    {
+     "likes": 1051,
+     "comments": 0,
+     "caption": "🎄🎅 【HAPPY CHRISTMAS COLLECTION】\n\nとっておきのおうち時間を、\nクリスマス気分で楽しもう🎁\n\nサンタさんやトナカイ、\nスノーマンに変身できちゃうロンパースや、\nさっと羽織れるマントなど\nクリスマスにぴったりのアイテムが勢ぞろい🎄\n\nかわいい姿に思わず写真を撮りたくなっちゃう📸💕\n\nクリスマスパーティーや\nおうちでの記念撮影にもおすすめです✨\n\nお気に入りの",
+     "timestamp": "2026-10-30T12:00:03.000Z",
+     "postUrl": "https://instagram.com/p/DfHiCQnk5cQ",
+     "imageUrl": "/api/social-image/akachan-honpo/top_2.jpg"
+    }
+   ],
+   "recentPosts": [
+    {
+     "likes": 70,
+     "comments": 0,
+     "caption": "⠀\n〖 大容量 𝟱𝟴𝗟 の荷物収納 〗\n\nお子さまとのお出かけは荷物が多くなりがち…\n\nそんなお悩みを解決するのが、\n▌𝘦𝘭𝘪𝘱𝘵𝘰 (エリプト)\n\nバスケットは58Lも入る大容量収納🧺ˎˊ˗\n\nスプリング式になっているので\n荷物の出し入れがラクラクで便利𓂃.·\n\nelipto(エリプト)で快適なお出かけをお楽しみください🌱\n\n✔️Joie Signature新シリーズは全",
+     "timestamp": "2026-11-10T06:00:02.000Z",
+     "postUrl": "https://instagram.com/p/DfjNqwpI27v",
+     "imageUrl": "/api/social-image/akachan-honpo/rec_0.jpg"
+    },
+    {
+     "likes": 23,
+     "comments": 0,
+     "caption": "🌾＼今年も新米の季節がやってきました！／🌾\n\n今しか味わえない、令和8年産の新米を贈りませんか？🍚\n\nアカチャンホンポ限定の新米ギフトが\nただいま受注受付中です🎁\n\n今回ご紹介するのは、\nお米場 田心のこだわりの新米ギフト✨\n\nおすすめは、赤ちゃんが生まれたときの体重と\n同じ重さのお米を贈れる「名入れ体重米」。\n\n赤ちゃんのお名前を入れられるので、\n出産内祝いや大切な方への贈りものにぴった",
+     "timestamp": "2026-11-14T01:01:53.000Z",
+     "postUrl": "https://instagram.com/p/Dfs-ol1n99g",
+     "imageUrl": "/api/social-image/akachan-honpo/rec_1.jpg"
+    },
+    {
+     "likes": 26,
+     "comments": 0,
+     "caption": "👩‍🍼\n産前・産後のバストをやさしくサポート♡\n\n新しくなった「シルエットキレイ」をご紹介します✨\n\n妊娠中は乳腺の発達に伴い、\n横に大きく変化していくバスト。\n\nそんな産前・産後のバストに寄り添う\nノンワイヤーブラです。\n\nおすすめポイントはこちら💡\n\n✔️ カップ裏の一体型パネル\n横に大きく、重くなるバストをやさしくサポートし、\nきれいなシルエットに。\n\n✔️ アンダーゴムの伸縮性がアッ",
+     "timestamp": "2026-11-16T05:15:04.000Z",
+     "postUrl": "https://instagram.com/p/DfylMoTHxJj",
+     "imageUrl": "/api/social-image/akachan-honpo/rec_2.jpg"
+    },
+    {
+     "likes": 499,
+     "comments": 0,
+     "caption": "👀4Kチラシでご覧ください✨\n\n🎉＼アカチャンホンポのRED FRIDAY！／🎉\n\nわくわくが止まらない！\nスペシャルセール開催中❤️‍🔥\n\n11/13（金）からは、いよいよ第3弾・第4弾がスタート！\n\n今回も見逃せないお買い得アイテムが盛りだくさん✨\n\n【第3弾】11/13（金）～11/19（木）\n【第4弾】11/20（金）～11/26（木）\nさらに、11/13（金）～11/26（木）の",
+     "timestamp": "2026-11-10T12:00:28.000Z",
+     "postUrl": "https://instagram.com/p/Dfj20bEH21D",
+     "imageUrl": "/api/social-image/akachan-honpo/rec_3.jpg"
+    },
+    {
+     "likes": 63,
+     "comments": 0,
+     "caption": "⭐\n【保存版】冬のねんね用品、乾燥機OKで選ぶ🌙\n \n冬は洗たく物が乾きにくいのに、寝あせ・吐きもどし・おもらしで、ねんね用品の洗たく物は増えるばかり…。\nだから、ねんね用品は「お手入れのしやすさ」で選びたい！\n乾燥機OKのアイテムを4つまとめました✨\n \n■ ベビー羽毛ふとん7点セット シェルクレール（サンデシカ）\nレギュラー（敷きふとん約70×120cm）／ミニ（敷きふとん約60×90cm）",
+     "timestamp": "2026-11-15T12:00:09.000Z",
+     "postUrl": "https://instagram.com/p/Dfwu15kE409",
+     "imageUrl": "/api/social-image/akachan-honpo/rec_4.jpg"
+    }
+   ],
+   "engagementRate": null,
+   "tiktokHandle": "akachanhonpo_official",
+   "tiktokData": {
+    "summary": {
+     "postCount": 30,
+     "avgEngagement": 117,
+     "postingFrequencyPerWeek": 6.5
+    },
+    "topPosts": [
+     {
+      "likes": 1038,
+      "comments": 1,
+      "caption": "肌着選びの基本と、あると便利なアイテムをまとめました✨\n \n【基本のスタイル】 \n短肌着＋コンビ肌着を中心に、季節に合わせて重ね着します。\n赤ちゃんは汗っかきで、1日に何度も着替えることも。\nセットで揃えておくと安心です。\n \n▼はじめての肌着 \n🧸はじめて肌着4点セット あったかキルト \n短肌着（50cm）×2、コンビ肌着（50〜60cm）×2 \n4,990円（税込5,489円）\n※綿100％",
+      "timestamp": "2026-10-31T12:00:00.000Z",
+      "postUrl": "https://www.tiktok.com/@akachanhonpo_official/video/7701920229470801172",
+      "imageUrl": null
+     },
+     {
+      "likes": 963,
+      "comments": 1,
+      "caption": "サンタさんやトナカイ、\nスノーマンに変身できちゃうロンパースや、\nさっと羽織れるマントなど、\nクリスマスにぴったりのアイテムが勢ぞろい🎄\n\nかわいい姿に思わず写真を\n撮りたくなっちゃうかも📸💕\n\nクリスマスパーティーや\nおうちでの記念撮影にもおすすめです✨\n\nお気に入りのクリスマスコーデを見つけてね♡\n\n※画像はイメージです。\n※掲載の情報・価格は投稿時点のものです。\n※店舗・オンラインショ",
+      "timestamp": "2026-10-30T12:00:00.000Z",
+      "postUrl": "https://www.tiktok.com/@akachanhonpo_official/video/7701954302503439637",
+      "imageUrl": null
+     },
+     {
+      "likes": 355,
+      "comments": 0,
+      "caption": "おトクがいっぱいのレッドフライデーが、\nいよいよ10/30（金）スタート🔥\n\nベビー・キッズ用品など、\n見逃せないお買い得商品が盛りだくさん✨\n\n📣 チラシでCHECK！\n🔴 第1弾｜10/30（金）〜11/5（木）\n🔴 第2弾｜11/6（金）〜11/12（木）\n🔴 通期｜10/30（金）〜11/12（木）\n\n気になる商品や欲しかったアイテムを、\nおトクに手に入れるチャンス！\n\nぜひチラ",
+      "timestamp": "2026-10-27T03:52:44.000Z",
+      "postUrl": "https://www.tiktok.com/@akachanhonpo_official/video/7701190570303261972",
+      "imageUrl": null
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 7
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 5
+     },
+     {
+      "theme": "Seasonal",
+      "count": 3
+     },
+     {
+      "theme": "Lifestyle",
+      "count": 2
+     },
+     {
+      "theme": "Brand Story",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-08",
+      "avgEngagement": 229,
+      "postCount": 1
+     },
+     {
+      "month": "2026-09",
+      "avgEngagement": 48,
+      "postCount": 1
+     },
+     {
+      "month": "2026-10",
+      "avgEngagement": 293,
+      "postCount": 9
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 31,
+      "postCount": 19
+     }
+    ]
+   },
+   "facebookHandle": "akachanhonpo",
+   "facebookData": {
+    "summary": {
+     "postCount": 20,
+     "avgEngagement": 49,
+     "postingFrequencyPerWeek": 4.7
+    },
+    "topPosts": [
+     {
+      "likes": 317,
+      "comments": 3,
+      "caption": "＼今日の　#スマイル育児／\n生後6カ月の赤ちゃんが発見したもの。\n自身の脚🦵\n動く脚を不思議そうに見る姿がかわいいですね💖\n@cokkun_3　さん、ありがとうございました。\n\n:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・\nスマイルな育児を応援◎癒しの過去投稿はこちら→　@akachanhonpo \n赤ちゃん動画|育児漫画|育児あ",
+      "timestamp": "2026-11-06T06:30:24.000Z",
+      "postUrl": "https://www.facebook.com/reel/1745085097324006/",
+      "imageUrl": null
+     },
+     {
+      "likes": 144,
+      "comments": 3,
+      "caption": "＼今日の　#スマイル育児／\n睡魔と必死に戦う1歳の女の子。\n眠くてお顔をごしごし。\nそしてついに限界・・・・・\n眠りに入ることに抗う姿がかわいいですね。\n@k_chan0539　さん、ありがとうございました。\n\n:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・\nスマイルな育児を応援◎癒しの過去投稿はこちら→　@akachanhonpo \n",
+      "timestamp": "2026-10-30T06:30:22.000Z",
+      "postUrl": "https://www.facebook.com/reel/1414345593746113/",
+      "imageUrl": null
+     },
+     {
+      "likes": 132,
+      "comments": 1,
+      "caption": "＼今日の　#スマイル育児／\nはじめての支援センター。\n家では、後追いが激しいのに、こちらではどんどん探検中。\nはじめての場所に興味津々なのはいいことですね。\nそして力尽きた姿がとってもかわいいですね💖\n@uiha_1004　さん、ありがとうございました。\n\n:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・:*.’*・\nスマイルな育児を応援◎癒しの過",
+      "timestamp": "2026-11-02T06:30:30.000Z",
+      "postUrl": "https://www.facebook.com/reel/1671845734277762/",
+      "imageUrl": null
+     }
+    ],
+    "contentThemes": [],
+    "monthlyTrend": [
+     {
+      "month": "2026-10",
+      "avgEngagement": 147,
+      "postCount": 1
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 44,
+      "postCount": 19
+     }
+    ]
+   },
+   "xHandle": "akachanhonpo",
+   "xData": {
+    "summary": {
+     "postCount": 42,
+     "avgEngagement": 58,
+     "postingFrequencyPerWeek": 9.8
+    },
+    "topPosts": [
+     {
+      "likes": 907,
+      "comments": 0,
+      "caption": "アカチャンホンポのレッドフライデー💖\nお楽しみに🥰 https://t.co/XAAb0lUltf",
+      "timestamp": "2026-10-27T05:09:30.000Z",
+      "postUrl": "https://x.com/akachanhonpo/status/2114947577225593243",
+      "imageUrl": "https://pbs.twimg.com/media/HVnNZD0aAAAnhup.jpg",
+      "shares": 105,
+      "views": 341638
+     },
+     {
+      "likes": 285,
+      "comments": 1,
+      "caption": "どんな「とき」も、いつもともに。\n\n子育ての何気ない日々の瞬間も、振り返ると大切な「とき」だったと気づくことも。子育てに関わるすべての人たちへ、アカチャンホンポの想いをお届けします。 https://t.co/XfRdxcT2oJ",
+      "timestamp": "2026-10-28T05:22:42.000Z",
+      "postUrl": "https://x.com/akachanhonpo/status/2115313284786373037",
+      "imageUrl": "https://pbs.twimg.com/amplify_video_thumb/2115311994878509056/img/lww1g9oWTMZpSkV5.jpg",
+      "shares": 45,
+      "views": 21527
+     },
+     {
+      "likes": 169,
+      "comments": 0,
+      "caption": "／\n小さな背中に\nやさしいクッション❤\n＼\nお子さまの頭や背中を守ってくれるひつじのセーフティクッション👶厚みのあるふわふわ素材が衝撃を分散・吸収してくれます👌\nアジャスター付きでサイズ調節可能💡\n月齢：5か月頃～\n※対象月齢以上であっても必ず首がすわってからご使用ください。 https://t.co/OvcQkW8CkO",
+      "timestamp": "2026-11-09T23:35:49.000Z",
+      "postUrl": "https://x.com/akachanhonpo/status/2119937031602401422",
+      "imageUrl": "https://pbs.twimg.com/media/HWuHLjeagAAfXQI.jpg",
+      "shares": 19,
+      "views": 27721
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Seasonal",
+      "count": 1
+     },
+     {
+      "theme": "Promotional",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-10",
+      "avgEngagement": 99,
+      "postCount": 13
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 39,
+      "postCount": 29
+     }
+    ],
+    "followers": 97541
+   },
+   "youtubeHandle": "https://www.youtube.com/channel/UCrW_zOFeyKcQQsfPAUkJBzw",
+   "youtubeChannel": {
+    "id": "UCrW_zOFeyKcQQsfPAUkJBzw",
+    "title": "アカチャンホンポ",
+    "customUrl": "@akachanhonpo",
+    "country": "JP",
+    "subscriberCount": 25100,
+    "hiddenSubscriberCount": false,
+    "videoCount": 919,
+    "viewCount": 13304730
+   },
+   "youtubeData": {
+    "summary": {
+     "postCount": 25,
+     "avgEngagement": 16,
+     "postingFrequencyPerWeek": 4.2
+    },
+    "topPosts": [
+     {
+      "likes": 29,
+      "comments": 0,
+      "caption": "絵本のクッキー缶を開封📖🍪食べ終わった後も楽しい#ノンタン",
+      "timestamp": "2026-10-23T01:00:19Z",
+      "postUrl": "https://www.youtube.com/watch?v=TqN6c9tfMt0",
+      "imageUrl": "https://i.ytimg.com/vi/TqN6c9tfMt0/hqdefault.jpg",
+      "views": 1808
+     },
+     {
+      "likes": 29,
+      "comments": 0,
+      "caption": "せっかく寝たのに背中スイッチ…それ、抱っこ紐のせいです。 #shorts #抱っこ紐 #出産準備 #ラクリス",
+      "timestamp": "2026-10-14T12:00:14Z",
+      "postUrl": "https://www.youtube.com/watch?v=DzejIikpNT8",
+      "imageUrl": "https://i.ytimg.com/vi/DzejIikpNT8/hqdefault.jpg",
+      "views": 4998
+     },
+     {
+      "likes": 26,
+      "comments": 0,
+      "caption": "新生児肌着の新常識！？😳🍼",
+      "timestamp": "2026-10-24T12:00:30Z",
+      "postUrl": "https://www.youtube.com/watch?v=q-GL3CTsj0o",
+      "imageUrl": "https://i.ytimg.com/vi/q-GL3CTsj0o/hqdefault.jpg",
+      "views": 2762
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Seasonal",
+      "count": 2
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 2
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-10",
+      "avgEngagement": 18,
+      "postCount": 18
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 10,
+      "postCount": 7
+     }
+    ]
+   },
+   "lineId": null,
+   "handleSources": {
+    "instagram": "page-scan",
+    "tiktok": "page-scan",
+    "facebook": "page-scan",
+    "x": "page-scan",
+    "youtube": "page-scan"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "ok",
+     "reason": null,
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "ok",
+     "reason": null,
+     "source": "youtube-data-api"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": null,
+   "partialData": false
+  },
+  {
+   "id": "premium-bandai",
+   "name": "Premium Bandai",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T21:59:30.138Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": null,
+   "facebookData": null,
+   "xHandle": "p_bandai",
+   "xData": {
+    "summary": {
+     "postCount": 46,
+     "avgEngagement": 287,
+     "postingFrequencyPerWeek": 10.7
+    },
+    "topPosts": [
+     {
+      "likes": 1677,
+      "comments": 0,
+      "caption": "／\n📢ご注文受付開始\n＼\n「劇場版 魔法少女まどか☆マギカ〈ワルプルギスの廻天〉 メルトジェムリング」が登場✨\n\nワス、丁香、セルマが装着しているメルトジェムリングです🌟\nSilver925を使用した本格的な日本製のリングとなります🎵\n#まどかマギカ\n\n詳しくはこちら🔽\nhttps://t.co/TYS36zF3gS https://t.co/eTwlXdeu8k",
+      "timestamp": "2026-11-16T01:31:05.000Z",
+      "postUrl": "https://x.com/p_bandai/status/2122140368074596560",
+      "imageUrl": "https://pbs.twimg.com/media/HXNbarSbcAABJwy.jpg",
+      "shares": 624,
+      "views": 173126
+     },
+     {
+      "likes": 1129,
+      "comments": 13,
+      "caption": "━━『ゴジラ-0.0』公開記念 ━━\nシリーズ最大クラスのボリュームで登場！\n\n【11/13(金)～受注開始】\nS.H.MonsterArts キングギドラ(2026)\n\n劇中の3Dデータを元に\n本編さながらの姿で立体化✨\n\nプロポーションを崩さず、\n自然な形で全身各所に広い可動域を搭載。\n\n商品はこちら🔽 https://t.co/JukpSCyH70",
+      "timestamp": "2026-11-13T01:00:09.000Z",
+      "postUrl": "https://x.com/p_bandai/status/2121045420277387546",
+      "imageUrl": "https://pbs.twimg.com/media/HW93kTLbYAA0KXP.jpg",
+      "shares": 320,
+      "views": 96661
+     },
+     {
+      "likes": 1080,
+      "comments": 10,
+      "caption": "／\n📢ご注文受付開始\n＼\n『鳥人戦隊ジェットマン』より、「クロスチェンジャー -MEMORIAL EDITION-」が登場✨ https://t.co/Sgw5SqFZoj",
+      "timestamp": "2026-11-12T07:30:11.000Z",
+      "postUrl": "https://x.com/p_bandai/status/2120781184728965514",
+      "imageUrl": "https://pbs.twimg.com/media/HW52WeraoAAjGMZ.jpg",
+      "shares": 426,
+      "views": 101448
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Product Showcase",
+      "count": 25
+     },
+     {
+      "theme": "Brand Story",
+      "count": 5
+     },
+     {
+      "theme": "Promotional",
+      "count": 4
+     },
+     {
+      "theme": "Behind the Scenes",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-11",
+      "avgEngagement": 287,
+      "postCount": 46
+     }
+    ],
+    "followers": 732909
+   },
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {
+    "x": "claude"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "ok",
+     "reason": null,
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  },
+  {
+   "id": "sanrio-online-shop",
+   "name": "Sanrio Online Shop",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T21:59:43.044Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": null,
+   "facebookData": null,
+   "xHandle": "sanrio_shop_jp",
+   "xData": null,
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {
+    "x": "claude"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "no-data",
+     "reason": "X scrape returned no original posts",
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  },
+  {
+   "id": "don-quijote",
+   "name": "Don Quijote",
+   "role": "competitor",
+   "handle": "donki_jp",
+   "scrapedAt": "2026-11-16T21:59:48.998Z",
+   "summary": {
+    "postCount": 50,
+    "avgEngagement": 1422,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 11.6
+   },
+   "topPosts": [
+    {
+     "likes": 44258,
+     "comments": 271,
+     "caption": "【ASMR🎧 ドンキ🐧店内🛒 環境音】スマホ📱を横にして喉の辺りで持ってみて！✨実はおまけもあったり…⁉️ #DonTV #ドンキ #asmr",
+     "timestamp": "2026-10-31T09:30:07.000Z",
+     "postUrl": "https://instagram.com/p/DfJ1uGXh-el",
+     "imageUrl": "/api/social-image/don-quijote/top_0.jpg"
+    },
+    {
+     "likes": 4267,
+     "comments": 35,
+     "caption": "ヴィランズ好きさん必見！😈🖤\n普段使いもしやすいヴィランズの限定ZIPパーカー✨\n\n商品名：ヴィランズ / ボアZIPパーカー メンズサイズ M/L/LL\n価格：税抜 ¥2,999（税込 ¥3,299）\n\n※店舗により価格・取扱が異なる場合がございます。\n（表示価格は、投稿時点で、もっとも多くの当社店舗において販売されていることが確認されている価格です）\n\n商品JANコード：\n\nマレフィセント",
+     "timestamp": "2026-11-04T08:00:08.000Z",
+     "postUrl": "https://instagram.com/p/DfT-kVfBuA-",
+     "imageUrl": "/api/social-image/don-quijote/top_1.jpg"
+    },
+    {
+     "likes": 1714,
+     "comments": 112,
+     "caption": "あなたはどれ派？🍬 \n\nカンデミーナの新商品候補4種の中から、食べてみたい商品に投票しよう！ みんなの投票で選ばれた味は来年発売予定✨ \nあなたの1票が新商品を決めるかも👀 \n\n#カンデミーナ #えらんでどれ派 #新商品開発\nhttps://www.majica-net.com/campaign/kanro_candemina/",
+     "timestamp": "2026-11-01T01:31:24.000Z",
+     "postUrl": "https://instagram.com/p/DfLjo-Vj6_t",
+     "imageUrl": "/api/social-image/don-quijote/top_2.jpg"
+    }
+   ],
+   "recentPosts": [
+    {
+     "likes": 442,
+     "comments": 1,
+     "caption": "実はスリッポンタイプもめっちゃかわいい💖✨\n「かわいいけど、ここが惜しい…」その声ちゃんと届いてます👀\nマジボイスをもとに、履き心地も見た目もこだわってリニューアル✨\n\n商品名：ヒール厚底ムートンサンダル・スリッポン\nサンダル　税抜 ¥1,999（税込 ¥2,199）\nスリッポン　税抜 ¥1,599（税込 ¥1,759）\n\n※店舗により価格・取扱が異なる場合がございます。\n（表示価格は、投稿時",
+     "timestamp": "2026-11-16T09:06:21.000Z",
+     "postUrl": "https://instagram.com/p/Dfy_nRdNG1Y",
+     "imageUrl": "/api/social-image/don-quijote/rec_0.jpg"
+    },
+    {
+     "likes": 192,
+     "comments": 0,
+     "caption": "買い忘れてるものない！？✨\n＼ みんなの「これいい！」がお買い得に💖 ／\n\n“企業が売りたい商品”ではなく、\n“お客さまが本当に欲しいもの”をおトクにGET🛍️✨\nmajicaアプリのレビュー機能「マジボイス」📣で\nお客さまから特に高評価をいただいた商品の中から、\n厳選した50品をmajica会員さま限定価格でご用意しました🎉\n\n「えっ、こんなに安くていいの!?」Σ( ˙꒳ ˙ )✨\nと思",
+     "timestamp": "2026-11-11T10:00:06.000Z",
+     "postUrl": "https://instagram.com/p/DfmN5G9B8J8",
+     "imageUrl": "/api/social-image/don-quijote/rec_1.jpg"
+    },
+    {
+     "likes": 270,
+     "comments": 0,
+     "caption": "📢本日スタート！\n全国各地で開催を望む声、ありがとうございます🐧\nまずは東京で、池袋東口駅前店から新宿店へ！\n2つのドンキを巡る謎解きに挑戦しよう🔎\n東京が大盛況なら、地方開催もあるかも…？👀\n謎解きキット付きのメンソレータムの商品（2品入り）2,200円（税込）\n\n💻🔎WEB謎解きも開催中！\n参加方法や詳しい情報は、ドン・キホーテ公式Xをチェック！\n\n#リアル脱出ゲーム #ドンキ脱出",
+     "timestamp": "2026-11-13T04:01:00.000Z",
+     "postUrl": "https://instagram.com/p/DfquVvKEpNw",
+     "imageUrl": "/api/social-image/don-quijote/rec_2.jpg"
+    },
+    {
+     "likes": 297,
+     "comments": 0,
+     "caption": "＼🍚偏愛めし大増量祭 開催！🔥／\n好きなものへの愛もボリュームも増量中！？🤤💕\n今回の対象商品はこちら！👇\n🍗にんにく最香！にんにく最高！にんにくチキン弁当🧄\n💰498円（税込538円）\n通常商品：最香チキン弁当\n \n🥗狂盛りクルトンサラダ🍞\n💰398円（税込430円）\n通常商品：爆盛りクルトンサラダ\n \n📅販売期間：11/11(水)～11/20(金)\nお値段そのまま！期間",
+     "timestamp": "2026-11-11T03:31:07.000Z",
+     "postUrl": "https://instagram.com/p/DflhSRyn-Oq",
+     "imageUrl": "/api/social-image/don-quijote/rec_3.jpg"
+    },
+    {
+     "likes": 416,
+     "comments": 0,
+     "caption": "上下左右360°のぞき見を防いで、画面もしっかりガード📱\nドンキで年間9億円売れてるGORITEX、やっぱ強そうすぎる😳\n\n商品名：GORITEX［反射ZERO×透明MAX］1年保証 360°のぞき見防止\n価格：税抜 ¥3,999~4,499（税込 ¥4,399~¥4,949）\n\n商品JANコード：\n4549777129614\n4549777131020\n4549777130634\n45497",
+     "timestamp": "2026-11-10T09:30:33.000Z",
+     "postUrl": "https://instagram.com/p/Dfjlu46hed8",
+     "imageUrl": "/api/social-image/don-quijote/rec_4.jpg"
+    }
+   ],
+   "engagementRate": null,
+   "tiktokHandle": "donki_cp",
+   "tiktokData": {
+    "summary": {
+     "postCount": 30,
+     "avgEngagement": 581,
+     "postingFrequencyPerWeek": 6.7
+    },
+    "topPosts": [
+     {
+      "likes": 8032,
+      "comments": 253,
+      "caption": "【ASMR🎧 ドンキ🐧店内🛒 環境音】スマホ📱を横にして喉の辺りで持ってみて！✨実はおまけもあったり…⁉️ #DonTV #ドンキ #asmr",
+      "timestamp": "2026-10-31T09:30:00.000Z",
+      "postUrl": "https://www.tiktok.com/@donki_cp/video/7702416136087801108",
+      "imageUrl": null
+     },
+     {
+      "likes": 1890,
+      "comments": 69,
+      "caption": "ヴィランズ好きさん必見！😈🖤\n普段使いもしやすいヴィランズの限定ZIPパーカー✨\n\n◾️ヴィランズ / ボアZIPパーカー メンズサイズ M/L/LL\n価格：税抜 ¥2,999（税込 ¥3,299）\n\n※店舗により価格・取扱が異なる場合がございます。\n（表示価格は、投稿時点で、もっとも多くの当社店舗において販売されていることが確認されている価格です）\n\n商品JANコード：\n\nマレフィセント柄\n",
+      "timestamp": "2026-11-04T08:00:00.000Z",
+      "postUrl": "https://www.tiktok.com/@donki_cp/video/7704132940938169608",
+      "imageUrl": null
+     },
+     {
+      "likes": 1134,
+      "comments": 77,
+      "caption": "シークレットには一体どの地域のドンペンが……？㊙️\n全20種類の「ご当地ドンペンマンチョコ」が、全国のドンキ系列店舗で発売中🎉\nなんと、シークレットをゲットできました🤫✨\n全種類コンプリートへの道は、まだまだ続く…！\nみんなもお気に入りのドンペンを探してみてね〜🤭💞\n\n💰価格：税抜159円（税込172円）\n※一部取り扱いのない店舗がございます。\n※店舗により取り扱い状況・在庫状況が異なり",
+      "timestamp": "2026-09-15T07:00:00.000Z",
+      "postUrl": "https://www.tiktok.com/@donki_cp/video/7685578237187050772",
+      "imageUrl": null
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "User Generated",
+      "count": 8
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 4
+     },
+     {
+      "theme": "Lifestyle",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-09",
+      "avgEngagement": 1211,
+      "postCount": 1
+     },
+     {
+      "month": "2026-10",
+      "avgEngagement": 2231,
+      "postCount": 4
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 292,
+      "postCount": 25
+     }
+    ]
+   },
+   "facebookHandle": "donki.majicaglobal.jp",
+   "facebookData": {
+    "summary": {
+     "postCount": 28,
+     "avgEngagement": 8,
+     "postingFrequencyPerWeek": 1.9
+    },
+    "topPosts": [
+     {
+      "likes": 13,
+      "comments": 0,
+      "caption": "＼majicaアプリから応募！／\n#プレゼントキャンペーン\n\n今年もみんなでシェアして楽しもう！\n11月11日は「ポッキー&プリッツの日」\n\n動画内のキーワードを答えると、抽選で「ポッキーorプリッツクッション」が当たる🎁✨\n\n詳細はコチラ👇\n■キャンペーン期間\n2026年10月9日(金)AM09:00～2026年12月8日(火)PM11:59\n\n■応募方法\n①majicaアプリをダウンロード",
+      "timestamp": "2026-10-09T02:01:03.000Z",
+      "postUrl": "https://www.facebook.com/donki.majicaglobal.jp/posts/pfbid07Qy8FaSxFkAVnbYxTZgzD9T4bv2Az4fAbnGqZN354EmRtCdzPCFmVeSj45YfoDT9l",
+      "imageUrl": null
+     },
+     {
+      "likes": 13,
+      "comments": 0,
+      "caption": "＼majicaアプリから応募！／\n#プレゼントキャンペーン\n\n今年もみんなでシェアして楽しもう！\n11月11日は「ポッキー&プリッツの日」\n\n動画内のキーワードを答えると、抽選で「ポッキーorプリッツクッション」が当たる🎁✨\n\n詳細はコチラ👇\n■キャンペーン期間\n2026年10月9日(金)AM09:00～2026年12月8日(火)PM11:59\n\n■応募方法\n①majicaアプリをダウンロード",
+      "timestamp": "2026-10-09T02:01:03.000Z",
+      "postUrl": "https://www.facebook.com/donki.majicaglobal.jp/posts/pfbid07Qy8FaSxFkAVnbYxTZgzD9T4bv2Az4fAbnGqZN354EmRtCdzPCFmVeSj45YfoDT9l",
+      "imageUrl": null
+     },
+     {
+      "likes": 13,
+      "comments": 0,
+      "caption": "＼majicaアプリから応募！／\n#プレゼントキャンペーン\n \n今日飲みたい！🍺けど、明日のために控えなきゃ…そんな時はときどきノンアルが正解！？\n\n動画内のキーワードを答えると最大1,000majicaポイントが抽選で当たる✨\n\n詳細はコチラ👇�https://rcdm.jp/0srwI",
+      "timestamp": "2026-09-18T10:01:04.000Z",
+      "postUrl": "https://www.facebook.com/reel/2175016163057018/",
+      "imageUrl": null
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 27
+     },
+     {
+      "theme": "Lifestyle",
+      "count": 2
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 2
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-09",
+      "avgEngagement": 10,
+      "postCount": 8
+     },
+     {
+      "month": "2026-10",
+      "avgEngagement": 8,
+      "postCount": 13
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 6,
+      "postCount": 7
+     }
+    ]
+   },
+   "xHandle": "donki_donki",
+   "xData": {
+    "summary": {
+     "postCount": 42,
+     "avgEngagement": 127,
+     "postingFrequencyPerWeek": 9.8
+    },
+    "topPosts": [
+     {
+      "likes": 501,
+      "comments": 2,
+      "caption": "🛁💕 #ドン・キホーテ系列店舗限定 💕🛁\nサンリオキャラクターズの\n「ミニトートバッグマスコット バスボール」が登場！🎀\n中からかわいいミニトートバッグ型のマスコットが出てくるよ👜✨\nハローキティやクロミなど、全6種類💕\n何が出るかはお楽しみ！\n📅11月12日以降順次発売！ https://t.co/yzZQk4L3iM",
+      "timestamp": "2026-11-13T02:00:17.000Z",
+      "postUrl": "https://x.com/donki_donki/status/2121060550700634119",
+      "imageUrl": "https://pbs.twimg.com/media/HW-FUm9asAAqFnf.jpg",
+      "shares": 113,
+      "views": 44296
+     },
+     {
+      "likes": 393,
+      "comments": 34,
+      "caption": "やっほ〜！🌼\n宣伝担当の近藤あいです♡\n#プレキャン　#カスタム　#タンブラー\nみんな、タンブラーって毎日使うものだからこそ、\n色もデザインも自分好みにこだわりたくない？🥺💗\n\n「この色があったらいいのに！」\n「もうちょっと自分らしくしたい！」 https://t.co/xj5UZkcfby",
+      "timestamp": "2026-11-16T01:00:33.000Z",
+      "postUrl": "https://x.com/donki_donki/status/2122132683698680032",
+      "imageUrl": "https://pbs.twimg.com/media/HXNUavQa8AARtl0.jpg",
+      "shares": 882,
+      "views": 46684
+     },
+     {
+      "likes": 393,
+      "comments": 34,
+      "caption": "やっほ〜！🌼\n宣伝担当の近藤あいです♡\n#プレキャン　#カスタム　#タンブラー\nみんな、タンブラーって毎日使うものだからこそ、\n色もデザインも自分好みにこだわりたくない？🥺💗\n\n「この色があったらいいのに！」\n「もうちょっと自分らしくしたい！」 https://t.co/xj5UZkcfby",
+      "timestamp": "2026-11-16T01:00:33.000Z",
+      "postUrl": "https://x.com/donki_donki/status/2122132683698680032",
+      "imageUrl": "https://pbs.twimg.com/media/HXNUavQa8AARtl0.jpg",
+      "shares": 882,
+      "views": 46684
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 9
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 8
+     },
+     {
+      "theme": "User Generated",
+      "count": 4
+     },
+     {
+      "theme": "Brand Story",
+      "count": 3
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-11",
+      "avgEngagement": 127,
+      "postCount": 42
+     }
+    ],
+    "followers": 1358054
+   },
+   "youtubeHandle": "https://www.youtube.com/user/DonQuijotekoushiki",
+   "youtubeChannel": {
+    "id": "UCCBXzMVzGBZH8Elvsd_5nwA",
+    "title": "ドン・キホーテ公式チャンネル",
+    "customUrl": "@dontube_donki",
+    "country": null,
+    "subscriberCount": 62000,
+    "hiddenSubscriberCount": false,
+    "videoCount": 1456,
+    "viewCount": 217423640
+   },
+   "youtubeData": {
+    "summary": {
+     "postCount": 25,
+     "avgEngagement": 37,
+     "postingFrequencyPerWeek": 5.8
+    },
+    "topPosts": [
+     {
+      "likes": 126,
+      "comments": 8,
+      "caption": "【質問】フライパンでラーメンを作るのはありですか？フライパンひとつで鶏ガラ醤油ラーメン税抜¥198（税込¥214）#ロビン・フッド  #ロビンフッド#ラーメン",
+      "timestamp": "2026-11-10T09:00:09Z",
+      "postUrl": "https://www.youtube.com/watch?v=I_Pznxy1sBA",
+      "imageUrl": "https://i.ytimg.com/vi/I_Pznxy1sBA/hqdefault.jpg",
+      "views": 18255
+     },
+     {
+      "likes": 120,
+      "comments": 4,
+      "caption": "【ドンキ酒】あなたはどっち派？ドンキ限定ブッシュミルズ2種をバイヤーがご紹介",
+      "timestamp": "2026-11-13T08:00:07Z",
+      "postUrl": "https://www.youtube.com/watch?v=JyFMF8_tPdk",
+      "imageUrl": "https://i.ytimg.com/vi/JyFMF8_tPdk/hqdefault.jpg",
+      "views": 15063
+     },
+     {
+      "likes": 97,
+      "comments": 1,
+      "caption": "#ネタロビン・フッドの店員は、お客様の心の声まで聞こえちゃうみたい...👀#ロビン・フッド #安得速楽 #一人飯 #スーパー #コント",
+      "timestamp": "2026-11-14T05:00:21Z",
+      "postUrl": "https://www.youtube.com/watch?v=CVm7PmFGfIA",
+      "imageUrl": "https://i.ytimg.com/vi/CVm7PmFGfIA/hqdefault.jpg",
+      "views": 6534
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "User Generated",
+      "count": 4
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-11",
+      "avgEngagement": 37,
+      "postCount": 25
+     }
+    ]
+   },
+   "lineId": "@634oqtiy",
+   "handleSources": {
+    "instagram": "page-scan",
+    "tiktok": "page-scan",
+    "facebook": "page-scan",
+    "x": "page-scan",
+    "youtube": "page-scan",
+    "line": "page-scan"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "ok",
+     "reason": null,
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "ok",
+     "reason": null,
+     "source": "youtube-data-api"
+    },
+    "line": {
+     "status": "presence-only",
+     "reason": "Badge not shown on the public add-friend page"
+    }
+   },
+   "error": null,
+   "partialData": false
+  },
+  {
+   "id": "aeon.com",
+   "name": "AEON.com",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T22:02:34.673Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": "aeonretail",
+   "facebookData": {
+    "summary": {
+     "postCount": 20,
+     "avgEngagement": 52,
+     "postingFrequencyPerWeek": 1.6
+    },
+    "topPosts": [
+     {
+      "likes": 122,
+      "comments": 0,
+      "caption": "＼1️⃣0️⃣0️⃣年記念商品 販売中🎉／\nお店の様子をチラっと紹介💁‍♀️\n今週末は、ぜひイオンに来てね✨\n\n※一部、取り扱いのない店舗もございます。\n※品切れの際はご容赦ください\n\n100年記念特設サイトはこちら👇\nhttps://www.aeon.info/100th",
+      "timestamp": "2026-09-18T07:00:24.000Z",
+      "postUrl": "https://www.facebook.com/aeonretail/posts/pfbid02CX33Zndodepze9DmWmquAd5KWvQpY1jhs6LVncQm8gPYexVFk5Hy84vvVWFhoW7kl",
+      "imageUrl": null
+     },
+     {
+      "likes": 68,
+      "comments": 0,
+      "caption": "／\n🎅🫎今年も残り3か月じゃと⁉️\n＼\n\n本日から予約開始‼️\nイオンのクリスマスケーキ＆ごちそう🍰🍗✨\n📢早得は11/27㊎まで♪\n\n当日、売り切れで選べない😢💦\nってなる方は予約がおすすめ！\n\n商品はここからみてね✅✨\nhttps://chirashi.otoku.aeonsquare.net/pc/chirashi/christmas_cake/",
+      "timestamp": "2026-10-02T13:00:10.000Z",
+      "postUrl": "https://www.facebook.com/aeonretail/posts/pfbid0pPGfGC5xouhv2FXtWVHhETSNg6Muo1mp5tur5MiP7cbTBrBwnysH83ToiSwu9v9sl",
+      "imageUrl": null
+     },
+     {
+      "likes": 67,
+      "comments": 0,
+      "caption": "【気になった人は保存してね👆】\n\n秋の味覚を堪能😋🍁\nさつまいもレシピを4つご紹介✨\n\nレシピ詳細は画像をチェック💬\n\n🍴レシピ一覧🍴\n①豆乳で作る！うさぎのスイートポテト\n②さつまいものきんぴら\n③ホクホクさつまいもの簡単チーズガレット\n④焼き鮭とさつまいもの中華風炊き込みご飯\n\n#イオン #イオン購入品 #トップバリュ #さつまいもレシピ #秋の味覚",
+      "timestamp": "2026-09-18T08:01:03.000Z",
+      "postUrl": "https://www.facebook.com/aeonretail/posts/pfbid0gXqZRPtTTYVg9UwFhySr4aPr8iGW5xzd4uZqi1bpv4KzoYP2t8kzenPsjnMdEkql",
+      "imageUrl": null
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 5
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 4
+     },
+     {
+      "theme": "Lifestyle",
+      "count": 1
+     },
+     {
+      "theme": "Seasonal",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-08",
+      "avgEngagement": 54,
+      "postCount": 2
+     },
+     {
+      "month": "2026-09",
+      "avgEngagement": 59,
+      "postCount": 8
+     },
+     {
+      "month": "2026-10",
+      "avgEngagement": 50,
+      "postCount": 8
+     },
+     {
+      "month": "2026-11",
+      "avgEngagement": 33,
+      "postCount": 2
+     }
+    ]
+   },
+   "xHandle": "AEON_JAPAN",
+   "xData": {
+    "summary": {
+     "postCount": 48,
+     "avgEngagement": 1749,
+     "postingFrequencyPerWeek": 11.2
+    },
+    "topPosts": [
+     {
+      "likes": 3800,
+      "comments": 3769,
+      "caption": "あなたが好きな黒くて美味しいものは❓️\n\n予告📣イオンブラックフライデーフェスは\n11/20(金)より開催!!\n\n11/30(月)迄CP開催中\n① @AEON_JAPAN をフォロー\n② 本投稿を🔁\n後日抽選でイオンギフトカードが当たる‼\n\n指定のハッシュタグをつけて\nコメントで当選確率UP\n\n規約はプロフィールをチェック",
+      "timestamp": "2026-11-11T23:00:01.000Z",
+      "postUrl": "https://x.com/AEON_JAPAN/status/2120652796408312219",
+      "imageUrl": null,
+      "shares": 15515,
+      "views": 145418
+     },
+     {
+      "likes": 3766,
+      "comments": 3357,
+      "caption": "ブラックパンダの向きを当ててね👇️\n\n予告📣イオンブラックフライデーフェスは\n11/20より開催🐼\n\n11/30(月)迄CP開催中🎉\n① @AEON_JAPAN をフォロー\n② 本投稿を🔁\n後日抽選でイオンギフトカードが当たる‼\n\n指定のハッシュタグをつけて\nコメントで当選確率UP✨️\n\n規約はプロフィールをチェック",
+      "timestamp": "2026-11-07T23:00:00.000Z",
+      "postUrl": "https://x.com/AEON_JAPAN/status/2119203242974576858",
+      "imageUrl": null,
+      "shares": 15344,
+      "views": 503220
+     },
+     {
+      "likes": 3609,
+      "comments": 3512,
+      "caption": "予告📣\nイオンブラックフライデーフェスは\n11/20～30🐼\n\nイオンドリームキャンペーンも開催予定🎉\n合計1️⃣1️⃣0️⃣0️⃣名さまに豪華景品が当たる\n\n11/30(月)まで開催中\n❶ @AEON_JAPAN をフォロー\n❷ 本投稿をリポスト\n\n指定のハッシュタグをつけて\nコメントすると当選確率UP✨\n\n規約はプロフィールをチェック",
+      "timestamp": "2026-11-10T23:00:01.000Z",
+      "postUrl": "https://x.com/AEON_JAPAN/status/2120290411113824455",
+      "imageUrl": null,
+      "shares": 14639,
+      "views": 108547
+     }
+    ],
+    "contentThemes": [
+     {
+      "theme": "Promotional",
+      "count": 6
+     },
+     {
+      "theme": "Product Showcase",
+      "count": 4
+     },
+     {
+      "theme": "Seasonal",
+      "count": 1
+     },
+     {
+      "theme": "Lifestyle",
+      "count": 1
+     },
+     {
+      "theme": "Brand Story",
+      "count": 1
+     }
+    ],
+    "monthlyTrend": [
+     {
+      "month": "2026-11",
+      "avgEngagement": 1749,
+      "postCount": 48
+     }
+    ],
+    "followers": 1459975
+   },
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {
+    "facebook": "page-scan",
+    "x": "page-scan"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "ok",
+     "reason": null,
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  },
+  {
+   "id": "joshin",
+   "name": "Joshin",
+   "role": "competitor",
+   "handle": null,
+   "scrapedAt": "2026-11-16T22:03:13.261Z",
+   "summary": {
+    "postCount": 0,
+    "avgEngagement": 0,
+    "followersEstimate": null,
+    "postingFrequencyPerWeek": 0
+   },
+   "topPosts": [],
+   "recentPosts": [],
+   "engagementRate": null,
+   "tiktokHandle": null,
+   "tiktokData": null,
+   "facebookHandle": "joshin.official",
+   "facebookData": null,
+   "xHandle": "joshin_pr",
+   "xData": null,
+   "youtubeHandle": null,
+   "youtubeChannel": null,
+   "youtubeData": null,
+   "lineId": null,
+   "handleSources": {
+    "facebook": "claude",
+    "x": "claude"
+   },
+   "platformStatus": {
+    "x": {
+     "status": "no-data",
+     "reason": "X scrape returned no original posts",
+     "source": "apidojo/tweet-scraper"
+    },
+    "youtube": {
+     "status": "not-applicable",
+     "reason": "No YouTube channel found"
+    },
+    "line": {
+     "status": "not-applicable",
+     "reason": "No LINE Official Account found"
+    }
+   },
+   "error": "Could not detect Instagram handle",
+   "partialData": true
+  }
+ ],
+ "whiteSpaceOpportunities": [
+  {
+   "theme": "Behind the Scenes",
+   "description": "Short videos/carousels showing store restocking, toy unboxing in warehouse, staff setting up seasonal displays, or new shipment arrivals at Toys R Us Japan stores",
+   "rationale": "Zero competitors are doing this well; it's a completely open content category that builds authenticity and anticipation",
+   "brandAlignment": "Reinforces the fun, trustworthy, family-friendly retail experience and humanizes the brand for parents and kids alike",
+   "suggestedFormat": "Reels",
+   "priority": "high"
+  },
+  {
+   "theme": "Brand Story",
+   "description": "Content tracing Toys R Us Japan's legacy, Geoffrey the Giraffe mascot history, nostalgic throwbacks for parents who grew up with the brand, and store milestone celebrations",
+   "rationale": "No brand currently owns this space; strong emotional nostalgia angle is untapped and can differentiate from discount-focused competitors like Don Quijote",
+   "brandAlignment": "Leverages decades of brand heritage and iconic mascot to build emotional loyalty across generations",
+   "suggestedFormat": "Carousel",
+   "priority": "high"
+  },
+  {
+   "theme": "User Generated",
+   "description": "Reposting/curating customer photos and videos of kids playing with purchased toys, in-store visit moments, or unboxing reactions, with light branded captions",
+   "rationale": "Only Don Quijote taps this theme; Toys R Us Japan can own it more authentically given its family-first positioning, driving community engagement at low production cost",
+   "brandAlignment": "Aligns with Lifestyle theme already used and strengthens customer-centric, family community feel",
+   "suggestedFormat": "Story",
+   "priority": "high"
+  },
+  {
+   "theme": "Behind the Scenes x Brand Story Hybrid",
+   "description": "Staff spotlights/interviews explaining toy selection process, favorite picks, or how seasonal campaigns are created",
+   "rationale": "Combines two zero-competition white spaces into a differentiated recurring series, giving a human voice behind decisions no other retailer shows",
+   "brandAlignment": "Builds trust and warmth consistent with a family-oriented toy retailer voice",
+   "suggestedFormat": "Video",
+   "priority": "medium"
+  },
+  {
+   "theme": "User Generated",
+   "description": "Launch a branded hashtag challenge inviting families to share play moments with Toys R Us Japan products for featured reposts and small incentives",
+   "rationale": "Expands on UGC white space with active engagement mechanic rather than passive curation, further separating from Don Quijote's casual UGC approach",
+   "brandAlignment": "Encourages community participation while reinforcing playful, joyful brand image",
+   "suggestedFormat": "Reels",
+   "priority": "medium"
+  }
+ ],
+ "competitionStrategy": [
+  {
+   "tactic": "Own 'low-frequency, high-care' posting on Instagram",
+   "rationale": "Toys R Us Japan posts only 0.9/wk vs competitors posting 6-11/wk; rather than chase volume against Don Quijote and Akachan Honpo, lean into curated, infrequent but polished storytelling posts that stand out in feed as quality over quantity",
+   "competitorInspiration": null,
+   "brandAlignment": "Positions brand as a trusted, premium toy specialist rather than a discount/volume retailer",
+   "priority": "high"
+  },
+  {
+   "tactic": "Build an X-first engagement hub distinct from Product Showcase competitors",
+   "rationale": "X data shows target has 48 posts but low avg eng (81) vs AEON.com (1749) and Yahoo Shopping (475); since Don Quijote and Akachan Honpo dominate Product Showcase themes elsewhere, use X for community Q&A, polls, and kid/parent interaction threads instead of showcasing products",
+   "competitorInspiration": "AEON.com",
+   "brandAlignment": "Builds a conversational, parent-community voice distinct from catalog-style competitors",
+   "priority": "high"
+  },
+  {
+   "tactic": "Launch a 'Play Testing Lab' content series on Instagram",
+   "rationale": "No competitor uses a specialist review/testing angle; Don Quijote and Akachan Honpo focus on promotional/showcase content, leaving a gap for authentic hands-on kid-tested content that builds trust",
+   "competitorInspiration": null,
+   "brandAlignment": "Reinforces Toys R Us Japan's heritage as toy experts, not just a seller, differentiating from discount-store positioning",
+   "priority": "high"
+  },
+  {
+   "tactic": "Establish Facebook as a parenting-resource channel",
+   "rationale": "Target has a Facebook handle with no post data, an open lane; most competitors with Facebook data show low engagement (Don Quijote 8 avg, AEON 52 avg), meaning no one owns this platform meaningfully - easy to claim leadership with parenting tips, gift guides, and age-appropriate toy advice",
+   "competitorInspiration": null,
+   "brandAlignment": "Positions brand as a helpful family resource rather than a flash-sale promoter",
+   "priority": "medium"
+  },
+  {
+   "tactic": "Avoid TikTok/YouTube video race; invest in LINE for direct relationship marketing",
+   "rationale": "Competitors like Don Quijote and Nishimatsuya have LINE presence but no confirmed engagement data, and TikTok is dominated by Don Quijote (581 avg) and Akachan Honpo (117 avg); building a confirmed, active LINE account offers an uncontested owned channel for loyalty and exclusive offers",
+   "competitorInspiration": "Don Quijote",
+   "brandAlignment": "Creates a direct, personalized retention channel that aligns with specialty retailer trust-building rather than mass virality",
+   "priority": "medium"
+  }
+ ]
+}

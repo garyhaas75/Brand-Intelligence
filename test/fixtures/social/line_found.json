@@ -1,0 +1,6 @@
+{
+  "status": 200,
+  "finalUrl": "https://line.me/R/ti/p/@uniqlo?from=page&searchId=uniqlo",
+  "html": "<html><head><title>Add LINE friend</title><meta property=\"og:title\" content=\"Add LINE friend\"><meta property=\"og:image\" content=\"https://page-share.line.me/@246qipts/global/og_image.png?ts=1794861444650\"></head><body><div class=\"MdQrSuccess\"><p class=\"mdQrCode\"><img src=\"https://qr-official.line.me/gs/M_uniqlo_GW.png?from=page&amp;searchId=uniqlo\" alt=\"\"></p><p class=\"mdQrTxt01\">QRコードで友だちを追加</p></div></body></html>",
+  "_note": "Trimmed from a live fetch of https://page.line.me/uniqlo on 2026-11-16 (desktop UA). Badge markers are not present on this page."
+}

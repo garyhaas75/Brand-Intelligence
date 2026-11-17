@@ -1,0 +1,28 @@
+{
+  "channels": {
+    "items": [
+      {
+        "id": "UCtestchannel000000000001",
+        "snippet": { "title": "トイザらス公式チャンネル", "customUrl": "@toysrusjptest", "country": "JP" },
+        "statistics": { "subscriberCount": "48200", "hiddenSubscriberCount": false, "videoCount": "512", "viewCount": "31000000" },
+        "contentDetails": { "relatedPlaylists": { "uploads": "UUtestchannel000000000001" } }
+      }
+    ]
+  },
+  "search": { "items": [ { "id": { "kind": "youtube#channel", "channelId": "UCtestchannel000000000001" } } ] },
+  "playlistItems": { "items": [ { "contentDetails": { "videoId": "vidA" } }, { "contentDetails": { "videoId": "vidB" } } ] },
+  "videos": {
+    "items": [
+      {
+        "id": "vidA",
+        "snippet": { "title": "【開封動画】人気のブロックセットを組み立ててみた", "publishedAt": "2026-11-10T09:00:00Z", "thumbnails": { "high": { "url": "https://i.ytimg.com/vi/vidA/hqdefault.jpg" } } },
+        "statistics": { "viewCount": "12000", "likeCount": "340", "commentCount": "25" }
+      },
+      {
+        "id": "vidB",
+        "snippet": { "title": "クリスマスギフト特集 2026", "publishedAt": "2026-10-28T09:00:00Z", "thumbnails": { "default": { "url": "https://i.ytimg.com/vi/vidB/default.jpg" } } },
+        "statistics": { "viewCount": "8000", "likeCount": "150" }
+      }
+    ]
+  }
+}

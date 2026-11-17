@@ -32,7 +32,14 @@ function ensureLogs() {
 }
 
 function loadBrands() {
-  try { return JSON.parse(fs.readFileSync(BRANDS_FILE, 'utf8')).brands || []; }
+  try {
+    const all = JSON.parse(fs.readFileSync(BRANDS_FILE, 'utf8')).brands || [];
+    // A brand with scheduled:false is refreshed only on demand (dashboard or CLI). Used for brands
+    // that cost more per run, or whose site blocks automated access, until someone opts them in.
+    const skipped = all.filter(b => b.scheduled === false).map(b => b.slug);
+    if (skipped.length) log(`Not scheduled (scheduled:false): ${skipped.join(', ')}`);
+    return all.filter(b => b.scheduled !== false);
+  }
   catch { return []; }
 }
 

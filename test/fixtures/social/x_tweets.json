@@ -1,0 +1,43 @@
+[
+  {
+    "type": "tweet",
+    "id": "1850000000000000001",
+    "url": "https://x.com/toysrus_jp_test/status/1850000000000000001",
+    "text": "【新商品】クリスマスにぴったりのおもちゃが入荷しました！ #トイザらス #クリスマス",
+    "createdAt": "Wed Nov 11 03:00:00 +0000 2026",
+    "likeCount": 120,
+    "replyCount": 8,
+    "retweetCount": 30,
+    "quoteCount": 2,
+    "viewCount": 15000,
+    "isRetweet": false,
+    "author": { "userName": "toysrus_jp_test", "followers": 250000 },
+    "extendedEntities": { "media": [ { "media_url_https": "https://pbs.twimg.com/media/test1.jpg" } ] }
+  },
+  {
+    "type": "tweet",
+    "id": "1850000000000000002",
+    "url": "https://x.com/toysrus_jp_test/status/1850000000000000002",
+    "text": "週末限定セール開催中 ポイント10倍",
+    "createdAt": "Sun Oct 18 01:30:00 +0000 2026",
+    "likeCount": 45,
+    "replyCount": 3,
+    "retweetCount": 10,
+    "quoteCount": 0,
+    "viewCount": 6000,
+    "isRetweet": false,
+    "author": { "userName": "toysrus_jp_test", "followers": 250000 }
+  },
+  {
+    "type": "tweet",
+    "id": "1850000000000000003",
+    "url": "https://x.com/toysrus_jp_test/status/1850000000000000003",
+    "text": "RT @someone: retweeted content",
+    "createdAt": "Sat Oct 17 01:30:00 +0000 2026",
+    "likeCount": 0,
+    "replyCount": 0,
+    "retweetCount": 99,
+    "isRetweet": true
+  },
+  { "noResults": true }
+]

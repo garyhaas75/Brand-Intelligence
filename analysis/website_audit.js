@@ -13,8 +13,12 @@ const fs = require('fs');
 const net = require('net');
 const path = require('path');
 const { chromium } = require('playwright');
-const { scrapeBrands } = require('../scrapers/site_scraper');
+const { scrapeBrands, manualCaptureFor, isFailedResult, scrapeStatusLine } = require('../scrapers/site_scraper');
+const { isJapanMarket } = require('../utils/market');
 const { getBrandContext } = require('../utils/brand_context');
+const checkpoint = require('../utils/checkpoint');
+
+const CHECKPOINT_STEP = 'website-scrape';
 
 const DATA_DIR = path.join(__dirname, '../data');
 
@@ -91,8 +95,11 @@ async function runLighthouse(url) {
 
     // Chromium can launch, fail to actually render the page, and still report a
     // full set of zeros. That is a failure, not a site scoring zero everywhere.
+    // Seen on sites that serve a bot challenge: the page loads, but what loads is the
+    // challenge, so every category scores zero.
     if (scores.seo === 0 && scores.performance === 0 && scores.accessibility === 0) {
-      log('Lighthouse returned all-zero scores — Chromium launched but could not evaluate the page');
+      const runtimeError = result.lhr.runtimeError && result.lhr.runtimeError.code;
+      log(`Lighthouse returned all-zero scores${runtimeError ? ` (${runtimeError})` : ''}: the page could not be evaluated, most often because the site blocks automated browsers`);
       return null;
     }
 
@@ -125,8 +132,8 @@ async function run() {
   log(`Starting website audit for: ${profile.name}`);
 
   const brandsToScrape = [
-    { id: slug, name: profile.name, url: profile.url, role: 'target', takeScreenshot: true },
-    ...(profile.identifiedCompetitors || []).slice(0, 6).map(c => ({
+    { id: slug, name: profile.name, url: profile.url, role: 'target', takeScreenshot: true, skipApifyRetry: !!(profile.scrape && profile.scrape.skipApifyRetry), manualCapture: manualCaptureFor(slug, slug) },
+    ...(profile.identifiedCompetitors || []).slice(0, isJapanMarket(profile) ? 12 : 6).map(c => ({
       id: c.name.toLowerCase().replace(/\s+/g, '-'),
       name: c.name, url: /^https?:\/\//i.test(c.url) ? c.url : `https://${c.url}`, role: 'competitor',
     })),
@@ -141,35 +148,54 @@ async function run() {
   // costs only the sites that hadn't finished.
   const SCRAPE_BUDGET_MS = 10 * 60 * 1000;
   const partial = [];
+  // Previous output, keyed by brand id: a brand that fails this time keeps its last
+  // good data (marked stale) instead of being replaced by the failure.
+  const existingData = existingBrandsById(loadBrandData(slug, 'site_intelligence.json'));
+  let scrapeTimedOut = false;
+  let scrapeTimer;
+  // Aborted on timeout so the scrape still running in the background starts no new
+  // brand and writes no checkpoint after this run has moved on.
+  const scrapeAbort = new AbortController();
   const scraped = await Promise.race([
-    scrapeBrands(brandsToScrape, { logFile, collector: partial }),
-    new Promise(resolve => setTimeout(() => {
-      log(`Scraping timed out after 10min — continuing with ${partial.length}/${brandsToScrape.length} sites that finished`);
-      resolve(partial);
-    }, SCRAPE_BUDGET_MS)),
+    scrapeBrands(brandsToScrape, { logFile, collector: partial, existingData, slug, checkpointStep: CHECKPOINT_STEP, signal: scrapeAbort.signal }),
+    new Promise(resolve => { scrapeTimer = setTimeout(() => {
+      scrapeTimedOut = true;
+      scrapeAbort.abort();
+      log(`Scraping timed out after 10min: continuing with ${partial.length}/${brandsToScrape.length} sites that finished`);
+      resolve(fillUnfinished(brandsToScrape, [...partial], existingData, 'scrape budget exceeded'));
+    }, SCRAPE_BUDGET_MS); scrapeTimer.unref(); }),
   ]);
+  clearTimeout(scrapeTimer);
   log(`Scraped ${scraped.length}/${brandsToScrape.length} sites (${scraped.filter(b => !b.botBlocked && !b.error).length} usable)`);
 
-  // Timeout is a backstop only — a healthy run finishes in well under a minute.
-  log(`Running Lighthouse audit for ${profile.url}...`);
-  const lighthouseAudit = await Promise.race([
-    runLighthouse(profile.url),
-    new Promise(resolve => setTimeout(() => { log('Lighthouse timed out after 120s — skipping'); resolve(null); }, 120000)),
-  ]);
+  // Timeout is a backstop only; a healthy run finishes in well under a minute.
+  const targetScraped = scraped.find(s => s.role === 'target') || {};
+  const lighthouseSkip = lighthouseSkipReason(profile, brandsToScrape[0], targetScraped);
+  let lighthouseAudit = null;
+  let lighthouseNote = null;
+  if (lighthouseSkip) {
+    lighthouseNote = lighthouseSkip;
+    log(`Lighthouse skipped: ${lighthouseSkip}`);
+  } else {
+    log(`Running Lighthouse audit for ${profile.url}...`);
+    let lhTimer;
+    lighthouseAudit = await Promise.race([
+      runLighthouse(profile.url),
+      new Promise(resolve => { lhTimer = setTimeout(() => { log('Lighthouse timed out after 120s, skipping'); resolve(null); }, 120000); lhTimer.unref(); }),
+    ]);
+    clearTimeout(lhTimer);
+    if (!lighthouseAudit) lighthouseNote = 'Lighthouse could not evaluate the page (see log)';
+  }
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext(slug);
 
-  const targetSite = scraped.find(s => s.role === 'target') || {};
-  const competitorSites = scraped.filter(s => s.role === 'competitor');
+  const targetFound = scraped.find(s => s.role === 'target');
+  const targetSite = targetFound || {};
 
-  // Build comparison context for Claude
-  const competitorContext = competitorSites.map(c =>
-    `${c.name}:
-  Nav: ${(c.featuredCategories || []).slice(0, 15).join(', ') || 'not scraped'}
-  Hero: "${c.heroContent?.headline || 'not found'}"
-  Promos: ${(c.promoBanners || []).slice(0, 2).join(' | ') || 'none'}`
-  ).join('\n\n');
+  // Build comparison context for Claude. Every competitor that was meant to be
+  // scraped appears, with its data status (stale, blocked, or no data at all).
+  const competitorContext = competitorContextBlock(brandsToScrape, scraped);
 
   const visionNote = targetSite.screenshotBase64
     ? '\nA screenshot of the target brand homepage is attached. Use it to assess visual design, hero messaging, image vs. live text usage, CTA prominence, and above-the-fold content.'
@@ -183,7 +209,7 @@ Nav categories: ${(targetSite.featuredCategories || []).join(', ') || 'not scrap
 Hero headline: "${targetSite.heroContent?.headline || 'not found'}"
 All hero text: ${(targetSite.heroContent?.allText || []).slice(0, 5).join(' | ') || 'none'}
 Promo banners: ${(targetSite.promoBanners || []).slice(0, 3).join(' | ') || 'none'}
-Bot blocked: ${targetSite.botBlocked ? 'yes (limited data)' : 'no'}
+Data status: ${scrapeStatusLine(targetFound)}
 
 COMPETITORS:
 ${competitorContext}
@@ -272,14 +298,88 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
     brandSlug: slug,
     brands: brandsForStorage,
     lighthouseAudit: lighthouseAudit || null,
+    ...(lighthouseNote ? { lighthouseNote } : {}),
     hasScreenshot: !!targetSite.screenshotBase64,
     ...analysis,
   };
 
-  const existing = loadBrandData(slug, 'site_intelligence.json');
-  if (existing) archiveData(slug, 'site_intelligence', existing);
-  saveBrandData(slug, 'site_intelligence.json', output);
-  log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? `SEO ${lighthouseAudit.scores.seo}` : 'failed'}.`);
+  persistOutput(slug, output, { complete: !scrapeTimedOut });
+  log(`Done. ${(analysis.navGaps || []).length} nav gaps, ${(analysis.topOpportunities || []).length} opportunities. Lighthouse: ${lighthouseAudit ? `SEO ${lighthouseAudit.scores.seo}` : lighthouseSkip ? 'skipped' : 'failed'}.`);
+}
+
+/**
+ * Competitor section of the audit prompt. Each competitor that was meant to be
+ * scraped gets a Status line: stale data carries its date and reason, and a
+ * competitor with no data at all is listed as such instead of being omitted.
+ */
+function competitorContextBlock(brandsToScrape, scraped) {
+  const byId = new Map(scraped.map(s => [s.id, s]));
+  return brandsToScrape.filter(b => b.role === 'competitor').map(b => {
+    const c = byId.get(b.id);
+    if (!c) return `${b.name}:\n  Status: ${scrapeStatusLine(null)}`;
+    return `${c.name}:
+  Status: ${scrapeStatusLine(c)}
+  Nav: ${(c.featuredCategories || []).slice(0, 15).join(', ') || 'not scraped'}
+  Hero: "${c.heroContent?.headline || 'not found'}"
+  Promos: ${(c.promoBanners || []).slice(0, 2).join(' | ') || 'none'}`;
+  }).join('\n\n');
+}
+
+/** Previous output's brands keyed by id, for carry-forward. */
+function existingBrandsById(prev) {
+  const out = {};
+  for (const b of (prev && Array.isArray(prev.brands) ? prev.brands : [])) if (b && b.id) out[b.id] = b;
+  return out;
+}
+
+/**
+ * After a scrape timeout, brands that never finished keep their previous good
+ * data, marked stale, instead of silently disappearing from the output.
+ */
+function fillUnfinished(brands, finished, existingData, reason, now = new Date().toISOString()) {
+  const done = new Set(finished.map(b => b && b.id));
+  for (const b of brands) {
+    const prior = existingData[b.id];
+    if (!done.has(b.id) && prior && !isFailedResult(prior)) {
+      finished.push({ ...prior, stale: true, asOf: prior.asOf || prior.scrapedAt || null, lastAttempt: now, lastError: reason });
+    }
+  }
+  return finished;
+}
+
+/**
+ * Why Lighthouse should not run against the target, or null to run it. Running it
+ * against a site that blocks automated browsers only scores the block page, which
+ * is reported as all zeros and read as a failure. Universal rule: skip when the
+ * brand is configured as blocked (skipApifyRetry), when a manual capture stands in
+ * for the live page, or when this run's scrape of the target was bot-blocked.
+ */
+function lighthouseSkipReason(profile, targetBrand, targetScraped) {
+  if (targetBrand && targetBrand.manualCapture) return 'target site blocks automated access; a manual capture is in use, so there is no live page to audit';
+  if ((targetBrand && targetBrand.skipApifyRetry) || (profile && profile.scrape && profile.scrape.skipApifyRetry)) return 'target site blocks automated access (profile.scrape.skipApifyRetry)';
+  if (targetScraped && targetScraped.botBlocked) return 'target site served a bot challenge to this run, so Lighthouse would only score the block page';
+  return null;
+}
+
+/**
+ * Archive the previous output, write the new one, then clear the scrape checkpoint.
+ * An incomplete run (scrape budget exceeded) keeps its checkpoint so the next run
+ * resumes the brands that did finish.
+ */
+function persistOutput(slug, output, { complete = true, dataDir = DATA_DIR } = {}) {
+  const dir = path.join(dataDir, 'brands', slug);
+  ensureDir(dir);
+  const file = path.join(dir, 'site_intelligence.json');
+  let existing = null;
+  try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* first run */ }
+  if (existing) {
+    const histDir = path.join(dir, 'history');
+    ensureDir(histDir);
+    fs.writeFileSync(path.join(histDir, `site_intelligence_${new Date().toISOString().slice(0, 10)}.json`), JSON.stringify(existing, null, 2));
+  }
+  fs.writeFileSync(file, JSON.stringify(output, null, 2));
+  if (complete) checkpoint.clear(slug, CHECKPOINT_STEP, { dataDir });
+  else log(`Scrape incomplete, keeping checkpoint ${CHECKPOINT_STEP} so the next run resumes`);
 }
 
 // Hard kill after 12 minutes — prevents zombie processes on Railway
@@ -290,6 +390,21 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
 // but a completed run exits immediately and cleanly.
 // Must stay comfortably above the scrape budget (10min) plus Lighthouse (2min)
 // plus the Claude analysis call, or this kills healthy runs mid-flight.
-setTimeout(() => { log('TIMEOUT: website audit exceeded 20min, forcing exit'); process.exit(1); }, 20 * 60 * 1000).unref();
+// Only auto-run as a script, so helpers can be required and tested in isolation.
+if (require.main === module) {
+  setTimeout(() => { log('TIMEOUT: website audit exceeded 20min, forcing exit'); process.exit(1); }, 20 * 60 * 1000).unref();
 
-run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+  // A stranded network call (an Apify request whose race was already lost) can
+  // reject or throw after the fact. Log it, keep whatever is checkpointed, and exit
+  // non-zero instead of dumping a stack and leaving the cause unclear.
+  const onFatal = (kind) => (err) => {
+    log(`FATAL (${kind}): ${err && err.message ? err.message : String(err)}${err && err.code ? ` [${err.code}]` : ''}. Completed sites stay checkpointed under data/brands/<slug>/_checkpoints/${CHECKPOINT_STEP}.json; rerun to resume.`);
+    process.exit(1);
+  };
+  process.on('unhandledRejection', onFatal('unhandledRejection'));
+  process.on('uncaughtException', onFatal('uncaughtException'));
+
+  run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+}
+
+module.exports = { competitorContextBlock, existingBrandsById, fillUnfinished, lighthouseSkipReason, persistOutput, CHECKPOINT_STEP };

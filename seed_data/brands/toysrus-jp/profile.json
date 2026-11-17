@@ -1,0 +1,69 @@
+{
+  "slug": "toysrus-jp",
+  "name": "Toys R Us Japan",
+  "url": "https://www.toysrus.co.jp/",
+  "industry": "Toys & Children's Retail",
+  "market": "Japan",
+  "identifiedCompetitors": [
+    {
+      "name": "Amazon.co.jp Toys",
+      "url": "https://www.amazon.co.jp/toys/",
+      "rationale": "marketplace (Japan). Redirects to /gp/browse.html?node=13299531. Title: Amazon | おもちゃ・玩具."
+    },
+    {
+      "name": "Rakuten Ichiba Toys",
+      "url": "https://www.rakuten.co.jp/category/566382/",
+      "rationale": "marketplace (Japan). Title: 【楽天市場】おもちゃの通販 (Chromium). Curl gets a 43 byte Akamai reference body with status 200, so curl alone is not proof h"
+    },
+    {
+      "name": "Yahoo! Shopping Games and Toys",
+      "url": "https://shopping.yahoo.co.jp/category/2511/recommend",
+      "rationale": "marketplace (Japan). Category 2511 taken from the Yahoo! Shopping homepage menu. The /category/2511/ list view answers 500 to automation; /re"
+    },
+    {
+      "name": "Kiddy Land",
+      "url": "https://www.kiddyland.co.jp/",
+      "rationale": "specialty_toy (Japan). Character goods and toy specialty chain."
+    },
+    {
+      "name": "Nishimatsuya",
+      "url": "https://www.24028.jp/",
+      "rationale": "baby_kids (Japan). Baby and kids value chain with a toy assortment."
+    },
+    {
+      "name": "Akachan Honpo",
+      "url": "https://www.akachan.jp/",
+      "rationale": "baby_kids (Japan). Baby specialty chain; competes with Babies\"R\"Us Japan."
+    },
+    {
+      "name": "Premium Bandai",
+      "url": "https://p-bandai.jp/",
+      "rationale": "manufacturer_direct (Japan). From a non-JP IP redirects to /global_newpc.html (international page). Needs a JP IP for the domestic store."
+    },
+    {
+      "name": "Sanrio Online Shop",
+      "url": "https://shop.sanrio.co.jp/",
+      "rationale": "manufacturer_direct (Japan). Answers 200 with a restriction page (制限について) to a non-JP IP. Needs a JP IP for content."
+    },
+    {
+      "name": "Don Quijote",
+      "url": "https://www.donki.com/",
+      "rationale": "discount_general (Japan). Curl 200. Headless Chromium timed out at 20s on domcontentloaded."
+    },
+    {
+      "name": "AEON.com",
+      "url": "https://www.aeon.com/",
+      "rationale": "general_merchandise (Japan). AEON group portal. Toy assortment sits in AEON Style; no toy-specific URL confirmed."
+    },
+    {
+      "name": "Joshin",
+      "url": "https://joshinweb.jp/",
+      "rationale": "electronics_mass (Japan). Electronics chain with a large toy and hobby department. Access Denied to automation from a non-JP IP."
+    }
+  ],
+  "discoveryNotes": "Created by hand for the Japan scan: toysrus.co.jp is Cloudflare-blocked so brand_discovery cannot run. Competitors seeded from scrapers/jp_competitors.js.",
+  "scrape": {
+    "skipApifyRetry": true,
+    "note": "toysrus.co.jp is operated by Y.K. Toysrus Internet Japan behind Cloudflare and blocks automated access. Do not retry through proxies. Use data/brands/toysrus-jp/manual_capture/toysrus-jp.html (and .png) or get the operator to allowlist us."
+  }
+}

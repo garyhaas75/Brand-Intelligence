@@ -131,6 +131,10 @@ const MODULE_READERS = {
   site_intelligence:    ['website', 'action'],
   search_seo:           ['search', 'action'],
   action_plan:          ['action'],
+  // Japan market data. Marketplace is competitor intelligence; demand is the evidence behind the
+  // personas and the search work. Both feed the Action Plan.
+  marketplace:          ['competitive', 'action'],
+  jp_demand:            ['personas', 'search', 'action'],
 };
 
 // Only the tab that owns a module may pay for a re-run of it. Brand Profile is
@@ -142,6 +146,8 @@ const MODULE_WRITERS = {
   site_intelligence:    ['website', 'profile'],
   search_seo:           ['search'],
   action_plan:          ['action'],
+  marketplace:          ['competitive'],
+  jp_demand:            ['personas'],
 };
 
 const API_TAB_MAP = {
@@ -159,6 +165,8 @@ const API_TAB_MAP = {
   'site_intelligence':    MODULE_READERS.site_intelligence,
   'search_seo':           MODULE_READERS.search_seo,
   'action_plan':          MODULE_READERS.action_plan,
+  'marketplace':          MODULE_READERS.marketplace,
+  'jp_demand':            MODULE_READERS.jp_demand,
 
   // ---- Per-tab extras ------------------------------------------------------
   'persona-chat':         ['personas'],

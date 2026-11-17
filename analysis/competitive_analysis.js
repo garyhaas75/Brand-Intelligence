@@ -10,8 +10,12 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
 const path = require('path');
-const { scrapeBrands } = require('../scrapers/site_scraper');
+const { scrapeBrands, manualCaptureFor, scrapeStatusLine } = require('../scrapers/site_scraper');
 const { getBrandContext } = require('../utils/brand_context');
+const checkpoint = require('../utils/checkpoint');
+
+const SCRAPE_STEP = 'competitive-scrape';
+const ANALYZE_STEP = 'competitive-analyze';
 
 const DATA_DIR = path.join(__dirname, '../data');
 
@@ -46,14 +50,20 @@ function archiveData(slug, module, data) {
 }
 
 async function analyzeCompetitor(anthropic, brandName, brandIndustry, competitor) {
-  const prompt = `You are a competitive intelligence analyst. Analyze this competitor for ${brandName} (${brandIndustry}).
+  const prompt = buildCompetitorPrompt(brandName, brandIndustry, competitor);
+  return runCompetitorPrompt(anthropic, prompt);
+}
+
+/** Prompt for one competitor. Exported so the status wording can be tested. */
+function buildCompetitorPrompt(brandName, brandIndustry, competitor) {
+  return `You are a competitive intelligence analyst. Analyze this competitor for ${brandName} (${brandIndustry}).
 
 COMPETITOR: ${competitor.name}
 URL: ${competitor.url}
 NAV CATEGORIES: ${(competitor.featuredCategories || []).slice(0, 20).join(', ') || 'unknown'}
 HERO HEADLINE: ${competitor.heroContent?.headline || 'not scraped'}
 PROMO BANNERS: ${(competitor.promoBanners || []).slice(0, 3).join(' | ') || 'none'}
-SCRAPE STATUS: ${competitor.botBlocked ? 'bot-blocked (limited data)' : competitor.error ? 'error: ' + competitor.error : 'success'}
+SCRAPE STATUS: ${scrapeStatusLine(competitor)}
 
 Return JSON with this exact structure:
 {
@@ -62,8 +72,12 @@ Return JSON with this exact structure:
   "strengths": ["3-5 specific strengths vs ${brandName}"],
   "opportunities": ["3-5 specific gaps/weaknesses ${brandName} could exploit"],
   "assortmentHighlights": ["top 3-5 category strengths"]
-}`;
+}${competitor && competitor.stale ? `
 
+The site data above is STALE: it is from ${competitor.asOf || competitor.scrapedAt || 'an earlier run'} and could not be refreshed. Base the analysis on it, but do not describe it as the competitor's current site, promotions or messaging.` : ''}`;
+}
+
+async function runCompetitorPrompt(anthropic, prompt) {
   const msg = await anthropic.messages.create({
     model: MODEL_FAST,
     max_tokens: 2500,
@@ -82,10 +96,20 @@ Return JSON with this exact structure:
   try { return JSON.parse(raw.slice(start, end + 1)); } catch { return { pricingTier: 'mid', positioningStatement: '', strengths: [], opportunities: [], assortmentHighlights: [] }; }
 }
 
+/**
+ * One positioning-map line per competitor. A stale entry carries its date and
+ * reason; one with no analysis says so instead of reading as an empty "mid" brand.
+ */
+function competitorSummaryLine(c) {
+  if (!c.positioningStatement && !(c.strengths || []).length) {
+    return `${c.name}: NO DATA (no site data or analysis this run${c.error ? `: ${c.error}` : ''}). Do not place this brand from guesswork; omit it or mark it unknown.`;
+  }
+  const staleNote = c.stale ? ` [STALE: data from ${c.asOf || c.scrapedAt || 'an earlier run'}, not refreshed: ${c.lastError || 'unknown reason'}; do not describe as current]` : '';
+  return `${c.name}: ${c.positioningStatement || ''} (${c.pricingTier || 'mid'} tier)${staleNote}`;
+}
+
 async function generatePositioningMap(anthropic, brandName, brandContext, competitors) {
-  const competitorSummaries = competitors.map(c =>
-    `${c.name}: ${c.positioningStatement || ''} (${c.pricingTier || 'mid'} tier)`
-  ).join('\n');
+  const competitorSummaries = competitors.map(competitorSummaryLine).join('\n');
 
   const prompt = `You are a strategic brand consultant. Create a positioning map analysis for ${brandName} and its competitors.
 
@@ -191,7 +215,7 @@ async function run() {
 
   // Build brand list for scraping
   const brandsToScrape = [
-    { id: slug, name: profile.name, url: profile.url, role: 'target' },
+    { id: slug, name: profile.name, url: profile.url, role: 'target', skipApifyRetry: !!(profile.scrape && profile.scrape.skipApifyRetry), manualCapture: manualCaptureFor(slug, slug) },
     ...competitors.map(c => ({
       id: c.name.toLowerCase().replace(/\s+/g, '-'),
       name: c.name, url: c.url, role: 'competitor',
@@ -200,37 +224,23 @@ async function run() {
 
   log(`Scraping ${brandsToScrape.length} sites...`);
   const logFile = path.join(__dirname, '../logs', `competitive_analysis_${slug}.log`);
-  const scrapedResults = await scrapeBrands(brandsToScrape, { logFile });
+  // Previous site scrape, keyed by brand id: a brand that fails this time keeps its
+  // last good data (marked stale) instead of being replaced by the failure.
+  const prevSite = loadBrandData(slug, 'site_intelligence.json');
+  const existingData = {};
+  for (const b of (prevSite && Array.isArray(prevSite.brands) ? prevSite.brands : [])) if (b && b.id) existingData[b.id] = b;
+  const scrapedResults = await scrapeBrands(brandsToScrape, { logFile, existingData, slug, checkpointStep: SCRAPE_STEP });
+  const prevAnalysis = loadBrandData(slug, 'competitive_analysis.json');
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const brandContext = getBrandContext(slug);
 
   // Analyze each competitor
-  const analyzedCompetitors = [];
-  for (const scraped of scrapedResults.filter(r => r.role === 'competitor')) {
-    log(`Analyzing ${scraped.name}...`);
-    try {
-      const analysis = await analyzeCompetitor(anthropic, profile.name, profile.industry, scraped);
-      analyzedCompetitors.push({
-        name: scraped.name,
-        url: scraped.url,
-        pricingTier: analysis.pricingTier,
-        positioningStatement: analysis.positioningStatement,
-        strengths: analysis.strengths || [],
-        opportunities: analysis.opportunities || [],
-        assortmentHighlights: analysis.assortmentHighlights || [],
-        navCategories: scraped.featuredCategories || [],
-        heroHeadline: scraped.heroContent?.headline || '',
-        promoBanners: scraped.promoBanners || [],
-        scrapedAt: scraped.scrapedAt,
-        botBlocked: scraped.botBlocked || false,
-        error: scraped.error || null,
-      });
-    } catch (err) {
-      log(`Error analyzing ${scraped.name}: ${err.message}`);
-      analyzedCompetitors.push({ name: scraped.name, url: scraped.url, error: err.message, strengths: [], opportunities: [] });
-    }
-  }
+  const analyzedCompetitors = await analyzeAll(scrapedResults.filter(r => r.role === 'competitor'), {
+    slug, prevCompetitors: (prevAnalysis && prevAnalysis.competitors) || [],
+    analyze: (scraped) => analyzeCompetitor(anthropic, profile.name, profile.industry, scraped),
+  });
+
 
   // Generate positioning map
   log('Generating positioning map...');
@@ -279,12 +289,91 @@ async function run() {
   const existing = loadBrandData(slug, 'competitive_analysis.json');
   if (existing) archiveData(slug, 'competitive_analysis', existing);
   saveBrandData(slug, 'competitive_analysis.json', output);
+  // Real output is written: the next run starts fresh.
+  checkpoint.clear(slug, SCRAPE_STEP);
+  checkpoint.clear(slug, ANALYZE_STEP);
   log(`Done. ${analyzedCompetitors.length} competitors analyzed, ${topAssortmentGaps.length} assortment gaps found.`);
+
+  // ---- BEGIN marketplace_jp hook (Japan only; writes marketplace.json; never throws) ----
+  try {
+    const marketplaceJp = require('../scrapers/marketplace_jp');
+    if (marketplaceJp.isJapanMarket(profile) && process.env.BI_SKIP_MARKETPLACE_HOOK !== '1') {
+      log('Japan market: collecting marketplace intelligence (Amazon.co.jp, Rakuten)...');
+      const mp = await marketplaceJp.collectMarketplace({ slug, log: m => log(`[marketplace_jp] ${m}`) });
+      log(`Marketplace: ${(mp.categories || []).length} categories, ${(mp.reviews || []).length} reviews`);
+    }
+  } catch (err) {
+    log(`Marketplace step skipped: ${err.message}`);
+  }
+  // ---- END marketplace_jp hook ----
+}
+
+/**
+ * Analyze each scraped competitor with one Claude call, checkpointing every result
+ * under ANALYZE_STEP keyed by competitor id, so a failure part way does not pay
+ * again for the ones that finished. A checkpoint is reused only if it was made from
+ * the same scrape (matching scrapedAt). A failed analysis keeps the previous good
+ * analysis for that competitor, marked stale.
+ */
+async function analyzeAll(scrapedCompetitors, { slug, prevCompetitors = [], analyze, dataDir, now = () => new Date().toISOString() }) {
+  const cpOpts = dataDir ? { dataDir } : {};
+  const out = [];
+  for (const scraped of scrapedCompetitors) {
+    const key = scraped.id || scraped.name;
+    const saved = checkpoint.get(slug, ANALYZE_STEP, key, cpOpts);
+    if (saved && saved.scrapedAt === scraped.scrapedAt && !saved.analysisError) {
+      log(`${scraped.name}: resumed from checkpoint (${ANALYZE_STEP})`);
+      out.push(saved);
+      continue;
+    }
+    log(`Analyzing ${scraped.name}...`);
+    try {
+      const analysis = await analyze(scraped);
+      const entry = {
+        name: scraped.name,
+        url: scraped.url,
+        pricingTier: analysis.pricingTier,
+        positioningStatement: analysis.positioningStatement,
+        strengths: analysis.strengths || [],
+        opportunities: analysis.opportunities || [],
+        assortmentHighlights: analysis.assortmentHighlights || [],
+        navCategories: scraped.featuredCategories || [],
+        heroHeadline: scraped.heroContent?.headline || '',
+        promoBanners: scraped.promoBanners || [],
+        scrapedAt: scraped.scrapedAt,
+        botBlocked: scraped.botBlocked || false,
+        error: scraped.error || null,
+        ...(scraped.stale ? { stale: true, asOf: scraped.asOf || scraped.scrapedAt || null, lastAttempt: scraped.lastAttempt, lastError: scraped.lastError } : {}),
+      };
+      checkpoint.put(slug, ANALYZE_STEP, key, entry, cpOpts);
+      out.push(entry);
+    } catch (err) {
+      log(`Error analyzing ${scraped.name}: ${err.message}`);
+      const prior = prevCompetitors.find(c => c && c.name === scraped.name && !c.analysisError && (c.strengths || []).length > 0);
+      if (prior) {
+        log(`  Keeping previous analysis for ${scraped.name} (stale)`);
+        out.push({ ...prior, stale: true, asOf: prior.asOf || prior.scrapedAt || null, lastAttempt: now(), lastError: `analysis failed: ${err.message}` });
+      } else {
+        out.push({ name: scraped.name, url: scraped.url, error: err.message, analysisError: true, strengths: [], opportunities: [] });
+      }
+    }
+  }
+  return out;
 }
 
 // Only auto-run as a script, so helpers can be required and tested in isolation.
 if (require.main === module) {
+  // A stranded network call (run 1: an Apify request whose race was already lost
+  // died with ECONNRESET) can reject or throw after the fact. Log it, keep whatever
+  // is checkpointed, and exit non-zero instead of dumping a stack.
+  const onFatal = (kind) => (err) => {
+    log(`FATAL (${kind}): ${err && err.message ? err.message : String(err)}${err && err.code ? ` [${err.code}]` : ''}. Finished work stays checkpointed under data/brands/<slug>/_checkpoints/ (${SCRAPE_STEP}, ${ANALYZE_STEP}); rerun to resume.`);
+    process.exit(1);
+  };
+  process.on('unhandledRejection', onFatal('unhandledRejection'));
+  process.on('uncaughtException', onFatal('uncaughtException'));
+
   run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
 }
 
-module.exports = { filterAssortmentGaps };
+module.exports = { filterAssortmentGaps, analyzeAll, buildCompetitorPrompt, competitorSummaryLine, SCRAPE_STEP, ANALYZE_STEP };

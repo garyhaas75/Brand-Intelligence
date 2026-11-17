@@ -1,0 +1,1189 @@
+{
+  "generatedAt": "2026-11-16T21:52:39.568Z",
+  "market": "JP",
+  "sources": [
+    "rakuten",
+    "amazon_jp"
+  ],
+  "categories": [
+    {
+      "source": "rakuten",
+      "category": "toys",
+      "url": "https://www.rakuten.co.jp/category/toy/",
+      "topItems": [
+        {
+          "rank": 1,
+          "title": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+          "brand": null,
+          "priceJPY": 5890,
+          "reviewCount": 1150,
+          "rating": 4.63,
+          "url": "https://item.rakuten.co.jp/mottainaiya/10000641/?scid=seo-carousel-search"
+        },
+        {
+          "rank": 2,
+          "title": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+          "brand": null,
+          "priceJPY": 2980,
+          "reviewCount": 40,
+          "rating": 4.23,
+          "url": "https://item.rakuten.co.jp/shimataro/majisuto/?variantId=majisuto&scid=seo-carousel-search"
+        },
+        {
+          "rank": 3,
+          "title": "おしゃべりぬいぐるみ(スンスン)",
+          "brand": null,
+          "priceJPY": 4620,
+          "reviewCount": 116,
+          "rating": 4.53,
+          "url": "https://item.rakuten.co.jp/book/18461123/?variantId=18461123&scid=seo-carousel-search"
+        },
+        {
+          "rank": 4,
+          "title": "おしゃべりぬいぐるみ(ノンノン)",
+          "brand": null,
+          "priceJPY": 4620,
+          "reviewCount": 39,
+          "rating": 4.64,
+          "url": "https://item.rakuten.co.jp/book/18461124/?variantId=18461124&scid=seo-carousel-search"
+        },
+        {
+          "rank": 5,
+          "title": "Tamagotchi Paradise - White Glacier",
+          "brand": null,
+          "priceJPY": 6364,
+          "reviewCount": 2,
+          "rating": 5,
+          "url": "https://item.rakuten.co.jp/book/18646529/?variantId=18646529&scid=seo-carousel-search"
+        },
+        {
+          "rank": 6,
+          "title": "＼思い出の一枚を／日本企画製品 オリジナルフレーム カメラ 子供用 デジタルカメラ 1080p録画自撮り 32GBSDカード付 キッズカメラ トイカメラ 子供カメラ 知育玩具 女の子 プレゼント 誕生日 クリスマス おもちゃ",
+          "brand": null,
+          "priceJPY": 2980,
+          "reviewCount": 209,
+          "rating": 4.14,
+          "url": "https://item.rakuten.co.jp/auc-risecreation/c0234/?variantId=C0234-pink&scid=seo-carousel-search"
+        },
+        {
+          "rank": 7,
+          "title": "【即納可能】【新品】プチドロップステッカー　ムーミン/雲と月と星【カミオジャパン国内正規品】シール/ムーミン",
+          "brand": null,
+          "priceJPY": 460,
+          "reviewCount": 6,
+          "rating": 4.5,
+          "url": "https://item.rakuten.co.jp/machida/4550433077934/?variantId=4550433077934&scid=seo-carousel-search"
+        },
+        {
+          "rank": 8,
+          "title": "【4時間限定★5％OFFクーポン】19日20時～ 【公式】UKAboo 折りたたみ プール 大型 1年保証 安全基準クリア 即納 空気入れ不要 ビニールプール 子供用 大人用 長方形 大きい 3m 150 120 160cm ファミリープール 家庭用プール 大型プール ミニ ウカブー",
+          "brand": null,
+          "priceJPY": 5180,
+          "reviewCount": 861,
+          "rating": 4.39,
+          "url": "https://item.rakuten.co.jp/shopworld/10141240/?scid=seo-carousel-search"
+        },
+        {
+          "rank": 9,
+          "title": "【全品P5倍!20時から6時間限定】三輪車 5in1 BTM 子供用三輪車 三輪車のりもの セーフティーガードなし/付き 2タイプ 押し棒付き 安全バー付き おもちゃ 乗用玩具 幼児用 キッズバイク 誕生日ギフト 贈り物 プレゼント",
+          "brand": null,
+          "priceJPY": 6980,
+          "reviewCount": 1328,
+          "rating": 4.52,
+          "url": "https://item.rakuten.co.jp/ioffice/ms295471/?scid=seo-carousel-search"
+        },
+        {
+          "rank": 10,
+          "title": "雛人形 コンパクト ケース飾り モダン おしゃれ ひな人形 かわいい インテリア 親王飾り ふるうる はなのうた 丸型ケースL 桜柄 sonoca そのか 選べる6種類の衣裳と2種類のケース 2027年版 最新 お雛様 白 おひなさま 雛 今どき",
+          "brand": null,
+          "priceJPY": 42800,
+          "reviewCount": 2997,
+          "rating": 4.74,
+          "url": "https://item.rakuten.co.jp/komari/fleur-0019/?scid=seo-carousel-search"
+        }
+      ]
+    },
+    {
+      "source": "rakuten",
+      "category": "toys_ranking_daily",
+      "url": "https://ranking.rakuten.co.jp/daily/566382/",
+      "blocked": true,
+      "reason": "overload_page",
+      "topItems": []
+    },
+    {
+      "source": "amazon_jp",
+      "category": "toys_bestsellers",
+      "url": "https://www.amazon.co.jp/gp/bestsellers/toys/",
+      "topItems": [
+        {
+          "rank": 1,
+          "title": "バンダイ(BANDAI) ONE PIECEカードゲーム エクストラブースター EAST BLUE 【EB-06】 (BOX)24パック入り",
+          "brand": "バンダイ(BANDAI)",
+          "priceJPY": 5782,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HMZ9WLVZ"
+        },
+        {
+          "rank": 2,
+          "title": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX UX-22 スターター バニッシュルシファー WW",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 2500,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR75ZD4M"
+        },
+        {
+          "rank": 3,
+          "title": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-55 ランダムブースター Vol.12",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 2970,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR87SKKG"
+        },
+        {
+          "rank": 4,
+          "title": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+          "brand": null,
+          "priceJPY": 7216,
+          "reviewCount": 925,
+          "rating": 4.7,
+          "url": "https://www.amazon.co.jp/dp/B0GXCRBL5J"
+        },
+        {
+          "rank": 5,
+          "title": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+          "brand": null,
+          "priceJPY": 7658,
+          "reviewCount": 1728,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0HNVC7X53"
+        },
+        {
+          "rank": 6,
+          "title": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 11450,
+          "reviewCount": 30,
+          "rating": 4.6,
+          "url": "https://www.amazon.co.jp/dp/B0HJ75X3PN"
+        },
+        {
+          "rank": 7,
+          "title": "BEYBLADE X ベイブレードX UX-03 ブースター ウィザードロッド 5-70DB",
+          "brand": null,
+          "priceJPY": 2800,
+          "reviewCount": 703,
+          "rating": 4.8,
+          "url": "https://www.amazon.co.jp/dp/B0CV7D5B6K"
+        },
+        {
+          "rank": 8,
+          "title": "ポケモンカードゲーム MEGA 拡張パック ストームエメラルダ BOX",
+          "brand": null,
+          "priceJPY": 6006,
+          "reviewCount": 1122,
+          "rating": 4.6,
+          "url": "https://www.amazon.co.jp/dp/B0GP928YDZ"
+        },
+        {
+          "rank": 9,
+          "title": "パイロット メルちゃん おせわパーツ おせわいっぱい10てんセット　3歳以上 プレゼント",
+          "brand": null,
+          "priceJPY": 2736,
+          "reviewCount": 819,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B07G3NWFGM"
+        },
+        {
+          "rank": 10,
+          "title": "レゴ(LEGO) シティ アドベントカレンダー 2026 60510 おもちゃ 男の子 女の子 | 玩具 誕生日 クリスマス プレゼント ギフト デコレーション 飾り クリスマスプレゼント クリスマスギフト オーナメント ブロック 知育 5歳 6歳 7歳 8歳 インテリア オシャレ フィギュア グッズ 子供 252ピース",
+          "brand": "レゴ(LEGO)",
+          "priceJPY": 3491,
+          "reviewCount": 844,
+          "rating": 4.7,
+          "url": "https://www.amazon.co.jp/dp/B0GGSTTS1R"
+        },
+        {
+          "rank": 11,
+          "title": "タカラトミー(TAKARA TOMY) HB-BP01 ホロビート カードゲーム 拡張パック 第一弾 ホロビート BOX",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 5132,
+          "reviewCount": 1,
+          "rating": 4,
+          "url": "https://www.amazon.co.jp/dp/B0HBV9344D"
+        },
+        {
+          "rank": 12,
+          "title": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX CX-17 ランダムブースター Vol.10",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 2890,
+          "reviewCount": 119,
+          "rating": 4.1,
+          "url": "https://www.amazon.co.jp/dp/B0GWKWBXH3"
+        },
+        {
+          "rank": 13,
+          "title": "BEYBLADE X ベイブレードX BX-35 ランダムブースター Vol.4",
+          "brand": null,
+          "priceJPY": 3980,
+          "reviewCount": 263,
+          "rating": 3.6,
+          "url": "https://www.amazon.co.jp/dp/B0D6ML5D1N"
+        },
+        {
+          "rank": 14,
+          "title": "タカラトミー(TAKARA TOMY) DM26-SD1 デュエル・マスターズTCG ドキドキつよいデッキ 25の王道",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 2530,
+          "reviewCount": 477,
+          "rating": 4.3,
+          "url": "https://www.amazon.co.jp/dp/B0GR85C99Y"
+        },
+        {
+          "rank": 15,
+          "title": "[Evospace] 双眼鏡【IFデザイン賞受賞】双眼鏡 ライブ用 20倍 望遠鏡 防振 オペラグラス 天空席 ディテールを明瞭に捉えます【SPIE光学技術 + 物理技術防振】広角視野 人間工学に基づく設計&アイカップ クリアで安定した視覚体験 超軽量 コンパクト 手の平サイズ 近視対応 日本語取扱説明書 バードウォッチング/スポーツ観戦用/コンサート用/野鳥観察/卒業コンサート",
+          "brand": null,
+          "priceJPY": 1708,
+          "reviewCount": 416,
+          "rating": 4.6,
+          "url": "https://www.amazon.co.jp/dp/B0H398TMG2"
+        },
+        {
+          "rank": 16,
+          "title": "バンダイ(BANDAI) ガンダムカードゲーム ブースターパック Blazing Fist[GD07] (BOX)24パック入り",
+          "brand": "バンダイ(BANDAI)",
+          "priceJPY": 6019,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HMZL7G11"
+        },
+        {
+          "rank": 17,
+          "title": "マジック：ザ・ギャザリング | ノークティス：深淵の水府 コレクター・ブースター 日本語版（BOX12パック入り）MTG トレカ ウィザーズ・オブ・ザ・コースト NAU D64261400",
+          "brand": null,
+          "priceJPY": 96360,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR7DL7SN"
+        },
+        {
+          "rank": 18,
+          "title": "マジック：ザ・ギャザリング | ノークティス：深淵の水府 コマンダーデッキ 『海に漂う血』 日本語版 MTG トレカ ウィザーズ・オブ・ザ・コースト NAU D64291400",
+          "brand": null,
+          "priceJPY": 14300,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR7R7FHP"
+        },
+        {
+          "rank": 19,
+          "title": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-52 スターター ラスタードラグーン6-60LC",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 2300,
+          "reviewCount": 53,
+          "rating": 4.8,
+          "url": "https://www.amazon.co.jp/dp/B0HJ783F18"
+        },
+        {
+          "rank": 20,
+          "title": "【Amazon.co.jp限定】 シルバニアファミリー 人形 【 赤ちゃんドリームショータイムセット 】 C-75 STマーク認証 3歳以上 おもちゃ ドールハウス Sylvanian Families エポック社 EPOCH",
+          "brand": null,
+          "priceJPY": 1947,
+          "reviewCount": 55,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0DT94Y7N3"
+        },
+        {
+          "rank": 21,
+          "title": "りぶはあと マスコット はむにぎり くろまめ (全長約10cm) ハムスター ぬいどり ふわふわ もちもち 47903-75",
+          "brand": null,
+          "priceJPY": 1760,
+          "reviewCount": 303,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B0HGQVPSFG"
+        },
+        {
+          "rank": 22,
+          "title": "La Kissa 数字 バルーン 誕生日バルーン バースデー 誕生日 飾り付け 王冠付き 40インチ 大きい 風船 約90cm(王冠ブルー,６) | 写真映えする華やかなデザイン・記念撮影やパーティー装飾、サプライズ演出にぴったり・お子様から大人まで幅広く使えるフォトアイテム(王冠ブルー,６)",
+          "brand": null,
+          "priceJPY": 549,
+          "reviewCount": 560,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0DCMWQ6D4"
+        },
+        {
+          "rank": 23,
+          "title": "ポケモンカードゲーム MEGA 30th CELEBRATION カードセット フシギダネ・ヒトカゲ・ゼニガメ",
+          "brand": null,
+          "priceJPY": 1200,
+          "reviewCount": 80,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B0GXCYMRGL"
+        },
+        {
+          "rank": 24,
+          "title": "お前、もしかしてロケット団? (4～6人用 30分～ 10歳以上向け) | 正体隠匿系ボードゲーム",
+          "brand": null,
+          "priceJPY": 2726,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0H4T36DNR"
+        },
+        {
+          "rank": 25,
+          "title": "[バンダイ(BANDAI)] ゴジバースト ゴジラ(2026) 対象年齢 3 才以上 | ゴジラ-0.0",
+          "brand": null,
+          "priceJPY": 2350,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HFM784VC"
+        },
+        {
+          "rank": 27,
+          "title": "マジック：ザ・ギャザリング | ノークティス：深淵の水府 コマンダーデッキ 『取引上手なアザラシ』 日本語版 MTG トレカ ウィザーズ・オブ・ザ・コースト NAU D64291400",
+          "brand": null,
+          "priceJPY": 8230,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR87QYYN"
+        },
+        {
+          "rank": 28,
+          "title": "マテルゲーム(Mattel Game) ウノ(UNO) ウノ カードゲーム パーティーゲーム 2~10人用 7歳から B7696",
+          "brand": "マテルゲーム(Mattel Game)",
+          "priceJPY": 697,
+          "reviewCount": 7822,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B0006334AO"
+        },
+        {
+          "rank": 29,
+          "title": "タカラトミー(TAKARA TOMY) キラ★ガチャシール ぷっくりドロップ DXセット サンリオキャラクターズ",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 4200,
+          "reviewCount": 54,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0HG8D1Q5F"
+        },
+        {
+          "rank": 30,
+          "title": "ポケモンカードゲーム MEGA 30th CELEBRATION カードセット ニャオハ・ホゲータ・クワッス",
+          "brand": null,
+          "priceJPY": 1200,
+          "reviewCount": 45,
+          "rating": 4.2,
+          "url": "https://www.amazon.co.jp/dp/B0GXCT83HB"
+        }
+      ]
+    },
+    {
+      "source": "amazon_jp",
+      "category": "toys_browse",
+      "url": "https://www.amazon.co.jp/toys-games/b?node=13299531",
+      "topItems": [
+        {
+          "rank": 1,
+          "title": "タカラトミー(TAKARA TOMY) HB-SD02 ホロビート カードゲーム スタートデッキ 不死火翔 緑 | 不死火翔",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 1000,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HBW2VWJW"
+        },
+        {
+          "rank": 2,
+          "title": "サンリオ(SANRIO) シール（サンリオシール交換） サンリオキャラクターズ 289604",
+          "brand": "サンリオ(SANRIO)",
+          "priceJPY": 880,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HQP9M3HR"
+        },
+        {
+          "rank": 3,
+          "title": "フジックス FUJIX シャッペスパン 普通地 用 ミシン糸 太さ 60番 200m巻 #403 生成 F56",
+          "brand": null,
+          "priceJPY": 168,
+          "reviewCount": null,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B006YF498Y"
+        },
+        {
+          "rank": 4,
+          "title": "サンリオ(SANRIO) シートカレンダー 2027年 スヌーピー 卓上タイプ 921564",
+          "brand": "サンリオ(SANRIO)",
+          "priceJPY": 693,
+          "reviewCount": null,
+          "rating": 4.8,
+          "url": "https://www.amazon.co.jp/dp/B0HCCTYMF5"
+        },
+        {
+          "rank": 5,
+          "title": "カモ井加工紙(Kamoi Kakoshi) mt マスキングテープ 1P コルク 50mm幅x7m巻 MT5W202",
+          "brand": "カモ井加工紙(Kamoi Kakoshi)",
+          "priceJPY": 564,
+          "reviewCount": null,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0C6KG6277"
+        },
+        {
+          "rank": 6,
+          "title": "サンリオ(SANRIO) オーロラ立体シール シナモロール 対象年齢3才以上 225312",
+          "brand": "サンリオ(SANRIO)",
+          "priceJPY": 748,
+          "reviewCount": null,
+          "rating": 4.7,
+          "url": "https://www.amazon.co.jp/dp/B0H8DMMTNT"
+        },
+        {
+          "rank": 7,
+          "title": "サンリオ(SANRIO) カラーゲルインキボールペンjuice（I Love Hello Kitty） ハローキティ ブラック 341436",
+          "brand": "サンリオ(SANRIO)",
+          "priceJPY": 396,
+          "reviewCount": null,
+          "rating": 4.6,
+          "url": "https://www.amazon.co.jp/dp/B0HF8CMBW5"
+        },
+        {
+          "rank": 8,
+          "title": "ターナー色彩 アクリルガッシュ ホワイト AG020001 20ml(6号)",
+          "brand": null,
+          "priceJPY": 262,
+          "reviewCount": null,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B003BYL4MA"
+        },
+        {
+          "rank": 9,
+          "title": "KAWAGUCHI TK94014 水に強い布用両面テープ 幅10mm 20m巻 | 水洗い可/洗濯可/裾上げ/衣装",
+          "brand": null,
+          "priceJPY": 510,
+          "reviewCount": null,
+          "rating": 4.1,
+          "url": "https://www.amazon.co.jp/dp/B07NPXBD1X"
+        },
+        {
+          "rank": 10,
+          "title": "ニッチプラス(Niche Plus) プラスチックカップ COLD専用 アイス 透明 満杯容量:約350ml 約50個入｜84-12 | プラカップ クリアカップ アイスコーヒー アイスドリンク 試飲 試食 スムージー タピオカ イベント 展示会 パーティー 使い捨て",
+          "brand": "ニッチプラス(Niche Plus)",
+          "priceJPY": 692,
+          "reviewCount": null,
+          "rating": 4.2,
+          "url": "https://www.amazon.co.jp/dp/B0HBJQZS3D"
+        },
+        {
+          "rank": 11,
+          "title": "サクラクレパス 消しゴム アーチ 小学生 学習用 5個 RFAGM-5P",
+          "brand": null,
+          "priceJPY": 499,
+          "reviewCount": null,
+          "rating": 4.6,
+          "url": "https://www.amazon.co.jp/dp/B09688BJN9"
+        },
+        {
+          "rank": 12,
+          "title": "クツワ STAD スポーツなわとび NT010 ブルー 長さ2.7m",
+          "brand": null,
+          "priceJPY": 532,
+          "reviewCount": null,
+          "rating": 4.2,
+          "url": "https://www.amazon.co.jp/dp/B007JAC3FY"
+        },
+        {
+          "rank": 13,
+          "title": "バンダイ(BANDAI) ONE PIECEカードゲーム エクストラブースター EAST BLUE 【EB-06】 (BOX)24パック入り",
+          "brand": "バンダイ(BANDAI)",
+          "priceJPY": 5782,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HMZ9WLVZ"
+        },
+        {
+          "rank": 14,
+          "title": "サンスター文具(Sun-Star Stationery) ボンボンドロップシール 10枚セット",
+          "brand": "サンスター文具(Sun-Star Stationery)",
+          "priceJPY": 5500,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HJPNSGBK"
+        },
+        {
+          "rank": 15,
+          "title": "サンスター文具(Sun-Star Stationery) ディズニー グッズ ボンボンドロップシール ミニ 8枚セット",
+          "brand": "サンスター文具(Sun-Star Stationery)",
+          "priceJPY": 4400,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HJPQRNPN"
+        },
+        {
+          "rank": 16,
+          "title": "サンスター文具(Sun-Star Stationery) サンリオキャラクターズ グッズ ボンボンドロップシール ミニ 8枚セット",
+          "brand": "サンスター文具(Sun-Star Stationery)",
+          "priceJPY": 4400,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HJPQKH6D"
+        },
+        {
+          "rank": 17,
+          "title": "TAMASHII NATIONS METAL BUILD ナイツ&amp;マジック イカルガ 塗装済み可動フィギュア | ABS&amp;PVC&amp;ダイキャスト製 塗装済み可動フィギュア",
+          "brand": null,
+          "priceJPY": 44000,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HPJQ28T7"
+        },
+        {
+          "rank": 18,
+          "title": "TAMASHII NATIONS ROBOT魂 機動武闘伝Gガンダム ボルトガンダム マーシャルアクション | ABS&amp;PVC製 塗装済み可動フィギュア",
+          "brand": null,
+          "priceJPY": 9900,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR4867LW"
+        },
+        {
+          "rank": 19,
+          "title": "TAMASHII NATIONS 超合金 カービィ＆ドラグーン | カービィのエアライダー ABS&amp;ダイキャスト&amp;PVC製 塗装済み可動フィギュア",
+          "brand": null,
+          "priceJPY": 19800,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HR53347V"
+        },
+        {
+          "rank": 20,
+          "title": "タカラトミー(TAKARA TOMY) HB-BP01 ホロビート カードゲーム 拡張パック 第一弾 ホロビート BOX",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 5132,
+          "reviewCount": null,
+          "rating": 4,
+          "url": "https://www.amazon.co.jp/dp/B0HBV9344D"
+        },
+        {
+          "rank": 21,
+          "title": "バンダイ(BANDAI) ガンダムカードゲーム ブースターパック Blazing Fist[GD07] (BOX)24パック入り",
+          "brand": "バンダイ(BANDAI)",
+          "priceJPY": 6019,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0HMZL7G11"
+        },
+        {
+          "rank": 22,
+          "title": "タカラトミー(TAKARA TOMY) キラ★ガチャシール ぷっくりドロップ DXセット サンリオキャラクターズ",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 4200,
+          "reviewCount": null,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0HG8D1Q5F"
+        },
+        {
+          "rank": 23,
+          "title": "バンダイ(BANDAI) ONE PIECEカードゲーム エクストラブースター ONE PIECE Heroines Edition vol.2【EB-05】 (BOX)24パック入り",
+          "brand": "バンダイ(BANDAI)",
+          "priceJPY": 5782,
+          "reviewCount": null,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B0HB3JQ6P4"
+        },
+        {
+          "rank": 24,
+          "title": "タカラトミー 名探偵コナン TCG CT-P11 Case-Booster 11 月下のSHOW TIME! BOX | TAKARA TOMY コナン トレカ カード トレーディングカード",
+          "brand": null,
+          "priceJPY": 4805,
+          "reviewCount": null,
+          "rating": 4.9,
+          "url": "https://www.amazon.co.jp/dp/B0HGD893N5"
+        },
+        {
+          "rank": 25,
+          "title": "タカラトミー デュエル・マスターズ TCG DM26-EX5 デュエマプレイス・コラボパック 「電脳対戦 -WAR OF PLAY&#39;S-」 BOX | TAKARA TOMY デュエルマスターズ DM26EX5 デュエマプレイス",
+          "brand": null,
+          "priceJPY": 6160,
+          "reviewCount": null,
+          "rating": 2.5,
+          "url": "https://www.amazon.co.jp/dp/B0HMZ9729F"
+        },
+        {
+          "rank": 26,
+          "title": "タカラトミー(TAKARA TOMY) ポケットモンスター ポケモン も～っと! ポケなで モンスターボール | 日本おもちゃ大賞2026 キャラクター部門 優秀賞 ポケなでモンスターボール ぽけなで ポケモン図鑑 3言語対応",
+          "brand": "タカラトミー(TAKARA TOMY)",
+          "priceJPY": 7042,
+          "reviewCount": null,
+          "rating": 5,
+          "url": "https://www.amazon.co.jp/dp/B0HG8NWPND"
+        },
+        {
+          "rank": 27,
+          "title": "[BANDAI] [バンダイ DXレジェンドライダーエグズセット03 対象年齢 3 才以上 | 仮面ライダーマイス",
+          "brand": null,
+          "priceJPY": 1281,
+          "reviewCount": null,
+          "rating": 4.7,
+          "url": "https://www.amazon.co.jp/dp/B0HLCKLGXX"
+        },
+        {
+          "rank": 28,
+          "title": "[BANDAI] [バンダイ SUPER BEST 仮面ライダーエグゼイド シリーズ",
+          "brand": null,
+          "priceJPY": 4071,
+          "reviewCount": null,
+          "rating": 4.5,
+          "url": "https://www.amazon.co.jp/dp/B0HDB3Z1SR"
+        },
+        {
+          "rank": 29,
+          "title": "Xross Stars ブースターパック第5弾 『Ignition Vortex』 BOX",
+          "brand": null,
+          "priceJPY": 4882,
+          "reviewCount": null,
+          "rating": 4.4,
+          "url": "https://www.amazon.co.jp/dp/B0HFVWW1RW"
+        },
+        {
+          "rank": 30,
+          "title": "ヴァイスシュヴァルツ ブースターパック BanG Dream! [夢限大みゅーたいぷ] BOX",
+          "brand": null,
+          "priceJPY": 3975,
+          "reviewCount": null,
+          "rating": null,
+          "url": "https://www.amazon.co.jp/dp/B0DNB17RX8"
+        }
+      ]
+    }
+  ],
+  "brandMix": [
+    {
+      "brand": "タカラトミー(TAKARA TOMY)",
+      "count": 12
+    },
+    {
+      "brand": "BEYBLADE X",
+      "count": 7
+    },
+    {
+      "brand": "ベイブレードX",
+      "count": 7
+    },
+    {
+      "brand": "バンダイ(BANDAI)",
+      "count": 5
+    },
+    {
+      "brand": "MEGA",
+      "count": 4
+    },
+    {
+      "brand": "サンリオ(SANRIO)",
+      "count": 4
+    },
+    {
+      "brand": "サンリオキャラクターズ",
+      "count": 4
+    },
+    {
+      "brand": "ポケモンカードゲーム",
+      "count": 4
+    },
+    {
+      "brand": "マジック",
+      "count": 4
+    },
+    {
+      "brand": "CELEBRATION",
+      "count": 3
+    },
+    {
+      "brand": "NAU",
+      "count": 3
+    },
+    {
+      "brand": "ONE",
+      "count": 3
+    },
+    {
+      "brand": "PIECEカードゲーム",
+      "count": 3
+    },
+    {
+      "brand": "ウィザーズ・オブ・ザ・コースト",
+      "count": 3
+    },
+    {
+      "brand": "エクストラブースター",
+      "count": 3
+    },
+    {
+      "brand": "グッズ",
+      "count": 3
+    },
+    {
+      "brand": "ザ・ギャザリング",
+      "count": 3
+    },
+    {
+      "brand": "サンスター文具(Sun-Star Stationery)",
+      "count": 3
+    },
+    {
+      "brand": "ノークティス",
+      "count": 3
+    },
+    {
+      "brand": "ホロビート",
+      "count": 3
+    },
+    {
+      "brand": "ボンボンドロップシール",
+      "count": 3
+    },
+    {
+      "brand": "ミニ",
+      "count": 3
+    },
+    {
+      "brand": "塗装済み可動フィギュア",
+      "count": 3
+    },
+    {
+      "brand": "深淵の水府",
+      "count": 3
+    },
+    {
+      "brand": "Blazing",
+      "count": 2
+    },
+    {
+      "brand": "DXセット",
+      "count": 2
+    },
+    {
+      "brand": "EAST BLUE",
+      "count": 2
+    },
+    {
+      "brand": "Fist",
+      "count": 2
+    },
+    {
+      "brand": "HB-BP01",
+      "count": 2
+    },
+    {
+      "brand": "MTG",
+      "count": 2
+    },
+    {
+      "brand": "Paradise",
+      "count": 2
+    },
+    {
+      "brand": "TAKARA TOMY",
+      "count": 2
+    },
+    {
+      "brand": "Tamagotchi",
+      "count": 2
+    },
+    {
+      "brand": "TAMASHII NATIONS",
+      "count": 2
+    },
+    {
+      "brand": "TCG",
+      "count": 2
+    },
+    {
+      "brand": "ガチャシール",
+      "count": 2
+    },
+    {
+      "brand": "ガンダムカードゲーム",
+      "count": 2
+    },
+    {
+      "brand": "キラ",
+      "count": 2
+    },
+    {
+      "brand": "コマンダーデッキ",
+      "count": 2
+    },
+    {
+      "brand": "コンパクト",
+      "count": 2
+    }
+  ],
+  "reviews": [
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "This is Pokémon’s best set this year. We love all the cards in this set especially all the 30th Pikachus. The Japanese MEGA Expansion Pack 30th CELEBRATION is a premium set of 103 main cards that offers good value for collectors, ensuring an all-holo layout with a specialized artist-driven Pikachu and a basic foil energy inside every single six-card pack. These packs contains lots of hits, making the pull rates for the elusive cards or the legendary gold-bordered retro reprints highly rewarding. It’s just a fun set and hope to be able to get more.",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "Best and most fun pkmn product to open since a very long time! Buy if u can!",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "I used Amazon.com for the first time to purchase Pokémon 30th Anniversary cards, and it was an amazing experience! Everything was perfect, and I'm extremely satisfied with my purchase. Thank you so much!",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "ほんと最高。1パックにピカチュウ 確定はやばい！しかもみんな可愛い！ ありがとう株ポケ！",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "And on time & in perfect condition, was very excited to open!! Preordered months ago and it really came, definitely recommend seller to everyone , no problems at all deff will be buying again",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "excellent package, and consistent with description.",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "初ボックスでした✨ 早い配送でとっても嬉しかったです^ ^ 開けるの楽しみです♪",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 4,
+      "text": "Thank you for the invitation. I was very happy with the chance you gave me, to get this booster box. I am not very happy however with how you send it to me. It was placed, not in a average box with protective material in it, but in a simple cardboard box, in wich you would usually send a book. So my booster box is dented/damaged a bit that way.",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "Professional company with good reputation. They’ve amended issues I had with an order I received promptly and communicated effectively. Will shop again",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "First these are the Japanese version of the cards if you want the English version this is not it. The box came sealed and un opened and has the correct amount of packs. The are authentic 30th anniversary packs but they are not the English version. They come in a sealed unopened box as pictured and they are great as gifts for your family Pokémon enthusiasts.",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "Legit, Had some good pulls",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "100% authentic and sealed. Weigh between 0.240 kg to 0 243 kg",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "Japanese edition of the expansion collection! Arrived earlier than expected and in perfect condition!",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "孫のリクエストに応えた誕生日プレゼントでした。色も指定されてましたので、超お気に入りの様で、毎日楽しんでくれているようです。 娘も、昔のとは全然違って楽しみ方ごたくさんあるとのとこでした。",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "子供が楽しく遊んでいます",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "通信もできるし、ミニゲームもついてていい！ 育てるのが楽しすぎる！",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 4,
+      "text": "安く買えただけで十分。 子供大喜び。",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "買うか迷って買いました。 大人子供関係なしに楽しいです。",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "Nice product. I bought it as a gift for my 10yr old daughter and she really love it .",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "fast delivery, items properly packed. Tamagotchi is fun, with new functions and a lot more variations of tamagotchi to raise. Much easier to care compared to gen 1. Bonus when you have a friend to play together.",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 4,
+      "text": "子どもが楽しく育てています。お誕生日プレゼントにしました。",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "Three words. “YES” I received it as a present and I love it. The characters are so cute",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "El mejor producto del mundo Att: Arita Perez",
+      "lang": "es"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "Great but the packaging and instructions are completely in Japanese! Maybe that’s. Good think for some, but just caught me off guard. I bought a newer one on Amazon a month ago and wanted a second. That one had different packaging and had English and other languages. Everything else is the same. These also require AAA batteries that aren’t provided.",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "This was my first entry into tamagotchi paradise, and I'm in love with the colorway, and the forest biome is my favorite. However something to note, this device is sort of mid generation, not gen1 and not gen2, but rather a mix sort of some from one and some from the other. It doesn't share the same new content as the new generation devices, but still can connect with either generation for playdates and certain gifts. No multiplayer minigames sadly though. It's still my favorite of my two devices!",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "[バンダイ(BANDAI)] Tamagotchi Paradise - Neon Planets 対象年齢 6 才以上 | たまごっちパラダイス",
+      "rating": 5,
+      "text": "Very cute and fun, and keeps you entertained :) arrived 3 days earlier too!",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "Package arrived with great care from DHL Express as always! This is the best deal anyone could have for Beyblade X! If you can find it, I would recommend it for your first purchase as a beginner in Beyblade X!",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "Amazing, the aero pegasus and the knight shield v2 are amazing, meta contender. The arena is beautiful. If you wanna start playing with beys you need this💪🏽",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "excellent",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "Very good",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "GOOD",
+      "lang": "en"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "とても良い",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "タカラトミー(TAKARA TOMY) BEYBLADE X ベイブレードX BX-53 オールインワンセット",
+      "rating": 5,
+      "text": "過去のレアベイが入っているのがとても良かった",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+      "rating": 4,
+      "text": "想像より大きかったですが、2歳の子供が楽しく遊んでおりよかったです。1番高いストーンは足の踏み場が小さく1人では乗れないようです。色もとても良かったのですが、ストーンの裏に謎の黒いものが付いており、いい気持ちはしませんでした。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+      "rating": 5,
+      "text": "体を動かすことが好きな2歳の子の誕生日プレゼントに選びました。家にあるトランポリンなども使ってサーキット状にしてグルグル回って楽しそうです。特に6歳の子が気に入って自分で並び替えたりして遊んでいます。 床との相性も良く滑らず ズレません。 遊び終わったらふたりで重ねて片付けてくれるので 使わない時にごちゃごちゃしないのも良いです。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+      "rating": 5,
+      "text": "思ったより大きくてびっくりしましたが、2歳になる子供も大喜びで遊んでます！買ってよかったです！",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+      "rating": 4,
+      "text": "無事に届きました、早速自分で並べて遊んでいます。ありがとうございました。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+      "rating": 5,
+      "text": "孫のリクエストでクリスマスプレゼントとして購入しました。箱に穴のような凹みがあり、中を確認。内側に穴はなく、品物も大丈夫でした。孫も喜ぶと思います。 お忙しい中、迅速な対応をして頂き感謝です。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+      "rating": 5,
+      "text": "不具合もなく商品の状態は良好でした。 使っていると紐がすぐ絡まるのが大変ではあります。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+      "rating": 5,
+      "text": "孫へのプレゼントで購入しました。 とても楽しんでました。 紐の繋ぎ目がすぐ切れてしまうのが残念でした。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+      "rating": 5,
+      "text": "小学5年生の息子へのプレゼントでした。普段ゲームで遊んでいるのでおもちゃはすぐに飽きちゃうかなと思いましたが、意外とハマったようで気づくと手に取って遊んでいます。紐が絡まってしまう時もありますが、自分でほどいてまた遊んでくれています。10日ほど遊んでいますが、紐が切れることはまだありません。プレゼント用のラッピングセットも無料であったのでとてもありがたかったです。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+      "rating": 5,
+      "text": "まだ遊んでいませんが楽しみです！箱はきれいな状態でした",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+      "rating": 4,
+      "text": "思っていたより重量（疲れるほど重くはない）があってしっかりとした作りでした。 子供達にはお披露目していませんが、これからのシーズンにパーティーなどで皆んなで楽しめそうです。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "＼思い出の一枚を／日本企画製品 オリジナルフレーム カメラ 子供用 デジタルカメラ 1080p録画自撮り 32GBSDカード付 キッズカメラ トイカメラ 子供カメラ 知育玩具 女の子 プレゼント 誕生日 クリスマス おもちゃ",
+      "rating": 4,
+      "text": "娘の誕生日プレゼントに購入しました。カラーも可愛く、ゲームもできてとても気に入っています。が、なぜかインカメラで撮るとキレイに撮れるのに、アウトカメラで撮るとピンクのモヤ？みたいなものがかかってしまって全然キレイに撮れません。動画も同様アウトカメラではきれいに撮れないです。出かける度に持っていきたがるのですがアウトカメラが上手く撮れないのでインカメラの自撮りばかりになってしまっています(;_;)カメラ自体はとても気に入っているのでキレイに撮れるようになるといいのですが…。 追記です。 アウトカメラの件ですぐにメールをいただき、交換していただけました。今度はしっかりキレイに撮影できています！娘もとても喜んでいます。連休明けすぐに迅速な対応をしていただきありがとうございました。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "＼思い出の一枚を／日本企画製品 オリジナルフレーム カメラ 子供用 デジタルカメラ 1080p録画自撮り 32GBSDカード付 キッズカメラ トイカメラ 子供カメラ 知育玩具 女の子 プレゼント 誕生日 クリスマス おもちゃ",
+      "rating": 4,
+      "text": "クリスマスプレゼントとして買いました。充電の接続部が少しズレていて、充電する時に少し手こずりましたが、安いしこんなものか…と。充電は問題なくできました。(初期不良に対し、ご対応頂きました。)物自体は、4歳でも使いこなせて、喜んで使ってくれていました！しかし、使い始めて数日で内カメラのレンズがズレてしまったのか、写らなくなってしまいました。価格もやすいので仕方ないのかなあと思いますか、悲しかったです。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "＼思い出の一枚を／日本企画製品 オリジナルフレーム カメラ 子供用 デジタルカメラ 1080p録画自撮り 32GBSDカード付 キッズカメラ トイカメラ 子供カメラ 知育玩具 女の子 プレゼント 誕生日 クリスマス おもちゃ",
+      "rating": 4,
+      "text": "初めての自分専用のカメラにニッコニコ 子供の世界観に癒されてます",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "＼思い出の一枚を／日本企画製品 オリジナルフレーム カメラ 子供用 デジタルカメラ 1080p録画自撮り 32GBSDカード付 キッズカメラ トイカメラ 子供カメラ 知育玩具 女の子 プレゼント 誕生日 クリスマス おもちゃ",
+      "rating": 5,
+      "text": "子供のクリスマスプレゼントに購入しました。パッケージの破損などなく、簡単に使い始められてよかったです。",
+      "lang": "ja"
+    },
+    {
+      "source": "rakuten",
+      "productTitle": "＼思い出の一枚を／日本企画製品 オリジナルフレーム カメラ 子供用 デジタルカメラ 1080p録画自撮り 32GBSDカード付 キッズカメラ トイカメラ 子供カメラ 知育玩具 女の子 プレゼント 誕生日 クリスマス おもちゃ",
+      "rating": 4,
+      "text": "クリスマスプレゼントとして購入。プレゼントなのでまだ中身は開けていませんが、子供が、この色デザイン一択で、可愛くて一目惚れして購入を決めました。 お値段もとてもお得でした。 小さいことなのですが、子どものクリスマスプレゼント（サンタ）としての購入だったので、箱の状態が少し良くなかった点だけ残念でした。 箱も綺麗な状態だとより嬉しいです。",
+      "lang": "ja"
+    }
+  ],
+  "blocked": [
+    {
+      "source": "rakuten",
+      "category": "toys_ranking_daily",
+      "url": "https://ranking.rakuten.co.jp/daily/566382/",
+      "blocked": true,
+      "reason": "overload_page"
+    }
+  ],
+  "reviewStatus": [
+    {
+      "source": "amazon_jp",
+      "itemsTried": 6,
+      "collected": 33,
+      "reason": null
+    },
+    {
+      "source": "rakuten",
+      "itemsTried": 6,
+      "collected": 15,
+      "reason": null,
+      "skipped": 3,
+      "lastError": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://item.rakuten.co.jp/book/18646529/?variantId=18646529&scid=seo-carousel-search"
+    }
+  ],
+  "notes": [
+    "rakuten api: RAKUTEN_APP_ID not set",
+    "apify not used for https://ranking.rakuten.co.jp/daily/566382/: apify error: This Actor requires full access to your account. You must approve its permissions before running it: https://console.apify.com/actors/YrQuEkowkNCLdk4j2?approvePermissions=true"
+  ]
+}

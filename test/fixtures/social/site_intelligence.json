@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-11-16T00:00:00.000Z",
+  "brandSlug": "toysrus-jp-test",
+  "brands": [
+    { "id": "toysrus-jp-test", "name": "Toys R Us Japan", "url": "https://www.toysrus.co.jp/", "role": "target",
+      "structuredData": { "navNames": [], "types": ["Organization"], "socialLinks": [
+        "https://x.com/toysrus_jp_test",
+        "https://www.instagram.com/toysrus_jp_test/",
+        "https://www.youtube.com/@toysrusjptest",
+        "https://line.me/R/ti/p/@toysrusjptest",
+        "https://ja.wikipedia.org/wiki/Test"
+      ] } },
+    { "id": "kiddy-land-test", "name": "Kiddy Land Test", "url": "https://www.kiddyland.co.jp", "role": "competitor",
+      "structuredData": { "socialLinks": ["https://twitter.com/kiddyland_test?ref_src=twsrc", "https://lin.ee/AbCdEf1"] } }
+  ]
+}

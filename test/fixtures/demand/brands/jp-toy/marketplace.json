@@ -1,0 +1,11 @@
+{ "generatedAt": "2026-11-16T00:00:00.000Z", "market": "JP", "sources": ["amazon_jp", "rakuten"],
+  "categories": [
+    { "source": "amazon_jp", "category": "おもちゃ > 知育玩具の売れ筋ランキング", "url": "https://example.invalid/a", "topItems": [ { "rank": 1, "title": "木製パズル 2歳", "brand": "BrandA", "priceJPY": 1980, "reviewCount": 812, "rating": 4.5, "url": "https://example.invalid/p1" } ] },
+    { "source": "rakuten", "category": "ブロック", "url": "https://example.invalid/b", "topItems": [] },
+    { "source": "rakuten", "category": "Toys", "url": "https://example.invalid/c", "topItems": [] }
+  ],
+  "brandMix": [ { "brand": "BrandA", "count": 12 }, { "brand": "BrandB", "count": 7 } ],
+  "reviews": [
+    { "source": "rakuten", "productTitle": "木製パズル 2歳", "rating": 5, "text": "孫の誕生日に購入。とても喜んでいました。", "lang": "ja" },
+    { "source": "amazon_jp", "productTitle": "ブロックセット", "rating": 2, "text": "箱が潰れて届いた。プレゼント用なので残念。", "lang": "ja" }
+  ] }

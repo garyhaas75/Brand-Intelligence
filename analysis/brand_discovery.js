@@ -14,6 +14,8 @@
 
 require('dotenv').config();
 const { chromium } = require('playwright');
+const { isJapanMarket } = require('../utils/market');
+const runLock = require('../utils/run_lock');
 const Anthropic = require('@anthropic-ai/sdk');
 const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/models');
 const fs = require('fs');
@@ -98,8 +100,57 @@ async function scrapeHomepage(url) {
   return data;
 }
 
-async function researchLocalCompetitors(anthropic, brandName, industry, market) {
+// Verified seed lists by market and industry. A seed is a curated, URL-checked
+// list that goes ahead of the model's own pre-research, because a model asked
+// for local retailer domains from memory guesses wrong ones. Add a row per
+// market; never patch a single retailer into the prompt instead.
+let jpSeed = null;
+try { jpSeed = require('../scrapers/jp_competitors'); } catch { /* optional */ }
+const COMPETITOR_SEEDS = [
+  {
+    market: 'Japan',
+    industry: /toy|baby|kid|hobby|おもちゃ|玩具|ベビー|キッズ|ホビー|ザらス/i,
+    list: targetUrl => (jpSeed ? jpSeed.jpCompetitorsFor(targetUrl) : []),
+  },
+];
+
+function seedCompetitorsFor(market, industryText, targetUrl) {
+  const out = [];
+  for (const seed of COMPETITOR_SEEDS) {
+    if (seed.market !== market || !seed.industry.test(industryText || '')) continue;
+    for (const c of seed.list(targetUrl)) {
+      if (c.type === 'target') continue;
+      out.push({ name: c.name, nameLocal: c.nameJa || undefined, url: c.url, type: c.type, seeded: true });
+    }
+  }
+  return out;
+}
+
+function hostOf(u) {
+  try { return new URL(u).hostname.replace(/^www\./i, '').toLowerCase(); } catch { return ''; }
+}
+
+/** Seeds first, then model results whose host is not already present. */
+function mergeCompetitorLists(seeded, researched) {
+  const seen = new Set(seeded.map(c => hostOf(c.url)).filter(Boolean));
+  const extra = (researched || []).filter(c => {
+    const h = hostOf(c && c.url);
+    if (!h || seen.has(h)) return false;
+    seen.add(h);
+    return true;
+  });
+  return [...seeded, ...extra];
+}
+
+async function researchLocalCompetitors(anthropic, brandName, industry, market, targetUrl = '', industryHints = '') {
   if (!market || market === 'Global') return [];
+  const seeded = seedCompetitorsFor(market, `${industry} ${industryHints}`, targetUrl);
+  if (seeded.length) log(`  ${seeded.length} verified seed competitors for ${market}`);
+  const researched = await researchLocalCompetitorsWithModel(anthropic, brandName, industry, market);
+  return mergeCompetitorLists(seeded, researched);
+}
+
+async function researchLocalCompetitorsWithModel(anthropic, brandName, industry, market) {
   log(`  Pre-researching local ${industry} ecommerce competitors in ${market}...`);
   try {
     const msg = await anthropic.messages.create({
@@ -108,12 +159,13 @@ async function researchLocalCompetitors(anthropic, brandName, industry, market) 
       messages: [{ role: 'user', content:
         `List all known ${industry} retailers that have an ACTIVE ECOMMERCE WEBSITE serving customers in ${market}.
 Brand context: This research is for a brand named "${brandName}" in the ${industry} industry.
+The brand name and industry above may be written in any language or script (for example Japanese). Read them in that language.
 
 ONLY include businesses that:
 - Sell products ONLINE via a working ecommerce website with a shopping cart
 - Actively deliver to customers in ${market}
 - Are general ${industry} RETAILERS (sell multiple brands/products, not just one)
-- Have a local website or local domain (e.g. brand.lb, brand.ae) if one exists
+- Have a local website or local domain (e.g. brand.lb, brand.ae, brand.co.jp, brand.jp) if one exists
 
 DO NOT include:
 - Entertainment venues, theme parks, or experience centers
@@ -122,9 +174,9 @@ DO NOT include:
 - Global brands that have no confirmed local ecommerce presence in ${market}
 - Businesses whose websites you are not confident about
 
-For each, provide: name, website URL (use local domain if it exists), and type.
+For each, provide: name, website URL (use local domain if it exists), and type. Give "name" in the form commonly used in English, and "nameLocal" in the local script when it differs (for example Japanese), otherwise omit it.
 Return ONLY a JSON array with no other text:
-[{ "name": "...", "url": "https://...", "type": "ecommerce|both" }]
+[{ "name": "...", "nameLocal": "...", "url": "https://...", "type": "ecommerce|both" }]
 If you are not confident about a URL, omit that entry rather than guess.
 List up to 12 businesses.` }]
     });
@@ -149,7 +201,8 @@ async function discoverWithClaude(scraped, slug) {
   try {
     const hostname = new URL(scraped.url).hostname;
     const tld = hostname.split('.').slice(-1)[0];
-    const tldMap = { lb: 'Lebanon', ae: 'UAE', sa: 'Saudi Arabia', eg: 'Egypt', jo: 'Jordan', kw: 'Kuwait', qa: 'Qatar', bh: 'Bahrain', om: 'Oman', uk: 'United Kingdom', au: 'Australia', ca: 'Canada', de: 'Germany', fr: 'France', in: 'India', sg: 'Singapore' };
+    const tldMap = { lb: 'Lebanon', ae: 'UAE', sa: 'Saudi Arabia', eg: 'Egypt', jo: 'Jordan', kw: 'Kuwait', qa: 'Qatar', bh: 'Bahrain', om: 'Oman', uk: 'United Kingdom', au: 'Australia', ca: 'Canada', de: 'Germany', fr: 'France', in: 'India', sg: 'Singapore', jp: 'Japan' };
+    // tld is the last label, so second-level forms like .co.jp and .ne.jp map via jp.
     if (tldMap[tld]) { detectedMarket = tldMap[tld]; tldHint = `URL TLD (.${tld}) strongly suggests this brand operates in: ${tldMap[tld]}`; }
   } catch {}
 
@@ -158,14 +211,17 @@ async function discoverWithClaude(scraped, slug) {
   const roughIndustry = scraped.navCategories.slice(0, 5).join(', ') || scraped.title || slug.replace(/-/g, ' ') || 'retail';
   // Extract rough brand name from URL for context
   const roughBrandName = scraped.title || new URL(scraped.url).hostname.replace(/^www\./, '').split('.')[0];
-  const localCompetitors = detectedMarket ? await researchLocalCompetitors(anthropic, roughBrandName, roughIndustry, detectedMarket) : [];
+  // Slug and host go along as industry hints for seed matching: a bot wall
+  // replaces the title with "Attention Required!", but the slug survives.
+  const industryHints = `${slug || ''} ${(() => { try { return new URL(scraped.url).hostname; } catch { return ''; } })()}`;
+  const localCompetitors = detectedMarket ? await researchLocalCompetitors(anthropic, roughBrandName, roughIndustry, detectedMarket, scraped.url, industryHints) : [];
   const localCompetitorContext = localCompetitors.length > 0
-    ? `\nKNOWN LOCAL COMPETITORS IN ${detectedMarket} (pre-researched — use these as your primary source for identifiedCompetitors):\n${localCompetitors.map(c => `- ${c.name} (${c.type}): ${c.url}`).join('\n')}\n`
+    ? `\nKNOWN LOCAL COMPETITORS IN ${detectedMarket} (pre-researched; use these as your primary source for identifiedCompetitors):\n${localCompetitors.map(c => `- ${c.name}${c.nameLocal ? ` / ${c.nameLocal}` : ''} (${c.type})${c.seeded ? ' [URL verified]' : ''}: ${c.url}`).join('\n')}\n`
     : '';
 
   const prompt = `You are a brand intelligence analyst. Analyze the following data scraped from a brand's homepage and return a JSON profile.
 
-SCRAPED HOMEPAGE DATA:
+SCRAPED HOMEPAGE DATA (may be in any language or script, for example Japanese; read it in its own language and do not treat non-Latin text as missing data):
 URL: ${scraped.url}
 ${tldHint ? `Geographic signal: ${tldHint}` : ''}
 Page title: ${scraped.title}
@@ -241,6 +297,8 @@ const SCRIPT_TO_MODULE = {
   'search_seo.js': 'search_seo',
   'personas.js': 'personas',
   'action_plan.js': 'action_plan',
+  '../scrapers/marketplace_jp.js': 'marketplace',
+  'jp_demand.js': 'jp_demand',
 };
 
 // The output file each module writes when it finishes.
@@ -325,6 +383,82 @@ function spawnModule(script, slug, extraArgs = []) {
   }
 }
 
+/**
+ * Run one module to completion and report its exit code. Unlike spawnModule (fire and forget),
+ * this lets a phased run wait for a step before starting the ones that read its output.
+ */
+function runModule(script, slug, extraEnv = {}) {
+  return new Promise(resolve => {
+    const moduleName = SCRIPT_TO_MODULE[script] || script.replace('.js', '');
+    let stdio = 'ignore';
+    try {
+      const brandDir = path.join(DATA_DIR, 'brands', slug);
+      ensureDir(brandDir);
+      const logFd = fs.openSync(path.join(brandDir, `${moduleName}.log`), 'a');
+      stdio = ['ignore', logFd, logFd];
+    } catch (err) { log(`WARN: no log file for ${moduleName}: ${err.message}`); }
+    log(`Starting: ${script} --slug=${slug}`);
+    const closeLog = () => { if (Array.isArray(stdio)) { try { fs.closeSync(stdio[1]); } catch (_) {} } };
+    // A module that never exits (a browser left open, a hung request) must not stall the phases
+    // behind it. Deadline per module, then SIGTERM, then SIGKILL, recorded as 'timeout'.
+    const limitMs = (Number(process.env.BI_MODULE_TIMEOUT_MIN) > 0 ? Number(process.env.BI_MODULE_TIMEOUT_MIN) : 45) * 60 * 1000;
+    try {
+      const child = spawn('node', [path.join(__dirname, script), `--slug=${slug}`], {
+        env: { ...process.env, ...extraEnv }, cwd: path.join(__dirname, '..'), stdio,
+      });
+      let done = false, timedOut = false;
+      const finish = result => { if (done) return; done = true; clearTimeout(timer); closeLog(); resolve(result); };
+      const timer = setTimeout(() => {
+        timedOut = true;
+        log(`WARN: ${script} exceeded ${limitMs / 60000} min, stopping it (progress is checkpointed)`);
+        try { child.kill('SIGTERM'); } catch (_) {}
+        setTimeout(() => { try { child.kill('SIGKILL'); } catch (_) {} }, 10000).unref();
+      }, limitMs);
+      child.on('error', err => { log(`ERROR: ${script} failed to start: ${err.message}`); finish(-1); });
+      child.on('exit', code => { log(`Finished: ${script} exit ${timedOut ? 'timeout' : code}`); finish(timedOut ? 'timeout' : code); });
+    } catch (err) { log(`ERROR: failed to spawn ${script}: ${err.message}`); closeLog(); resolve(-1); }
+  });
+}
+
+/**
+ * Japan refresh-all. The legacy path starts everything at once, which is wrong for modules that
+ * read another module's output (personas reads search_seo, marketplace and demand; social reads
+ * the site scrape's structured links). Phases run in dependency order, a failed step never stops
+ * the later ones, and each module resumes from its own checkpoint on a re-run.
+ */
+async function runJapanPhased(slug) {
+  if (!runLock.acquire(slug, 'phased')) {
+    log(`Another run is already active for ${slug}, not starting a second one`);
+    return;
+  }
+  process.on('exit', () => runLock.release(slug));
+  const startedAt = new Date().toISOString();
+  const phases = [
+    { name: 'collect', scripts: ['website_audit.js', '../scrapers/marketplace_jp.js', 'jp_demand.js'], env: {} },
+    { name: 'analyse', scripts: ['social_audit.js', 'competitive_analysis.js', 'search_seo.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
+    { name: 'personas', scripts: ['personas.js'], env: {} },
+    { name: 'plan', scripts: ['action_plan.js'], env: {} },
+  ];
+  const summary = { slug, startedAt, phases: [] };
+  const write = () => { try { fs.writeFileSync(path.join(DATA_DIR, 'brands', slug, '_run_summary.json'), JSON.stringify({ ...summary, updatedAt: new Date().toISOString() }, null, 2)); } catch (_) {} };
+  for (const phase of phases) {
+    log(`Phase ${phase.name}: ${phase.scripts.join(', ')}`);
+    summary.phases.push({ name: phase.name, scripts: phase.scripts, startedAt: new Date().toISOString(), exit: null });
+    write();
+    const codes = await Promise.all(phase.scripts.map((s, i) => new Promise(r => setTimeout(r, i * 5000)).then(() => runModule(s, slug, phase.env))));
+    const rec = summary.phases[summary.phases.length - 1];
+    rec.exit = Object.fromEntries(phase.scripts.map((s, i) => [s, codes[i]]));
+    rec.finishedAt = new Date().toISOString();
+    write();
+    const failed = phase.scripts.filter((s, i) => codes[i] !== 0);
+    if (failed.length) log(`WARN: phase ${phase.name} had failures: ${failed.join(', ')}. Continuing; re-run resumes from checkpoints.`);
+  }
+  summary.finishedAt = new Date().toISOString();
+  write();
+  runLock.release(slug);
+  log('Japan refresh-all finished');
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const slugArg = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
@@ -339,6 +473,10 @@ async function run() {
 
   if (refreshAll) {
     log(`Re-running all modules for slug: ${slugArg}`);
+    try {
+      const prof = JSON.parse(fs.readFileSync(path.join(brandDir, 'profile.json'), 'utf8'));
+      if (isJapanMarket(prof)) { await runJapanPhased(slugArg); return; }
+    } catch (err) { log(`WARN: could not read profile to choose run mode (${err.message}), using the standard run`); }
     const scripts = ['competitive_analysis.js', 'social_audit.js', 'website_audit.js', 'search_seo.js', 'personas.js'];
     const startedAt = Date.now();
     scripts.forEach(s => spawnModule(s, slugArg));
@@ -434,4 +572,4 @@ async function run() {
 // required and tested without kicking off a real discovery run.
 if (require.main === module) run();
 
-module.exports = { runActionPlanWhenReady, SCRIPT_TO_OUTPUT };
+module.exports = { runActionPlanWhenReady, SCRIPT_TO_OUTPUT, seedCompetitorsFor, mergeCompetitorLists };

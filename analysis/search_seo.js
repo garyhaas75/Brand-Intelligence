@@ -338,9 +338,37 @@ async function scrapeMultiplePages(urlGroups) {
 
 // ─── Keyword universe ─────────────────────────────────────────────────────────
 
-async function generateKeywordUniverse(anthropic, profile, onPageSeo, competitorSeos) {
-  const targetNav = (loadBrandData(profile.slug || '', 'site_intelligence.json')?.brands?.find(b => b.role === 'target')?.featuredCategories || []).slice(0, 20);
-  const competitorNavs = competitorSeos.flatMap(c => c.h2s || []).slice(0, 20);
+// ─── Japan market support ─────────────────────────────────────────────────────
+//
+// Japanese shoppers search in Japanese, on google.co.jp, and AI assistants are asked in
+// Japanese. Running the English flow against a .jp site measures a market that does not exist.
+// Every helper below returns null / '' for non-Japan profiles so those runs are unchanged.
+
+const { isJapanMarket } = require('../utils/market');
+
+// SerpAPI parameters for localized Google results. Null means "no localization", which is the
+// pre-existing behavior for every non-Japan market.
+function serpParamsFor(profile) {
+  if (!isJapanMarket(profile)) return null;
+  return { engine: 'google', gl: 'jp', hl: 'ja', google_domain: 'google.co.jp' };
+}
+
+// TODO(yahoo-japan): Yahoo! Japan (search.yahoo.co.jp) is a large share of Japanese search.
+// Its organic results are served from Google's index, so google.co.jp ranks are a close proxy.
+// SerpAPI's documented Yahoo engine targets yahoo.com domains; a Yahoo! Japan engine has not been
+// confirmed for the provider in use, so no Yahoo! Japan lookup is made. Add it here as a second,
+// labelled engine entry once the provider documents support.
+
+const JAPAN_KEYWORD_ADDENDUM = (market) => `
+
+JAPANESE MARKET RULES (this overrides the English examples above):
+- Write every term in Japanese exactly as a Japanese shopper types it into google.co.jp: kanji, hiragana and katakana as natives use them, with Latin letters only where natives type them (brand names such as "LEGO" or "トミカ" as commonly written).
+- Local intent uses Japanese patterns: "近く", "店舗", "営業時間", "通販", "送料無料", "当日配送", prefecture and city names such as "東京", "大阪", "横浜".
+- Occasions follow the Japanese calendar: クリスマス, 誕生日, 入学祝い, こどもの日, お年玉, 出産祝い.
+- Do NOT append "${market}" or "日本" to terms, for the same reason given above.
+- Add one more top-level key, "glosses": an object mapping every Japanese term you returned to a short English gloss, for example {"おもちゃ 3歳 男の子": "toys for 3 year old boy"}.`;
+
+function buildKeywordUniversePrompt(profile, { targetNav = [], competitorNavs = [], onPageSeo = {} } = {}) {
   const market = profile.market || 'their market';
 
   const prompt = `Generate a comprehensive keyword research list (150-200 terms total) for ${profile.name}, a ${profile.industry} brand operating in ${market}.
@@ -370,10 +398,20 @@ IMPORTANT, how people in ${market} actually search:
 Do NOT append "${market}" to terms. Someone in ${market} searching for LEGO types "lego", not "lego ${market}". Adding the country name is how a person OUTSIDE the market searches, or how an export site is found, and those terms carry almost no domestic volume. This site already targets ${market} through its domain and Google's own location signals.
 Express local intent the way locals do instead: "near me", "open now", "delivery", "click and collect", and city, state or suburb names. A country name belongs in a term only when a shopper would genuinely type it, such as a query about shipping or availability from abroad. Keep at most 2 such terms in total across every category.`;
 
+  return isJapanMarket(profile) ? prompt + JAPAN_KEYWORD_ADDENDUM(market) : prompt;
+}
+
+async function generateKeywordUniverse(anthropic, profile, onPageSeo, competitorSeos) {
+  const targetNav = (loadBrandData(profile.slug || '', 'site_intelligence.json')?.brands?.find(b => b.role === 'target')?.featuredCategories || []).slice(0, 20);
+  const competitorNavs = competitorSeos.flatMap(c => c.h2s || []).slice(0, 20);
+  const japan = isJapanMarket(profile);
+  const prompt = buildKeywordUniversePrompt(profile, { targetNav, competitorNavs, onPageSeo });
+
   try {
     const msg = await anthropic.messages.create({
       model: MODEL_FAST,
-      max_tokens: 5000,
+      // Japanese output carries an English gloss per term, roughly doubling the tokens.
+      max_tokens: japan ? 10000 : 5000,
       output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -382,6 +420,14 @@ Express local intent the way locals do instead: "near me", "open now", "delivery
     const end = raw.lastIndexOf('}');
     if (start !== -1 && end !== -1) {
       const parsed = JSON.parse(raw.slice(start, end + 1));
+      if (japan) {
+        // Glosses are metadata, not terms: keep them out of the category count.
+        const glosses = parsed.glosses && typeof parsed.glosses === 'object' ? parsed.glosses : {};
+        delete parsed.glosses;
+        const totalCount = Object.values(parsed).flat().length;
+        log(`Keyword universe (Japanese): ${totalCount} terms across ${Object.keys(parsed).length} categories, ${Object.keys(glosses).length} glosses`);
+        return { ...parsed, glosses, language: 'ja', totalCount };
+      }
       const totalCount = Object.values(parsed).flat().length;
       log(`Keyword universe: ${totalCount} terms across ${Object.keys(parsed).length} categories`);
       return { ...parsed, totalCount };
@@ -489,24 +535,93 @@ Rules:
 
 // ─── GEO analysis ─────────────────────────────────────────────────────────────
 
-function analyzeAgentResponse(response, brandName, competitorNames) {
+// opts is Japan-only: brandAliases (how the brand is written in Japanese), competitorAliases
+// ({ canonicalName: [aliases] }) and japanese (sentence breaks and sentiment words). With no
+// opts this is the original English matcher.
+function analyzeAgentResponse(response, brandName, competitorNames, opts = {}) {
   if (!response) return { brandMentioned: false, mentionPosition: null, sentiment: 'not_mentioned', competitorMentions: [], snippet: '' };
   const lower = response.toLowerCase();
-  const brandMentioned = lower.includes(brandName.toLowerCase());
+  const okAlias = (n) => typeof n === 'string' && n.trim().length >= 2;
+  const brandForms = [brandName, ...(opts.brandAliases || []).filter(okAlias)];
+  const hit = brandForms.find(n => lower.includes(n.toLowerCase())) || brandName;
+  const brandMentioned = brandForms.some(n => lower.includes(n.toLowerCase()));
   let mentionPosition = null;
   let sentiment = 'not_mentioned';
   if (brandMentioned) {
-    const sentences = response.split(/[.!?]/);
-    mentionPosition = sentences.findIndex(s => s.toLowerCase().includes(brandName.toLowerCase())) + 1;
-    const idx = lower.indexOf(brandName.toLowerCase());
+    const sentences = response.split(opts.japanese ? /[.!?。！？]/ : /[.!?]/);
+    mentionPosition = sentences.findIndex(s => s.toLowerCase().includes(hit.toLowerCase())) + 1;
+    const idx = lower.indexOf(hit.toLowerCase());
     const ctx = response.slice(Math.max(0, idx - 60), idx + 120).toLowerCase();
-    sentiment = /excellent|great|top|best|highly|recommend|strong|quality|popular|favorite|leading/.test(ctx) ? 'positive'
-      : /avoid|poor|limited|overpriced|decline|outdated|bad/.test(ctx) ? 'negative'
+    const pos = opts.japanese ? /excellent|great|top|best|highly|recommend|strong|quality|popular|favorite|leading|おすすめ|人気|定番|豊富|信頼|最大|充実/ : /excellent|great|top|best|highly|recommend|strong|quality|popular|favorite|leading/;
+    const neg = opts.japanese ? /avoid|poor|limited|overpriced|decline|outdated|bad|割高|少ない|不満|閉店|避け/ : /avoid|poor|limited|overpriced|decline|outdated|bad/;
+    sentiment = pos.test(ctx) ? 'positive'
+      : neg.test(ctx) ? 'negative'
       : 'neutral';
   }
-  const competitorMentions = competitorNames.filter(c => lower.includes(c.toLowerCase()));
+  const compAliases = opts.competitorAliases || {};
+  const competitorMentions = competitorNames.filter(c =>
+    [c, ...(compAliases[c] || []).filter(okAlias)].some(n => lower.includes(n.toLowerCase())));
   const snippet = response.slice(0, 300);
   return { brandMentioned, mentionPosition, sentiment, competitorMentions, snippet };
+}
+
+const GEO_SYSTEM_EN = 'You are a helpful shopping assistant. Give honest, specific recommendations mentioning real brands.';
+const GEO_SYSTEM_JA = 'あなたは親切なショッピングアシスタントです。実在するブランドや店舗の名前を挙げて、正直で具体的なおすすめを日本語で答えてください。';
+
+function geoSystemPrompt(profile) {
+  return isJapanMarket(profile) ? GEO_SYSTEM_JA : GEO_SYSTEM_EN;
+}
+
+function buildGeoQueryGenPrompt(profile, competitorNames = []) {
+  if (!isJapanMarket(profile)) {
+    return `Generate 20 realistic search queries that a customer might use when looking for a ${profile.industry} brand like ${profile.name} (${profile.market || ''}).
+
+Include these categories (4-5 queries each): brand discovery, category/product search, occasion-based, comparison/alternatives, local market.
+
+Return a JSON array only:
+[{"id": "q1", "category": "brand discovery", "query": "the search query"}]`;
+  }
+  return `Generate 20 realistic questions a shopper in Japan would type, in Japanese, to an AI shopping assistant when looking for a ${profile.industry} retailer like ${profile.name} (${profile.url || ''}).
+
+Include these categories (4-5 queries each): brand discovery, category/product search, occasion-based, comparison/alternatives, local market.
+Write each query in natural Japanese as a native speaker would ask it, with occasions from the Japanese calendar and Japanese place names for local queries. Do not append "${profile.market || 'Japan'}" or "日本" unless a native would.
+
+Also list how Japanese shoppers write ${profile.name} and each of these competitors in Japanese text (katakana, kanji or common short forms). Only forms you are confident are in real use; use an empty array if unsure.
+Competitors: ${competitorNames.join(', ') || 'none listed'}
+
+Return a JSON object only:
+{"brandAliases": ["..."], "competitorAliases": {"<competitor name exactly as given>": ["..."]}, "queries": [{"id": "q1", "category": "brand discovery", "query": "<Japanese query>", "queryEn": "<short English gloss>"}]}`;
+}
+
+function parseJapanGeoQueryGen(raw, brandName, competitorNames = []) {
+  const out = { queries: [], matchOpts: { brandAliases: [], competitorAliases: {} } };
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start === -1 || end === -1) return out;
+  let parsed;
+  try { parsed = JSON.parse(raw.slice(start, end + 1)); } catch { return out; }
+  out.queries = (Array.isArray(parsed.queries) ? parsed.queries : [])
+    .filter(q => q && typeof q.query === 'string' && q.query.trim())
+    .map((q, i) => ({ id: q.id || `q${i + 1}`, category: q.category || 'other', query: q.query, queryEn: q.queryEn || null }));
+  const strs = (a) => (Array.isArray(a) ? a.filter(s => typeof s === 'string' && s.trim() && s !== brandName) : []);
+  out.matchOpts.brandAliases = strs(parsed.brandAliases);
+  const ca = parsed.competitorAliases && typeof parsed.competitorAliases === 'object' ? parsed.competitorAliases : {};
+  for (const c of competitorNames) if (ca[c]) out.matchOpts.competitorAliases[c] = strs(ca[c]);
+  return out;
+}
+
+function fallbackGeoQueries(profile) {
+  const brandName = profile.name;
+  if (isJapanMarket(profile)) {
+    return [
+      { id: 'q1', category: 'brand discovery', query: `${profile.industry}のおすすめのお店はどこですか`, queryEn: `where are good ${profile.industry} stores` },
+      { id: 'q2', category: 'comparison', query: `${brandName}の代わりになるお店`, queryEn: `${brandName} alternatives` },
+    ];
+  }
+  return [
+    { id: 'q1', category: 'brand discovery', query: `best ${profile.industry} stores in ${profile.market || 'my area'}` },
+    { id: 'q2', category: 'comparison', query: `${brandName} alternatives` },
+  ];
 }
 
 async function runGeoAnalysis(anthropic, profile, keywordUniverse) {
@@ -514,40 +629,46 @@ async function runGeoAnalysis(anthropic, profile, keywordUniverse) {
   const competitorNames = (profile.identifiedCompetitors || []).slice(0, 8).map(c => c.name);
   const aiQueries = (keywordUniverse.aiDiscoveryQueries || []).slice(0, 10);
 
-  const queryGenPrompt = `Generate 20 realistic search queries that a customer might use when looking for a ${profile.industry} brand like ${profile.name} (${profile.market || ''}).
-
-Include these categories (4-5 queries each): brand discovery, category/product search, occasion-based, comparison/alternatives, local market.
-
-Return a JSON array only:
-[{"id": "q1", "category": "brand discovery", "query": "the search query"}]`;
+  const japan = isJapanMarket(profile);
+  const queryGenPrompt = buildGeoQueryGenPrompt(profile, competitorNames);
 
   let queries = [];
+  let matchOpts = {};
   try {
     const msg = await anthropic.messages.create({
       model: MODEL_FAST,
-      max_tokens: 3000,
+      max_tokens: japan ? 4000 : 3000,
       output_config: EFFORT_LOW,
       messages: [{ role: 'user', content: queryGenPrompt }],
     });
     const raw = extractText(msg);
-    const start = raw.indexOf('[');
-    const end = raw.lastIndexOf(']');
-    if (start !== -1 && end !== -1) queries = JSON.parse(raw.slice(start, end + 1));
+    if (japan) {
+      const parsed = parseJapanGeoQueryGen(raw, brandName, competitorNames);
+      queries = parsed.queries;
+      matchOpts = parsed.matchOpts;
+    } else {
+      const start = raw.indexOf('[');
+      const end = raw.lastIndexOf(']');
+      if (start !== -1 && end !== -1) queries = JSON.parse(raw.slice(start, end + 1));
+    }
   } catch (_) { log('Could not generate dynamic queries'); }
+  if (japan) matchOpts.japanese = true;
 
-  const extraQueries = aiQueries.map((q, i) => ({ id: `ai${i}`, category: 'ai discovery', query: q }));
+  // Japan: keyword-universe aiDiscoveryQueries are already Japanese, glossed in keywordUniverse.glosses.
+  const glosses = keywordUniverse.glosses || {};
+  const extraQueries = aiQueries.map((q, i) => (japan
+    ? { id: `ai${i}`, category: 'ai discovery', query: q, queryEn: glosses[q] || null }
+    : { id: `ai${i}`, category: 'ai discovery', query: q }));
   const allQueries = [...queries, ...extraQueries].slice(0, 30);
 
   if (allQueries.length === 0) {
-    allQueries.push(
-      { id: 'q1', category: 'brand discovery', query: `best ${profile.industry} stores in ${profile.market || 'my area'}` },
-      { id: 'q2', category: 'comparison', query: `${brandName} alternatives` },
-    );
+    allQueries.push(...fallbackGeoQueries(profile));
   }
 
-  log(`Running GEO analysis: ${allQueries.length} queries via Claude`);
+  log(`Running GEO analysis: ${allQueries.length} queries via Claude${japan ? ' (Japanese)' : ''}`);
 
   const claudeResults = [];
+  const system = geoSystemPrompt(profile);
 
   for (const q of allQueries) {
     log(`  Query: "${q.query.slice(0, 50)}"`);
@@ -555,10 +676,12 @@ Return a JSON array only:
       const msg = await anthropic.messages.create({
         model: MODEL_FAST,
         max_tokens: 2500,
-        system: 'You are a helpful shopping assistant. Give honest, specific recommendations mentioning real brands.',
+        system,
         messages: [{ role: 'user', content: q.query }],
       });
-      const analysis = analyzeAgentResponse(extractText(msg), brandName, competitorNames);
+      const analysis = japan
+        ? analyzeAgentResponse(extractText(msg), brandName, competitorNames, matchOpts)
+        : analyzeAgentResponse(extractText(msg), brandName, competitorNames);
       claudeResults.push({ ...q, agent: 'claude', ...analysis });
       log(`    Claude: ${brandName} ${analysis.brandMentioned ? 'mentioned' : 'NOT mentioned'}`);
     } catch (err) {
@@ -580,7 +703,7 @@ Return a JSON array only:
     'Ensure brand Wikipedia/Wikidata entry is accurate and up to date',
   ].slice(0, 6);
 
-  return {
+  const result = {
     queriesTested: allQueries.length,
     byAgent: {
       claude: { visibilityScore: claudeScore, queries: claudeResults },
@@ -590,6 +713,70 @@ Return a JSON array only:
     queries: claudeResults,
     visibilityScore: claudeScore,
   };
+  if (japan) {
+    result.language = 'ja';
+    result.brandAliasesUsed = matchOpts.brandAliases || [];
+  }
+  return result;
+}
+
+// ─── Localized SERP rank check (Japan only, optional) ────────────────────────
+//
+// Runs only when serpParamsFor(profile) is non-null (Japan today) AND SERP_API_KEY is set.
+// Non-Japan runs never reach this, so their output is unchanged. Provider: SerpAPI
+// (https://serpapi.com/search.json), which accepts gl, hl and google_domain.
+
+const SERP_MAX_TERMS = 10;
+const hostOf = (u) => { try { return new URL(u).hostname.toLowerCase().replace(/^www\./, ''); } catch { return ''; } };
+
+function pickSerpTerms(keywordUniverse, max = SERP_MAX_TERMS) {
+  const ku = keywordUniverse || {};
+  const pool = [
+    ...(ku.categoryTerms || []).slice(0, 4),
+    ...(ku.occasionTerms || []).slice(0, 3),
+    ...(ku.localTerms || []).slice(0, 3),
+    ...(ku.ageGroupTerms || []).slice(0, 2),
+  ].filter(t => typeof t === 'string' && t.trim());
+  return [...new Set(pool)].slice(0, max);
+}
+
+function buildSerpUrl(term, params, apiKey) {
+  const qs = new URLSearchParams({ ...params, q: term, num: '20', api_key: apiKey });
+  return `https://serpapi.com/search.json?${qs.toString()}`;
+}
+
+function rankIn(organic, host) {
+  if (!host) return null;
+  const hit = (organic || []).find(r => { const h = hostOf(r.link); return h === host || h.endsWith(`.${host}`); });
+  return hit ? (hit.position ?? null) : null;
+}
+
+async function runSerpRankCheck(profile, keywordUniverse, { fetchJson } = {}) {
+  const params = serpParamsFor(profile);
+  if (!params) return null;
+  const apiKey = process.env.SERP_API_KEY;
+  if (!apiKey) return { skipped: true, reason: 'SERP_API_KEY is not set, so google.co.jp rankings were not checked.', params };
+  const get = fetchJson || (async (url) => JSON.parse(await fetchText(url, 20000)));
+  const targetHost = hostOf(profile.url);
+  const comps = (profile.identifiedCompetitors || []).slice(0, 8).map(c => ({ name: c.name, host: hostOf(c.url) })).filter(c => c.host);
+  const glosses = keywordUniverse?.glosses || {};
+  const results = [];
+  for (const term of pickSerpTerms(keywordUniverse)) {
+    try {
+      const data = await get(buildSerpUrl(term, params, apiKey));
+      const organic = Array.isArray(data?.organic_results) ? data.organic_results : [];
+      const competitorPositions = {};
+      for (const c of comps) { const p = rankIn(organic, c.host); if (p != null) competitorPositions[c.name] = p; }
+      results.push({ engine: 'google', label: 'Google Japan (google.co.jp)', term, termEn: glosses[term] || null, targetPosition: rankIn(organic, targetHost), competitorPositions });
+    } catch (err) {
+      const msg = String(err.message || err).replace(/api_key=[^&\s]*/g, 'api_key=<redacted>');
+      log(`  SERP error for "${term}": ${msg}`);
+      results.push({ engine: 'google', label: 'Google Japan (google.co.jp)', term, termEn: glosses[term] || null, error: msg });
+    }
+  }
+  const ranked = results.filter(r => r.targetPosition != null).length;
+  log(`SERP (google.co.jp): target ranks top-20 for ${ranked}/${results.length} terms`);
+  return { skipped: false, provider: 'serpapi', params, results };
 }
 
 // ─── Competitor benchmarks ────────────────────────────────────────────────────
@@ -852,6 +1039,12 @@ async function run() {
     return { queries: [], visibilityScore: 0, combinedScore: 0, byAgent: { claude: { visibilityScore: 0, queries: [] } }, gapRecommendations: ['GEO analysis failed — check API key'] };
   });
 
+  // 8b. Localized SERP rank check. Japan only; null for every other market.
+  const serpRankings = await runSerpRankCheck(profile, keywordUniverse).catch(err => {
+    log(`SERP rank check error: ${err.message}`);
+    return { skipped: true, reason: `SERP rank check failed: ${err.message}` };
+  });
+
   // 8. Competitor benchmarks
   log('Generating competitor benchmarks...');
   const competitorBenchmarks = await generateCompetitorBenchmarks(anthropic, profile, onPageSeo, competitorSeos).catch(err => {
@@ -888,6 +1081,8 @@ async function run() {
     ],
     geoSection,
   };
+  if (serpRankings) output.serpRankings = serpRankings;
+  if (isJapanMarket(profile)) output.market = { code: 'JP', language: 'ja', serp: serpParamsFor(profile) };
 
   const existing = loadBrandData(slug, 'search_seo.json');
   if (existing) archiveData(slug, 'search_seo', existing);
@@ -895,4 +1090,20 @@ async function run() {
   log(`Done. Pages: ${allPageAnalyses.length}. Keywords: ${keywordUniverse.totalCount || 0}. GEO combined: ${geoSection.combinedScore}%. Priority actions: ${priorityActions.length}.`);
 }
 
-run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+module.exports = {
+  isJapanMarket,
+  serpParamsFor,
+  buildKeywordUniversePrompt,
+  buildGeoQueryGenPrompt,
+  parseJapanGeoQueryGen,
+  geoSystemPrompt,
+  fallbackGeoQueries,
+  analyzeAgentResponse,
+  pickSerpTerms,
+  buildSerpUrl,
+  runSerpRankCheck,
+};
+
+if (require.main === module) {
+  run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
+}

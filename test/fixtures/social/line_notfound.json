@@ -1,0 +1,6 @@
+{
+  "status": 404,
+  "finalUrl": "https://line.me/R/ti/p/@linejapan?from=page&searchId=linejapan",
+  "html": "<html><head><title>LINE</title><meta property=\"og:title\" content=\"title\"></head><body><div class=\"MdQrError\"><p class=\"mdQrErrorTxt01\">404</p></div></body></html>",
+  "_note": "Shape of the live 404 returned for https://page.line.me/linejapan on 2026-11-16."
+}

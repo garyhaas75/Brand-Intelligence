@@ -57,7 +57,7 @@ function mergeBrandSeedData(slug) {
   if (!fs.existsSync(seedBrandDir)) return;
   ensureDir(liveBrandDir);
   ensureDir(path.join(liveBrandDir, 'history'));
-  for (const file of fs.readdirSync(seedBrandDir).filter(f => f.endsWith('.json'))) {
+  for (const file of fs.readdirSync(seedBrandDir).filter(f => f.endsWith('.json') && !f.startsWith('_'))) {
     const livePath = path.join(liveBrandDir, file);
     const seedPath = path.join(seedBrandDir, file);
     try {
@@ -86,6 +86,11 @@ function mergeBrandSeedData(slug) {
 // Run seed for all brands on startup
 (function bootstrapSeeds() {
   const brandsData = loadBrandsRegistry();
+  // Brands that ship with the code and must not go through discovery (see modules/seed_registry.js)
+  try {
+    const added = require('./modules/seed_registry').registerSeedBrands(brandsData, path.join(__dirname, 'seed_data', 'brands'));
+    if (added.length) { saveBrandsRegistry(brandsData); console.log(`[seed] registered brands: ${added.join(', ')}`); }
+  } catch (e) { console.error('[seed] brand registration failed:', e.message); }
   brandsData.brands.forEach(b => mergeBrandSeedData(b.slug));
   // Also seed the demo brand if seed dir exists
   const demoBrandSeedDir = path.join(__dirname, 'seed_data', 'brands', 'demo-brand');
@@ -862,7 +867,11 @@ app.get('/api/brands/:slug', (req, res) => {
 app.delete('/api/brands/:slug', (req, res) => {
   const { slug } = req.params;
   const registry = loadBrandsRegistry();
+  // A shipped (seeded) brand that is deleted must stay deleted: remember it so the next boot's
+  // seed registration does not quietly bring it back.
+  const wasSeeded = registry.brands.some(b => b.slug === slug && b.seeded);
   registry.brands = registry.brands.filter(b => b.slug !== slug);
+  if (wasSeeded) registry.deletedSeeds = [...new Set([...(registry.deletedSeeds || []), slug])];
   saveBrandsRegistry(registry);
   const brandDir = path.join(BRANDS_DIR, slug);
   if (fs.existsSync(brandDir)) fs.rmSync(brandDir, { recursive: true, force: true });
@@ -927,6 +936,9 @@ const BRAND_MODULES = [
   { name: 'site_intelligence',    file: 'site_intelligence.json',    script: 'analysis/website_audit.js' },
   { name: 'search_seo',           file: 'search_seo.json',           script: 'analysis/search_seo.js' },
   { name: 'action_plan',          file: 'action_plan.json',          script: 'analysis/action_plan.js' },
+  // Japan market modules
+  { name: 'marketplace',          file: 'marketplace.json',          script: 'scrapers/marketplace_jp.js' },
+  { name: 'jp_demand',            file: 'jp_demand.json',            script: 'analysis/jp_demand.js' },
 ];
 
 BRAND_MODULES.forEach(({ name, file }) => {
@@ -943,6 +955,8 @@ app.post('/api/brands/:slug/refresh/all', (req, res) => {
   const registry = loadBrandsRegistry();
   const brand = registry.brands.find(b => b.slug === slug);
   if (!brand) return res.status(404).json({ error: 'Brand not found' });
+  const held = require('./utils/run_lock').status(slug, { dataDir: DATA_DIR });
+  if (held.held) return res.status(409).json({ error: 'A refresh is already running for this brand', startedAt: held.startedAt || null });
 
   const profilePath = path.join(BRANDS_DIR, slug, 'profile.json');
   const hasProfile = fs.existsSync(profilePath);
@@ -976,6 +990,8 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   }
   const mod = BRAND_MODULES.find(m => m.name === moduleName);
   if (!mod) return res.status(400).json({ error: `Unknown module: ${moduleName}` });
+  const heldRun = require('./utils/run_lock').status(slug, { dataDir: DATA_DIR });
+  if (heldRun.held) return res.status(409).json({ error: 'A full refresh is running for this brand, wait for it to finish', startedAt: heldRun.startedAt || null });
 
   let moduleStdio = 'ignore';
   try {

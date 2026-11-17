@@ -1,0 +1,4 @@
+{ "generatedAt": "2026-11-16T00:00:00.000Z", "market": "JP",
+  "trends": [ { "term": "おもちゃ", "termEn": "toys", "interestOverTime": { "points": 52, "mean": 40, "latest": 88, "peak": { "value": 100, "at": "Dec 2025" }, "direction": "rising" }, "topRelated": [ { "query": "おもちゃ 2歳", "value": 100 } ] } ],
+  "demographics": { "source": "e-Stat", "datasets": { "births": { "label": "Live births", "rows": [ { "value": "686061", "時間軸": "2024年" } ] } } },
+  "notes": [] }
