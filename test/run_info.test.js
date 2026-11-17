@@ -26,7 +26,7 @@ test('an active run reports the phase in progress and the ones before and after 
   const r = getRunInfo('s', d);
   assert.strictEqual(r.active, true);
   assert.strictEqual(r.phase, 'analyse');
-  assert.deepStrictEqual(r.phases.map(p => p.state), ['done', 'running', 'pending', 'pending']);
+  assert.deepStrictEqual(r.phases.map(p => p.state), ['done', 'running', 'pending', 'pending', 'pending']);
 });
 
 test('a failed module in a finished phase is listed so the card can say so', () => {

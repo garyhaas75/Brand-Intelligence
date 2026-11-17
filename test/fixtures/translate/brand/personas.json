@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-11-16T22:14:21.255Z",
+  "brandSlug": "toysrus-jp",
+  "personas": [
+    {
+      "name": "The Developmental-Stage Mom",
+      "ageRange": "28-38",
+      "income": "¥5.5M-¥8.5M household (approx. $38k-$58k)",
+      "painPoints": [
+        "Hard to filter toys by developmental stage on the brand site, so she defaults to marketplace search",
+        "Worries about safety certification and small parts for toddlers"
+      ],
+      "quoteExample": "If I can see it's 検査済 (safety-inspected) and other moms say it lasted past age three, I'll buy it in store that day."
+    }
+  ],
+  "summaryInsights": [
+    "Demand is occasion-led and item-specific, not category-led: reviews repeatedly cite birthdays, pre-orders and named requests (R5, R14, R19, R21), so a seasonal campaign hub plus reservation/pre-order visibility is the single highest-leverage site fix.",
+    "Character and IP franchises are the real navigation layer — Takara Tomy, Beyblade X, Bandai TCG, Pokémon cards and Sanrio dominate best-seller lists (B1-B8, C3, C4) — yet the site lacks IP hubs, pushing discovery to Amazon and Rakuten by default."
+  ]
+}

@@ -22,6 +22,47 @@ const DARK_T = {
 const ThemeContext = React.createContext(LIGHT_T)
 const useT = () => React.useContext(ThemeContext)
 
+// ─── Language ──────────────────────────────────────────────────────────────────
+// One switch for every module tab. 'orig' asks the server for the data as stored;
+// 'en' and 'ja' append ?lang= so the server answers from translations.json. Only
+// module data reads go through moduleFetch: profile, writes, refresh posts,
+// progress polls and history never carry the parameter.
+const LANGS = [
+  { id: 'en', label: 'EN', name: 'English' },
+  { id: 'ja', label: '日本語', name: 'Japanese' },
+  { id: 'orig', label: 'Original', name: 'Original language' },
+]
+const LANG_KEY = 'brand_intel_lang'
+// Tabs whose data the language setting changes (profile is not localized).
+const DATA_TABS = ['competitive', 'personas', 'social', 'website', 'search', 'action']
+function readStoredLang() {
+  try {
+    const v = window.localStorage.getItem(LANG_KEY)
+    return LANGS.some(l => l.id === v) ? v : 'orig'
+  } catch { return 'orig' }
+}
+function storeLang(v) {
+  try { window.localStorage.setItem(LANG_KEY, v) } catch { /* storage blocked: keep it for this session only */ }
+}
+const langQuery = lang => (lang === 'en' || lang === 'ja' ? `?lang=${lang}` : '')
+const LangContext = React.createContext({ lang: 'orig', onTranslationsHeader: () => {} })
+const useLang = () => React.useContext(LangContext)
+
+// Returns a getter for one brand module's JSON in the current language. Its
+// identity changes with the language, so an effect that lists it as a
+// dependency refetches when the toggle moves.
+function useModuleFetch() {
+  const { lang, onTranslationsHeader } = useLang()
+  return useCallback(async (slug, module) => {
+    const res = await fetch(`${API}/brands/${slug}/${module}${langQuery(lang)}`)
+    if (lang !== 'orig') {
+      const h = (res.headers.get('X-Translations') || '').toLowerCase()
+      onTranslationsHeader(slug, lang, module, h === 'missing' || h === 'stale' ? h : null)
+    }
+    return res.json()
+  }, [lang, onTranslationsHeader])
+}
+
 const TABS = [
   { id: 'portfolio', label: 'Portfolio' },
   { id: 'profile', label: 'Brand Profile' },
@@ -672,11 +713,14 @@ function BrandProfileTab({ slug, onRefresh, running }) {
 function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
+  const getModule = useModuleFetch()
 
   useEffect(() => {
     if (!slug) return
-    fetch(`${API}/brands/${slug}/competitive_analysis`).then(r => r.json()).then(setData).catch(() => {})
-  }, [slug, dataVersion])
+    let live = true
+    getModule(slug, 'competitive_analysis').then(d => { if (live) setData(d) }).catch(() => {})
+    return () => { live = false }
+  }, [slug, dataVersion, getModule])
 
   if (!data) return <EmptyState message="Competitive analysis not yet generated." cta="Run Competitive Analysis" onCta={() => onRefresh('competitive_analysis')} />
 
@@ -762,11 +806,28 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
   const [suggestions, setSuggestions] = useState(null)
   const [loadingSuggestions, setLoadingSuggestions] = useState(false)
   const chatEndRef = useRef(null)
+  const getModule = useModuleFetch()
+  // A language switch reloads the same personas in another language, so the
+  // selected persona and the chat stay. A new brand or a refresh resets them.
+  const loadedKeyRef = useRef(null)
 
   useEffect(() => {
     if (!slug) return
-    fetch(`${API}/brands/${slug}/personas`).then(r => r.json()).then(d => { setData(d); setActivePersona(0); setChatMessages([]) }).catch(() => {})
-  }, [slug, dataVersion])
+    let live = true
+    const key = `${slug}|${dataVersion}`
+    getModule(slug, 'personas').then(d => {
+      if (!live) return
+      setData(d)
+      if (loadedKeyRef.current !== key) {
+        loadedKeyRef.current = key
+        setActivePersona(0); setChatMessages([])
+      } else {
+        const n = (d && Array.isArray(d.personas)) ? d.personas.length : 0
+        setActivePersona(i => (n > 0 && i >= n ? n - 1 : i))
+      }
+    }).catch(() => {})
+    return () => { live = false }
+  }, [slug, dataVersion, getModule])
 
   useEffect(() => {
     if (chatMessages.length > 0) chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -900,11 +961,14 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
   const [auditProgress, setAuditProgress] = useState(null)
+  const getModule = useModuleFetch()
 
   useEffect(() => {
     if (!slug) return
-    fetch(`${API}/brands/${slug}/social_intelligence`).then(r => r.json()).then(setData).catch(() => {})
-  }, [slug, dataVersion])
+    let live = true
+    getModule(slug, 'social_intelligence').then(d => { if (live) setData(d) }).catch(() => {})
+    return () => { live = false }
+  }, [slug, dataVersion, getModule])
 
   useEffect(() => {
     if (!running || !slug) { setAuditProgress(null); return }
@@ -1209,11 +1273,14 @@ function LighthouseScore({ label, score }) {
 function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
+  const getModule = useModuleFetch()
 
   useEffect(() => {
     if (!slug) return
-    fetch(`${API}/brands/${slug}/site_intelligence`).then(r => r.json()).then(setData).catch(() => {})
-  }, [slug, dataVersion])
+    let live = true
+    getModule(slug, 'site_intelligence').then(d => { if (live) setData(d) }).catch(() => {})
+    return () => { live = false }
+  }, [slug, dataVersion, getModule])
 
   if (!data) return <EmptyState message="Website audit not yet generated." cta="Run Website Audit" onCta={() => onRefresh('site_intelligence')} />
 
@@ -1533,11 +1600,14 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
   const [showAllKeywords, setShowAllKeywords] = useState(false)
   const [geoAgent, setGeoAgent] = useState('claude')
   const [expandedPage, setExpandedPage] = useState(null)
+  const getModule = useModuleFetch()
 
   useEffect(() => {
     if (!slug) return
-    fetch(`${API}/brands/${slug}/search_seo`).then(r => r.json()).then(setData).catch(() => {})
-  }, [slug, dataVersion])
+    let live = true
+    getModule(slug, 'search_seo').then(d => { if (live) setData(d) }).catch(() => {})
+    return () => { live = false }
+  }, [slug, dataVersion, getModule])
 
   if (!data) return <EmptyState message="Search & SEO analysis not yet generated." cta="Run Search & SEO Analysis" onCta={() => onRefresh('search_seo')} />
 
@@ -2088,17 +2158,20 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
   const [shareUrl, setShareUrl] = useState('')
   const [shareExpires, setShareExpires] = useState(null)
   const [shareDays, setShareDays] = useState(7)      // 30 is the ceiling the server enforces
+  const getModule = useModuleFetch()
 
   useEffect(() => {
     if (!slug) return
+    let live = true
     Promise.allSettled([
-      fetch(`${API}/brands/${slug}/action_plan`).then(r => r.json()),
-      fetch(`${API}/brands/${slug}/competitive_analysis`).then(r => r.json()),
-      fetch(`${API}/brands/${slug}/social_intelligence`).then(r => r.json()),
-      fetch(`${API}/brands/${slug}/site_intelligence`).then(r => r.json()),
-      fetch(`${API}/brands/${slug}/search_seo`).then(r => r.json()),
-      fetch(`${API}/brands/${slug}/personas`).then(r => r.json()),
+      getModule(slug, 'action_plan'),
+      getModule(slug, 'competitive_analysis'),
+      getModule(slug, 'social_intelligence'),
+      getModule(slug, 'site_intelligence'),
+      getModule(slug, 'search_seo'),
+      getModule(slug, 'personas'),
     ]).then(([ap, comp, soc, site, seo, per]) => {
+      if (!live) return
       if (ap.status === 'fulfilled') setData(ap.value)
       if (comp.status === 'fulfilled') setCompData(comp.value)
       if (soc.status === 'fulfilled') setSocialData(soc.value)
@@ -2106,7 +2179,8 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
       if (seo.status === 'fulfilled') setSeoData(seo.value)
       if (per.status === 'fulfilled') setPersonasData(per.value)
     })
-  }, [slug, dataVersion])
+    return () => { live = false }
+  }, [slug, dataVersion, getModule])
 
   async function exportPdf() {
     setExporting(true)
@@ -2858,6 +2932,78 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
   )
 }
 
+// ─── Top bar: language toggle and report download ───────────────────────────────
+// Selected segment colors chosen for AA text contrast: light #4F46E5 with white
+// is 6.29:1; dark #818CF8 with #0F172A text is 5.98:1 (white on it is 2.98:1).
+const SEG_ON = { light: { bg: '#4f46e5', fg: '#ffffff' }, dark: { bg: '#818cf8', fg: '#0f172a' } }
+
+function LanguageToggle({ lang, onChange }) {
+  const T = useT()
+  const on_ = T === DARK_T ? SEG_ON.dark : SEG_ON.light
+  return (
+    <div role="group" aria-label="Data language" style={{ display: 'flex', border: `1px solid ${T.inputBorder}`, borderRadius: 8, flexShrink: 0, background: T.inputBg }}>
+      {LANGS.map((l, i) => {
+        const on = lang === l.id
+        return (
+          <button key={l.id} type="button" className="bi-ctl bi-seg" aria-pressed={on} title={`Show data in ${l.name}`}
+                  onClick={() => { if (!on) onChange(l.id) }}
+                  style={{ background: on ? on_.bg : 'transparent', color: on ? on_.fg : T.textSub, border: 'none', borderRadius: i === 0 ? '7px 0 0 7px' : i === LANGS.length - 1 ? '0 7px 7px 0' : 0, padding: '5px 10px', fontSize: 12, fontWeight: on ? 700 : 500, cursor: on ? 'default' : 'pointer', whiteSpace: 'nowrap' }}>
+            {l.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+const REPORT_ITEMS = [
+  { id: 'en', label: 'English PDF' },
+  { id: 'ja', label: '日本語 PDF' },
+]
+const REPORT_TIMEOUT_MS = 3 * 60 * 1000
+
+function ReportMenu({ slug, busy, onDownload }) {
+  const T = useT()
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onDown = e => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
+    const onKey = e => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey) }
+  }, [open])
+
+  const disabled = !slug || !!busy
+  return (
+    <div ref={wrapRef} style={{ position: 'relative', flexShrink: 0 }}>
+      <button type="button" className="bi-ctl" aria-haspopup="menu" aria-expanded={open} disabled={disabled}
+              title={slug ? 'Download the full report as a PDF' : 'Pick a brand to download its report'}
+              onClick={() => setOpen(o => !o)}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 164, background: T.inputBg, border: `1px solid ${T.inputBorder}`, color: T.textSub, borderRadius: 8, padding: '5px 10px', fontSize: 12, fontWeight: 600, cursor: disabled ? 'default' : 'pointer', opacity: disabled && !busy ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+        {busy && <span aria-hidden="true" style={{ width: 10, height: 10, border: `2px solid ${T.border}`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
+        {busy ? 'Generating report…' : 'Download report ▾'}
+      </button>
+      {open && !disabled && (
+        <div role="menu" aria-label="Download report"
+             style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 170, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', padding: 4, zIndex: 200 }}>
+          {REPORT_ITEMS.map(it => (
+            <button key={it.id} type="button" className="bi-ctl" role="menuitem"
+                    onClick={() => { setOpen(false); onDownload(it.id) }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', color: T.text, fontSize: 13, padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = T.surfaceAlt }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'none' }}>
+              {it.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
   const params = new URLSearchParams(window.location.search)
@@ -2876,6 +3022,56 @@ export default function App() {
   const fetchIdRef = useRef(0)
   const pollRef = useRef(null)
   const modulePollRefs = useRef({}) // module → intervalId
+
+  // Data language. Persisted when storage allows, 'orig' otherwise.
+  const [lang, setLangState] = useState(readStoredLang)
+  const setLang = l => { setLangState(l); storeLang(l) }
+  // slug|lang|module → 'missing' (no translations.json), 'stale' (module
+  // refreshed after translations were built) or null, from X-Translations.
+  const [trStatus, setTrStatus] = useState({})
+  const onTranslationsHeader = useCallback((slug, l, module, status) => {
+    const k = `${slug}|${l}|${module}`
+    setTrStatus(m => (m[k] === status ? m : { ...m, [k]: status }))
+  }, [])
+  const trFor = activeBrand && lang !== 'orig'
+    ? Object.entries(trStatus).filter(([k]) => k.startsWith(`${activeBrand}|${lang}|`)).map(([, v]) => v)
+    : []
+  const trMissing = trFor.includes('missing')
+  const trStale = !trMissing && trFor.includes('stale')
+  const langCtx = React.useMemo(() => ({ lang, onTranslationsHeader }), [lang, onTranslationsHeader])
+
+  // Report PDF download. busy holds the language being generated.
+  const [reportBusy, setReportBusy] = useState(null)
+  const [reportError, setReportError] = useState('')
+  async function downloadReport(l) {
+    if (!activeBrand || reportBusy) return
+    const slug = activeBrand
+    setReportBusy(l); setReportError('')
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), REPORT_TIMEOUT_MS)
+    try {
+      // The fetch wrapper in auth.jsx adds the bearer token to /api calls.
+      const res = await fetch(`${API}/brands/${slug}/report.pdf?lang=${l}`, { signal: ctrl.signal })
+      if (!res.ok) {
+        let detail = ''
+        try { const j = await res.json(); detail = j.error || j.detail || j.message || '' } catch { /* not JSON */ }
+        throw new Error(detail ? `Report failed: ${detail}` : `Report failed (HTTP ${res.status}).`)
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = `${slug}-report-${l}.pdf`
+      document.body.appendChild(a); a.click(); a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 2000)
+    } catch (e) {
+      setReportError(e && e.name === 'AbortError'
+        ? 'The report took too long to generate. Try again in a minute.'
+        : (e && e.message) || 'Report download failed.')
+    } finally {
+      clearTimeout(timer)
+      setReportBusy(null)
+    }
+  }
 
   // Who is signed in, and which areas they hold. Presentation only: the API
   // enforces the same rules independently, so hiding a tab is never the line of
@@ -2999,10 +3195,15 @@ export default function App() {
 
   return (
     <ThemeContext.Provider value={T}>
+    <LangContext.Provider value={langCtx}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .bi-seg:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+        @media (max-width: 640px) {
+          .bi-ctl { min-height: 40px; padding-left: 14px !important; padding-right: 14px !important; }
+        }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
@@ -3065,11 +3266,42 @@ export default function App() {
 
         {/* Brand sub-header */}
         {activeBrandData && !pdfMode && (
-          <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: '8px 24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 12px' }}>
             <span style={{ color: T.text, fontWeight: 700, fontSize: 15 }}>{activeBrandData.name}</span>
             {activeBrandData.industry && <span style={{ color: T.textMuted, fontSize: 13 }}>{activeBrandData.industry}</span>}
             <HealthBadge status={activeBrandData.healthStatus} />
             {activeBrandData.discoveryStatus === 'running' && <span style={{ color: '#3b82f6', fontSize: 12, fontWeight: 600 }}>🔍 Discovery running...</span>}
+            {/* Language and report controls. Here rather than in the nav row,
+                which is already full at 1280px; they only apply to a brand. */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexWrap: 'wrap' }}>
+              {/* Same canSee check the nav uses. The toggle needs at least one
+                  data tab; the report is the Action Plan export, so it needs 'action'. */}
+              {DATA_TABS.some(canSee) && <LanguageToggle lang={lang} onChange={setLang} />}
+              {canSee('action') && <ReportMenu slug={activeBrand} busy={reportBusy} onDownload={downloadReport} />}
+            </div>
+          </div>
+        )}
+
+        {/* Language and report notices. Non-blocking: the tabs keep working. */}
+        {!pdfMode && (trMissing || trStale || reportBusy || reportError) && (
+          <div role="status" aria-live="polite" style={{ background: T.surfaceAlt, borderBottom: `1px solid ${T.border}`, padding: '0 24px', minHeight: 32, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 16px', fontSize: 12, lineHeight: '18px' }}>
+            {trMissing && (
+              <span style={{ color: T.textSub, padding: '7px 0' }}>Translations are not ready for this brand yet. Showing the original text.</span>
+            )}
+            {trStale && (
+              <span style={{ color: T.textSub, padding: '7px 0' }}>Some text changed since the last translation and is shown untranslated.</span>
+            )}
+            {reportBusy && (
+              <span style={{ color: T.textSub, padding: '7px 0' }}>Generating the {reportBusy === 'ja' ? 'Japanese' : 'English'} report. This can take up to a minute.</span>
+            )}
+            {reportError && (
+              <span style={{ color: darkMode ? '#fca5a5' : '#b91c1c', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flex: '1 1 auto' }}>
+                {/* #B91C1C on #F3F4F6 is 5.88:1, #FCA5A5 on #0F172A is 9.41:1 */}
+                <span style={{ padding: '7px 0' }}>{reportError}</span>
+                <button type="button" className="bi-ctl" onClick={() => setReportError('')} aria-label="Dismiss report error"
+                        style={{ background: 'none', border: 'none', color: 'inherit', fontSize: 16, lineHeight: '18px', padding: '0 4px', cursor: 'pointer', flexShrink: 0 }}>×</button>
+              </span>
+            )}
           </div>
         )}
 
@@ -3103,6 +3335,7 @@ export default function App() {
       </div>
 
       {showAddBrand && <AddBrandModal onClose={() => setShowAddBrand(false)} onAdded={handleBrandAdded} />}
+    </LangContext.Provider>
     </ThemeContext.Provider>
   )
 }

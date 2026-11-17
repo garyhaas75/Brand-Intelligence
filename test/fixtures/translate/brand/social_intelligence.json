@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-11-16T22:03:57.441Z",
+  "brandSlug": "toysrus-jp",
+  "brands": [
+    {
+      "id": "toysrus-jp",
+      "name": "Toys R Us Japan",
+      "role": "target",
+      "handle": "toysrus_jp",
+      "platform": "instagram",
+      "contentThemes": [
+        {
+          "theme": "Lifestyle",
+          "count": 10
+        },
+        {
+          "theme": "Promotional",
+          "count": 6
+        }
+      ],
+      "recentPosts": [
+        {
+          "likes": 46,
+          "comments": 0,
+          "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n9月25日の中秋の名月に合わせて、宇宙と月をモチーフにしたアイテムを集めました🌙\n気になった商品は、店頭またはオンラインストアでチェックを✔️\n秋の夜長のお供に、ぜひチェックしてみてください🍂🌙\n\n───────────\n\n#中秋の名月 #お月見 #宇宙 #",
+          "timestamp": "2026-09-25T09:01:19.000Z",
+          "postUrl": "https://instagram.com/p/DdtFwYeAXq4",
+          "imageUrl": "/api/social-image/toysrus-jp/rec_0.jpg"
+        },
+        {
+          "likes": 61,
+          "comments": 0,
+          "caption": "他の投稿もCHECK👀▷▷️ @toysrus_jp\n見返せるように＜保存＞＜シェア＞がおすすめです🔖\n\n───────────\n\n今夜、家族で何して遊ぶ？🌙\n電池を用意しなくてもすぐ遊べる、アナログゲームはいかがですか？\nバランスゲームからボードゲーム、迷路パズルまで幅広い年齢向けにご紹介しています。\n気になるアイテムはコメントで教えてね💬✨\n\n───────────\n\n#トイザらス #",
+          "timestamp": "2026-09-21T09:02:06.000Z",
+          "postUrl": "https://instagram.com/p/Ddiym8Zj-az",
+          "imageUrl": "/api/social-image/toysrus-jp/rec_1.jpg"
+        }
+      ],
+      "xHandle": "ToysRUs_jp",
+      "xData": {
+        "topPosts": [
+          {
+            "likes": 1134,
+            "comments": 4,
+            "caption": "/／\nもちろん今年もやります🦒✨\nトイザらス・ベビーザらス\nブラックフライデー🖤\n\\＼\n今年はトイザらス・ベビーザらス同時開催🙌🌈\n11/20(金)(※)からスタート！\nまずは紙面をチェックして準備📱！\n※オンラインストアは11/19(木)12:00～ https://t.co/yK6fTo8osT",
+            "timestamp": "2026-11-12T04:00:28.000Z",
+            "postUrl": "https://x.com/TOYSRUS_JP/status/2120728410121294262",
+            "imageUrl": "https://pbs.twimg.com/media/HW5XPpjaIAAkAmo.jpg",
+            "shares": 135,
+            "views": 525035
+          }
+        ]
+      }
+    }
+  ],
+  "whiteSpaceOpportunities": [
+    {
+      "theme": "Behind the Scenes",
+      "description": "Short videos/carousels showing store restocking, toy unboxing in warehouse, staff setting up seasonal displays, or new shipment arrivals at Toys R Us Japan stores",
+      "rationale": "Zero competitors are doing this well; it's a completely open content category that builds authenticity and anticipation",
+      "brandAlignment": "Reinforces the fun, trustworthy, family-friendly retail experience and humanizes the brand for parents and kids alike",
+      "suggestedFormat": "Reels",
+      "priority": "high"
+    }
+  ]
+}

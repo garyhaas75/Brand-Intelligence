@@ -1,0 +1,450 @@
+{
+ "profile": {
+  "slug": "test-toys",
+  "name": "Test Toys Co",
+  "url": "https://test-toys.example/",
+  "industry": "Toys",
+  "market": "Japan",
+  "identifiedCompetitors": [
+   {
+    "name": "Rival Toys",
+    "url": "https://rival.example/",
+    "rationale": "Direct competitor"
+   }
+  ],
+  "scrape": {
+   "skipApifyRetry": true
+  }
+ },
+ "data": {
+  "action_plan": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "executiveSummary": "Test Toys Co should focus on gifting.",
+   "immediateWins": [
+    {
+     "rank": 1,
+     "title": "Fix the hero headline",
+     "description": "Use live HTML text.",
+     "effort": "low",
+     "impact": "high",
+     "sourceModule": "website"
+    }
+   ],
+   "roadmap": {
+    "day30": [
+     {
+      "action": "Launch gift hub",
+      "owner": "Ecommerce",
+      "metric": "Sessions"
+     }
+    ],
+    "day60": [],
+    "day90": []
+   },
+   "competitiveGapsToClose": [
+    {
+     "gap": "Gift hub missing",
+     "competitor": "Rival Toys",
+     "priority": "high"
+    }
+   ],
+   "opportunitiesRanked": [
+    {
+     "rank": 1,
+     "opportunity": "Ship a gift finder",
+     "rationale": "Birthday demand",
+     "estimatedImpact": "10%"
+    }
+   ]
+  },
+  "competitive_analysis": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "competitors": [
+    {
+     "name": "Rival Toys",
+     "url": "https://rival.example/",
+     "pricingTier": "mid",
+     "positioningStatement": "Value toys",
+     "strengths": [
+      "Wide range"
+     ],
+     "opportunities": [
+      "Weak gifting"
+     ],
+     "assortmentHighlights": [
+      "LEGO"
+     ],
+     "stale": true,
+     "asOf": "2026-10-01T00:00:00.000Z",
+     "lastAttempt": "2026-11-16T10:00:00.000Z",
+     "lastError": "HTTP 503 from upstream"
+    }
+   ],
+   "positioningMap": {
+    "narrative": "Crowded middle.",
+    "axes": {
+     "x": "Price",
+     "y": "Experience"
+    },
+    "brandPositions": [
+     {
+      "name": "Test Toys Co",
+      "x": 50,
+      "y": 50,
+      "note": "Middle"
+     }
+    ],
+    "whiteSpaceOpportunities": [
+     "Premium gifting"
+    ]
+   },
+   "topAssortmentGaps": [
+    "Outdoor toys"
+   ]
+  },
+  "site_intelligence": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "brands": [
+    {
+     "id": "test-toys",
+     "name": "Test Toys Co",
+     "role": "target",
+     "url": "https://test-toys.example/",
+     "botBlocked": true,
+     "navigation": [],
+     "featuredCategories": [],
+     "heroContent": {
+      "headline": "Sorry, you have been blocked"
+     }
+    },
+    {
+     "id": "rival",
+     "name": "Rival Toys",
+     "role": "competitor",
+     "url": "https://rival.example/",
+     "botBlocked": false,
+     "navigation": [
+      {
+       "name": "Toys"
+      }
+     ],
+     "featuredCategories": [
+      {
+       "name": "LEGO"
+      }
+     ],
+     "heroContent": {
+      "headline": "Big toy sale"
+     }
+    }
+   ],
+   "lighthouseAudit": null,
+   "navGaps": [
+    {
+     "category": "Age hubs",
+     "competitorsWithIt": [
+      "Rival Toys"
+     ],
+     "priority": "high"
+    }
+   ],
+   "messagingGaps": [
+    {
+     "gap": "No value proposition",
+     "competitorExample": "Rival says value",
+     "recommendation": "Add one"
+    }
+   ],
+   "ctaEffectiveness": {
+    "rating": "weak",
+    "observations": "None found",
+    "recommendation": "Add CTAs"
+   },
+   "topOpportunities": [
+    {
+     "rank": 1,
+     "title": "Unblock crawlers",
+     "description": "Allow verified bots",
+     "impact": "high"
+    }
+   ],
+   "crawlerVisibility": {
+    "heroTextIsLive": false,
+    "contentInImagesLevel": "high",
+    "aiReadabilityNote": "Blocked page"
+   }
+  },
+  "marketplace": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "market": "JP",
+   "sources": [
+    "amazon_jp"
+   ],
+   "categories": [
+    {
+     "source": "amazon_jp",
+     "category": "toys",
+     "url": "https://amazon.example/",
+     "topItems": [
+      {
+       "rank": 1,
+       "title": "Lego City Set",
+       "brand": "LEGO",
+       "priceJPY": 5980,
+       "reviewCount": 120,
+       "rating": 4.6,
+       "url": "https://amazon.example/1"
+      }
+     ],
+     "stale": true,
+     "asOf": "2026-11-01T00:00:00.000Z",
+     "lastError": "timeout"
+    }
+   ],
+   "brandMix": [
+    {
+     "brand": "LEGO",
+     "count": 5
+    },
+    {
+     "brand": "Bandai",
+     "count": 3
+    }
+   ],
+   "reviews": [
+    {
+     "source": "amazon_jp",
+     "productTitle": "Lego City Set",
+     "rating": 5,
+     "text": "Great gift for my son.",
+     "lang": "en"
+    }
+   ],
+   "blocked": [
+    {
+     "source": "rakuten",
+     "category": "ranking",
+     "blocked": true,
+     "reason": "overload_page"
+    }
+   ],
+   "notes": [
+    "rakuten api: key not set"
+   ]
+  },
+  "social_intelligence": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "brands": [
+    {
+     "name": "Test Toys Co",
+     "role": "target",
+     "handle": "testtoys",
+     "summary": {
+      "postCount": 20,
+      "avgEngagement": 50,
+      "postingFrequencyPerWeek": 2
+     },
+     "contentThemes": [
+      {
+       "theme": "Gifts",
+       "count": 5
+      }
+     ],
+     "topHashtags": [
+      {
+       "tag": "#toys",
+       "count": 4
+      }
+     ],
+     "postingPattern": {
+      "bestDay": "Thursday"
+     },
+     "platformStatus": {
+      "x": {
+       "status": "not-applicable"
+      },
+      "youtube": {
+       "status": "ok"
+      },
+      "line": {
+       "status": "presence-only"
+      }
+     },
+     "contentGaps": [
+      {
+       "headline": "Run giveaways",
+       "detail": "Rivals do it",
+       "competitor": "Rival Toys",
+       "platform": "x"
+      }
+     ]
+    },
+    {
+     "name": "Rival Toys",
+     "role": "competitor",
+     "error": "Could not detect Instagram handle",
+     "summary": {
+      "postCount": 0
+     }
+    }
+   ],
+   "whiteSpaceOpportunities": [
+    {
+     "theme": "Behind the scenes",
+     "description": "Store videos",
+     "suggestedFormat": "Reels",
+     "priority": "high"
+    }
+   ],
+   "competitionStrategy": [
+    {
+     "tactic": "Post less, better",
+     "rationale": "Quality",
+     "priority": "medium"
+    }
+   ]
+  },
+  "personas": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "personas": [
+    {
+     "name": "The Planner Parent",
+     "ageRange": "30-40",
+     "income": "Mid",
+     "location": "Tokyo",
+     "occupation": [
+      "Office worker"
+     ],
+     "values": [
+      "Safety"
+     ],
+     "shoppingBehaviors": [
+      "Buys early"
+     ],
+     "painPoints": [
+      "Stockouts"
+     ],
+     "motivators": [
+      "Deals"
+     ],
+     "preferredChannels": [
+      "Instagram"
+     ],
+     "contentTopics": [
+      "Gift guides"
+     ],
+     "brandFit": "Strong",
+     "quoteExample": "I plan birthdays early."
+    }
+   ],
+   "summaryInsights": [
+    "Gifting drives demand."
+   ]
+  },
+  "search_seo": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "brandName": "Test Toys Co",
+   "onPageSeo": {
+    "titleTag": "Blocked",
+    "h1": "Sorry",
+    "blocked": true
+   },
+   "competitors": [
+    {
+     "name": "Rival Toys",
+     "titleTag": "Rival Toys home",
+     "h1": "Toys",
+     "metaDescription": "Value toys"
+    }
+   ],
+   "sitemapAnalysis": {
+    "found": false,
+    "totalUrls": 0,
+    "issues": [
+     "No robots.txt"
+    ]
+   },
+   "priorityActions": [
+    {
+     "rank": 1,
+     "action": "Unblock search engines",
+     "why": "Invisible today",
+     "impact": "High",
+     "effort": "Quick Win"
+    }
+   ],
+   "competitorBenchmarks": [
+    {
+     "signal": "Title Tag",
+     "competitorName": "Rival Toys",
+     "competitorValue": "Rival Toys home",
+     "targetValue": "Blocked",
+     "recommendation": "Fix access"
+    }
+   ],
+   "keywordIntelligence": {
+    "clusters": [
+     {
+      "name": "Local",
+      "intent": "navigational",
+      "estimatedMonthlySearches": "1000",
+      "keywords": [
+       "toy store near me"
+      ],
+      "recommendation": "Store pages"
+     }
+    ]
+   },
+   "geoSection": {
+    "queriesTested": 2,
+    "combinedScore": 50,
+    "queries": [
+     {
+      "category": "discovery",
+      "query": "best toy shop",
+      "queryEn": "best toy shop",
+      "brandMentioned": true,
+      "mentionPosition": 1
+     }
+    ],
+    "gapRecommendations": [
+     "Add FAQ schema"
+    ]
+   },
+   "serpRankings": {
+    "skipped": true,
+    "reason": "SERP_API_KEY is not set"
+   }
+  },
+  "jp_demand": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "market": "JP",
+   "trends": [
+    {
+     "term": "誕生日プレゼント",
+     "termEn": "birthday gifts",
+     "interestOverTime": [
+      {
+       "value": 40
+      },
+      {
+       "value": 60
+      }
+     ],
+     "topRelated": [
+      {
+       "query": "gift ideas"
+      }
+     ]
+    }
+   ],
+   "demographics": {
+    "omitted": true,
+    "reason": "ESTAT_APP_ID is not set"
+   },
+   "notes": [
+    "Trends partial"
+   ]
+  }
+ }
+}

@@ -55,6 +55,8 @@ pkill -f "node server.js"
 ## Japan market (Toys R Us Japan)
 
 - Japan mode switches on from `profile.market` naming Japan or a `.jp` host (`utils/market.js`). Other markets keep the old behavior.
+- The Japan Refresh All runs in phases: collect (website, marketplace), analyse (demand, social, competitive, search), personas, plan, then translate (`analysis/translate_outputs.js`, writes `translations.json`).
+- **Bilingual output.** Any module read accepts `?lang=orig|en|ja` (a lookup in `translations.json`, no model call; header `X-Translations: missing|stale` says when it is absent or older than the module). `GET /api/brands/:slug/report?lang=en|ja` returns the full report as HTML and `/report.pdf` as a PDF (one at a time, gated to the Action Plan tab). The dashboard has an EN | 日本語 | Original toggle and a Download report menu. Translations are cached once per string in `data/translations_cache.json`. Only Japan-market brands can run the translations refresh.
 - `toysrus-jp` is seeded with `scheduled:false`, so no cron job runs it. It refreshes only on demand (Refresh all runs the phased Japan run in `analysis/brand_discovery.js`; a per-brand run lock returns 409 if one is already active).
 - Its site (toysrus.co.jp) is operated by another company behind Cloudflare. The profile sets `scrape.skipApifyRetry`, so nothing requests that site. A hand-saved capture goes in `data/brands/<slug>/manual_capture/<brand-id>.html` (and `.png`).
 - Runs save progress per brand and per source (`utils/checkpoint.js`, 24h, `BI_FORCE=1` ignores it). A failed unit keeps its previous data marked stale, and prompts label it STALE.

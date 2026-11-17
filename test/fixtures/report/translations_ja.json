@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-11-17T00:00:00.000Z",
+  "en": {
+    "おもちゃ": "toys"
+  },
+  "ja": {
+    "Unblock crawlers and AI shopping agents": "クローラーとAIショッピングエージェントのアクセスを許可する",
+    "Reconfigure Cloudflare bot management to allow verified search, LLM, and shopping-agent user agents, and monitor with log analysis. Until this is fixed, the site is invisible to AI answer engines that increasingly mediate toy discovery.": "Cloudflareのボット管理設定を見直し、認証済みの検索エンジン、LLM、ショッピングエージェントのユーザーエージェントを許可したうえで、ログ分析で監視します。これが解消されるまで、おもちゃ探しで存在感を増しているAI回答エンジンからサイトは見えません。",
+    "Server-render a live-text hero with a clear value proposition": "明確な価値提案をHTMLテキストのメインビジュアルとして表示する",
+    "Replace any image- or script-dependent hero with an H1, supporting subhead, and primary CTA in HTML that states the specialist toy + baby positioning. This gives both Google and LLMs a quotable brand statement.": "画像やスクリプトに依存したメインビジュアルを、おもちゃとベビー用品の専門店であることを示すH1見出し、補足の小見出し、主要CTAをHTMLで記述したものに置き換えます。これにより、GoogleとLLMの双方が引用できるブランドメッセージを提示できます。",
+    "Demand is occasion-led and item-specific, not category-led: reviews repeatedly cite birthdays, pre-orders and named requests (R5, R14, R19, R21), so a seasonal campaign hub plus reservation/pre-order visibility is the single highest-leverage site fix.": "需要はカテゴリーではなく、行事と特定商品によって動いています。レビューでは誕生日、予約購入、指名買いが繰り返し挙がっており（R5、R14、R19、R21）、季節キャンペーンの特設ページと予約情報の見やすさの改善が、最も効果の高いサイト改善策です。",
+    "The Developmental-Stage Mom": "発達段階を重視するママ",
+    "Short videos/carousels showing store restocking, toy unboxing in warehouse, staff setting up seasonal displays, or new shipment arrivals at Toys R Us Japan stores": "トイザらス店舗での品出し、倉庫での開封、スタッフによる季節の売り場づくり、新商品の入荷の様子を見せる短尺動画やカルーセル投稿"
+  }
+}

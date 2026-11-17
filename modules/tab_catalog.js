@@ -135,6 +135,7 @@ const MODULE_READERS = {
   // personas and the search work. Both feed the Action Plan.
   marketplace:          ['competitive', 'action'],
   jp_demand:            ['personas', 'search', 'action'],
+  translations:         ['action'],
 };
 
 // Only the tab that owns a module may pay for a re-run of it. Brand Profile is
@@ -148,6 +149,7 @@ const MODULE_WRITERS = {
   action_plan:          ['action'],
   marketplace:          ['competitive'],
   jp_demand:            ['personas'],
+  translations:         ['action'],
 };
 
 const API_TAB_MAP = {
@@ -168,6 +170,7 @@ const API_TAB_MAP = {
   'action_plan':          MODULE_READERS.action_plan,
   'marketplace':          MODULE_READERS.marketplace,
   'jp_demand':            MODULE_READERS.jp_demand,
+  'translations':         MODULE_READERS.translations,
 
   // ---- Per-tab extras ------------------------------------------------------
   'persona-chat':         ['personas'],
@@ -182,6 +185,9 @@ const API_TAB_MAP = {
   'export':               ['action'],
   'export/pdf':           ['action'],
   'export/share-link':    ['action'],
+  // The full bilingual report (HTML and PDF) is the Action Plan tab's deliverable like the export.
+  'report':               ['action'],
+  'report.pdf':           ['action'],
   'share-links':          ['action'],
 
   // ---- Portfolio -----------------------------------------------------------

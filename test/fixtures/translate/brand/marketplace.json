@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-11-16T21:52:39.568Z",
+  "market": "JP",
+  "categories": [
+    {
+      "source": "rakuten",
+      "category": "toys",
+      "url": "https://www.rakuten.co.jp/category/toy/",
+      "topItems": [
+        {
+          "rank": 1,
+          "title": "【MAX50%OFFクーポン】 子供PSCマーク検査済★バランスストーン 11個セット 子供用 飛び石 おもちゃ 男の子 女の子 こども 幼児 バランス感覚 体幹トレーニング 耐荷重70kg 知育 玩具 室内遊具 バランス ブロック 平均台 保育園 幼稚園 プレゼント",
+          "brand": null,
+          "priceJPY": 5890,
+          "reviewCount": 1150,
+          "rating": 4.63,
+          "url": "https://item.rakuten.co.jp/mottainaiya/10000641/?scid=seo-carousel-search"
+        },
+        {
+          "rank": 2,
+          "title": "ジップストリング おもちゃ 紐が浮く マジックストリング 【本体+ひも4本セット】 蓄光 LED 光る ロープランチャー 遊び方 使い方 技 紐が浮かぶ 替え紐 ヒモ 紐交換 充電式 日本語説明書付き 誕生日 プレゼント クリスマス 小学生 男の子 女の子 パーティー マジック",
+          "brand": null,
+          "priceJPY": 2980,
+          "reviewCount": 40,
+          "rating": 4.23,
+          "url": "https://item.rakuten.co.jp/shimataro/majisuto/?variantId=majisuto&scid=seo-carousel-search"
+        }
+      ]
+    }
+  ],
+  "brandMix": [
+    {
+      "brand": "タカラトミー(TAKARA TOMY)",
+      "count": 12
+    },
+    {
+      "brand": "BEYBLADE X",
+      "count": 7
+    },
+    {
+      "brand": "ベイブレードX",
+      "count": 7
+    }
+  ],
+  "reviews": [
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "ほんと最高。1パックにピカチュウ 確定はやばい！しかもみんな可愛い！ ありがとう株ポケ！",
+      "lang": "ja"
+    },
+    {
+      "source": "amazon_jp",
+      "productTitle": "ポケモンカードゲーム MEGA 拡張パック 30th CELEBRATION BOX",
+      "rating": 5,
+      "text": "初ボックスでした✨ 早い配送でとっても嬉しかったです^ ^ 開けるの楽しみです♪",
+      "lang": "ja"
+    }
+  ]
+}

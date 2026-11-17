@@ -1,0 +1,18 @@
+{
+ "slug": "fixture-brand",
+ "name": "Fixture Brand",
+ "market": "Japan",
+ "industry": "Toys",
+ "identifiedCompetitors": [
+  {
+   "name": "Rival Toys",
+   "url": "https://rival.example/",
+   "rationale": "国内最大級のおもちゃ専門チェーン"
+  },
+  {
+   "name": "Other Shop",
+   "url": "https://other.example/",
+   "rationale": "Large national toy chain with strong gifting."
+  }
+ ]
+}

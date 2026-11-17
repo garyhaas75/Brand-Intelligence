@@ -954,14 +954,108 @@ const BRAND_MODULES = [
   // Japan market modules
   { name: 'marketplace',          file: 'marketplace.json',          script: 'scrapers/marketplace_jp.js' },
   { name: 'jp_demand',            file: 'jp_demand.json',            script: 'analysis/jp_demand.js' },
+  { name: 'translations',         file: 'translations.json',         script: 'analysis/translate_outputs.js' },
 ];
+
+// ?lang=orig|en|ja on any module read. 'en' keeps Japanese text and adds the English beside it;
+// 'ja' returns English prose in Japanese. The translations are precomputed (translations.json), so
+// this is a lookup, never a model call. Anything without a translation is returned unchanged, and
+// the X-Translations header says when the sidecar is missing or could not be applied.
+function localizedBrandData(slug, data, lang, res, file) {
+  if (lang !== 'en' && lang !== 'ja') return data;
+  const tr = loadBrandData(slug, 'translations.json');
+  if (!tr) { res.setHeader('X-Translations', 'missing'); return data; }
+  // The sidecar is only rebuilt by the phased run (or refresh/translations). If this module was
+  // refreshed after that, its new or changed sentences have no translation yet: say so, so the
+  // dashboard can tell the user instead of silently showing them untranslated.
+  try {
+    if (file && fs.statSync(path.join(BRANDS_DIR, slug, file)).mtimeMs > fs.statSync(path.join(BRANDS_DIR, slug, 'translations.json')).mtimeMs + 1000) {
+      res.setHeader('X-Translations', 'stale');
+    }
+  } catch (_) { /* no file to compare: nothing to flag */ }
+  try { return require('./modules/localize').localizeData(data, lang, tr); }
+  catch (e) { console.error('[localize] failed:', e.message); res.setHeader('X-Translations', 'error'); return data; }
+}
+const reqLang = req => { const l = String(req.query.lang || 'orig').toLowerCase(); return l === 'en' || l === 'ja' ? l : 'orig'; };
 
 BRAND_MODULES.forEach(({ name, file }) => {
   app.get(`/api/brands/:slug/${name}`, (req, res) => {
     const data = loadBrandData(req.params.slug, file);
     if (!data) return res.status(404).json({ error: `${name} not yet generated` });
-    res.json(data);
+    res.json(name === 'translations' ? data : localizedBrandData(req.params.slug, data, reqLang(req), res, file));
   });
+});
+
+// ─── Full report, English or Japanese ──────────────────────────────────────────
+const REPORT_MODULES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand'];
+
+function buildReportHtml(slug, lang, res) {
+  const { renderReport } = require('./modules/report_html');
+  // One loader for the server and the CLI (scripts/render_report.js) so the two cannot drift: it
+  // localizes the profile and every module with the translations sidecar.
+  const { loadBrandReportInput } = require('./scripts/render_report');
+  const tr = loadBrandData(slug, 'translations.json');
+  if (!tr) res.setHeader('X-Translations', 'missing');
+  const { profile, data } = loadBrandReportInput(path.join(BRANDS_DIR, slug), lang, tr);
+  const brand = loadBrandsRegistry().brands.find(b => b.slug === slug) || {};
+  return renderReport({ profile, brandName: profile.name || brand.name || slug, data, lang, generatedAt: new Date().toISOString() });
+}
+
+// GET /api/brands/:slug/report?lang=en|ja : the whole report as one HTML document
+app.get('/api/brands/:slug/report', (req, res) => {
+  const { slug } = req.params;
+  if (!loadBrandsRegistry().brands.find(b => b.slug === slug)) return res.status(404).json({ error: 'Brand not found' });
+  const lang = reqLang(req) === 'ja' ? 'ja' : 'en';
+  try {
+    const html = buildReportHtml(slug, lang, res);
+    res.type('html').send(html);
+  } catch (e) { res.status(500).json({ error: `Report failed: ${e.message}` }); }
+});
+
+// GET /api/brands/:slug/report.pdf?lang=en|ja : the same report as a PDF. One at a time: a browser
+// per request is heavy, and a second click while one renders must not pile up.
+let reportPdfBusy = false;
+app.get('/api/brands/:slug/report.pdf', async (req, res) => {
+  const { slug } = req.params;
+  if (!loadBrandsRegistry().brands.find(b => b.slug === slug)) return res.status(404).json({ error: 'Brand not found' });
+  if (reportPdfBusy) return res.status(429).json({ error: 'A report is already being generated, try again in a minute' });
+  const lang = reqLang(req) === 'ja' ? 'ja' : 'en';
+  reportPdfBusy = true;
+  let browser;
+  try {
+    const html = buildReportHtml(slug, lang, res);
+    const puppeteer = require('puppeteer-core');
+    try {
+      const chromium = require('@sparticuz/chromium');
+      browser = await puppeteer.launch({ args: chromium.args, defaultViewport: chromium.defaultViewport, executablePath: await chromium.executablePath(), headless: chromium.headless });
+    } catch {
+      browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
+    }
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'load', timeout: 45000 });
+    const pdf = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true, margin: { top: '16mm', bottom: '16mm', left: '14mm', right: '14mm' } });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${slug}-report-${lang}-${new Date().toISOString().slice(0, 10)}.pdf"`);
+    res.send(Buffer.from(pdf));
+  } catch (e) {
+    res.status(500).json({ error: `PDF generation failed: ${e.message}` });
+  } finally {
+    // release the guard only once the browser is gone, so a second request cannot start a second
+    // browser while the first is still shutting down
+    // Release the guard as soon as the PDF has been produced and sent. Holding it through the
+    // browser shutdown made a second request (say the Japanese PDF right after the English one)
+    // fail with 429 for a few seconds, and the client already has its file. The shutdown below can
+    // overlap a new render briefly, which is fine.
+    reportPdfBusy = false;
+    // A hung shutdown must not leak a Chrome process: give close() 10 seconds, then kill it.
+    if (browser) {
+      try {
+        await Promise.race([browser.close(), new Promise((_, rej) => setTimeout(() => rej(new Error('browser close timed out')), 10000))]);
+      } catch (_) {
+        try { const proc = browser.process && browser.process(); if (proc) proc.kill('SIGKILL'); } catch (__) {}
+      }
+    }
+  }
 });
 
 // POST /api/brands/:slug/refresh/:module — trigger individual module refresh
@@ -1011,6 +1105,12 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   }
   const mod = BRAND_MODULES.find(m => m.name === moduleName);
   if (!mod) return res.status(400).json({ error: `Unknown module: ${moduleName}` });
+  // Translating costs money and only the Japan market needs it: refuse it for any other brand
+  if (moduleName === 'translations') {
+    let isJp = false;
+    try { isJp = require('./utils/market').isJapanMarket(JSON.parse(fs.readFileSync(path.join(BRANDS_DIR, slug, 'profile.json'), 'utf8'))); } catch (_) {}
+    if (!isJp) return res.status(400).json({ error: 'Translations are only available for Japan-market brands' });
+  }
   const heldRun = require('./utils/run_lock').status(slug, { dataDir: DATA_DIR });
   if (heldRun.held) return res.status(409).json({ error: 'A full refresh is running for this brand, wait for it to finish', startedAt: heldRun.startedAt || null });
 

@@ -299,6 +299,7 @@ const SCRIPT_TO_MODULE = {
   'action_plan.js': 'action_plan',
   '../scrapers/marketplace_jp.js': 'marketplace',
   'jp_demand.js': 'jp_demand',
+  'translate_outputs.js': 'translations',
 };
 
 // The output file each module writes when it finishes.
@@ -441,6 +442,9 @@ async function runJapanPhased(slug) {
     { name: 'analyse', scripts: ['jp_demand.js', 'social_audit.js', 'competitive_analysis.js', 'search_seo.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
     { name: 'personas', scripts: ['personas.js'], env: {} },
     { name: 'plan', scripts: ['action_plan.js'], env: {} },
+    // translations last: they read every module's final output (English to Japanese for the report,
+    // Japanese to English for the dashboard and the English report)
+    { name: 'translate', scripts: ['translate_outputs.js'], env: {} },
   ];
   const summary = { slug, startedAt, phases: [] };
   const write = () => { try { fs.writeFileSync(path.join(DATA_DIR, 'brands', slug, '_run_summary.json'), JSON.stringify({ ...summary, updatedAt: new Date().toISOString() }, null, 2)); } catch (_) {} };
