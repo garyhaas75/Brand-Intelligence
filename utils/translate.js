@@ -35,8 +35,11 @@ const DEFAULT_BATCH_SIZE = 40;
 const DEFAULT_BATCH_CHARS = 4500; // keeps 4000 + chars * 3 under the 20000 token cap
 const DEFAULT_CONCURRENCY = 3;
 
+// The English direction changed its rules (no Japanese characters may remain, see buildPrompt), so its
+// cache entries are versioned: results written under the old rules are not reused.
+const CACHE_VERSION = { en: 'en.v2', ja: 'ja' };
 function cacheKey(direction, s) {
-  return crypto.createHash('sha1').update(`${direction}\n${s}`).digest('hex');
+  return crypto.createHash('sha1').update(`${CACHE_VERSION[direction] || direction}\n${s}`).digest('hex');
 }
 
 function readCache(cacheFile) {
@@ -137,7 +140,7 @@ function makeBatches(strings, batchSize = DEFAULT_BATCH_SIZE, batchChars = DEFAU
   return batches;
 }
 
-function buildPrompt(batch, direction) {
+function buildPrompt(batch, direction, opts = {}) {
   const target = direction === 'en' ? 'English' : 'natural, native Japanese';
   const source = direction === 'en' ? 'Japanese (or mixed Japanese and English)' : 'English';
   const input = {};
@@ -146,10 +149,20 @@ function buildPrompt(batch, direction) {
     `You translate ${source} text from a retail competitive intelligence report into ${target}.`,
     'Rules:',
     '- Keep proper nouns, brand names, product names, store names and character names recognisable. For English output, write the established English name if one exists, otherwise romanise; do not invent names.',
-    '- Keep numbers, prices, dates, percentages, punctuation, emoji, hashtags, @handles and URLs exactly as they are.',
+    '- Keep numbers, prices, dates, percentages, punctuation, emoji, @handles and URLs exactly as they are.',
+    ...(direction === 'en' ? [
+      '- The English output must contain NO Japanese characters (no hiragana, katakana or kanji). This is the most important rule.',
+      '- The input is often English that already quotes or glosses Japanese terms, for example "Choose 知育玩具 (educational toys)" or "searches \'3歳 知育玩具\'/educational toys for 3-year-olds". Keep the English meaning and drop the Japanese: "Choose educational toys", "searches \'educational toys for 3-year-olds\'". Do not repeat the same idea twice.',
+      '- A quoted Japanese phrase becomes its English meaning in the same quotation marks. A Japanese brand, store or product name becomes its established English name, otherwise romaji. A Japanese hashtag becomes an English hashtag of its meaning, for example #おうち遊び becomes #at-home-play.',
+    ] : [
+      '- Keep hashtags exactly as they are.',
+    ]),
     '- Keep list markers, line breaks and bullet structure.',
     '- Translate meaning faithfully. Do not summarise, add commentary, or omit content.',
-    '- If a string is already fully in the target language, return it unchanged.',
+    direction === 'en'
+      ? '- Only if a string contains no Japanese characters at all, return it unchanged.'
+      : '- If a string is already fully in the target language, return it unchanged.',
+    ...(opts.strict ? ['- A previous answer still contained Japanese characters. Check every string again and remove every one of them.'] : []),
     'Input is a JSON object mapping index to source string.',
     'Reply with ONLY a JSON object mapping the same indexes to the translated strings, every index present, no other text.',
   ].join('\n');
@@ -204,8 +217,8 @@ function maxTokensFor(batch) {
   return Math.min(20000, Math.max(MIN_TOKENS_JSON, 4000 + chars * 3));
 }
 
-async function callBatch(client, batch, direction) {
-  const { system, user } = buildPrompt(batch, direction);
+async function callOnce(client, batch, direction, opts) {
+  const { system, user } = buildPrompt(batch, direction, opts);
   const msg = await client.messages.create({
     model: MODEL_FAST,
     max_tokens: maxTokensFor(batch),
@@ -215,6 +228,21 @@ async function callBatch(client, batch, direction) {
   });
   if (msg && msg.stop_reason === 'max_tokens') throw new Error('reply hit max_tokens');
   return validateReply(extractText(msg), batch.length);
+}
+
+const HAS_JAPANESE = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
+
+async function callBatch(client, batch, direction, residualRetry = true) {
+  const out = await callOnce(client, batch, direction, {});
+  if (direction !== 'en' || !residualRetry) return out;
+  // English output must have no Japanese left. Ask again, once, for just the offenders.
+  const bad = out.map((t, i) => (HAS_JAPANESE.test(t) ? i : -1)).filter(i => i >= 0);
+  if (!bad.length) return out;
+  try {
+    const retry = await callOnce(client, bad.map(i => batch[i]), direction, { strict: true });
+    bad.forEach((i, k) => { if (!HAS_JAPANESE.test(retry[k]) || retry[k].length) out[i] = retry[k]; });
+  } catch (_) { /* keep the first answer rather than fail the whole batch */ }
+  return out;
 }
 
 function defaultClient() {
@@ -304,7 +332,7 @@ async function translateStrings(strings, direction, opts = {}) {
         stats.sent += attempt === 1 ? batch.length : 0;
         stats.chars += batch.reduce((n, s) => n + s.length, 0);
         try {
-          out = await callBatch(client, batch, direction);
+          out = await callBatch(client, batch, direction, opts.residualRetry !== false);
         } catch (e) {
           lastErr = e;
           log(`[translate] ${direction} batch ${idx + 1}/${batches.length} attempt ${attempt} failed: ${e.message}`);

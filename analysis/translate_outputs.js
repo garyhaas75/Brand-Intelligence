@@ -24,6 +24,8 @@ const SOURCE_FILES = [
   'competitive_analysis.json', 'personas.json', 'social_intelligence.json', 'site_intelligence.json',
   'search_seo.json', 'action_plan.json', 'marketplace.json', 'jp_demand.json', 'profile.json',
 ];
+// Bump when the translation rules change so previously saved translations are not reused.
+const TRANSLATOR_VERSION = 2;
 const DEFAULT_MAX_STRINGS = 3000;
 const DEFAULT_MAX_CHARS = 400000; // total source characters per direction
 const CAPTIONS_PER_BRAND = 60;
@@ -121,7 +123,15 @@ async function run(opts = {}) {
   const collected = collectAll(sources, { captionsPerBrand: opts.captionsPerBrand || CAPTIONS_PER_BRAND });
 
   const prev = readJson(outFile) || {};
-  const prevMap = { en: prev.en && typeof prev.en === 'object' ? prev.en : {}, ja: prev.ja && typeof prev.ja === 'object' ? prev.ja : {} };
+  // Entries are reused from the previous file only if it was built under the same translator rules.
+  // The English rules changed (no Japanese may remain in English output), so a file written before
+  // that carries entries that still contain Japanese and must be redone. The shared cache is
+  // versioned the same way, so redoing them costs only the strings that really changed.
+  const prevEnOk = prev.translatorVersion === TRANSLATOR_VERSION;
+  const prevMap = {
+    en: prevEnOk && prev.en && typeof prev.en === 'object' ? prev.en : {},
+    ja: prev.ja && typeof prev.ja === 'object' ? prev.ja : {},
+  };
   const cache = readCache(cacheFile);
 
   const plan = {};
@@ -182,7 +192,7 @@ async function run(opts = {}) {
     const toTranslate = plan[dir].list.filter(s => !Object.prototype.hasOwnProperty.call(prevMap[dir], s));
     const map = await translateStrings(toTranslate, dir, {
       log, cacheFile, client: opts.client, checkpoint: cp, concurrency: opts.concurrency,
-      batchSize: opts.batchSize, batchChars: opts.batchChars,
+      batchSize: opts.batchSize, batchChars: opts.batchChars, residualRetry: opts.residualRetry,
     });
     for (const [s, t] of map) merged[dir][s] = t;
     const st = map.stats;
@@ -207,6 +217,7 @@ async function run(opts = {}) {
 
   const output = {
     generatedAt: new Date().toISOString(),
+    translatorVersion: TRANSLATOR_VERSION,
     en: merged.en,
     ja: merged.ja,
     stats: {
@@ -243,7 +254,7 @@ function parseArgs(argv) {
   return args;
 }
 
-module.exports = { run, parseArgs, collectAll, capSocialCaptions, loadSources, SOURCE_FILES, CAPTIONS_PER_BRAND, DEFAULT_MAX_STRINGS, DEFAULT_MAX_CHARS };
+module.exports = { TRANSLATOR_VERSION, run, parseArgs, collectAll, capSocialCaptions, loadSources, SOURCE_FILES, CAPTIONS_PER_BRAND, DEFAULT_MAX_STRINGS, DEFAULT_MAX_CHARS };
 
 if (require.main === module) {
   try { require('dotenv').config(); } catch (_) {}

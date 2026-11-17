@@ -3,9 +3,11 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const {
-  translateStrings, makeBatches, validateReply, readCache, cacheKey,
-} = require('../utils/translate');
+const T = require('../utils/translate');
+const { makeBatches, validateReply, readCache, cacheKey } = T;
+// These tests are about batching, caching and failures. Their fake replies echo the Japanese source,
+// which the residual-Japanese retry (tested separately below) would treat as a bad English answer.
+const translateStrings = (strings, direction, opts = {}) => T.translateStrings(strings, direction, { residualRetry: false, ...opts });
 const outputs = require('../analysis/translate_outputs');
 const checkpoint = require('../utils/checkpoint');
 
@@ -202,7 +204,7 @@ test('translate_outputs dry run makes no call and writes nothing', async () => {
 test('translate_outputs keeps the previous file on failure and merges on success', async () => {
   const { dataDir, brandDir, outFile } = brandSandbox();
   const { en, ja } = outputs.collectAll(outputs.loadSources(brandDir));
-  const prev = { generatedAt: 'old', en: { [en[0]]: 'old entry' }, ja: { [ja[0]]: '古い文' }, stats: {} };
+  const prev = { generatedAt: 'old', translatorVersion: outputs.TRANSLATOR_VERSION, en: { [en[0]]: 'old entry' }, ja: { [ja[0]]: '古い文' }, stats: {} };
   fs.writeFileSync(outFile, JSON.stringify(prev));
   const client = stubClient();
   await outputs.run({ slug: 'demo', dataDir, client, log: quiet, cacheFile: path.join(dataDir, 'c1.json') });
@@ -230,7 +232,7 @@ test('translate_outputs keeps the previous file on failure and merges on success
 test('translate_outputs: all batches failing still writes, reports failures, keeps old entries', async () => {
   const { dataDir, brandDir, outFile } = brandSandbox();
   const { en } = outputs.collectAll(outputs.loadSources(brandDir));
-  fs.writeFileSync(outFile, JSON.stringify({ en: { [en[0]]: 'old' }, ja: {} }));
+  fs.writeFileSync(outFile, JSON.stringify({ translatorVersion: outputs.TRANSLATOR_VERSION, en: { [en[0]]: 'old' }, ja: {} }));
   const crashing = stubClient(() => { throw new Error('overloaded'); });
   const res = await outputs.run({ slug: 'demo', dataDir, client: crashing, log: quiet });
   const out = JSON.parse(fs.readFileSync(outFile, 'utf8'));
@@ -332,7 +334,7 @@ test('translate_outputs maxChars caps source characters per direction in collect
   const { en } = outputs.collectAll(outputs.loadSources(brandDir));
   const cap = en[0].length + en[1].length; // exactly the first two en strings fit
   const client = stubClient();
-  const res = await outputs.run({ slug: 'demo', dataDir, client, log: quiet, maxChars: cap });
+  const res = await outputs.run({ slug: 'demo', dataDir, client, log: quiet, maxChars: cap, residualRetry: false });
   const out = JSON.parse(fs.readFileSync(outFile, 'utf8'));
   assert.deepEqual(Object.keys(out.en), [en[0], en[1]]);
   assert.equal(out.stats.truncated.en, en.length - 2);
@@ -397,4 +399,50 @@ test('output token request stays under the SDK non-streaming limit for every def
   }
   // even one string longer than the batch limit may not exceed the cap
   assert.ok(maxTokensFor(['y'.repeat(DEFAULT_BATCH_CHARS * 3)]) <= 20000);
+});
+
+test('English output: the prompt forbids Japanese, residual Japanese is retried once with the strict rule, and the cache is versioned', async () => {
+  const { buildPrompt } = T;
+  const sys = buildPrompt(['x'], 'en').system;
+  assert.match(sys, /NO Japanese characters/);
+  assert.match(sys, /知育玩具 \(educational toys\)/);
+  assert.doesNotMatch(sys, /hashtags[^\n]*exactly as they are/);
+  assert.match(buildPrompt(['x'], 'ja').system, /Keep hashtags exactly as they are/);
+  assert.match(buildPrompt(['x'], 'en', { strict: true }).system, /remove every one of them/);
+  const sha = d => require('crypto').createHash('sha1').update(d).digest('hex');
+  assert.notStrictEqual(cacheKey('en', 'a'), sha('en\na'), 'en cache must be versioned');
+  assert.strictEqual(cacheKey('ja', 'a'), sha('ja\na'), 'ja cache unchanged');
+  const src = ['Choose 知育玩具 (educational toys) for age 3', 'Plain 玩具'];
+  const calls = [];
+  const client = { messages: { create: async req => {
+    calls.push(req.system);
+    const input = JSON.parse(req.messages[0].content);
+    const strict = /remove every one of them/.test(req.system);
+    const text = JSON.stringify(Object.fromEntries(Object.entries(input).map(([k, v]) => [k, strict ? 'Choose educational toys for age 3' : (v.includes('Choose') ? 'Choose 知育玩具 (educational toys) for age 3' : 'Plain toy')])));
+    return { stop_reason: 'end_turn', content: [{ type: 'text', text }] };
+  } } };
+  const map = await T.translateStrings(src, 'en', { client, cacheFile: path.join(tmpDir(), 'c.json'), log: () => {} });
+  assert.strictEqual(map.get(src[0]), 'Choose educational toys for age 3');
+  assert.strictEqual(map.get(src[1]), 'Plain toy');
+  assert.strictEqual(calls.length, 2, 'one batch call plus one strict retry for the single offender');
+});
+
+test('a translations.json built under older English rules is not reused; the same version is', async () => {
+  const dataDir = tmpDir();
+  const dir = path.join(dataDir, 'brands', 'demo');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'personas.json'), JSON.stringify({ lifestyle: 'Choose 知育玩具 (educational toys) for age 3' }));
+  const quiet = () => {};
+  const mk = () => { const calls = []; return { calls, messages: { create: async req => { calls.push(1); const input = JSON.parse(req.messages[0].content); return { stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(Object.fromEntries(Object.entries(input).map(([k]) => [k, /into English/.test(req.system) ? 'Choose educational toys for age 3' : 'x']))) }] }; } } }; };
+  // an old-format file (no translatorVersion) holding the bad entry
+  fs.writeFileSync(path.join(dir, 'translations.json'), JSON.stringify({ generatedAt: 'x', en: { 'Choose 知育玩具 (educational toys) for age 3': 'Choose 知育玩具 (educational toys) for age 3' }, ja: {} }));
+  const c1 = mk();
+  await outputs.run({ slug: 'demo', dataDir, client: c1, log: quiet, cacheFile: path.join(dataDir, 'cache.json') });
+  const out1 = JSON.parse(fs.readFileSync(path.join(dir, 'translations.json'), 'utf8'));
+  assert.strictEqual(out1.en['Choose 知育玩具 (educational toys) for age 3'], 'Choose educational toys for age 3');
+  assert.strictEqual(out1.translatorVersion, outputs.TRANSLATOR_VERSION);
+  assert.ok(c1.calls.length >= 1, 'the old entry was redone');
+  const c2 = mk();
+  await outputs.run({ slug: 'demo', dataDir, client: c2, log: quiet, cacheFile: path.join(dataDir, 'cache.json') });
+  assert.strictEqual(c2.calls.length, 0, 'same version: nothing is re-sent');
 });
