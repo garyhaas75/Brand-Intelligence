@@ -432,10 +432,13 @@ async function runJapanPhased(slug) {
     return;
   }
   process.on('exit', () => runLock.release(slug));
+  try { require('../modules/run_info').clearRequested(slug, DATA_DIR); } catch (_) {}
   const startedAt = new Date().toISOString();
   const phases = [
-    { name: 'collect', scripts: ['website_audit.js', '../scrapers/marketplace_jp.js', 'jp_demand.js'], env: {} },
-    { name: 'analyse', scripts: ['social_audit.js', 'competitive_analysis.js', 'search_seo.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
+    // jp_demand reads marketplace.json for its search terms, so it runs after the collect phase
+    // (run 1 on Railway ran it alongside marketplace and it fell back to industry terms only).
+    { name: 'collect', scripts: ['website_audit.js', '../scrapers/marketplace_jp.js'], env: {} },
+    { name: 'analyse', scripts: ['jp_demand.js', 'social_audit.js', 'competitive_analysis.js', 'search_seo.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
     { name: 'personas', scripts: ['personas.js'], env: {} },
     { name: 'plan', scripts: ['action_plan.js'], env: {} },
   ];

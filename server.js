@@ -155,7 +155,9 @@ function getBrandStatus(slug) {
 
 function getHealthStatus(slug) {
   const status = getBrandStatus(slug);
-  const existingModules = status.filter(s => s.exists);
+  // profile.json is configuration (it is seeded and edited by hand), not analysis output, so it
+  // must not make a brand that has never run look fresh.
+  const existingModules = status.filter(s => s.exists && s.module !== 'profile');
   if (existingModules.length === 0) return 'never_run';
   const mostRecent = existingModules.reduce((a, b) => new Date(a.lastRefreshed) > new Date(b.lastRefreshed) ? a : b);
   const ageHours = (Date.now() - new Date(mostRecent.lastRefreshed)) / 3600000;
@@ -559,6 +561,7 @@ app.get('/api/social-image/:slug/:filename', (req, res) => {
 // check, /share/:token, and the cached social images. Share links are meant to be openable by
 // people with no account, which is the whole point of them.
 const { requireUser } = require('./whpAuth');
+const { getRunInfo } = require('./modules/run_info');
 const { publishCatalog, pushCatalog } = require('./modules/whp_catalog');
 const { TAB_CATALOG, tabsForPath, userAllowed } = require('./modules/tab_catalog');
 
@@ -803,12 +806,16 @@ app.get('/api/brands', (req, res) => {
   let dirty = false;
   const brands = registry.brands.map(b => {
     const moduleStatus = getBrandStatus(b.slug);
-    // Auto-clear stuck 'running' status when at least one module has completed
-    if (b.discoveryStatus === 'running' && moduleStatus.some(m => m.exists)) {
+    const run = getRunInfo(b.slug, DATA_DIR);
+    // Auto-clear stuck 'running' status when at least one module has completed, but never while a
+    // phased run still holds its lock: that run is genuinely in progress.
+    if (b.discoveryStatus === 'running' && !run.active && moduleStatus.some(m => m.exists && m.module !== 'profile')) {
       b.discoveryStatus = 'complete';
       dirty = true;
     }
-    return { ...b, healthStatus: getHealthStatus(b.slug), moduleStatus };
+    // A live run shows as running whatever the stored flag says (reported only, never saved)
+    const discoveryStatus = run.active ? 'running' : b.discoveryStatus;
+    return { ...b, discoveryStatus, run, healthStatus: getHealthStatus(b.slug), moduleStatus };
   });
   if (dirty) saveBrandsRegistry(registry);
   res.json({ brands });
@@ -860,7 +867,8 @@ app.get('/api/brands/:slug', (req, res) => {
   const registry = loadBrandsRegistry();
   const brand = registry.brands.find(b => b.slug === req.params.slug);
   if (!brand) return res.status(404).json({ error: 'Brand not found' });
-  res.json({ ...brand, healthStatus: getHealthStatus(brand.slug), moduleStatus: getBrandStatus(brand.slug) });
+  const run = getRunInfo(brand.slug, DATA_DIR);
+  res.json({ ...brand, discoveryStatus: run.active ? 'running' : brand.discoveryStatus, run, healthStatus: getHealthStatus(brand.slug), moduleStatus: getBrandStatus(brand.slug) });
 });
 
 // DELETE /api/brands/:slug — remove brand and all its data
@@ -906,6 +914,13 @@ app.put('/api/brands/:slug/profile', (req, res) => {
 });
 
 // GET /api/brands/:slug/status — per-module freshness
+// GET /api/brands/:slug/run-status: what a phased run is doing right now
+app.get('/api/brands/:slug/run-status', (req, res) => {
+  if (!loadBrandsRegistry().brands.find(b => b.slug === req.params.slug)) return res.status(404).json({ error: 'Brand not found' });
+  res.json(getRunInfo(req.params.slug, DATA_DIR));
+});
+
+// GET /api/brands/:slug/status: which module output files exist
 app.get('/api/brands/:slug/status', (req, res) => {
   res.json({ slug: req.params.slug, modules: getBrandStatus(req.params.slug) });
 });
@@ -956,7 +971,13 @@ app.post('/api/brands/:slug/refresh/all', (req, res) => {
   const brand = registry.brands.find(b => b.slug === slug);
   if (!brand) return res.status(404).json({ error: 'Brand not found' });
   const held = require('./utils/run_lock').status(slug, { dataDir: DATA_DIR });
-  if (held.held) return res.status(409).json({ error: 'A refresh is already running for this brand', startedAt: held.startedAt || null });
+  if (held.held || getRunInfo(slug, DATA_DIR).active) return res.status(409).json({ error: 'A refresh is already running for this brand', startedAt: held.startedAt || null });
+  // Japan brands run the phased, locked path: mark the run as requested so the dashboard shows it
+  // from the first poll (see modules/run_info.js)
+  try {
+    const prof = JSON.parse(fs.readFileSync(path.join(BRANDS_DIR, slug, 'profile.json'), 'utf8'));
+    if (require('./utils/market').isJapanMarket(prof)) require('./modules/run_info').markRequested(slug, DATA_DIR);
+  } catch (_) { /* no profile: legacy path */ }
 
   const profilePath = path.join(BRANDS_DIR, slug, 'profile.json');
   const hasProfile = fs.existsSync(profilePath);

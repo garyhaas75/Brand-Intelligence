@@ -157,6 +157,7 @@ const API_TAB_MAP = {
   'upload_style_guide':   ['profile'],
   'process_style_guide':  ['profile'],
   'discovery-log':        ['profile', 'portfolio'],
+  'run-status':           ['portfolio', 'profile'],
 
   // ---- Analysis module reads ----------------------------------------------
   'competitive_analysis': MODULE_READERS.competitive_analysis,
