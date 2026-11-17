@@ -300,6 +300,7 @@ const SCRIPT_TO_MODULE = {
   '../scrapers/marketplace_jp.js': 'marketplace',
   'jp_demand.js': 'jp_demand',
   'translate_outputs.js': 'translations',
+  'site_blueprint.js': 'site_blueprint',
 };
 
 // The output file each module writes when it finishes.
@@ -441,6 +442,9 @@ async function runJapanPhased(slug) {
     { name: 'collect', scripts: ['website_audit.js', '../scrapers/marketplace_jp.js'], env: {} },
     { name: 'analyse', scripts: ['jp_demand.js', 'social_audit.js', 'competitive_analysis.js', 'search_seo.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
     { name: 'personas', scripts: ['personas.js'], env: {} },
+    // the blueprint reads personas, marketplace, demand, search and the competitor scrape, and the
+    // action plan then builds on it
+    { name: 'blueprint', scripts: ['site_blueprint.js'], env: {} },
     { name: 'plan', scripts: ['action_plan.js'], env: {} },
     // translations last: they read every module's final output (English to Japanese for the report,
     // Japanese to English for the dashboard and the English report)

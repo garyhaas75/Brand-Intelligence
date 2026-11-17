@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const runLock = require('../utils/run_lock');
 
-const PHASE_ORDER = ['collect', 'analyse', 'personas', 'plan', 'translate'];
+const PHASE_ORDER = ['collect', 'analyse', 'personas', 'blueprint', 'plan', 'translate'];
 
 // Between the click and the orchestrator taking its lock there is a gap of a second or two (a new
 // process has to start). The route drops a marker file then, so the brand reads as running from
@@ -31,7 +31,8 @@ function getRunInfo(slug, dataDir) {
   const byName = new Map(((summary && summary.phases) || []).map(p => [p.name, p]));
   const phases = PHASE_ORDER.map(name => {
     const p = byName.get(name);
-    if (!p) return { name, state: 'pending' };
+    // a summary written before this phase existed (finished run) must not show it as pending forever
+    if (!p) return { name, state: summary && summary.finishedAt ? 'skipped' : 'pending' };
     if (p.exit) {
       const failed = Object.entries(p.exit).filter(([, c]) => c !== 0).map(([s]) => s);
       return { name, state: 'done', failed: failed.length ? failed : undefined };

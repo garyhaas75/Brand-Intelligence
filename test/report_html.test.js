@@ -277,3 +277,203 @@ test('loadBrandReportInput localizes the profile too, so CLI and server render t
   assert.strictEqual(enHtml.split('国内最大級のおもちゃ専門チェーン').length - 1, 1, 'Japanese source appears once in en');
   assert.ok(enHtml.includes('One of the largest toy specialist chains in Japan'), 'English gloss present in en');
 });
+
+// ---------- website blueprint ----------
+
+test('blueprint section renders after website, with banner, evidence line, groups, calendar, practices, verify-first and roadmap', () => {
+  for (const lang of ['en', 'ja']) {
+    const d = DICT[lang];
+    const html = render({ lang });
+    const iWeb = html.indexOf(`<h2>${escHtml(d.s_website)}</h2>`);
+    const iBp = html.indexOf(`<h2>${escHtml(d.s_blueprint)}</h2>`);
+    const iMp = html.indexOf(`<h2>${escHtml(d.s_marketplace)}</h2>`);
+    assert.ok(iWeb > 0 && iBp > iWeb && iMp > iBp, `${lang}: blueprint sits between website and marketplace`);
+    const sec = html.slice(iBp, iMp);
+    assert.ok(sec.includes(escHtml(d.notObservedTitle)), `${lang}: banner`);
+    assert.ok(sec.includes(escHtml(d.evidenceBase)));
+    for (const g of ['g_navigation', 'g_homepage', 'g_searchAndDiscovery', 'g_seoAndAiVisibility']) assert.ok(sec.includes(`<h3>${escHtml(d[g])}</h3>`), `${lang}: ${g}`);
+    for (const g of ['g_productAndCategoryPages', 'g_trustAndService']) assert.ok(!sec.includes(`<h3>${escHtml(d[g])}</h3>`), `${lang}: empty ${g} dropped`);
+    assert.ok(sec.includes(escHtml(d.seasonal)) && sec.includes('Christmas toy fair'));
+    assert.ok(sec.includes(escHtml(d.bestPracticesTitle)) && sec.includes('IP-first navigation'));
+    assert.ok(sec.includes(escHtml(d.verifyFirst)) && sec.includes('class="compact verify"') && sec.includes('class="box"'), `${lang}: verify-first table`);
+    assert.ok(sec.includes('class="phases"') && (sec.match(/class="phase"/g) || []).length === 3, `${lang}: three roadmap blocks`);
+    const summary = html.slice(html.indexOf('id="sec-summary"'), html.indexOf('id="sec-competitors"'));
+    assert.ok(summary.includes(escHtml(d.websiteDirection)) && summary.includes('Build the site around gifting moments.'), `${lang}: website direction in summary`);
+  }
+});
+
+test('evidence line counts in English', () => {
+  const html = render();
+  assert.ok(html.includes('5 of 6 competitor sites, 15 marketplace items, 48 customer reviews, 5 search-demand terms, 4 personas</p>'));
+  assert.ok(!html.slice(html.indexOf('class="evidence-line"')).split('</p>')[0].includes('87'), 'no AI score in evidence line');
+});
+
+test('ja banner uses the Japanese default when the note is still English', () => {
+  const html = render({ lang: 'ja' });
+  assert.ok(html.includes(escHtml(DICT.ja.notObservedDefault)));
+});
+
+test('benchmark banner absent when the target was observed', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.site_blueprint.targetObserved = true;
+  data.site_blueprint.mode = 'audit-informed';
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data });
+    assert.ok(!html.includes(escHtml(DICT[lang].notObservedTitle)), `${lang}: no banner`);
+    assert.ok(html.includes(`<h2>${escHtml(DICT[lang].s_blueprint)}</h2>`));
+  }
+});
+
+test('without blueprint the section is omitted and listed as no data yet', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  delete data.site_blueprint;
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data });
+    assert.ok(!html.includes(`<h2>${escHtml(DICT[lang].s_blueprint)}</h2>`));
+    const line = html.slice(html.indexOf('class="empty-line"'));
+    assert.ok(line.includes(escHtml(DICT[lang].s_blueprint)), `${lang}: named in no-data line`);
+    assert.ok(!html.includes(escHtml(DICT[lang].websiteDirection)));
+  }
+});
+
+test('website section labels findings as Recommended when the audit is a benchmark', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.site_intelligence.auditBasis = 'benchmark';
+  data.site_intelligence.auditNote = 'Target site not observed; items below are benchmarks.';
+  const html = render({ data });
+  const web = html.slice(html.indexOf('id="sec-website"'), html.indexOf('id="sec-blueprint"'));
+  assert.ok(web.includes('Target site not observed; items below are benchmarks.'));
+  for (const k of ['navGaps', 'messagingGaps', 'topOpportunities']) assert.ok(web.includes(`<h3>${escHtml(DICT.en[k])} <span class="lbl">Recommended</span></h3>`), k);
+  const plain = render();
+  assert.ok(!plain.slice(plain.indexOf('id="sec-website"'), plain.indexOf('id="sec-blueprint"')).includes('<span class="lbl">Recommended</span>'));
+});
+
+test('data notes list blueprint freshness and stale state', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.site_blueprint.stale = true;
+  data.site_blueprint.asOf = '2026-11-01T00:00:00.000Z';
+  data.site_blueprint.lastError = 'overload_page';
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data });
+    const notes = html.slice(html.indexOf('id="sec-notes"'));
+    assert.ok(notes.includes(`<td>${escHtml(DICT[lang].s_blueprint)}</td>`), `${lang}: freshness row`);
+    assert.ok(notes.includes(escHtml(`${DICT[lang].partial}: ${DICT[lang].includesStale}`)), `${lang}: stale status`);
+    assert.ok(!notes.includes('site_blueprint'), `${lang}: raw key not shown`);
+  }
+});
+
+test('blueprint strings are escaped and carry no em dashes', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  const evil = '<img src=x onerror=alert(1)> & "q" \u2014 end';
+  data.site_blueprint.summary = evil;
+  data.site_blueprint.blueprint.navigation[0].item = evil;
+  data.site_blueprint.verifyFirst[0].check = evil;
+  data.site_blueprint.roadmap[0].phase = evil;
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data });
+    assert.ok(!html.includes('<img'), `${lang}: raw tag`);
+    assert.ok(!html.includes('\u2014'), `${lang}: em dash`);
+    assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'));
+  }
+});
+
+// ---------- round 4: benchmark honesty and design ----------
+
+function benchData() {
+  const data = JSON.parse(JSON.stringify(full.data));
+  Object.assign(data.site_intelligence, {
+    auditBasis: 'benchmark',
+    targetObserved: false,
+    auditNote: 'Target site not observed in this run.',
+    ctaEffectiveness: { rating: 'CTA-RATING-POOR', observations: 'CTA-OBSERVATION-TEXT', recommendation: 'CTA-RECO-TEXT' },
+    crawlerVisibility: { heroTextIsLive: null, contentInImagesLevel: 'image-embedded', aiReadabilityNote: 'CRAWLER-NOTE-TEXT' },
+    navigationAnalysis: { missingCategories: ['Character hubs'], depth: 'DEPTH-SHALLOW' },
+    productContentReview: { contentGaps: ['Age guides'], priceVisibility: 'PRICE-HIDDEN', ageGroupCoverage: [] },
+    heroMessagingAnalysis: { targetStrengths: ['STRENGTH-TEXT'], targetGaps: ['GAP-TEXT'] },
+  });
+  return data;
+}
+
+test('benchmark mode: no CTA block, no crawler readings, no unlabelled findings', () => {
+  for (const lang of ['en', 'ja']) {
+    const d = DICT[lang];
+    const html = render({ lang, data: benchData() });
+    for (const bad of ['CTA-RATING-POOR', 'CTA-OBSERVATION-TEXT', 'CTA-RECO-TEXT', 'image-embedded', 'CRAWLER-NOTE-TEXT', 'STRENGTH-TEXT', 'GAP-TEXT', 'DEPTH-SHALLOW', 'PRICE-HIDDEN']) {
+      assert.ok(!html.includes(bad), `${lang}: ${bad} leaked`);
+    }
+    assert.ok(!html.includes(`<h3>${escHtml(d.missingCategories)}</h3>`), `${lang}: unlabelled missing categories`);
+    assert.ok(!html.includes(`<h3>${escHtml(d.contentGaps)}</h3>`) || !html.slice(html.indexOf('id="sec-website"'), html.indexOf('id="sec-blueprint"')).includes(`<h3>${escHtml(d.contentGaps)}</h3>`), `${lang}: unlabelled content gaps in website section`);
+    const rec = ` <span class="lbl">${escHtml(d.recommended)}</span></h3>`;
+    assert.ok(html.includes(`<h3>${escHtml(d.recCategories)}${rec}`), `${lang}: recommended categories`);
+    assert.ok(html.includes(`<h3>${escHtml(d.recContent)}${rec}`), `${lang}: recommended content`);
+  }
+});
+
+test('observed mode: unknown crawler readings render as Not observed in this run', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.site_intelligence.crawlerVisibility = { heroTextIsLive: null, contentInImagesLevel: 'unknown', aiReadabilityNote: 'Note' };
+  const html = render({ data });
+  const web = html.slice(html.indexOf('id="sec-website"'), html.indexOf('id="sec-blueprint"'));
+  assert.strictEqual(web.split(DICT.en.notObservedRun).length - 1, 2);
+  assert.ok(!web.includes('>unknown<'));
+});
+
+test('blueprint tables: evidence under the reason, priority, effort and confidence stacked in one column', () => {
+  for (const lang of ['en', 'ja']) {
+    const d = DICT[lang];
+    const html = render({ lang });
+    const tb = html.slice(html.indexOf('<table class="compact bp">'));
+    const head = tb.slice(0, tb.indexOf('</thead>'));
+    assert.strictEqual((head.match(/<th /g) || []).length, 3, `${lang}: three columns`);
+    assert.ok(tb.slice(0, tb.indexOf('</tbody>')).includes('class="ev"'), `${lang}: evidence under the reason`);
+    assert.ok(head.includes(escHtml(d.pec)));
+    const row = tb.slice(tb.indexOf('<tbody>'), tb.indexOf('</tr>', tb.indexOf('<tbody>')));
+    assert.strictEqual((row.match(/class="pec"/g) || []).length, 3, `${lang}: three stacked labels`);
+    for (const k of ['priority', 'effort', 'confidence']) assert.ok(row.includes(`<span class="pec-k">${escHtml(d[k])}</span>`), `${lang}: ${k} text label`);
+  }
+});
+
+test('blueprint banner is neutral grey, not the warning style', () => {
+  const html = render();
+  const sec = html.slice(html.indexOf('id="sec-blueprint"'));
+  assert.ok(sec.includes('<div class="callout callout-note"><strong>'));
+  assert.ok(!sec.slice(0, sec.indexOf('</div>')).includes('callout-warn'));
+});
+
+test('AI score is labelled as brand recall asked of Claude, in both languages', () => {
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang });
+    assert.ok(html.includes(escHtml(DICT[lang].aiVisibility)));
+    assert.ok(!html.includes('AI visibility score') && !html.includes('AI露出スコア'));
+  }
+  assert.strictEqual(DICT.en.aiVisibility, 'AI brand recall (asked of Claude)');
+});
+
+test('jaPunctuate collapses a full stop followed by a joining comma', () => {
+  const { jaPunctuate } = require('../modules/report_html');
+  assert.strictEqual(jaPunctuate('在庫を確認する。, 次に注文する。'), '在庫を確認する。次に注文する。');
+  assert.strictEqual(jaPunctuate('在庫を確認する。 , 次に'), '在庫を確認する。次に');
+  assert.strictEqual(jaPunctuate('在庫を確認する。、次に'), '在庫を確認する。次に');
+});
+
+test('roadmap never shows the internal verifyFirst field name; verifyFirst ids are ignored', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.site_blueprint.roadmap[0].actions = ['Run the verifyFirst checklist with the team'];
+  data.site_blueprint.verifyFirst[0].id = 'vf-crawler-0001';
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data });
+    assert.ok(!html.includes('verifyFirst'), `${lang}: field name leaked`);
+    assert.ok(!html.includes('vf-crawler-0001'), `${lang}: id rendered`);
+  }
+  assert.ok(render({ data }).includes('Run the Verify first checklist with the team'));
+});
+
+test('Japan-only sections are not listed as missing for a brand in another market', () => {
+  const { renderReport } = require('../modules/report_html');
+  const lb = renderReport({ profile: { name: 'LB', market: 'Lebanon', url: 'https://x.com.lb' }, brandName: 'LB', data: { personas: { personas: [{ name: 'P', painPoints: ['a'] }] } }, lang: 'en', generatedAt: '2026-01-01T00:00:00Z' });
+  const jp = renderReport({ profile: { name: 'JP', market: 'Japan', url: 'https://x.co.jp' }, brandName: 'JP', data: { personas: { personas: [{ name: 'P', painPoints: ['a'] }] } }, lang: 'en', generatedAt: '2026-01-01T00:00:00Z' });
+  const text = h => h.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
+  assert.doesNotMatch(text(lb), /Website blueprint/, 'a Lebanon brand never mentions the Japan-only blueprint');
+  assert.doesNotMatch(text(lb), /No data yet for:[^.]*(Marketplace|Demand)/i);
+  assert.match(text(jp), /Website blueprint/, 'a Japan brand still lists the blueprint as not yet available');
+});

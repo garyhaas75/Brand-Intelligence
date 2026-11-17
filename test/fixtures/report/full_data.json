@@ -445,6 +445,131 @@
    "notes": [
     "Trends partial"
    ]
+  },
+  "site_blueprint": {
+   "generatedAt": "2026-11-16T10:00:00.000Z",
+   "brandSlug": "test-toys",
+   "mode": "benchmark",
+   "targetObserved": false,
+   "targetNote": "Not observed: the site blocks automated access. Everything below is a recommendation.",
+   "evidenceBasis": {
+    "competitorsTotal": 6,
+    "competitorsScraped": 5,
+    "marketplaceItems": 15,
+    "reviewsAnalyzed": 48,
+    "demandTerms": 5,
+    "personas": 4,
+    "geoScore": 87,
+    "notes": []
+   },
+   "summary": "Build the site around gifting moments.",
+   "blueprint": {
+    "navigation": [
+     {
+      "item": "Split Toys and Baby in the top nav",
+      "rationale": "Rivals do this and personas ask for it.",
+      "evidence": [
+       "Rival Toys",
+       "personas (Planner Parent)"
+      ],
+      "priority": "high",
+      "effort": "medium",
+      "confidence": "medium"
+     }
+    ],
+    "homepage": [
+     {
+      "item": "Lead with a dated seasonal hero",
+      "rationale": "Rivals do this and personas ask for it.",
+      "evidence": [
+       "Rival Toys",
+       "personas (Planner Parent)"
+      ],
+      "priority": "high",
+      "effort": "medium",
+      "confidence": "medium"
+     }
+    ],
+    "productAndCategoryPages": [],
+    "searchAndDiscovery": [
+     {
+      "item": "Add age and price filters",
+      "rationale": "Rivals do this and personas ask for it.",
+      "evidence": [
+       "Rival Toys",
+       "personas (Planner Parent)"
+      ],
+      "priority": "high",
+      "effort": "medium",
+      "confidence": "medium"
+     }
+    ],
+    "trustAndService": [],
+    "seoAndAiVisibility": [
+     {
+      "item": "Unblock verified crawlers",
+      "rationale": "Rivals do this and personas ask for it.",
+      "evidence": [
+       "Rival Toys",
+       "personas (Planner Parent)"
+      ],
+      "priority": "high",
+      "effort": "medium",
+      "confidence": "medium"
+     }
+    ],
+    "seasonalCalendar": [
+     {
+      "moment": "Christmas toy fair",
+      "timing": "Late October to 24 December",
+      "action": "Launch a dated Christmas hub",
+      "evidence": [
+       "Rival Toys"
+      ]
+     }
+    ]
+   },
+   "bestPractices": [
+    {
+     "practice": "IP-first navigation",
+     "whoDoesIt": [
+      "Rival Toys"
+     ],
+     "whyItWorks": "Shoppers name characters",
+     "howToApply": "Add a shop-by-character menu",
+     "priority": "high",
+     "effort": "medium",
+     "confidence": "high"
+    }
+   ],
+   "verifyFirst": [
+    {
+     "check": "Whether crawlers are blocked",
+     "how": "Search Console live test",
+     "ifMissing": "Allowlist verified bots",
+     "ifPresent": "Request indexing"
+    }
+   ],
+   "roadmap": [
+    {
+     "phase": "First 30 days",
+     "actions": [
+      "Fix crawler access"
+     ]
+    },
+    {
+     "phase": "Days 31 to 60",
+     "actions": [
+      "Build gift hub"
+     ]
+    },
+    {
+     "phase": "Days 61 to 90",
+     "actions": [
+      "Launch filters"
+     ]
+    }
+   ]
   }
  }
 }

@@ -955,6 +955,7 @@ const BRAND_MODULES = [
   { name: 'marketplace',          file: 'marketplace.json',          script: 'scrapers/marketplace_jp.js' },
   { name: 'jp_demand',            file: 'jp_demand.json',            script: 'analysis/jp_demand.js' },
   { name: 'translations',         file: 'translations.json',         script: 'analysis/translate_outputs.js' },
+  { name: 'site_blueprint',       file: 'site_blueprint.json',       script: 'analysis/site_blueprint.js' },
 ];
 
 // ?lang=orig|en|ja on any module read. 'en' keeps Japanese text and adds the English beside it;
@@ -987,7 +988,7 @@ BRAND_MODULES.forEach(({ name, file }) => {
 });
 
 // ─── Full report, English or Japanese ──────────────────────────────────────────
-const REPORT_MODULES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand'];
+const REPORT_MODULES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand', 'site_blueprint'];
 
 function buildReportHtml(slug, lang, res) {
   const { renderReport } = require('./modules/report_html');
@@ -1105,11 +1106,11 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   }
   const mod = BRAND_MODULES.find(m => m.name === moduleName);
   if (!mod) return res.status(400).json({ error: `Unknown module: ${moduleName}` });
-  // Translating costs money and only the Japan market needs it: refuse it for any other brand
-  if (moduleName === 'translations') {
+  // These modules cost model calls and exist only for the Japan market: refuse them for any other brand
+  if (['translations', 'site_blueprint', 'marketplace', 'jp_demand'].includes(moduleName)) {
     let isJp = false;
     try { isJp = require('./utils/market').isJapanMarket(JSON.parse(fs.readFileSync(path.join(BRANDS_DIR, slug, 'profile.json'), 'utf8'))); } catch (_) {}
-    if (!isJp) return res.status(400).json({ error: 'Translations are only available for Japan-market brands' });
+    if (!isJp) return res.status(400).json({ error: 'This module is only available for Japan-market brands' });
   }
   const heldRun = require('./utils/run_lock').status(slug, { dataDir: DATA_DIR });
   if (heldRun.held) return res.status(409).json({ error: 'A full refresh is running for this brand, wait for it to finish', startedAt: heldRun.startedAt || null });

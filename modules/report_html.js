@@ -49,7 +49,7 @@ const DICT = {
     keyFacts: 'At a glance',
     competitorsTracked: 'Competitors tracked',
     personasCount: 'Customer personas',
-    aiVisibility: 'AI visibility score',
+    aiVisibility: 'AI brand recall (asked of Claude)',
     winsCount: 'Immediate wins',
     topPriorities: 'Top priorities',
     keyInsights: 'Key insights',
@@ -187,7 +187,7 @@ const DICT = {
     monthlySearches: 'Est. monthly searches',
     keywords: 'Keywords',
     geo: 'AI assistant visibility',
-    visibility: 'Visibility score',
+    visibility: 'AI brand recall (asked of Claude)',
     queriesTested: 'Queries tested',
     query: 'Query',
     mentioned: 'Brand mentioned',
@@ -234,6 +234,44 @@ const DICT = {
     r_noPosts: 'No posts were returned',
     r_notReached: 'Not collected because the run stopped early',
     r_generic: 'Collection issue (see run log)',
+    s_blueprint: 'Website blueprint',
+    websiteDirection: 'Website direction',
+    notObservedTitle: 'Recommendations, not findings',
+    notObservedDefault: 'The current site could not be observed. Everything in this section is a recommendation built from competitor and market evidence, not a finding about the current site.',
+    recommended: 'Recommended',
+    evidenceBase: 'Evidence base',
+    ev_competitors: '{n} of {total} competitor sites',
+    ev_items: '{n} marketplace items',
+    ev_reviews: '{n} customer reviews',
+    ev_terms: '{n} search-demand terms',
+    ev_personas: '{n} personas',
+    notObservedRun: 'Not observed in this run',
+    recCategories: 'Recommended categories',
+    recContent: 'Recommended content',
+    pec: 'Priority, effort, confidence',
+    g_navigation: 'Navigation',
+    g_homepage: 'Homepage',
+    g_productAndCategoryPages: 'Product and category pages',
+    g_searchAndDiscovery: 'Search and discovery',
+    g_trustAndService: 'Trust and service',
+    g_seoAndAiVisibility: 'SEO and AI visibility',
+    whyShort: 'Why',
+    evidence: 'Evidence',
+    confidence: 'Confidence',
+    seasonal: 'Seasonal calendar',
+    moment: 'Moment',
+    timing: 'Timing',
+    bestPracticesTitle: 'Best practices from competitors',
+    practice: 'Practice',
+    whoDoesIt: 'Who does it',
+    howToApply: 'How to apply',
+    verifyFirst: 'Verify first',
+    verifyIntro: 'Check these on the live site before acting. Each confirmed line turns a recommendation into a finding.',
+    checkDone: 'Done',
+    check: 'Check',
+    whereToLook: 'Where to look',
+    ifMissing: 'If missing',
+    ifPresent: 'If present',
   },
   ja: {
     docTitle: 'ブランド・インテリジェンス・レポート',
@@ -266,7 +304,7 @@ const DICT = {
     keyFacts: '概要',
     competitorsTracked: '調査対象の競合数',
     personasCount: '顧客ペルソナ数',
-    aiVisibility: 'AI露出スコア',
+    aiVisibility: 'AIのブランド認知度（Claudeへの質問）',
     winsCount: '即効性のある施策数',
     topPriorities: '最優先事項',
     keyInsights: '主なインサイト',
@@ -404,7 +442,7 @@ const DICT = {
     monthlySearches: '推定月間検索数',
     keywords: 'キーワード',
     geo: 'AIアシスタントでの露出',
-    visibility: '露出スコア',
+    visibility: 'AIのブランド認知度（Claudeへの質問）',
     queriesTested: '検証したクエリ数',
     query: 'クエリ',
     mentioned: 'ブランドへの言及',
@@ -451,6 +489,44 @@ const DICT = {
     r_noPosts: '投稿を取得できませんでした',
     r_notReached: '実行が途中で終了したため未取得です',
     r_generic: '取得時に問題が発生しました（実行ログを参照）',
+    s_blueprint: 'ウェブサイト改善ブループリント',
+    websiteDirection: 'ウェブサイトの方向性',
+    notObservedTitle: '現状の調査結果ではなく推奨事項です',
+    notObservedDefault: '現行サイトを確認できませんでした。このセクションの内容はすべて競合と市場のデータに基づく推奨事項であり、現行サイトについての調査結果ではありません。',
+    recommended: '推奨',
+    evidenceBase: '根拠データ',
+    ev_competitors: '競合サイト{total}件中{n}件',
+    ev_items: 'マーケットプレイス商品{n}件',
+    ev_reviews: '顧客レビュー{n}件',
+    ev_terms: '需要検索語{n}件',
+    ev_personas: 'ペルソナ{n}件',
+    notObservedRun: '今回の実行では確認できませんでした',
+    recCategories: '推奨カテゴリー',
+    recContent: '推奨コンテンツ',
+    pec: '優先度・工数・確度',
+    g_navigation: 'ナビゲーション',
+    g_homepage: 'トップページ',
+    g_productAndCategoryPages: '商品ページ・カテゴリーページ',
+    g_searchAndDiscovery: 'サイト内検索と商品探索',
+    g_trustAndService: '信頼性とサービス',
+    g_seoAndAiVisibility: 'SEOとAI検索での露出',
+    whyShort: '理由',
+    evidence: '根拠',
+    confidence: '確度',
+    seasonal: '季節販促カレンダー',
+    moment: '商機',
+    timing: '時期',
+    bestPracticesTitle: '競合に学ぶベストプラクティス',
+    practice: '取り組み',
+    whoDoesIt: '実施企業',
+    howToApply: '自社での適用方法',
+    verifyFirst: 'まず確認すべき事項',
+    verifyIntro: '着手前に実際のサイトで確認してください。確認できた項目は、推奨事項から確定した調査結果になります。',
+    checkDone: '確認',
+    check: '確認項目',
+    whereToLook: '確認方法',
+    ifMissing: '未対応の場合',
+    ifPresent: '対応済みの場合',
   },
 };
 
@@ -459,6 +535,7 @@ const SECTION_ORDER = [
   ['action', 's_action'],
   ['competitors', 's_competitors'],
   ['website', 's_website'],
+  ['blueprint', 's_blueprint'],
   ['marketplace', 's_marketplace'],
   ['social', 's_social'],
   ['personas', 's_personas'],
@@ -467,10 +544,16 @@ const SECTION_ORDER = [
   ['notes', 's_notes'],
 ];
 
+// Modules that exist only for the Japan market: for any other brand they are not applicable, so
+// they must not appear as 'No data yet' in the summary line or the freshness table.
+const JAPAN_ONLY = new Set(['site_blueprint', 'marketplace', 'jp_demand']);
+const sectionApplies = (dataKey, ctx) => !JAPAN_ONLY.has(dataKey) || !!ctx.data[dataKey] || require('../utils/market').isJapanMarket(ctx.profile);
+
 const MODULE_KEYS = [
   ['action_plan', 's_action'],
   ['competitive_analysis', 's_competitors'],
   ['site_intelligence', 's_website'],
+  ['site_blueprint', 's_blueprint'],
   ['marketplace', 's_marketplace'],
   ['social_intelligence', 's_social'],
   ['personas', 's_personas'],
@@ -512,7 +595,7 @@ function jaPunctuate(s) {
   if (typeof s !== 'string' || !RE_HAS_J.test(s)) return s;
   return s.split(RE_URLISH).map((part, i) => {
     if (i % 2 === 1) return part; // captured URL, email or handle
-    let x = part;
+    let x = part.replace(/。\s*[,、]\s*/g, '。');
     x = x.replace(/\(([^()]*)\)/g, (m, inner) => (RE_HAS_J.test(inner) ? `（${inner}）` : m));
     x = x.replace(new RegExp(`(${JCH}|[）」』])\\s*;\\s*`, 'g'), '$1；');
     x = x.replace(new RegExp(`\\s*;\\s*(${JCH}|[（「『])`, 'g'), '；$1');
@@ -689,6 +772,8 @@ function secSummary(ctx) {
   const parts = [];
   if (blockInfo.blocked) parts.push(`<div class="callout callout-warn">${esc(t('targetBlocked'))}</div>`);
   if (isObj(ap) && str(ap.executiveSummary)) parts.push(para(ap.executiveSummary, 'lead'));
+  const bp = data.site_blueprint;
+  if (isObj(bp) && str(bp.summary)) parts.push(h3(t('websiteDirection')) + (bp.targetObserved === false ? `<p class="small"><span class="lbl">${esc(t('recommended'))}</span> ${esc(t('notObservedTitle'))}</p>` : '') + para(bp.summary));
 
   const compCount = isObj(comp) ? arr(comp.competitors).length
     : (isObj(ctx.profile) ? arr(ctx.profile.identifiedCompetitors).length : 0);
@@ -780,7 +865,11 @@ function secWebsite(ctx) {
   const si = data.site_intelligence;
   if (!isObj(si)) return '';
   const parts = [];
-  if (blockInfo.blocked) parts.push(`<div class="callout callout-warn">${esc(t('targetBlocked'))}</div>`);
+  const bench = si.auditBasis === 'benchmark' || si.targetObserved === false;
+  if (bench) parts.push(observedBanner(si.auditNote, t, lang));
+  else if (blockInfo.blocked) parts.push(`<div class="callout callout-warn">${esc(t('targetBlocked'))}</div>`);
+  const rec = bench ? ` <span class="lbl">${esc(t('recommended'))}</span>` : '';
+  const recH3 = (key) => `<h3>${esc(t(key))}${rec}</h3>`;
   const brands = arr(si.brands).filter(isObj);
   if (brands.length) {
     parts.push(h3(t('sitesReviewed')) + table([t('name'), t('role'), t('status'), t('navItems'), t('featuredCats'), t('heroHeadline')], brands.map(b => {
@@ -792,24 +881,85 @@ function secWebsite(ctx) {
   const lh = isObj(si.lighthouseAudit) && isObj(si.lighthouseAudit.scores) ? si.lighthouseAudit.scores : null;
   if (lh) parts.push(h3(t('lighthouse')) + kv(['performance', 'accessibility', 'bestPractices', 'seo'].map(k => [t(k), esc(lh[k])])) + ul(si.lighthouseAudit.topIssues, 6));
   const ng = arr(si.navGaps).filter(isObj);
-  if (ng.length) parts.push(h3(t('navGaps')) + table([t('category'), t('competitorsWithIt'), t('priority')], ng.map(g => [esc(g.category), esc(arr(g.competitorsWithIt).map(str).filter(Boolean).join(', ')), esc(vocab(g.priority, t))])));
+  if (ng.length) parts.push(recH3('navGaps') + table([t('category'), t('competitorsWithIt'), t('priority')], ng.map(g => [esc(g.category), esc(arr(g.competitorsWithIt).map(str).filter(Boolean).join(', ')), esc(vocab(g.priority, t))])));
   const mg = arr(si.messagingGaps).filter(isObj);
-  if (mg.length) parts.push(h3(t('messagingGaps')) + table([t('gap'), t('competitorExample'), t('recommendation')], mg.map(g => [esc(g.gap), esc(g.competitorExample), esc(g.recommendation)])));
-  if (isObj(si.ctaEffectiveness)) {
+  if (mg.length) parts.push(recH3('messagingGaps') + table([t('gap'), t('competitorExample'), t('recommendation')], mg.map(g => [esc(g.gap), esc(g.competitorExample), esc(g.recommendation)])));
+  // In benchmark mode the target site was not observed: CTA ratings and crawler readings would read as findings about it.
+  if (!bench && isObj(si.ctaEffectiveness)) {
     const c = si.ctaEffectiveness;
     const s = kv([[t('rating'), esc(c.rating)], [t('observations'), esc(c.observations)], [t('recommendation'), esc(c.recommendation)]]);
     if (s) parts.push(h3(t('ctaTitle')) + s);
   }
   const to = arr(si.topOpportunities).filter(isObj);
-  if (to.length) parts.push(h3(t('topOpportunities')) + table([t('rank'), t('opportunity'), t('detail'), t('impact')], to.map((o, i) => [esc(str(o.rank) || String(i + 1)), `<strong>${esc(o.title)}</strong>`, esc(o.description), esc(vocab(o.impact, t))])));
-  if (isObj(si.crawlerVisibility)) {
+  if (to.length) parts.push(recH3('topOpportunities') + table([t('rank'), t('opportunity'), t('detail'), t('impact')], to.map((o, i) => [esc(str(o.rank) || String(i + 1)), `<strong>${esc(o.title)}</strong>`, esc(o.description), esc(vocab(o.impact, t))])));
+  if (!bench && isObj(si.crawlerVisibility)) {
     const c = si.crawlerVisibility;
-    const live = c.heroTextIsLive === true ? t('yes') : c.heroTextIsLive === false ? t('no') : '';
-    const s = kv([[t('heroLive'), esc(live)], [t('contentInImages'), esc(vocab(c.contentInImagesLevel, t))], [t('notes'), esc(c.aiReadabilityNote)]]);
+    const notObs = `<span class="muted">${esc(t('notObservedRun'))}</span>`;
+    const live = c.heroTextIsLive === true ? esc(t('yes')) : c.heroTextIsLive === false ? esc(t('no')) : notObs;
+    const lvl = str(c.contentInImagesLevel);
+    const known = ['high', 'medium', 'low', 'none'].includes(lvl.trim().toLowerCase());
+    const s = kv([[t('heroLive'), live], [t('contentInImages'), known ? esc(vocab(lvl, t)) : notObs], [t('notes'), esc(c.aiReadabilityNote)]]);
     if (s) parts.push(h3(t('crawlerTitle')) + s);
   }
-  if (isObj(si.navigationAnalysis) && arr(si.navigationAnalysis.missingCategories).length) parts.push(h3(t('missingCategories')) + ul(si.navigationAnalysis.missingCategories, 12));
-  if (isObj(si.productContentReview) && arr(si.productContentReview.contentGaps).length) parts.push(h3(t('contentGaps')) + ul(si.productContentReview.contentGaps, 10));
+  if (isObj(si.navigationAnalysis) && arr(si.navigationAnalysis.missingCategories).length) parts.push((bench ? recH3('recCategories') : h3(t('missingCategories'))) + ul(si.navigationAnalysis.missingCategories, 12));
+  if (isObj(si.productContentReview) && arr(si.productContentReview.contentGaps).length) parts.push((bench ? recH3('recContent') : h3(t('contentGaps'))) + ul(si.productContentReview.contentGaps, 10));
+  return parts.join('');
+}
+
+/** Plain-language banner for a site that was not observed. Uses the data note when it reads in the report language. */
+function observedBanner(note, t, lang) {
+  const n = str(note);
+  const useNote = n && (lang === 'ja' ? /[぀-ヿ一-鿿]/.test(n) : true);
+  return `<div class="callout callout-note"><strong>${esc(t('notObservedTitle'))}</strong><br>${esc(useNote ? n : t('notObservedDefault'))}</div>`;
+}
+
+const lbl = (v, t) => (str(v) ? `<span class="lbl">${esc(vocab(v, t))}</span>` : '');
+
+const BLUEPRINT_GROUPS = ['navigation', 'homepage', 'productAndCategoryPages', 'searchAndDiscovery', 'trustAndService', 'seoAndAiVisibility'];
+
+function evidenceLine(eb, t, lang) {
+  if (!isObj(eb)) return '';
+  const n = (v) => (typeof v === 'number' && Number.isFinite(v) ? fmtNum(v, lang, 0) : null);
+  const bits = [];
+  if (n(eb.competitorsScraped) !== null && n(eb.competitorsTotal) !== null) bits.push(t('ev_competitors', { n: n(eb.competitorsScraped), total: n(eb.competitorsTotal) }));
+  if (eb.marketplaceItems > 0) bits.push(t('ev_items', { n: n(eb.marketplaceItems) }));
+  if (eb.reviewsAnalyzed > 0) bits.push(t('ev_reviews', { n: n(eb.reviewsAnalyzed) }));
+  if (eb.demandTerms > 0) bits.push(t('ev_terms', { n: n(eb.demandTerms) }));
+  if (eb.personas > 0) bits.push(t('ev_personas', { n: n(eb.personas) }));
+  if (!bits.length) return '';
+  return `<p class="evidence-line"><strong>${esc(t('evidenceBase'))}</strong>: ${esc(bits.join(lang === 'ja' ? '、' : ', '))}</p>`;
+}
+
+function secBlueprint(ctx) {
+  const { t, data, lang } = ctx;
+  const b = data.site_blueprint;
+  if (!isObj(b)) return '';
+  const parts = [];
+  if (b.targetObserved === false) parts.push(observedBanner(b.targetNote, t, lang));
+  if (b.stale === true) parts.push(`<p>${staleTag(b, t, lang)}</p>`);
+  parts.push(evidenceLine(b.evidenceBasis, t, lang));
+  if (str(b.summary)) parts.push(para(b.summary, 'lead'));
+  const ev = (xs) => `<span class="small muted">${esc(arr(xs).map(str).filter(Boolean).join('; '))}</span>`;
+  const bp = isObj(b.blueprint) ? b.blueprint : {};
+  for (const g of BLUEPRINT_GROUPS) {
+    const items = arr(bp[g]).filter(x => isObj(x) && str(x.item));
+    if (!items.length) continue;
+    const pec = (x) => [['priority', x.priority], ['effort', x.effort], ['confidence', x.confidence]]
+      .filter(([, v]) => str(v)).map(([k, v]) => `<div class="pec"><span class="pec-k">${esc(t(k))}</span>${lbl(v, t)}</div>`).join('');
+    // Evidence sits under the reason as a small line, so the reason and the recommendation get the width.
+    parts.push(h3(t('g_' + g)) + table([t('recommendation'), `${t('whyShort')} / ${t('evidence')}`, t('pec')],
+      items.map(x => [`<strong>${esc(x.item)}</strong>`, `${esc(x.rationale)}${arr(x.evidence).length ? `<div class="ev">${ev(x.evidence)}</div>` : ''}`, pec(x)]), { cls: 'compact bp' }));
+  }
+  const cal = arr(bp.seasonalCalendar).filter(x => isObj(x) && str(x.moment));
+  if (cal.length) parts.push(h3(t('seasonal')) + table([t('moment'), t('timing'), t('action')], cal.map(x => [`<strong>${esc(x.moment)}</strong>`, esc(x.timing), esc(x.action)]), { cls: 'compact' }));
+  const bpr = arr(b.bestPractices).filter(x => isObj(x) && str(x.practice));
+  if (bpr.length) parts.push(h3(t('bestPracticesTitle')) + table([t('practice'), t('whoDoesIt'), t('howToApply'), t('priority')],
+    bpr.map(x => [`<strong>${esc(x.practice)}</strong>${str(x.whyItWorks) ? `<div class="small muted">${esc(x.whyItWorks)}</div>` : ''}`, esc(arr(x.whoDoesIt).map(str).filter(Boolean).join(', ')), esc(x.howToApply), lbl(x.priority, t)]), { cls: 'compact' }));
+  const vf = arr(b.verifyFirst).filter(x => isObj(x) && str(x.check));
+  if (vf.length) parts.push(h3(t('verifyFirst')) + `<p class="small muted intro">${esc(t('verifyIntro'))}</p>` + table([t('checkDone'), t('check'), t('whereToLook'), t('ifMissing'), t('ifPresent')],
+    vf.map(x => ['<span class="box" aria-hidden="true"></span>', `<strong>${esc(x.check)}</strong>`, esc(x.how), esc(x.ifMissing), esc(x.ifPresent)]), { cls: 'compact verify' }));
+  const rm = arr(b.roadmap).filter(x => isObj(x) && arr(x.actions).length);
+  if (rm.length) parts.push(h3(t('roadmap')) + `<div class="phases">${rm.map(x => `<div class="phase"><h4>${esc(x.phase)}</h4>${ul(arr(x.actions).map(a => str(a).replace(/\bverifyFirst\b/g, t('verifyFirst'))), 10)}</div>`).join('')}</div>`);
   return parts.join('');
 }
 
@@ -1016,7 +1166,7 @@ function secNotes(ctx) {
   const parts = [`<p class="muted">${esc(t('notesIntro'))}</p>`];
   const stale = collectStale(data);
   const staleMods = new Set(stale.map(x => x.mod));
-  parts.push(h3(t('freshness')) + table([t('module'), t('updated'), t('status')], MODULE_KEYS.map(([k, label]) => {
+  parts.push(h3(t('freshness')) + table([t('module'), t('updated'), t('status')], MODULE_KEYS.filter(([k]) => sectionApplies(k, ctx)).map(([k, label]) => {
     const d = data[k];
     const g = isObj(d) ? fmtDate(d.generatedAt, lang) : '';
     const st = moduleStatus(k, ctx, staleMods);
@@ -1024,7 +1174,7 @@ function secNotes(ctx) {
   })));
 
   const modName = (k) => t((MODULE_KEYS.find(m => m[0] === k) || [k, k])[1]);
-  if (stale.length) parts.push(h3(t('staleItems')) + table([t('module'), t('item'), t('asOf'), t('reason')], stale.map(x => [esc(modName(x.mod)), esc(clip(x.label, 60)), esc(fmtDate(x.asOf, lang) || t('unknown')), esc(plainReason(x.lastError, t))])));
+  if (stale.length) parts.push(h3(t('staleItems')) + table([t('module'), t('item'), t('asOf'), t('reason')], stale.map(x => [esc(modName(x.mod)), esc(clip(x.label === x.mod ? modName(x.mod) : x.label, 60)), esc(fmtDate(x.asOf, lang) || t('unknown')), esc(plainReason(x.lastError, t))])));
 
   const blocked = [];
   const seen = new Set();
@@ -1132,6 +1282,19 @@ td, th { overflow-wrap: break-word; word-break: normal; }
 th { word-break: keep-all; }
 /* First column holds names and labels: wrap only between words, and never squeeze below a readable width. */
 td:first-child, th:first-child { overflow-wrap: break-word; min-width: 26mm; }
+.lbl { display: inline-block; font-size: 7.5pt; font-weight: 700; color: #374151; border: 1px solid #9ca3af; border-radius: 1mm; padding: 0 1.2mm; white-space: nowrap; }
+p.intro { break-after: avoid; break-before: avoid; }
+.evidence-line { font-size: 8.5pt; color: #374151; }
+table.bp td:nth-child(1) { width: 34%; }
+table.bp td:nth-child(3), table.bp th:nth-child(3) { width: 31mm; }
+table.bp .ev { margin-top: 0.8mm; line-height: 1.3; }
+.pec { margin-bottom: 0.6mm; line-height: 1.3; white-space: nowrap; }
+.pec-k { display: inline-block; min-width: 13mm; font-size: 6.5pt; color: #6b7280; }
+table.verify td:first-child, table.verify th:first-child { min-width: 0; width: 9mm; text-align: center; }
+.box { display: inline-block; width: 3.2mm; height: 3.2mm; border: 1px solid #374151; border-radius: 0.5mm; margin-top: 0.6mm; }
+.phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.phase { border-top: 3px solid #1d4ed8; background: #f9fafb; padding: 2mm 3mm; break-inside: avoid; font-size: 8.5pt; }
+.phase h4 { margin-top: 0; }
 .tag-partial { color: #92400e; font-weight: 700; font-size: 8pt; }
 .empty-line { color: #6b7280; font-size: 8.5pt; margin-top: 5mm; }
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 6mm; }
@@ -1141,6 +1304,7 @@ td:first-child, th:first-child { overflow-wrap: break-word; min-width: 26mm; }
 .fact-label { font-size: 8pt; color: #6b7280; }
 .callout { padding: 3mm 4mm; margin: 0 0 4mm; border-left: 3px solid #6b7280; background: #f3f4f6; }
 .callout-warn { border-left-color: #b45309; background: #fffbeb; }
+.callout-note { border-left-color: #6b7280; background: #f3f4f6; color: #1f2937; }
 .nodata { color: #6b7280; font-style: italic; padding: 3mm 0; }
 .tag { display: inline-block; font-size: 7pt; font-weight: 700; padding: 0.3mm 1.6mm; border-radius: 1mm; background: #e5e7eb; color: #374151; vertical-align: middle; white-space: nowrap; }
 .tag-stale { background: #fef3c7; color: #92400e; }
@@ -1174,7 +1338,7 @@ function renderReportInner(opts) {
   const ctx = { t, lang, profile, data, brandName, blockInfo: targetBlockedInfo(profile, data) };
 
   const builders = {
-    summary: secSummary, action: secAction, competitors: secCompetitors, website: secWebsite,
+    summary: secSummary, action: secAction, competitors: secCompetitors, website: secWebsite, blueprint: secBlueprint,
     marketplace: secMarketplace, social: secSocial, personas: secPersonas, search: secSearch,
     demand: secDemand, notes: secNotes,
   };
@@ -1186,7 +1350,8 @@ function renderReportInner(opts) {
       if (id === 'summary' || id === 'notes') continue;
       try { bodies[id] = builders[id](ctx) || ''; } catch { bodies[id] = ''; }
     }
-    const empty = SECTION_ORDER.filter(([id]) => id !== 'summary' && id !== 'notes' && !hasText(bodies[id]));
+    const SECTION_DATA = { blueprint: 'site_blueprint', marketplace: 'marketplace', demand: 'jp_demand' };
+    const empty = SECTION_ORDER.filter(([id]) => id !== 'summary' && id !== 'notes' && !hasText(bodies[id]) && (!SECTION_DATA[id] || sectionApplies(SECTION_DATA[id], ctx)));
     ctx.emptySections = empty.map(([, key]) => t(key));
     try { bodies.notes = builders.notes(ctx) || ''; } catch { bodies.notes = ''; }
     try { bodies.summary = builders.summary(ctx) || ''; } catch { bodies.summary = ''; }

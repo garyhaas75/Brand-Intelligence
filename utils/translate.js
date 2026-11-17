@@ -240,7 +240,7 @@ async function callBatch(client, batch, direction, residualRetry = true) {
   if (!bad.length) return out;
   try {
     const retry = await callOnce(client, bad.map(i => batch[i]), direction, { strict: true });
-    bad.forEach((i, k) => { if (!HAS_JAPANESE.test(retry[k]) || retry[k].length) out[i] = retry[k]; });
+    bad.forEach((i, k) => { if (retry[k] && retry[k].trim()) out[i] = retry[k]; });
   } catch (_) { /* keep the first answer rather than fail the whole batch */ }
   return out;
 }

@@ -121,6 +121,24 @@ async function runLighthouse(url) {
 }
 
 
+/**
+ * When the target's own site was not observed, remove every field of the model's analysis that
+ * makes a claim about the CURRENT site, whatever the model wrote. What stays are recommendations
+ * drawn from competitors (navGaps, messagingGaps, topOpportunities, competitor best practices,
+ * recommended missing categories), which the dashboard and report label as such.
+ */
+function neutralizeUnobservedAudit(a) {
+  const x = a && typeof a === 'object' ? { ...a } : {};
+  const hm = x.heroMessagingAnalysis && typeof x.heroMessagingAnalysis === 'object' ? x.heroMessagingAnalysis : {};
+  x.heroMessagingAnalysis = { targetStrengths: [], targetGaps: [], competitorBestPractices: Array.isArray(hm.competitorBestPractices) ? hm.competitorBestPractices : [] };
+  x.ctaEffectiveness = null;
+  x.crawlerVisibility = { heroTextIsLive: null, contentInImagesLevel: 'unknown', aiReadabilityNote: 'Not observed in this run.' };
+  const nav = x.navigationAnalysis && typeof x.navigationAnalysis === 'object' ? x.navigationAnalysis : {};
+  x.navigationAnalysis = { topCategories: [], missingCategories: Array.isArray(nav.missingCategories) ? nav.missingCategories : [], depth: 'unknown', notes: 'Not observed in this run.' };
+  x.productContentReview = { brandsCovered: [], ageGroupCoverage: [], priceVisibility: 'unknown', contentGaps: [] };
+  return x;
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
@@ -201,14 +219,21 @@ async function run() {
     ? '\nA screenshot of the target brand homepage is attached. Use it to assess visual design, hero messaging, image vs. live text usage, CTA prominence, and above-the-fold content.'
     : '';
 
-  const prompt = `You are a UX, digital strategy, and SEO auditor. Analyze ${profile.name}'s website against its competitors.${visionNote}
+  // Was the target's own site actually observed? If not (blocked, stale, skipped), the model has no
+  // data about it, and an audit that lists "missing categories" for it would be invented. Say so.
+  const targetUnobserved = !require('../utils/observed').targetObservation(targetFound).observed;
+  const benchmarkRule = targetUnobserved ? `
+IMPORTANT: ${profile.name}'s own website was NOT observed in this run (${scrapeStatusLine(targetFound)}). You know nothing about what it currently contains. Do NOT state or imply what the site has or lacks. Treat navGaps, messagingGaps, topOpportunities and missingCategories as RECOMMENDATIONS drawn from what the competitors do, worded as "recommended" or "competitors with this" and never as findings about the current site. Set heroTextIsLive to null and contentInImagesLevel, depth and priceVisibility to "unknown". Say in aiReadabilityNote and notes that the target site was not observed.
+` : '';
+
+  const prompt = `You are a UX, digital strategy, and SEO auditor. Analyze ${profile.name}'s website against its competitors.${visionNote}${benchmarkRule}
 
 TARGET BRAND:
 ${brandContext}
-Nav categories: ${(targetSite.featuredCategories || []).join(', ') || 'not scraped'}
+${targetUnobserved ? 'Nav categories: not observed\nHero headline: not observed\nAll hero text: not observed\nPromo banners: not observed' : `Nav categories: ${(targetSite.featuredCategories || []).join(', ') || 'not scraped'}
 Hero headline: "${targetSite.heroContent?.headline || 'not found'}"
 All hero text: ${(targetSite.heroContent?.allText || []).slice(0, 5).join(' | ') || 'none'}
-Promo banners: ${(targetSite.promoBanners || []).slice(0, 3).join(' | ') || 'none'}
+Promo banners: ${(targetSite.promoBanners || []).slice(0, 3).join(' | ') || 'none'}`}
 Data status: ${scrapeStatusLine(targetFound)}
 
 COMPETITORS:
@@ -286,6 +311,8 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
     try { analysis = JSON.parse(raw.slice(start, end + 1)); } catch (e) { log(`JSON parse error: ${e.message}`); }
   }
 
+  if (targetUnobserved) analysis = neutralizeUnobservedAudit(analysis);
+
   const now = new Date().toISOString();
   // Strip screenshotBase64 from saved brands (too large for JSON file)
   const brandsForStorage = scraped.map(b => {
@@ -301,6 +328,10 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
     ...(lighthouseNote ? { lighthouseNote } : {}),
     hasScreenshot: !!targetSite.screenshotBase64,
     ...analysis,
+    // Said last so the model cannot override it: was the target's own site observed in this run?
+    targetObserved: !targetUnobserved,
+    auditBasis: targetUnobserved ? 'benchmark' : 'observed',
+    ...(targetUnobserved ? { auditNote: 'The target site was not observed in this run. The items below are recommendations drawn from competitors, not findings about the current site. See the website blueprint for the full direction and a checklist to verify.' } : {}),
   };
 
   persistOutput(slug, output, { complete: !scrapeTimedOut });
@@ -407,4 +438,4 @@ if (require.main === module) {
   run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
 }
 
-module.exports = { competitorContextBlock, existingBrandsById, fillUnfinished, lighthouseSkipReason, persistOutput, CHECKPOINT_STEP };
+module.exports = { competitorContextBlock, existingBrandsById, fillUnfinished, lighthouseSkipReason, persistOutput, neutralizeUnobservedAudit, CHECKPOINT_STEP };

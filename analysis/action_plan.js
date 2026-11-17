@@ -62,6 +62,7 @@ async function run() {
   const socialIntel = loadBrandData(slug, 'social_intelligence.json') || {};
   const siteIntel = loadBrandData(slug, 'site_intelligence.json') || {};
   const searchSeo = loadBrandData(slug, 'search_seo.json') || {};
+  const blueprint = loadBrandData(slug, 'site_blueprint.json') || {};
   const brandContext = getBrandContext(slug);
 
   // Build comprehensive context for Claude
@@ -101,13 +102,26 @@ Note: Target brand social data may be limited due to platform restrictions — d
   }
 
   // Website
+  const siteUnseen = siteIntel.auditBasis === 'benchmark';
   if (siteIntel.topOpportunities?.length) {
-    contextSections.push(`WEBSITE AUDIT TOP OPPORTUNITIES:
+    contextSections.push(`${siteUnseen ? 'WEBSITE RECOMMENDATIONS FROM COMPETITOR BENCHMARKING (the brand\'s own site was not observed; these are not findings about it)' : 'WEBSITE AUDIT TOP OPPORTUNITIES'}:
 ${siteIntel.topOpportunities.slice(0, 5).map((o, i) => `${i + 1}. [${o.impact}] ${o.title}: ${o.description}`).join('\n')}`);
   }
   if (siteIntel.navGaps?.length) {
     const navGapList = Array.isArray(siteIntel.navGaps) ? siteIntel.navGaps.slice(0, 5).map(g => g.category || g) : [];
-    if (navGapList.length) contextSections.push(`NAVIGATION GAPS: ${navGapList.join(', ')}`);
+    if (navGapList.length) contextSections.push(`${siteUnseen ? 'CATEGORIES COMPETITORS HAVE (own site not observed)' : 'NAVIGATION GAPS'}: ${navGapList.join(', ')}`);
+  }
+
+  // Website blueprint: the direction for the site, built from competitor and market evidence
+  if (blueprint.bestPractices?.length) {
+    const prac = blueprint.bestPractices.filter(p => p.priority === 'high').slice(0, 6).map((p, i) => `${i + 1}. ${p.practice}: ${p.howToApply}`).join('\n');
+    const road = (blueprint.roadmap || []).map(r => `${r.phase}: ${(r.actions || []).slice(0, 3).join('; ')}`).join('\n');
+    contextSections.push(`WEBSITE BLUEPRINT (${blueprint.targetObserved ? 'site observed' : 'the site was NOT observed: these are recommendations from competitor and market evidence, to be verified'}${blueprint.stale ? '; NOTE this blueprint is from an earlier run and could not be refreshed' : ''}):
+${blueprint.summary || ''}
+High-priority best practices:
+${prac || 'none'}
+Roadmap:
+${road || 'none'}`);
   }
 
   // Search/SEO — frame as the primary growth lever

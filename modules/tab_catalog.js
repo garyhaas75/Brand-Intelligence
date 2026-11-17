@@ -136,6 +136,7 @@ const MODULE_READERS = {
   marketplace:          ['competitive', 'action'],
   jp_demand:            ['personas', 'search', 'action'],
   translations:         ['action'],
+  site_blueprint:       ['website', 'action'],
 };
 
 // Only the tab that owns a module may pay for a re-run of it. Brand Profile is
@@ -150,6 +151,7 @@ const MODULE_WRITERS = {
   marketplace:          ['competitive'],
   jp_demand:            ['personas'],
   translations:         ['action'],
+  site_blueprint:       ['website'],
 };
 
 const API_TAB_MAP = {
@@ -171,6 +173,7 @@ const API_TAB_MAP = {
   'marketplace':          MODULE_READERS.marketplace,
   'jp_demand':            MODULE_READERS.jp_demand,
   'translations':         MODULE_READERS.translations,
+  'site_blueprint':       MODULE_READERS.site_blueprint,
 
   // ---- Per-tab extras ------------------------------------------------------
   'persona-chat':         ['personas'],

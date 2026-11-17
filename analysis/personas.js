@@ -88,11 +88,14 @@ async function run() {
 
   if (siteIntel?.brands?.length) {
     const targetSite = siteIntel.brands.find(b => b.role === 'target');
-    if (targetSite?.featuredCategories?.length) {
+    // auditBasis 'benchmark' means the brand's own site was not observed: say nothing about what it
+    // contains (older data has no auditBasis and keeps the original wording byte for byte)
+    const siteUnseen = siteIntel.auditBasis === 'benchmark';
+    if (!siteUnseen && targetSite?.featuredCategories?.length) {
       intelParts.push(`PRODUCT CATEGORIES: ${targetSite.featuredCategories.slice(0, 15).join(', ')}`);
     }
     if (siteIntel.navGaps?.length) {
-      intelParts.push(`NAVIGATION GAPS VS COMPETITORS: ${(Array.isArray(siteIntel.navGaps) ? siteIntel.navGaps.slice(0, 5).map(g => g.category || g) : []).join(', ')}`);
+      intelParts.push(`${siteUnseen ? 'CATEGORIES COMPETITORS HAVE (the brand\'s own site was not observed, so do not assume what it lacks)' : 'NAVIGATION GAPS VS COMPETITORS'}: ${(Array.isArray(siteIntel.navGaps) ? siteIntel.navGaps.slice(0, 5).map(g => g.category || g) : []).join(', ')}`);
     }
   }
 

@@ -18,7 +18,7 @@ test('the module list was read from server.js', () => {
   assert.ok(modules.includes('marketplace') && modules.includes('jp_demand'));
 });
 
-for (const mod of ['marketplace', 'jp_demand', 'translations', 'competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan']) {
+for (const mod of ['marketplace', 'jp_demand', 'translations', 'site_blueprint', 'competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan']) {
   test(`${mod}: read, refresh and history all require a tab, and a user with no tabs is refused`, () => {
     for (const [p, m] of [[`/api/brands/s/${mod}`, 'GET'], [`/api/brands/s/refresh/${mod}`, 'POST'], [`/api/brands/s/history/${mod}`, 'GET']]) {
       const tabs = tabsForPath(p, m);
@@ -62,4 +62,10 @@ test('stale translations are signalled, the profile is localized for the report,
   const fin = src.slice(src.indexOf('Release the guard as soon as the PDF has been produced'));
   assert.ok(fin.indexOf('reportPdfBusy = false') < fin.indexOf('browser.close()'), 'guard must be released before the shutdown wait');
   assert.match(fin, /SIGKILL/);
+});
+
+test('model-cost Japan modules refuse a refresh for any other market', () => {
+  const src = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
+  assert.match(src, /\['translations', 'site_blueprint', 'marketplace', 'jp_demand'\]\.includes\(moduleName\)/);
+  assert.match(src, /only available for Japan-market brands/);
 });

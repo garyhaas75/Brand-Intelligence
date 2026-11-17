@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
 import { auth } from './auth.jsx'
+import { BlueprintPanel, VerifyFirstPanel, BenchmarkNotice, BlueprintMissing } from './SiteBlueprint.jsx'
 
 const API = '/api'
 
@@ -1270,7 +1271,17 @@ function LighthouseScore({ label, score }) {
   )
 }
 
-function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
+// Values the site analysis uses when it could not see the target site.
+// They mean "not observed", never a finding, so no badge is drawn for them.
+const isObserved = v => v != null && v !== '' && String(v).toLowerCase() !== 'unknown'
+const hostOf = url => { try { return new URL(url).hostname.toLowerCase() } catch { return '' } }
+// Japan brands are the only ones whose refresh builds the website blueprint.
+const isJapanBrand = (brand, slug) => /-jp$/.test(slug || '') || hostOf(brand?.url).endsWith('.jp') || /japan/i.test(brand?.market || '')
+// The hardcoded revenue-unlock cards name Lebanese retailers. The profile is
+// not loaded in the Action Plan tab, so the slug, host and name decide.
+const isLebanonBrand = (brand, slug) => /(^|-)lb(-|$)/.test(slug || '') || hostOf(brand?.url).endsWith('.lb') || /lebanon/i.test(`${brand?.market || ''} ${brand?.name || ''}`)
+
+function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
   const T = useT()
   const [data, setData] = useState(null)
   const getModule = useModuleFetch()
@@ -1282,7 +1293,35 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
     return () => { live = false }
   }, [slug, dataVersion, getModule])
 
-  if (!data) return <EmptyState message="Website audit not yet generated." cta="Run Website Audit" onCta={() => onRefresh('site_intelligence')} />
+  // The blueprint is optional: a 404 body ({ error }) or an empty answer means
+  // it has not been generated yet, which is a quiet note rather than an error.
+  // undefined = still loading, null = not generated.
+  const [blueprint, setBlueprint] = useState(undefined)
+  const japan = isJapanBrand(brand, slug)
+  useEffect(() => {
+    if (!slug || !japan) return
+    let live = true
+    getModule(slug, 'site_blueprint')
+      .then(d => { if (live) setBlueprint(d && !d.error && (d.blueprint || d.verifyFirst) ? d : null) })
+      .catch(() => { if (live) setBlueprint(null) })
+    return () => { live = false }
+  }, [slug, dataVersion, getModule, japan])
+
+  const blueprintBlock = !japan || blueprint === undefined ? null : blueprint === null ? <BlueprintMissing T={T} /> : (
+    <>
+      <BlueprintPanel T={T} data={blueprint} />
+      <VerifyFirstPanel key={slug} T={T} slug={slug} items={blueprint.verifyFirst} />
+    </>
+  )
+
+  if (!data) return (
+    <div>
+      {blueprintBlock}
+      <EmptyState message="Website audit not yet generated." cta="Run Website Audit" onCta={() => onRefresh('site_intelligence')} />
+    </div>
+  )
+
+  const benchmark = data.auditBasis === 'benchmark'
 
   const target = data.brands?.find(b => b.role === 'target') || {}
   const competitors = data.brands?.filter(b => b.role === 'competitor') || []
@@ -1299,7 +1338,11 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
         <RefreshButton onClick={() => onRefresh('site_intelligence')} loading={running} />
       </div>
 
-      {lh?.scores && (
+      {/* The blueprint carries its own "not observed" banner; the page notice only stands in when there is no blueprint. */}
+      {benchmark && (!japan || blueprint === null) && <BenchmarkNotice T={T} note={data.auditNote} />}
+      {blueprintBlock}
+
+      {lh?.scores && !benchmark && (
         <Card style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Lighthouse Technical Audit</h3>
@@ -1329,7 +1372,7 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
 
       {(data.topOpportunities || []).length > 0 && (
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Top Opportunities</h3>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{benchmark ? 'Recommended opportunities' : 'Top Opportunities'}</h3>
           {data.topOpportunities.slice(0, 5).map((opp, i) => (
             <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '12px 0', borderBottom: i < 4 ? `1px solid ${T.border}` : 'none' }}>
               <span style={{ fontSize: 20, fontWeight: 800, color: T.accent, minWidth: 28 }}>{opp.rank || i + 1}</span>
@@ -1349,6 +1392,9 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
         {cv && (
           <Card>
             <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Crawler & AI Visibility</h3>
+            {benchmark || typeof cv.heroTextIsLive !== 'boolean' ? (
+              <p style={{ fontSize: 13, color: T.textSub, marginBottom: 10 }}><strong style={{ color: T.text }}>Hero text: </strong>Not observed in this run</p>
+            ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <span style={{ fontSize: 18 }}>{cv.heroTextIsLive ? '✓' : '✗'}</span>
               <div>
@@ -1356,20 +1402,21 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
                 <p style={{ fontSize: 12, color: T.textMuted }}>{cv.heroTextIsLive ? 'Visible to crawlers and AI agents' : 'Invisible to crawlers — SEO risk'}</p>
               </div>
             </div>
-            {cv.contentInImagesLevel && (
+            )}
+            {!benchmark && isObserved(cv.contentInImagesLevel) && (
               <div style={{ marginBottom: 10 }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>Content in Images</p>
                 <Badge label={`${cv.contentInImagesLevel} image content`} color={cv.contentInImagesLevel === 'low' ? 'green' : cv.contentInImagesLevel === 'medium' ? 'yellow' : 'red'} />
               </div>
             )}
-            {cv.aiReadabilityNote && <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>{cv.aiReadabilityNote}</p>}
+            {!benchmark && cv.aiReadabilityNote && <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>{cv.aiReadabilityNote}</p>}
           </Card>
         )}
-        {na && (
+        {na && (!benchmark || na.missingCategories?.length > 0) && (
           <Card>
             <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Navigation Analysis</h3>
-            {na.depth && <Badge label={`${na.depth} navigation`} color={na.depth === 'deep' ? 'green' : na.depth === 'moderate' ? 'yellow' : 'gray'} />}
-            {na.topCategories?.length > 0 && (
+            {!benchmark && isObserved(na.depth) && <Badge label={`${na.depth} navigation`} color={na.depth === 'deep' ? 'green' : na.depth === 'moderate' ? 'yellow' : 'gray'} />}
+            {!benchmark && na.topCategories?.length > 0 && (
               <div style={{ marginTop: 10 }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>Top Categories</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -1379,13 +1426,13 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
             )}
             {na.missingCategories?.length > 0 && (
               <div style={{ marginTop: 10 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>Missing Categories</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>{benchmark ? 'Recommended categories' : 'Missing Categories'}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {na.missingCategories.slice(0, 6).map(c => <span key={c} style={{ fontSize: 12, background: '#fee2e2', color: '#dc2626', padding: '3px 10px', borderRadius: 20 }}>{c}</span>)}
+                  {na.missingCategories.slice(0, 6).map(c => <span key={c} style={benchmark ? { fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` } : { fontSize: 12, background: '#fee2e2', color: '#dc2626', padding: '3px 10px', borderRadius: 20 }}>{c}</span>)}
                 </div>
               </div>
             )}
-            {na.notes && <p style={{ fontSize: 12, color: T.textMuted, marginTop: 10 }}>{na.notes}</p>}
+            {!benchmark && na.notes && <p style={{ fontSize: 12, color: T.textMuted, marginTop: 10 }}>{na.notes}</p>}
           </Card>
         )}
       </div>
@@ -1393,7 +1440,7 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
         {data.messagingGaps?.length > 0 && (
           <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Messaging Gaps</h3>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{benchmark ? 'Recommended messaging' : 'Messaging Gaps'}</h3>
             {data.messagingGaps.slice(0, 4).map((g, i) => (
               <div key={i} style={{ borderLeft: `3px solid #f59e0b`, paddingLeft: 12, marginBottom: 12 }}>
                 <p style={{ fontWeight: 700, color: T.text, fontSize: 13 }}>{g.gap}</p>
@@ -1402,7 +1449,7 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
             ))}
           </Card>
         )}
-        {data.ctaEffectiveness && (
+        {data.ctaEffectiveness && !benchmark && (
           <Card>
             <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>CTA Effectiveness</h3>
             {data.ctaEffectiveness.rating && <Badge label={data.ctaEffectiveness.rating === 'needs improvement' ? 'Needs Improvement' : data.ctaEffectiveness.rating} color={data.ctaEffectiveness.rating === 'strong' ? 'green' : data.ctaEffectiveness.rating === 'moderate' ? 'yellow' : 'red'} />}
@@ -1412,7 +1459,7 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
         )}
       </div>
 
-      {pcr && (
+      {pcr && !benchmark && (
         <Card style={{ marginBottom: 24 }}>
           <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Product Content Review</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
@@ -1434,7 +1481,8 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
             )}
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Price Visibility</p>
-              {pcr.priceVisibility && <Badge label={pcr.priceVisibility} color={pcr.priceVisibility === 'visible' ? 'green' : pcr.priceVisibility === 'partial' ? 'yellow' : 'red'} />}
+              {!isObserved(pcr.priceVisibility) && <p style={{ fontSize: 13, color: T.textSub }}>Not observed</p>}
+              {isObserved(pcr.priceVisibility) && <Badge label={pcr.priceVisibility} color={pcr.priceVisibility === 'visible' ? 'green' : pcr.priceVisibility === 'partial' ? 'yellow' : 'red'} />}
               {pcr.contentGaps?.length > 0 && (
                 <div style={{ marginTop: 10 }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>Content Gaps</p>
@@ -1464,8 +1512,8 @@ function WebsiteAuditTab({ slug, onRefresh, running, dataVersion }) {
                 {[target, ...competitors].filter(b => b.name).map(b => (
                   <tr key={b.name} style={{ borderTop: `1px solid ${T.border}`, background: b.role === 'target' ? '#ede9fe22' : 'transparent' }}>
                     <td style={{ padding: '12px 16px', fontWeight: b.role === 'target' ? 700 : 400, color: T.text }}>{b.name}{b.role === 'target' && ' ★'}</td>
-                    <td style={{ padding: '12px 16px', color: T.textSub, fontStyle: 'italic', maxWidth: 200 }}>{b.heroContent?.headline || '—'}</td>
-                    <td style={{ padding: '12px 16px', color: T.textSub }}>{(b.featuredCategories || []).slice(0, 6).join(', ') || '—'}</td>
+                    <td style={{ padding: '12px 16px', color: T.textSub, fontStyle: 'italic', maxWidth: 200 }}>{benchmark && b.role === 'target' ? 'Not observed in this run' : (b.heroContent?.headline || '-')}</td>
+                    <td style={{ padding: '12px 16px', color: T.textSub }}>{benchmark && b.role === 'target' ? 'Not observed in this run' : ((b.featuredCategories || []).slice(0, 6).join(', ') || '-')}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2146,7 +2194,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 }
 
 // ─── Action Plan Tab ────────────────────────────────────────────────────────────
-function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMode }) {
+function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion, pdfMode }) {
   const T = useT()
   const [data, setData] = useState(null)
   const [compData, setCompData] = useState(null)
@@ -2159,6 +2207,8 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
   const [shareExpires, setShareExpires] = useState(null)
   const [shareDays, setShareDays] = useState(7)      // 30 is the ceiling the server enforces
   const getModule = useModuleFetch()
+  const siteBenchmark = siteData?.auditBasis === 'benchmark'
+  const dark = T.bg === DARK_T.bg
 
   useEffect(() => {
     if (!slug) return
@@ -2621,14 +2671,22 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
       ) : <NoData />}
 
       {/* ── 5. YOUR DIGITAL PRESENCE ── */}
-      <SectionHeader label="Chapter 4" title="Your Digital Presence — Where You're Losing Customers" />
+      <SectionHeader label="Chapter 4" title={siteBenchmark ? 'Your Digital Presence: Where to Focus' : "Your Digital Presence: Where You're Losing Customers"} />
+      {siteBenchmark ? (
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
+          Your own website could not be observed in this run, so this section does not say what it contains. It shows what leading competitors do and what the market evidence recommends, with a checklist to confirm each point on your live site.
+        </p>
+      ) : (
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
         A customer who lands on your website has already found you — but the site has to convert them. This section surfaces the specific gaps that are costing you sales today: missing customer segments, content your competitors have that you don't, and messaging that isn't landing.
       </p>
+      
+      )}
       {siteData ? (
         <>
+          {siteBenchmark && <BenchmarkNotice T={T} note={siteData.auditNote} />}
           {/* Invisible to Google / AI */}
-          {siteData.crawlerVisibility?.heroTextIsLive === false && (
+          {!siteBenchmark && siteData.crawlerVisibility?.heroTextIsLive === false && (
             <div style={{ background: '#fff7ed', border: '1px solid #fdba74', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
               <p style={{ color: '#9a3412', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Critical: Your homepage hero is invisible to Google and AI</p>
               <p style={{ color: '#7c2d12', fontSize: 13, lineHeight: 1.65, margin: 0 }}>{siteData.crawlerVisibility.aiReadabilityNote}</p>
@@ -2636,13 +2694,13 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
           )}
 
           {/* Content expansion opportunities — 3 built-out opportunity cards */}
-          {siteData.productContentReview && (
+          {siteData.productContentReview && !siteBenchmark && isLebanonBrand(brand, slug) && (
             <div style={{ marginBottom: 20 }}>
               <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Three revenue unlocks hiding in plain sight</p>
               <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
                 Each of these is a page or category that competitors with smaller budgets have already built — and that shoppers in your market are actively searching for.
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              <div className="bi-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {/* Opportunity 1 */}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   <div style={{ background: '#0ea5e9', padding: '14px 18px' }}>
@@ -2653,9 +2711,9 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
                       New-parent spending is at its peak in the 0–2 age window — strollers, bouncers, sensory toys, first books. Chez Les Petits, Wild Willy Toys, The Toy Store LB, Mumzworld, and FirstCry Lebanon all have dedicated Baby & Toddler sections. Toys R Us Lebanon doesn't — meaning you're ceding the highest-spending parent demographic to every competitor at once.
                     </p>
-                    <div style={{ background: '#f0f9ff', borderRadius: 8, padding: '10px 14px' }}>
-                      <p style={{ color: '#0369a1', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: '#0c4a6e', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create a dedicated "Ages 0–2" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities on Instagram. One page, immediate SEO lift, long-term customer acquisition.</p>
+                    <div style={{ background: dark ? '#0c2a3d' : '#f0f9ff', borderRadius: 8, padding: '10px 14px' }}>
+                      <p style={{ color: dark ? '#7dd3fc' : '#0369a1', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
+                      <p style={{ color: dark ? '#e0f2fe' : '#0c4a6e', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create a dedicated "Ages 0–2" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities on Instagram. One page, immediate SEO lift, long-term customer acquisition.</p>
                     </div>
                   </div>
                 </Card>
@@ -2669,9 +2727,9 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
                       Finding the right gift is the #1 reason people visit a toy store. JouéClub Lebanon, The Toy Store LB, and Hamley's all have a Gift Finder in their navigation — a tool that filters by age, gender, and budget. Toys R Us Lebanon doesn't. Every shopper who arrives asking "what should I buy for a 7-year-old?" leaves to find an answer somewhere else.
                     </p>
-                    <div style={{ background: '#f5f3ff', borderRadius: 8, padding: '10px 14px' }}>
-                      <p style={{ color: '#5b21b6', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Build a simple Gift Finder page with 3 filters: age bracket, interest category, and price range. It can be as simple as a filtered product grid. Add it to main navigation. This is the single highest-converting page type in toy retail — it captures intent at the exact moment of purchase decision.</p>
+                    <div style={{ background: dark ? '#2e1065' : '#f5f3ff', borderRadius: 8, padding: '10px 14px' }}>
+                      <p style={{ color: dark ? '#c4b5fd' : '#5b21b6', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
+                      <p style={{ color: dark ? '#ede9fe' : '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Build a simple Gift Finder page with 3 filters: age bracket, interest category, and price range. It can be as simple as a filtered product grid. Add it to main navigation. This is the single highest-converting page type in toy retail: it captures intent at the exact moment of purchase decision.</p>
                     </div>
                   </div>
                 </Card>
@@ -2685,9 +2743,9 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
                       "Toys for 6-year-olds" is one of the highest-intent toy searches in every market. Parents and grandparents search by age — not by brand or category. Age-based landing pages (3–5, 6–8, 9–12, Teens) are how toy retailers capture this intent and rank for it on Google.
                     </p>
-                    <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px' }}>
-                      <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create 4–5 static landing pages organized by age bracket, tagged with relevant SEO keywords. Cross-link from homepage and navigation. These pages compound over time — once indexed, they drive organic traffic indefinitely.</p>
+                    <div style={{ background: dark ? '#052e1c' : '#f0fdf4', borderRadius: 8, padding: '10px 14px' }}>
+                      <p style={{ color: dark ? '#6ee7b7' : '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
+                      <p style={{ color: dark ? '#d1fae5' : '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create 4–5 static landing pages organized by age bracket, tagged with relevant SEO keywords. Cross-link from homepage and navigation. These pages compound over time, once indexed, they drive organic traffic indefinitely.</p>
                     </div>
                   </div>
                 </Card>
@@ -2698,13 +2756,13 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
           {/* Messaging gaps — reframed as messaging opportunities */}
           {(siteData.messagingGaps || []).length > 0 && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Messaging moves that will set you apart</p>
-              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>These are value messages your competitors are already communicating — adding them to your site is a fast, high-leverage way to increase trust and conversion.</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? 'Recommended messaging moves' : 'Messaging moves that will set you apart'}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{siteBenchmark ? 'Value messages competitors communicate. Your own site was not observed, so confirm on the live site before acting.' : 'These are value messages your competitors are already communicating: adding them to your site is a fast, high-leverage way to increase trust and conversion.'}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {siteData.messagingGaps.map((mg, i) => (
                   <div key={i} style={{ padding: '12px 16px', background: T.surfaceAlt, borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
                     <p style={{ color: T.accent, fontSize: 13, fontWeight: 700, marginBottom: mg.gap || mg.competitorExample ? 4 : 0 }}>{mg.recommendation || mg.gap}</p>
-                    {mg.recommendation && mg.gap && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.competitorExample ? 4 : 0, margin: 0 }}>Currently missing: {mg.gap}</p>}
+                    {mg.recommendation && mg.gap && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.competitorExample ? 4 : 0, margin: 0 }}>{siteBenchmark ? 'Why' : 'Currently missing'}: {mg.gap}</p>}
                     {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 4, marginBottom: 0 }}>Competitor example: {mg.competitorExample}</p>}
                   </div>
                 ))}
@@ -2715,8 +2773,8 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
           {/* Navigation gaps */}
           {(siteData.navGaps || []).length > 0 && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Navigation categories your competitors have that you don't</p>
-              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>When a customer arrives looking for something your navigation doesn't clearly offer, they leave. These are the specific categories where competitors are capturing traffic you're missing.</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? 'Recommended navigation categories' : "Navigation categories your competitors have that you don't"}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{siteBenchmark ? 'Categories competitors give a clear place in their navigation. Your own site was not observed, so check which of these it already has.' : <>When a customer arrives looking for something your navigation doesn't clearly offer, they leave. These are the specific categories where competitors are capturing traffic you're missing.</>}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {siteData.navGaps.map((gap, i) => (
                   <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 14px', background: T.surfaceAlt, borderRadius: 8 }}>
@@ -2732,10 +2790,10 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
           )}
 
           {/* Hero strengths and gaps */}
-          {siteData.heroMessagingAnalysis && ((siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 || (siteData.heroMessagingAnalysis.targetGaps || []).length > 0) && (
+          {siteData.heroMessagingAnalysis && (siteBenchmark ? (siteData.heroMessagingAnalysis.competitorBestPractices || []).length > 0 : ((siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 || (siteData.heroMessagingAnalysis.targetGaps || []).length > 0)) && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Homepage first impression — what's working and what's not</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 16 }}>{siteBenchmark ? 'What leading competitors do on their homepages' : "Homepage first impression: what's working and what's not"}</p>
+              <div style={{ display: siteBenchmark ? 'none' : 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {(siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 && (
                   <div>
                     <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What's landing</p>
@@ -2754,8 +2812,8 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
                 )}
               </div>
               {(siteData.heroMessagingAnalysis.competitorBestPractices || []).length > 0 && (
-                <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${T.border}` }}>
-                  <p style={{ color: '#3b82f6', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What competitors do better</p>
+                <div style={{ marginTop: siteBenchmark ? 0 : 16, paddingTop: siteBenchmark ? 0 : 16, borderTop: siteBenchmark ? 'none' : `1px solid ${T.border}` }}>
+                  <p style={{ color: '#3b82f6', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{siteBenchmark ? 'Observed on competitor sites' : 'What competitors do better'}</p>
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
                     {siteData.heroMessagingAnalysis.competitorBestPractices.map((b, i) => <li key={i} style={{ color: '#1e40af', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{b}</li>)}
                   </ul>
@@ -2767,7 +2825,7 @@ function ActionPlanTab({ slug, brandName, onRefresh, running, dataVersion, pdfMo
           {/* Top opportunities from site */}
           {(siteData.topOpportunities || []).length > 0 && (
             <Card style={{ padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Highest-impact site improvements</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? 'Recommended site improvements' : 'Highest-impact site improvements'}</p>
               <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Ranked by potential to increase traffic and conversions.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {siteData.topOpportunities.map((opp, i) => (
@@ -3314,9 +3372,9 @@ export default function App() {
           {tab === 'competitive' && activeBrand && <CompetitiveTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['competitive_analysis']} dataVersion={moduleVersions['competitive_analysis'] || 0} />}
           {tab === 'personas' && activeBrand && <PersonasTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['personas']} dataVersion={moduleVersions['personas'] || 0} />}
           {tab === 'social' && activeBrand && <SocialAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['social_intelligence']} dataVersion={moduleVersions['social_intelligence'] || 0} />}
-          {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
+          {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} brand={activeBrandData} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
           {tab === 'search' && activeBrand && <SearchSeoTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['search_seo']} dataVersion={moduleVersions['search_seo'] || 0} />}
-          {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} pdfMode={pdfMode} />}
+          {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brand={activeBrandData} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} pdfMode={pdfMode} />}
           {/* Deliberately NOT the shared EmptyState. This is a permissions
               answer, not an empty dataset, and the two used to render with the
               same chart icon and the same one-line layout, so a person could
