@@ -14,7 +14,8 @@ delete process.env.SOCIAL_DRY_RUN;
 
 const FX = path.join(__dirname, 'fixtures', 'social');
 const fx = name => JSON.parse(fs.readFileSync(path.join(FX, name), 'utf8'));
-const SHARED_POST_KEYS = ['likes', 'comments', 'caption', 'timestamp', 'postUrl', 'imageUrl'];
+// format (reel|carousel|video|image|live|text) was added with the 25-post depth work (2026-11-18).
+const SHARED_POST_KEYS = ['likes', 'comments', 'caption', 'timestamp', 'postUrl', 'imageUrl', 'format'];
 const ENGAGEMENT_KEYS = ['likes', 'comments', 'followers', 'friends', 'friendCount', 'views', 'posts', 'postCount', 'avgEngagement', 'engagementRate', 'summary', 'topPosts', 'monthlyTrend'];
 
 // ── classifySocialLinks ──────────────────────────────────────────────────────
@@ -127,7 +128,7 @@ test('YouTube: fixture maps channel stats and uploads to the shared post shape',
   assert.deepEqual(norm[0], {
     likes: 340, comments: 25, caption: '【開封動画】人気のブロックセットを組み立ててみた',
     timestamp: '2026-11-10T09:00:00Z', postUrl: 'https://www.youtube.com/watch?v=vidA',
-    imageUrl: 'https://i.ytimg.com/vi/vidA/hqdefault.jpg', views: 12000,
+    imageUrl: 'https://i.ytimg.com/vi/vidA/hqdefault.jpg', views: 12000, format: 'video',
   });
   assert.equal(norm[1].comments, 0, 'missing commentCount (comments disabled) becomes 0');
 });
@@ -175,7 +176,7 @@ test('LINE: 404 page is recorded as not confirmed; dry run never fetches', async
 
 // ── Existing platforms unchanged ────────────────────────────────────────────
 
-test('existing platforms: normalizePosts shape is exactly the shared six keys', () => {
+test('existing platforms: normalizePosts shape is exactly the shared seven keys (six plus format)', () => {
   for (const [file, platform] of [['instagram_posts.json', 'instagram'], ['tiktok_posts.json', 'tiktok'], ['facebook_posts.json', 'facebook']]) {
     const norm = social.normalizePosts(fx(file), platform);
     assert.deepEqual(Object.keys(norm[0]).sort(), [...SHARED_POST_KEYS].sort(), platform);

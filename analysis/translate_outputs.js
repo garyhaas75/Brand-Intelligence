@@ -23,6 +23,7 @@ const { MODEL_FAST } = require('../utils/models');
 const SOURCE_FILES = [
   'competitive_analysis.json', 'personas.json', 'social_intelligence.json', 'site_intelligence.json',
   'search_seo.json', 'action_plan.json', 'marketplace.json', 'jp_demand.json', 'site_blueprint.json', 'profile.json',
+  'strategy_360.json', 'par_matrix.json', 'tech_stack.json', 'niche_candidates.json',
 ];
 // Bump when the translation rules change so previously saved translations are not reused.
 const TRANSLATOR_VERSION = 2;

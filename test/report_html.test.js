@@ -7,6 +7,11 @@ const { renderReport, DICT, SECTION_ORDER } = require('../modules/report_html');
 
 const FIX = path.join(__dirname, 'fixtures', 'report');
 const full = JSON.parse(fs.readFileSync(path.join(FIX, 'full_data.json'), 'utf8'));
+// Japan 360 modules (FIXTURE shapes) join the full data so every section heading renders.
+const jp360 = JSON.parse(fs.readFileSync(path.join(FIX, 'jp360_data.json'), 'utf8'));
+full.data.strategy_360 = jp360.strategy_360;
+full.data.par_matrix = jp360.par_matrix;
+full.data.tech_stack = jp360.tech_stack;
 const GEN = '2026-11-17T09:00:00.000Z';
 
 const render = (over = {}) => renderReport({ profile: full.profile, brandName: full.profile.name, data: full.data, lang: 'en', generatedAt: GEN, ...over });
@@ -517,4 +522,101 @@ test('observed target row still prints its real title, H1 and meta description',
   const sec = html.slice(html.indexOf('id="sec-search"'), html.indexOf('id="sec-demand"'));
   for (const v of ['Test Toys official store', 'Toys for every age', 'Shop toys and baby goods.']) assert.ok(sec.includes(v), v);
   assert.ok(sec.includes(`<h3>${escHtml(DICT.en.sitemap)}</h3>`));
+});
+
+// ---------- Japan 360 chapters ----------
+
+const sliceSec = (html, id) => { const i = html.indexOf(`id="sec-${id}"`); if (i < 0) return ''; const j = html.indexOf('<section class="major"', i + 10); return html.slice(i, j < 0 ? undefined : j); };
+
+test('360 strategy is the opening chapter after the cover, in both languages', () => {
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang });
+    const first = html.indexOf('<section class="major"');
+    assert.ok(html.slice(first, first + 80).includes('id="sec-strategy"'), `${lang}: strategy first`);
+    const sec = sliceSec(html, 'strategy');
+    for (const k of ['x_execSummary', 'x_positioning', 'x_standOut', 'x_channelMap', 'x_onlineToStore', 'x_partnerPlay', 'x_techLandscape', 'x_parGaps', 'x_roadmap', 'x_openQuestions']) assert.ok(sec.includes(escHtml(DICT[lang][k])), `${lang}: ${k}`);
+    assert.ok(sec.includes(escHtml(DICT[lang].x_s360NotObserved)), `${lang}: not-observed banner`);
+    assert.ok(sec.includes(escHtml(DICT[lang].t_marketplace)), `${lang}: tier label`);
+    assert.ok(sec.includes('Does the site offer in-store pickup today?'));
+    assert.ok(sec.includes('70%') && sec.includes('60%'), 'par share normalised to percent');
+  }
+});
+
+test('par chapter: capabilities by tier share, target confirm, partner labelled and not counted; appendix grid', () => {
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang });
+    const sec = sliceSec(html, 'par');
+    const caps = jp360.par_matrix.capabilities;
+    assert.ok(sec.includes(escHtml(lang === 'ja' ? caps[1].labelJa : caps[1].label)));
+    assert.ok(sec.includes(escHtml(DICT[lang].x_confirm)), `${lang}: target confirm`);
+    assert.match(sec, new RegExp(`Don Quijote ?[(（]${DICT[lang].x_partner}[)）]`), `${lang}: partner column labelled`);
+    assert.ok(sec.includes(escHtml(DICT[lang].x_partnerExcluded)));
+    assert.ok(sec.includes(escHtml(DICT[lang].x_gap)), `${lang}: gaps highlighted`);
+    for (const tr of ['t_marketplace', 't_mass', 't_specialty', 't_niche']) assert.ok(sec.includes(escHtml(DICT[lang][tr])), `${lang}: ${tr}`);
+    const grid = sliceSec(html, 'parGrid');
+    assert.ok(grid.includes('Pokemon Center Online') && grid.includes('Toys R Us Japan'), 'appendix lists players');
+  }
+});
+
+test('tech chapter lists every player with observed or not observed', () => {
+  const html = render({ lang: 'en' });
+  const sec = sliceSec(html, 'tech');
+  for (const p of jp360.tech_stack.players) assert.ok(sec.includes(escHtml(p.name)), p.name);
+  assert.ok(sec.includes(DICT.en.x_notObserved) && sec.includes('ZETA SEARCH') && sec.includes('PayPay'));
+});
+
+test('social chapter adds tier insights, thin evidence, differentiation, partner play and coverage for schema v2', () => {
+  for (const lang of ['en', 'ja']) {
+    const data = { ...full.data, social_intelligence: { ...full.data.social_intelligence, ...jp360.social_v2, brands: jp360.social_v2.brands } };
+    const sec = sliceSec(render({ lang, data }), 'social');
+    for (const k of ['x_tierInsights', 'x_thin', 'x_standOutSocial', 'x_nichePlaybook', 'x_partnerSocial', 'x_coverage', 'x_platformMetrics', 'x_skippedBudget']) assert.ok(sec.includes(escHtml(DICT[lang][k])), `${lang}: ${k}`);
+    assert.ok(sec.includes(lang === 'ja' ? '$11.40（上限 $15.00）（ソーシャル $6.20）' : '$11.40 of $15.00 cap (social $6.20)'), `${lang}: budget spent of cap`);
+    assert.ok(sec.includes('Shop-in-shop opening countdown'));
+  }
+  const v1 = sliceSec(render({ lang: 'en' }), 'social');
+  assert.ok(!v1.includes(DICT.en.x_tierInsights), 'v1 social unchanged');
+});
+
+test('Japan-only 360 modules: a non-Japan brand without them shows no new chapter and no empty line for them', () => {
+  const data = { ...full.data };
+  delete data.strategy_360; delete data.par_matrix; delete data.tech_stack;
+  delete data.site_blueprint; delete data.marketplace; delete data.jp_demand;
+  const profile = { ...full.profile, market: 'Lebanon', url: 'https://example.com' };
+  const html = render({ data, profile });
+  for (const id of ['strategy', 'par', 'tech', 'parGrid']) assert.ok(!html.includes(`id="sec-${id}"`), id);
+  for (const k of ['s_strategy', 's_par', 's_tech']) assert.ok(!html.includes(escHtml(DICT.en[k])), k);
+});
+
+test('Japan brand without the 360 modules lists them as not yet available, never the appendix', () => {
+  const data = { ...full.data };
+  delete data.strategy_360; delete data.par_matrix; delete data.tech_stack;
+  const html = render({ data });
+  const line = html.slice(html.indexOf('class="empty-line"'));
+  assert.ok(line.includes(DICT.en.s_strategy) && line.includes(DICT.en.s_par) && line.includes(DICT.en.s_tech));
+  assert.ok(!line.slice(0, 400).includes(DICT.en.s_parGrid));
+});
+
+test('360 interface values are translated: status enums, roadmap phases, questions header, grid split and target confirm', () => {
+  const strat = { ...jp360.strategy_360,
+    techLandscape: { summary: 'x', categories: [{ category: 'Payments', bestInClassUses: 'PayPay', ourStatus: 'confirm', recommendation: 'r' }] },
+    parGaps: [{ capability: 'Gift wrapping', parShare: '60%', ourStatus: 'not evidenced', action: 'a' }],
+    roadmap: [{ phase: '30 days', actions: ['a'] }, { phase: '60 days', actions: ['b'] }, { phase: '90 days', actions: ['c'] }],
+    openQuestions: ['Does the site offer in-store pickup today?'] };
+  const players = Array.from({ length: 12 }, (_, i) => ({ name: `P${i}`, tier: 'specialty', cells: { a: { status: i % 2 ? 'yes' : 'no' } } }));
+  players[0] = { name: 'Us Co', role: 'target', cells: {} };
+  const pm = { capabilities: [{ key: 'a', label: 'Cap A' }], players, par: {}, gaps: [] };
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data: { ...full.data, strategy_360: strat, par_matrix: pm } });
+    const sec = sliceSec(html, 'strategy');
+    assert.ok(!/>confirm</.test(sec) && !sec.includes('not evidenced'), `${lang}: raw status enums`);
+    assert.ok(sec.includes(escHtml(DICT[lang].x_notEvidenced)), `${lang}: not evidenced label`);
+    assert.ok(sec.includes(`<h4>${escHtml(DICT[lang].x_days.replace('{n}', '30'))}</h4>`), `${lang}: phase label`);
+    assert.ok(sec.includes(`<th scope="col">${escHtml(DICT[lang].x_question)}</th>`), `${lang}: questions header`);
+    const grid = sliceSec(html, 'parGrid');
+    assert.equal((grid.match(/<table/g) || []).length, 2, `${lang}: two grid tables`);
+    const first = grid.slice(grid.indexOf('<table'), grid.indexOf('</table>'));
+    assert.equal((first.match(/<th[ >]/g) || []).length, 7, `${lang}: 6 players plus capability`);
+    assert.ok(grid.includes(`<span class="g-c">${escHtml(DICT[lang].x_confirm)}</span>`), `${lang}: target unknown reads confirm`);
+    assert.ok(grid.includes('class="g-y"') && grid.includes('class="g-n"'), `${lang}: tinted cells`);
+  }
 });

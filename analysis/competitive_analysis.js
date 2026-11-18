@@ -13,6 +13,7 @@ const path = require('path');
 const { scrapeBrands, manualCaptureFor, scrapeStatusLine } = require('../scrapers/site_scraper');
 const { getBrandContext } = require('../utils/brand_context');
 const checkpoint = require('../utils/checkpoint');
+const { playersFor, competitorsOnly, isPartner } = require('../utils/players');
 
 const SCRAPE_STEP = 'competitive-scrape';
 const ANALYZE_STEP = 'competitive-analyze';
@@ -200,57 +201,104 @@ async function filterAssortmentGaps(anthropic, profile, targetCategories, candid
   }
 }
 
-async function run() {
-  const args = process.argv.slice(2);
-  const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
-  if (!slug) { log('ERROR: --slug= required'); process.exit(1); }
+/**
+ * Split the profile's players for this module. Pure.
+ *   competitors: relationship 'competitor' with a website (scraped, analysed, mapped, counted)
+ *   partners:    relationship 'partner' (context only; never analysed, ranked, scored or counted)
+ *   noWebsite:   competitors with no url (recorded, never scraped)
+ */
+function planPlayers(profile) {
+  const players = playersFor(profile);
+  const competitors = [];
+  const noWebsite = [];
+  for (const p of competitorsOnly(players)) (p.url ? competitors : noWebsite).push(p);
+  const partners = players.filter(isPartner);
+  return { competitors, partners, noWebsite };
+}
 
-  const profile = loadBrandData(slug, 'profile.json');
-  if (!profile) { log('ERROR: profile.json not found — run brand_discovery.js first'); process.exit(1); }
+function brandIdFor(name) { return String(name).toLowerCase().replace(/\s+/g, '-'); }
 
-  log(`Starting competitive analysis for: ${profile.name}`);
+function playerSummary(p) {
+  return { name: p.name, url: p.url || null, tier: p.tier, relationship: p.relationship };
+}
 
-  const competitors = profile.identifiedCompetitors || [];
-  if (competitors.length === 0) { log('No competitors in profile — skipping'); process.exit(0); }
+/**
+ * The competitive output for one run, with every I/O dependency injected:
+ *   scrape(brands) -> scraped results (role 'target' | 'competitor')
+ *   analyze(scraped) -> per-competitor analysis
+ *   positioning(analyzedCompetitors) -> positioning map
+ *   filterGaps(targetCategories, candidates) -> relevant gap candidates
+ * Only competitors with a website reach analyze, positioning and the gap count.
+ */
+async function buildCompetitiveOutput({ slug, profile, scrape, analyze, positioning, filterGaps, prevCompetitors = [], dataDir, now = () => new Date().toISOString() }) {
+  const plan = planPlayers(profile);
+  const competitorIds = new Set(plan.competitors.map(c => brandIdFor(c.name)));
+  for (const p of plan.noWebsite) log(`${p.name}: no website on record, not scraped`);
+  if (plan.partners.length) log(`Partner(s) listed for context only, not analysed or ranked: ${plan.partners.map(p => p.name).join(', ')}`);
 
-  // Build brand list for scraping
   const brandsToScrape = [
     { id: slug, name: profile.name, url: profile.url, role: 'target', skipApifyRetry: !!(profile.scrape && profile.scrape.skipApifyRetry), manualCapture: manualCaptureFor(slug, slug) },
-    ...competitors.map(c => ({
-      id: c.name.toLowerCase().replace(/\s+/g, '-'),
-      name: c.name, url: c.url, role: 'competitor',
-    })),
+    ...plan.competitors.map(c => ({ id: brandIdFor(c.name), name: c.name, url: c.url, role: 'competitor' })),
   ];
-
   log(`Scraping ${brandsToScrape.length} sites...`);
-  const logFile = path.join(__dirname, '../logs', `competitive_analysis_${slug}.log`);
-  // Previous site scrape, keyed by brand id: a brand that fails this time keeps its
-  // last good data (marked stale) instead of being replaced by the failure.
-  const prevSite = loadBrandData(slug, 'site_intelligence.json');
-  const existingData = {};
-  for (const b of (prevSite && Array.isArray(prevSite.brands) ? prevSite.brands : [])) if (b && b.id) existingData[b.id] = b;
-  const scrapedResults = await scrapeBrands(brandsToScrape, { logFile, existingData, slug, checkpointStep: SCRAPE_STEP });
-  const prevAnalysis = loadBrandData(slug, 'competitive_analysis.json');
+  const scrapedResults = await scrape(brandsToScrape);
+  // Was the target's own site observed this run (proxied live scrape or manual capture)? When not,
+  // assortment gaps are only what competitors carry, not a finding about the current site.
+  const targetScrape = scrapedResults.find(r => r.role === 'target');
+  const targetObs = require('../utils/observed').targetObservation(targetScrape);
 
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const brandContext = getBrandContext(slug);
+  // Defence in depth: only ids planned as competitors are analysed, even if a scraper echoes more.
+  const scrapedCompetitors = scrapedResults.filter(r => r.role === 'competitor' && competitorIds.has(r.id));
+  const analyzedCompetitors = await analyzeAll(scrapedCompetitors, { slug, prevCompetitors, analyze, dataDir, now });
 
-  // Analyze each competitor
-  const analyzedCompetitors = await analyzeAll(scrapedResults.filter(r => r.role === 'competitor'), {
-    slug, prevCompetitors: (prevAnalysis && prevAnalysis.competitors) || [],
-    analyze: (scraped) => analyzeCompetitor(anthropic, profile.name, profile.industry, scraped),
-  });
-
-
-  // Generate positioning map
   log('Generating positioning map...');
-  const positioningMap = await generatePositioningMap(anthropic, profile.name, brandContext, analyzedCompetitors).catch(err => {
+  const positioningMap = await Promise.resolve().then(() => positioning(analyzedCompetitors)).catch(err => {
     log(`Positioning map error: ${err.message}`);
     return { narrative: '', axes: { x: 'Price (Budget → Luxury)', y: 'Style (Classic → Contemporary)' }, brandPositions: [], whiteSpaceOpportunities: [] };
   });
+  // A model may still place a partner it knows about; it never belongs on the competitor map.
+  const partnerNames = new Set(plan.partners.map(p => String(p.name).toLowerCase()));
+  if (positioningMap && Array.isArray(positioningMap.brandPositions)) {
+    positioningMap.brandPositions = positioningMap.brandPositions.filter(b => !(b && partnerNames.has(String(b.name || '').toLowerCase())));
+  }
 
-  // Compute assortment gaps
-  const targetCategories = new Set((scrapedResults.find(r => r.role === 'target')?.featuredCategories || []).map(c => c.toLowerCase()));
+  const targetCategories = new Set(((targetScrape && targetScrape.featuredCategories) || []).map(c => c.toLowerCase()));
+  const gapCandidates = assortmentGapCandidates(targetCategories, analyzedCompetitors);
+  const relevantGaps = await filterGaps([...targetCategories], gapCandidates);
+  const topAssortmentGaps = relevantGaps
+    .slice(0, 10)
+    .map(g => `${g.category} (seen at: ${g.seenAt.join(', ')})`);
+
+  return {
+    generatedAt: now(),
+    brandSlug: slug,
+    competitors: analyzedCompetitors,
+    positioningMap,
+    topAssortmentGaps,
+    // Context only: partners are a channel, never analysed, ranked, scored or counted as competitors.
+    partners: plan.partners.map(playerSummary),
+    // Competitors with no website on record: listed, not scraped.
+    noWebsite: plan.noWebsite.map(playerSummary),
+    // true when the target's own site was read this run (live, including via the authorized Japanese
+    // proxy, or from a manual capture). false: the gaps are competitor benchmarks, not site findings.
+    targetObserved: !!targetObs.observed,
+    targetObservedVia: !targetObs.observed ? null : (targetScrape.manualCapture ? 'manual_capture' : targetScrape.via === 'jp_proxy' ? 'jp_proxy' : 'direct'),
+    assortmentBasis: targetObs.observed ? 'observed' : 'benchmark',
+    ...(targetObs.observed ? {} : { assortmentNote: `The target site was not observed in this run (${targetObs.why}). Assortment gaps list what competitors carry and are not findings about the current site.` }),
+  };
+}
+
+/**
+ * Categories competitors carry that the target does not, most-seen first.
+ * The raw set difference is recall only. It cannot tell a real gap from a
+ * department belonging to a different business: general merchants like Kmart and
+ * Target publish their whole taxonomy, so a toy retailer gets told it is missing
+ * "men", "beauty" and "women". It also surfaces seasonal campaign pages
+ * ("black friday", "christmas") that are marketing rather than assortment, and
+ * trips on broader labels for what the brand already sells, so "toys" reads as a
+ * gap for a toy shop whose own categories are age bands and product lines.
+ */
+function assortmentGapCandidates(targetCategories, analyzedCompetitors) {
   const assortmentGapMap = {};
   analyzedCompetitors.forEach(c => {
     (c.navCategories || []).forEach(cat => {
@@ -261,29 +309,50 @@ async function run() {
       }
     });
   });
-  // The raw set difference is recall only. It cannot tell a real gap from a
-  // department belonging to a different business: general merchants like Kmart and
-  // Target publish their whole taxonomy, so a toy retailer gets told it is missing
-  // "men", "beauty" and "women". It also surfaces seasonal campaign pages
-  // ("black friday", "christmas") that are marketing rather than assortment, and
-  // trips on broader labels for what the brand already sells, so "toys" reads as a
-  // gap for a toy shop whose own categories are age bands and product lines.
-  const gapCandidates = Object.values(assortmentGapMap)
+  return Object.values(assortmentGapMap)
     .sort((a, b) => b.seenAt.length - a.seenAt.length)
     .slice(0, 60);
-  const relevantGaps = await filterAssortmentGaps(anthropic, profile, [...targetCategories], gapCandidates);
-  const topAssortmentGaps = relevantGaps
-    .slice(0, 10)
-    .map(g => `${g.category} (seen at: ${g.seenAt.join(', ')})`);
+}
 
-  const now = new Date().toISOString();
-  const output = {
-    generatedAt: now,
-    brandSlug: slug,
-    competitors: analyzedCompetitors,
-    positioningMap,
-    topAssortmentGaps,
-  };
+async function run() {
+  const args = process.argv.slice(2);
+  const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
+  if (!slug) { log('ERROR: --slug= required'); process.exit(1); }
+
+  const profile = loadBrandData(slug, 'profile.json');
+  if (!profile) { log('ERROR: profile.json not found, run brand_discovery.js first'); process.exit(1); }
+
+  log(`Starting competitive analysis for: ${profile.name}`);
+
+  // Only real competitors are scraped, analysed, mapped and counted. The partner (relationship
+  // 'partner', for Toys R Us Japan: Don Quijote) is a channel and is listed for context only.
+  // A player with no website (an approved niche brand with url null) is recorded, never scraped.
+  const plan = planPlayers(profile);
+  if (plan.competitors.length === 0 && plan.partners.length === 0 && plan.noWebsite.length === 0) { log('No competitors in profile, skipping'); process.exit(0); }
+
+  const logFile = path.join(__dirname, '../logs', `competitive_analysis_${slug}.log`);
+  // Previous site scrape, keyed by brand id: a brand that fails this time keeps its
+  // last good data (marked stale) instead of being replaced by the failure.
+  const prevSite = loadBrandData(slug, 'site_intelligence.json');
+  const existingData = {};
+  for (const b of (prevSite && Array.isArray(prevSite.brands) ? prevSite.brands : [])) if (b && b.id) existingData[b.id] = b;
+  const targetAccess = require('../utils/site_access').accessFor(profile.url);
+  if (targetAccess.mode === 'jp_proxy') log(`Target ${profile.url}: live scrape via Japanese proxy (authorized ${targetAccess.authorization.by} ${targetAccess.authorization.at}); manual capture only as fallback`);
+  const prevAnalysis = loadBrandData(slug, 'competitive_analysis.json');
+
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const brandContext = getBrandContext(slug);
+
+  const output = await buildCompetitiveOutput({
+    slug, profile,
+    prevCompetitors: (prevAnalysis && prevAnalysis.competitors) || [],
+    scrape: (brands) => scrapeBrands(brands, { logFile, existingData, slug, checkpointStep: SCRAPE_STEP }),
+    analyze: (scraped) => analyzeCompetitor(anthropic, profile.name, profile.industry, scraped),
+    positioning: (analyzed) => generatePositioningMap(anthropic, profile.name, brandContext, analyzed),
+    filterGaps: (targetCats, candidates) => filterAssortmentGaps(anthropic, profile, targetCats, candidates),
+  });
+  const analyzedCompetitors = output.competitors;
+  const topAssortmentGaps = output.topAssortmentGaps;
 
   // Archive previous and save new
   const existing = loadBrandData(slug, 'competitive_analysis.json');
@@ -376,4 +445,4 @@ if (require.main === module) {
   run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
 }
 
-module.exports = { filterAssortmentGaps, analyzeAll, buildCompetitorPrompt, competitorSummaryLine, SCRAPE_STEP, ANALYZE_STEP };
+module.exports = { filterAssortmentGaps, analyzeAll, planPlayers, buildCompetitiveOutput, assortmentGapCandidates, buildCompetitorPrompt, competitorSummaryLine, SCRAPE_STEP, ANALYZE_STEP };

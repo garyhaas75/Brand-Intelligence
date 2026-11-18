@@ -19,6 +19,12 @@
  *                       Missing: youtubeData stays null, youtubeStatus records why.
  *   SOCIAL_DRY_RUN=1    Same as --dry-run: no network for X, YouTube or LINE.
  *                       Those paths only run when a fixture is injected (tests).
+ *
+ * Depth and spend (2026-11-18): POSTS_ANALYSED (25) posts per platform plus follower counts. Every
+ * Apify call first reserves APIFY_EST_USD from utils/apify_budget (cap per run, all modules); after
+ * the first refusal the run stops paying and marks the rest budgetSkipped. Order: target, partner,
+ * mass, specialty, unclassified, marketplace, niche. The brand's own page is read per
+ * utils/site_access (direct, jp_proxy through fetchPage only, or denied).
  */
 
 require('dotenv').config();
@@ -30,9 +36,69 @@ const { MODEL_DEEP, MODEL_FAST, EFFORT_LOW, extractText } = require('../utils/mo
 const fs = require('fs');
 const path = require('path');
 const checkpoint = require('../utils/checkpoint');
+const apifyBudget = require('../utils/apify_budget');
+const siteAccessDefault = require('../utils/site_access');
+const { normTier, normRelationship } = require('../utils/players');
 
 const DATA_DIR = path.join(__dirname, '../data');
-const CHECKPOINT_STEP = 'social';
+// v2 (2026-11-18): 25 posts per platform plus follower counts. A v1 checkpoint held 5 posts and no
+// followers, so it must never be reused as if it were v2: the step name carries the version.
+const CHECKPOINT_STEP = 'social-v2';
+
+// Depth: posts analysed per platform, and how many of those get their image saved for the dashboard.
+const POSTS_ANALYSED = 25;
+const POSTS_WITH_IMAGES = 5;
+
+/**
+ * Apify cost estimate per account per platform (USD), reserved before the call. The ledger records
+ * the real usageTotalUsd afterwards, so these only decide whether a call may start.
+ *   instagram: profile scraper (followers, ~$0.003) + instagram-scraper 25 posts (~$2.70/1000 = $0.07)
+ *              + two actor starts (~$0.02 each) = ~$0.11, reserved as $0.12
+ *   tiktok:    clockworks/tiktok-scraper 25 posts (~$5/1000 = $0.125) + start = ~$0.15
+ *   facebook:  apify/facebook-posts-scraper 25 posts (~$5/1000 = $0.125) + start = ~$0.15
+ *   x:         apidojo/tweet-scraper 30 tweets (~$0.40/1000) + minimum charge and start = ~$0.05
+ * YouTube (Data API) and LINE (public page) cost no Apify money and are never gated.
+ */
+const APIFY_EST_USD = { instagram: 0.12, tiktok: 0.15, facebook: 0.15, x: 0.05 };
+
+/**
+ * Official accounts read from the brand's own site footer. They outrank the profile (which held a
+ * wrong Facebook page, ToysRUsJapan) and are written back to profile.json as a correction.
+ */
+const OFFICIAL_HANDLES = {
+  'toysrus.co.jp': {
+    checkedAt: '2026-11-18',
+    source: 'toysrus.co.jp site footer',
+    instagram: 'toysrus_jp',
+    facebook: 'toysrusjp',
+    x: 'toysrus_jp',
+    tiktok: 'toysrus_japan',
+    youtube: 'https://www.youtube.com/user/ToysrusJPN',
+    line: '@toysrus_jp',
+  },
+};
+
+// Marketplace category pages have no brand-level toy account. Used when a player has no tier yet.
+const MARKETPLACE_HOSTS = ['amazon.co.jp', 'amazon.com', 'rakuten.co.jp', 'shopping.yahoo.co.jp', 'yahoo.co.jp', 'mercari.com', 'jp.mercari.com'];
+const NO_BRAND_ACCOUNT_REASON = 'No brand-level toy account: a marketplace toy category, not a brand. Set a handle in the profile to scrape one.';
+
+function hostOfUrl(u) {
+  const p = parseUrlLoose(u);
+  return p ? p.hostname.toLowerCase().replace(/^www\./, '') : null;
+}
+function officialHandlesFor(url) {
+  const h = hostOfUrl(url);
+  if (!h) return null;
+  for (const [host, v] of Object.entries(OFFICIAL_HANDLES)) if (h === host || h.endsWith('.' + host)) return v;
+  return null;
+}
+function isMarketplacePlayer(b) {
+  if (!b) return false;
+  if (b.tier === 'marketplace') return true;
+  if (b.tier && b.tier !== 'unknown') return false;
+  const h = hostOfUrl(b.url);
+  return !!h && MARKETPLACE_HOSTS.some(m => h === m || h.endsWith('.' + m));
+}
 
 function log(msg) { console.log(`[social_audit] [${new Date().toISOString()}] ${msg}`); }
 function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
@@ -67,6 +133,17 @@ async function downloadPostImages(slug, posts, prefix = 'post', dataDir = DATA_D
   const saved = updated.filter(p => p.imageUrl?.startsWith('/api/')).length;
   if (saved > 0) log(`  Downloaded ${saved}/${posts.length} post images for ${slug}`);
   return updated;
+}
+
+/**
+ * Pure. Top posts get the saved image of the same post when it is among the newest (originals[i] ->
+ * downloaded[i]); otherwise they keep the platform's imageUrl. No download here.
+ */
+function reuseDownloadedImages(topPosts, originals, downloaded) {
+  return (topPosts || []).map(tp => {
+    const i = (originals || []).indexOf(tp);
+    return i >= 0 && downloaded && downloaded[i] ? { ...tp, imageUrl: downloaded[i].imageUrl } : tp;
+  });
 }
 
 function loadBrandData(slug, filename, dataDir = DATA_DIR) {
@@ -249,12 +326,57 @@ function loadFixture(fixture) {
 
 // ─── Handle Detection ─────────────────────────────────────────────────────────
 
+// The Playwright detectors below request a page DIRECTLY, so each keeps the no_contact.hostAllowed
+// gate: it is false for a denied host and for a jp_proxy host alike (utils/site_access.js). A jp_proxy
+// site is read once through site_access.fetchPage instead (scanPageViaFetch), never by Playwright.
+/** Pure: every href in an HTML string, made absolute against base. */
+function extractHrefs(html, base) {
+  const out = [];
+  for (const m of String(html || '').matchAll(/href\s*=\s*["']([^"']+)["']/gi)) {
+    try { out.push(new URL(m[1].replace(/&amp;/g, '&'), base).href); } catch { /* not a URL */ }
+  }
+  return out;
+}
+
+/**
+ * Handle scan for a site reachable only through the Japanese proxy: one fetchPage call (it routes
+ * through the proxy and enforces the page budget), never Playwright. Returns classified links.
+ */
+const proxyScanCache = new Map(); // url -> Promise<links>: one proxied page per process (page budget is 8)
+function scanPageViaFetch(brandUrl, siteAccess = siteAccessDefault) {
+  if (siteAccess === siteAccessDefault && proxyScanCache.has(brandUrl)) return proxyScanCache.get(brandUrl);
+  const p = scanPageViaFetchOnce(brandUrl, siteAccess);
+  if (siteAccess === siteAccessDefault) proxyScanCache.set(brandUrl, p);
+  return p;
+}
+async function scanPageViaFetchOnce(brandUrl, siteAccess) {
+  try {
+    const acc = siteAccess.accessFor(brandUrl);
+    if (acc.mode === 'denied') return emptySocialLinks();
+    if (acc.mode === 'jp_proxy') log(`  Requesting ${brandUrl} via Japanese proxy (authorized ${acc.authorization?.by || 'unknown'} ${acc.authorization?.at || ''})`);
+    const r = await siteAccess.fetchPage(brandUrl);
+    if (!r || !r.ok) { log(`  Page scan via ${r?.via || 'fetchPage'} skipped for ${brandUrl}: ${r?.reason || (r?.blocked ? 'block page' : `HTTP ${r?.status}`)}`); return emptySocialLinks(); }
+    return classifySocialLinks(extractHrefs(r.text, r.url || brandUrl));
+  } catch (err) {
+    log(`  Page scan via fetchPage failed for ${brandUrl}: ${err.message}`);
+    return emptySocialLinks();
+  }
+}
+
+// A page in a fresh context whose every request (redirects, subresources) is checked by
+// utils/site_access.js: a hop to a denied or proxy-only host is aborted, never loaded directly.
+async function guardedPage(browser) {
+  const context = await browser.newContext();
+  await siteAccessDefault.guardContext(context);
+  return context.newPage();
+}
+
 // One page load, every anchor classified. Used for X, YouTube and LINE when
 // neither the profile nor the structured data supplied them.
 async function detectHandlesFromPage(brandUrl) {
   if (!require('../utils/no_contact').hostAllowed(brandUrl)) return emptySocialLinks();
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const page = await guardedPage(browser);
   try {
     await page.goto(brandUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const links = await page.$$eval('a[href]', anchors => anchors.map(a => a.href)).catch(() => []);
@@ -266,7 +388,7 @@ async function detectHandlesFromPage(brandUrl) {
 async function detectInstagramHandle(brandUrl) {
   if (!require('../utils/no_contact').hostAllowed(brandUrl)) return null;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const page = await guardedPage(browser);
   try {
     await page.goto(brandUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const links = await page.$$eval('a[href*="instagram.com"]', anchors => anchors.map(a => a.href));
@@ -299,7 +421,7 @@ async function detectInstagramHandle(brandUrl) {
 async function detectTikTokHandle(brandUrl) {
   if (!require('../utils/no_contact').hostAllowed(brandUrl)) return null;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const page = await guardedPage(browser);
   try {
     await page.goto(brandUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const links = await page.$$eval('a[href*="tiktok.com"]', anchors => anchors.map(a => a.href)).catch(() => []);
@@ -318,7 +440,7 @@ async function detectTikTokHandle(brandUrl) {
 async function detectFacebookHandle(brandUrl) {
   if (!require('../utils/no_contact').hostAllowed(brandUrl)) return null;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const page = await guardedPage(browser);
   try {
     await page.goto(brandUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const links = await page.$$eval('a[href*="facebook.com"]', anchors => anchors.map(a => a.href)).catch(() => []);
@@ -391,73 +513,76 @@ async function lookupHandlesViaClaude(anthropic, brandName, brandUrl, market, ja
 
 // ─── Platform Scrapers ────────────────────────────────────────────────────────
 
-async function scrapeInstagramViaApify(handle) {
+/**
+ * Apify call context. processBrand reserves the budget for a platform step, then hands the real
+ * scraper this object: callOptions() gives the hard charge ceiling plus maxItems, onRun() collects
+ * every actor run so the step records its true cost once. Without a grant (no budget configured)
+ * it only passes maxItems through.
+ */
+function apifyContext(grant, budgetMod) {
+  const runs = [];
+  return {
+    runs,
+    callOptions: (extra = {}) => (grant && budgetMod ? budgetMod.callOptions(grant, extra) : { ...extra }),
+    onRun: (run) => { if (run) runs.push(run); },
+  };
+}
+function noCtx() { return apifyContext(null, null); }
+
+/** Pure: one run-like record for the budget ledger from every actor run in a step. */
+function combineRuns(runs) {
+  const list = (runs || []).filter(Boolean);
+  if (!list.length) return null;
+  const usages = list.map(r => Number(r.usageTotalUsd));
+  const known = usages.every(Number.isFinite);
+  return { id: list.map(r => r.id).filter(Boolean).join(',') || null, ...(known ? { usageTotalUsd: usages.reduce((a, b) => a + b, 0) } : {}) };
+}
+
+/**
+ * Instagram: the profile scraper first (followers, post count, up to 12 latest posts; costs a
+ * fraction of a cent), then the post scraper for POSTS_ANALYSED posts. Returns
+ * { posts: raw[], followers, postsCount }. Throws when the token is missing or the post run fails.
+ */
+async function scrapeInstagramViaApify(handle, apify = noCtx()) {
   if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
-  log(`  Scraping Instagram @${handle} via Apify...`);
+  let profile = null;
+  try {
+    log(`  Instagram @${handle}: profile (followers) via apify/instagram-profile-scraper...`);
+    const pr = await client.actor('apify/instagram-profile-scraper').call({ usernames: [handle] }, apify.callOptions({ maxItems: 1 }));
+    apify.onRun(pr);
+    const { items } = await client.dataset(pr.defaultDatasetId).listItems({ limit: 1 });
+    profile = items[0] || null;
+  } catch (err) { log(`  Instagram profile scrape failed for @${handle}: ${err.message}`); }
+
+  log(`  Scraping Instagram @${handle} via Apify (${POSTS_ANALYSED} posts)...`);
   const cookies = loadSocialCookies();
-  const igInput = {
-    directUrls: [`https://www.instagram.com/${handle}/`],
-    resultsType: 'posts',
-    resultsLimit: 50,
-  };
+  const igInput = { directUrls: [`https://www.instagram.com/${handle}/`], resultsType: 'posts', resultsLimit: POSTS_ANALYSED };
   if (cookies.instagram && cookies.instagram.length > 0) {
     igInput.loginCookies = cookies.instagram;
     log(`  Using ${cookies.instagram.length} session cookies for Instagram @${handle}`);
   }
-  const run = await client.actor('apify/instagram-scraper').call(igInput);
+  const run = await client.actor('apify/instagram-scraper').call(igInput, apify.callOptions({ maxItems: POSTS_ANALYSED }));
+  apify.onRun(run);
   log(`  Apify run status: ${run.status}, datasetId: ${run.defaultDatasetId}`);
-  const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 50 });
+  const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: POSTS_ANALYSED + 5 });
   log(`  Apify returned ${items.length} items`);
   const posts = items.filter(item =>
     item.type === 'Image' || item.type === 'Video' || item.type === 'Sidecar' ||
     item.shortCode || item.timestamp || item.taken_at_timestamp
   );
-  // Handle restricted profile response: Apify returns 1 profile object with latestPosts[]
+  // Restricted profile response: one profile object with latestPosts[]
   const restrictedPosts = items
     .filter(item => item.isRestrictedProfile && Array.isArray(item.latestPosts))
-    .flatMap(item => {
-      log(`  Restricted profile detected for @${handle}: extracting ${item.latestPosts.length} latestPosts`);
-      return item.latestPosts;
-    });
-  const allPosts = [...posts, ...restrictedPosts];
-  log(`  ${allPosts.length} valid Instagram posts after filtering (${restrictedPosts.length} from restricted profile)`);
-
-  // If primary actor returned nothing, try apify/instagram-profile-scraper as fallback
-  if (allPosts.length === 0) {
-    log(`  Primary actor returned 0 posts for @${handle}: trying apify/instagram-profile-scraper...`);
-    try {
-      const run2 = await client.actor('apify/instagram-profile-scraper').call({
-        usernames: [handle],
-        resultsLimit: 50,
-      });
-      const { items: items2 } = await client.dataset(run2.defaultDatasetId).listItems({ limit: 50 });
-      const posts2 = items2.filter(item =>
-        item.type === 'Image' || item.type === 'Video' || item.type === 'Sidecar' ||
-        item.shortCode || item.timestamp
-      );
-      log(`  Fallback actor returned ${posts2.length} posts for @${handle}`);
-      return posts2;
-    } catch (err2) {
-      log(`  Fallback actor also failed for @${handle}: ${err2.message}`);
-    }
+    .flatMap(item => item.latestPosts);
+  let allPosts = [...posts, ...restrictedPosts];
+  if (!allPosts.length && Array.isArray(profile?.latestPosts) && profile.latestPosts.length) {
+    log(`  Post scraper returned nothing for @${handle}: using ${profile.latestPosts.length} latestPosts from the profile scrape`);
+    allPosts = profile.latestPosts;
   }
-
-  return allPosts;
-}
-
-async function scrapeInstagramProfileViaApify(handle) {
-  if (!process.env.APIFY_API_TOKEN) return null;
-  const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
-  log(`  Trying profile-scraper fallback for @${handle}...`);
-  try {
-    const run = await client.actor('apify/instagram-profile-scraper').call({ usernames: [handle] });
-    const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 1 });
-    return items[0] || null;
-  } catch (err) {
-    log(`  Profile scraper also failed: ${err.message}`);
-    return null;
-  }
+  log(`  ${allPosts.length} valid Instagram posts for @${handle}`);
+  const followers = profile ? (profile.followersCount ?? profile.followers ?? null) : null;
+  return { posts: allPosts, followers: typeof followers === 'number' ? followers : null, postsCount: profile?.postsCount ?? profile?.mediaCount ?? null };
 }
 
 async function scrapeInstagramFallback(handle) {
@@ -465,6 +590,7 @@ async function scrapeInstagramFallback(handle) {
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   });
+  await siteAccessDefault.guardContext(context);
   const page = await context.newPage();
   try {
     await page.goto(`https://www.instagram.com/${handle}/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -486,40 +612,55 @@ async function scrapeInstagramFallback(handle) {
   }
 }
 
-async function scrapeTikTokViaApify(handle) {
+async function scrapeTikTokViaApify(handle, apify = noCtx()) {
   if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
   log(`  Scraping TikTok @${handle} via Apify...`);
   const run = await client.actor('clockworks/tiktok-scraper').call({
     profiles: [`https://www.tiktok.com/@${handle}`],
-    resultsPerPage: 30,
-  });
-  const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 30 });
+    resultsPerPage: POSTS_ANALYSED,
+  }, apify.callOptions({ maxItems: POSTS_ANALYSED }));
+  apify.onRun(run);
+  const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: POSTS_ANALYSED });
   const posts = items.filter(item => item.diggCount !== undefined || item.text || item.createTime);
   log(`  ${posts.length} TikTok posts for @${handle}`);
-  return posts;
+  return posts; // followers ride on each item as authorMeta.fans
 }
 
-async function scrapeFacebookViaApify(handle) {
+async function scrapeFacebookViaApify(handle, apify = noCtx()) {
   if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
   log(`  Scraping Facebook /${handle} via Apify (facebook-posts-scraper)...`);
   const fbCookies = loadSocialCookies();
-  const fbInput = {
-    startUrls: [{ url: `https://www.facebook.com/${handle}` }],
-    resultsLimit: 20,
-  };
+  const fbInput = { startUrls: [{ url: `https://www.facebook.com/${handle}` }], resultsLimit: POSTS_ANALYSED };
   if (fbCookies.facebook && fbCookies.facebook.length > 0) {
     fbInput.cookies = fbCookies.facebook;
     log(`  Using ${fbCookies.facebook.length} session cookies for Facebook /${handle}`);
   }
-  const run = await client.actor('apify/facebook-posts-scraper').call(fbInput);
-  const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 50 });
-  // Filter to actual post items with real content
+  const run = await client.actor('apify/facebook-posts-scraper').call(fbInput, apify.callOptions({ maxItems: POSTS_ANALYSED }));
+  apify.onRun(run);
+  const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: POSTS_ANALYSED + 10 });
   const posts = items.filter(item => item.message || item.text || item.story || item.postId);
   log(`  ${posts.length} Facebook posts for /${handle}`);
   return posts;
 }
+
+/** Pure: page followers from Facebook post items, when the actor includes them. Else null. */
+function facebookFollowersFrom(items) {
+  for (const p of Array.isArray(items) ? items : []) {
+    const v = p?.pageFollowers ?? p?.user?.followers ?? p?.pageLikes ?? p?.page?.followers ?? p?.page?.likes;
+    if (typeof v === 'number' && v > 0) return v;
+  }
+  return null;
+}
+
+/** Pure: a scraper may return a raw array (older seams) or { posts, followers, postsCount }. */
+function toScrapeResult(v) {
+  if (Array.isArray(v)) return { posts: v, followers: null, postsCount: null };
+  if (v && typeof v === 'object') return { posts: Array.isArray(v.posts) ? v.posts : [], followers: typeof v.followers === 'number' ? v.followers : null, postsCount: v.postsCount ?? null };
+  return { posts: [], followers: null, postsCount: null };
+}
+
 
 // ─── X (Twitter) via Apify ───────────────────────────────────────────────────
 // Actor: apidojo/tweet-scraper ("Tweet Scraper V2" by API Dojo), the most widely
@@ -573,8 +714,10 @@ async function scrapeXViaApify(handle, opts = {}) {
     } else {
       const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
       log(`  Scraping X @${clean} via Apify (${X_ACTOR_ID})...`);
-      const run = await client.actor(X_ACTOR_ID).call({ twitterHandles: [clean], maxItems: 50, sort: 'Latest' });
-      ({ items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 50 }));
+      const apify = opts.apify || noCtx();
+      const run = await client.actor(X_ACTOR_ID).call({ twitterHandles: [clean], maxItems: POSTS_ANALYSED + 5, sort: 'Latest' }, apify.callOptions({ maxItems: POSTS_ANALYSED + 5 }));
+      apify.onRun(run);
+      ({ items } = await client.dataset(run.defaultDatasetId).listItems({ limit: POSTS_ANALYSED + 5 }));
       // The not-found marker only appears in the run log. Reading the log is free; best effort.
       const hasPosts = (items || []).some(t => t && (t.text || t.fullText));
       if (!hasPosts && run?.id) {
@@ -821,9 +964,55 @@ function buildPostingPattern(normalizedPosts) {
   return { bestDay: best && best[1] > 0 ? DAY_LABELS[best[0]] : null, dayBreakdown };
 }
 
-// Normalize raw posts from any platform to a consistent shape
+/**
+ * Pure: the content format of one raw post: reel | carousel | video | image | live | text.
+ * Only reads fields the actors actually return; anything unrecognised falls back by platform.
+ */
+function detectFormat(p, platform) {
+  if (!p || typeof p !== 'object') return null;
+  if (platform === 'youtube') {
+    const live = p.snippet?.liveBroadcastContent;
+    return live === 'live' || live === 'upcoming' || p.liveStreamingDetails ? 'live' : 'video';
+  }
+  if (platform === 'tiktok') {
+    if (p.isLive || p.liveRoom) return 'live';
+    if (p.isSlideshow || (Array.isArray(p.imagePost?.images) && p.imagePost.images.length) || (Array.isArray(p.slideshowImageLinks) && p.slideshowImageLinks.length)) return 'carousel';
+    return 'video';
+  }
+  if (platform === 'x') {
+    const media = p.extendedEntities?.media || p.entities?.media || p.media || [];
+    if (!Array.isArray(media) || !media.length) return 'text';
+    if (media.some(m => m && (m.type === 'video' || m.type === 'animated_gif'))) return 'video';
+    return media.length > 1 ? 'carousel' : 'image';
+  }
+  if (platform === 'facebook') {
+    if (p.isLive || /live/i.test(String(p.videoType || ''))) return 'live';
+    if (p.isVideo || p.video || (Array.isArray(p.media) && p.media.some(m => /video/i.test(String(m?.__typename || m?.type || ''))))) return 'video';
+    if (Array.isArray(p.media) && p.media.length > 1) return 'carousel';
+    if (Array.isArray(p.media) && p.media.length === 1) return 'image';
+    return 'text';
+  }
+  // Instagram
+  if (p.productType === 'clips' || p.type === 'Reel') return 'reel';
+  if (p.type === 'Sidecar' || (Array.isArray(p.childPosts) && p.childPosts.length > 1) || p.childCount > 1) return 'carousel';
+  if (p.productType === 'igtv' || p.type === 'Video' || p.isVideo) return 'video';
+  if (p.type === 'Image') return 'image';
+  return null;
+}
+
+// Normalize raw posts from any platform to a consistent shape (plus `format`)
 function normalizePosts(rawPosts, platform) {
-  return rawPosts.map(p => {
+  return (rawPosts || []).map(p => ({ ...normalizeOne(p, platform), format: detectFormat(p, platform) }));
+}
+
+/** Pure: newest first, at most n (posts without a timestamp go last). */
+function newestFirst(posts, n = POSTS_ANALYSED) {
+  const t = p => { const d = p?.timestamp ? new Date(p.timestamp).getTime() : NaN; return Number.isFinite(d) ? d : -Infinity; };
+  return [...(posts || [])].sort((a, b) => t(b) - t(a)).slice(0, n);
+}
+
+function normalizeOne(p, platform) {
+  {
     if (platform === 'x') {
       // Shared shape plus additive shares/views. Caption text is kept verbatim (Japanese included).
       const media = p.extendedEntities?.media?.[0] || p.entities?.media?.[0] || p.media?.[0] || null;
@@ -887,7 +1076,7 @@ function normalizePosts(rawPosts, platform) {
       postUrl: p.shortCode ? `https://instagram.com/p/${p.shortCode}` : null,
       imageUrl: p.displayUrl || null,
     };
-  });
+  }
 }
 
 // Build a platform data object from normalized posts (for tiktokData / facebookData fields)
@@ -982,6 +1171,236 @@ function deriveEngagement(brand) {
   return out;
 }
 
+// ─── Per-platform blocks, coverage and tier evidence (pure) ──────────────────
+
+const BLOCK_PLATFORMS = ['instagram', 'tiktok', 'facebook', 'x', 'youtube', 'line'];
+const TIER_SEQUENCE = ['marketplace', 'mass', 'specialty', 'niche', 'unknown'];
+const THIN_EVIDENCE_MIN = 3; // fewer brands with data than this in a tier: say evidence is thin
+
+/**
+ * Pure: posts per week from post timestamps. (n - 1) intervals over the span between the oldest and
+ * newest post, so 25 posts over 12 weeks reads 2.0 whatever the date of the run.
+ * Returns { postsPerWeek, reason, lastPostAt }.
+ */
+function postsPerWeekFrom(posts) {
+  const ts = (posts || []).map(p => new Date(p?.timestamp).getTime()).filter(Number.isFinite).sort((a, b) => a - b);
+  const lastPostAt = ts.length ? new Date(ts[ts.length - 1]).toISOString() : null;
+  if (ts.length < 2) return { postsPerWeek: null, reason: ts.length ? 'only one dated post' : 'no dated posts', lastPostAt };
+  const weeks = (ts[ts.length - 1] - ts[0]) / (7 * 24 * 3600 * 1000);
+  if (!(weeks > 0)) return { postsPerWeek: null, reason: 'all posts share one timestamp', lastPostAt };
+  // At least one day of span, so a burst of same-day posts does not read as hundreds per week.
+  return { postsPerWeek: round((ts.length - 1) / Math.max(weeks, 1 / 7), 1), reason: null, lastPostAt };
+}
+
+/** Pure: format mix, most used first: [{ format, count, share }]. */
+function formatMix(posts) {
+  const counts = {};
+  let n = 0;
+  for (const p of posts || []) { if (!p?.format) continue; counts[p.format] = (counts[p.format] || 0) + 1; n++; }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([format, count]) => ({ format, count, share: round(count / n, 2) }));
+}
+
+/**
+ * Pure: the per-platform block. engagementRate is a percent of followers per post
+ * (avg interactions per post / followers * 100), null with engagementRateReason when either is missing.
+ */
+function buildPlatformBlock({ handle = null, posts = [], followers = null, followersReason = null, status = null, budgetSkipped = false, reason = null } = {}) {
+  const list = (posts || []).filter(Boolean);
+  const n = list.length;
+  const eng = n ? computeEngagement(list, followers) : null;
+  const freq = postsPerWeekFrom(list);
+  const f = typeof followers === 'number' && followers > 0 ? followers : null;
+  let engagementRateReason = null;
+  if (!(eng && eng.basis === 'followers')) {
+    engagementRateReason = budgetSkipped ? 'not scraped: Apify budget cap reached'
+      : !n ? (reason || 'no posts analysed')
+      : (followersReason || 'follower count not available from this source');
+  }
+  return {
+    handle: handle || null,
+    status: status || (n ? 'ok' : 'no-data'),
+    followers: f,
+    posts: n,
+    avgInteractions: eng ? eng.avgEngagementPerPost : null,
+    interactionsCounted: eng ? eng.counts : null,
+    engagementRate: eng && eng.basis === 'followers' ? eng.rate : null,
+    engagementRateUnit: 'percent of followers per post',
+    engagementRateReason,
+    postsPerWeek: freq.postsPerWeek,
+    ...(freq.reason && n ? { postsPerWeekReason: freq.reason } : {}),
+    lastPostAt: freq.lastPostAt,
+    topFormats: formatMix(list).slice(0, 5),
+    topThemes: extractContentThemes(list).slice(0, 5),
+    ...(budgetSkipped ? { budgetSkipped: true } : {}),
+    ...(reason ? { reason } : {}),
+  };
+}
+
+function hasPlatformData(block) { return !!block && (block.posts || 0) > 0; }
+
+/** Pure: brands with post data on at least one platform. */
+function brandsWithData(brands) {
+  return (brands || []).filter(b => b && BLOCK_PLATFORMS.some(p => hasPlatformData(b.platforms?.[p])));
+}
+
+/**
+ * Pure: which brands and platforms had data, which were skipped and why, and the Apify spend.
+ * budgetSummary: utils/apify_budget summary() for this run (or null).
+ */
+function buildCoverage(brands, budgetSummary = null) {
+  const list = (brands || []).filter(Boolean);
+  const perBrand = list.map(b => {
+    const withData = BLOCK_PLATFORMS.filter(p => hasPlatformData(b.platforms?.[p]));
+    const skipped = BLOCK_PLATFORMS.map(p => [p, b.platforms?.[p], b.platformStatus?.[p]])
+      .filter(([p, blk]) => !withData.includes(p))
+      .map(([p, blk, st]) => ({
+        platform: p,
+        reason: blk?.reason || st?.reason || (p === 'line' && b.lineAccount ? 'presence only (LINE has no public feed)' : 'no account found'),
+        ...(blk?.budgetSkipped || st?.budgetSkipped ? { budgetSkipped: true } : {}),
+        ...(p === 'line' && b.lineAccount?.exists ? { presenceOnly: true } : {}),
+      }));
+    return { name: b.name, role: b.role, tier: b.tier || 'unknown', relationship: b.relationship || 'competitor', platformsWithData: withData, skipped, ...(b.noBrandAccount ? { noBrandAccount: true } : {}), ...(b.stale ? { stale: true } : {}) };
+  });
+  const byTier = {};
+  for (const t of TIER_SEQUENCE) {
+    const inTier = perBrand.filter(b => b.role !== 'target' && b.tier === t);
+    if (!inTier.length) continue;
+    const withData = inTier.filter(b => b.platformsWithData.length).map(b => b.name);
+    byTier[t] = { brands: inTier.map(b => b.name), withData, evidence: withData.length >= THIN_EVIDENCE_MIN ? 'adequate' : 'thin' };
+  }
+  const platforms = {};
+  for (const p of BLOCK_PLATFORMS) {
+    platforms[p] = {
+      withData: perBrand.filter(b => b.platformsWithData.includes(p)).map(b => b.name),
+      budgetSkipped: perBrand.filter(b => b.skipped.some(s => s.platform === p && s.budgetSkipped)).map(b => b.name),
+    };
+  }
+  const entries = budgetSummary?.entries || [];
+  const socialEntries = entries.filter(e => /^social /.test(e.label || ''));
+  const spent = socialEntries.reduce((s, e) => s + (e.actualUsd != null ? e.actualUsd : (e.reservedUsd || 0)), 0);
+  return {
+    brands: perBrand,
+    byTier,
+    platforms,
+    brandsWithData: perBrand.filter(b => b.platformsWithData.length).length,
+    brandsTotal: perBrand.length,
+    budget: budgetSummary ? {
+      runId: budgetSummary.runId || null,
+      capUsd: budgetSummary.capUsd ?? null,
+      runSpentUsd: budgetSummary.spentUsd ?? null,
+      socialSpentUsd: round(spent, 2),
+      socialCalls: socialEntries.filter(e => !e.refused).length,
+      socialRefused: socialEntries.filter(e => e.refused).length,
+    } : null,
+  };
+}
+
+/**
+ * Pure: compact per-tier evidence for the synthesis prompt. Only brands with data are listed as
+ * evidence; brands without data are named separately so the model cannot cite them.
+ */
+function buildTierEvidence(brands) {
+  const out = {};
+  for (const b of (brands || []).filter(Boolean)) {
+    const tier = b.role === 'target' ? 'target' : (b.tier || 'unknown');
+    if (!out[tier]) out[tier] = { withData: [], withoutData: [] };
+    const plats = BLOCK_PLATFORMS.filter(p => hasPlatformData(b.platforms?.[p]));
+    if (!plats.length) { out[tier].withoutData.push(b.name); continue; }
+    out[tier].withData.push({
+      name: b.name,
+      relationship: b.relationship || (b.role === 'target' ? 'self' : 'competitor'),
+      platforms: Object.fromEntries(plats.map(p => {
+        const k = b.platforms[p];
+        return [p, {
+          followers: k.followers, posts: k.posts, engagementRate: k.engagementRate, avgInteractions: k.avgInteractions,
+          postsPerWeek: k.postsPerWeek, formats: k.topFormats.map(f => `${f.format} ${Math.round(f.share * 100)}%`).join(', '),
+          themes: k.topThemes.map(t => t.theme).join(', '),
+        }];
+      })),
+    });
+  }
+  return out;
+}
+
+function buildTierSynthesisPrompt({ targetName, market, evidence, coverage, guidelines }) {
+  const tiers = Object.entries(evidence);
+  const lines = tiers.map(([tier, ev]) => {
+    const thin = tier !== 'target' && ev.withData.length < THIN_EVIDENCE_MIN;
+    return `TIER ${tier}${thin ? ` (THIN EVIDENCE: only ${ev.withData.length} brand(s) with data)` : ''}\n`
+      + (ev.withData.length ? ev.withData.map(b => `  ${b.name} [${b.relationship}]: ` + Object.entries(b.platforms).map(([p, k]) =>
+        `${p} followers=${k.followers ?? 'unknown'} posts=${k.posts} eng=${k.engagementRate != null ? k.engagementRate + '%' : 'n/a'} avgInteractions=${k.avgInteractions ?? 'n/a'} perWeek=${k.postsPerWeek ?? 'n/a'} formats=[${k.formats}] themes=[${k.themes}]`).join(' | ')).join('\n') : '  (no brand in this tier returned data)')
+      + (ev.withoutData.length ? `\n  No data (do not cite): ${ev.withoutData.join(', ')}` : '');
+  }).join('\n');
+  const skippedBudget = (coverage?.brands || []).filter(b => b.skipped.some(s => s.budgetSkipped)).map(b => b.name);
+  return `You are a social media strategist for ${targetName}, a toy retailer in ${market}. The owner says the social picture has been weak and needs to know what niche brands do, how ${targetName} can differentiate, and how it can stand out from the marketplaces (Amazon, Rakuten, Yahoo! Shopping).
+
+Players are grouped in tiers: marketplace (pure e-commerce, many sellers), mass (general retail with a toy department), specialty (toy, character and hobby specialists), niche (small focused players: educational, gacha, collectibles, indie, D2C). Don Quijote is ${targetName}'s PARTNER (a shop-in-shop deal was just signed), never a competitor: never frame it as a rival.
+
+EVIDENCE (last ${POSTS_ANALYSED} posts per platform; engagement = average interactions per post as a percent of followers):
+${lines}
+${skippedBudget.length ? `\nNot scraped this run because the Apify budget cap was reached: ${skippedBudget.join(', ')}. Say so where it matters.\n` : ''}
+RULES
+- Every claim cites brands from the evidence above that actually have data, by exact name. Never cite a brand listed under "No data".
+- When a tier is marked THIN EVIDENCE, say the evidence is thin and describe only what those brands show; do not generalise to the whole tier.
+- Marketplaces usually have no brand-level toy account; if a marketplace tier has no data, say that rather than inventing their social behaviour.
+- ${LANGUAGE_INSTRUCTION}
+${buildGuidelinesContext(guidelines)}
+Return ONLY a JSON object:
+{
+  "tierInsights": [{"tier": "marketplace|mass|specialty|niche", "summary": "what these players do on social", "formats": "dominant formats", "cadence": "typical posts per week", "typicalEngagement": "typical engagement rate or interactions", "evidenceBrands": ["exact brand names with data"], "evidenceStrength": "adequate|thin"}],
+  "differentiation": {"nichePlaybook": [{"move": "what niche and specialty players do that marketplaces cannot (curation, storytelling, community, expertise, exclusives, events)", "evidenceBrands": ["..."]}], "standOutFromMarketplaces": [{"move": "how ${targetName} can stand out from the marketplaces on social", "why": "...", "platform": "instagram|tiktok|x|youtube|line|facebook|all", "evidenceBrands": ["..."]}]},
+  "partnerPlay": [{"idea": "how ${targetName} and Don Quijote use social around the shop-in-shop and to drive store traffic", "platform": "...", "how": "...", "evidenceBrands": ["..."]}]
+}`;
+}
+
+/**
+ * Pure: enforce the evidence rules on the model's answer. Citations of brands without data are
+ * removed (and counted), every tier insight gets evidenceStrength from the data rather than from the
+ * model, and a thin tier always says so.
+ */
+function enforceEvidence(synth, brands) {
+  if (!synth || typeof synth !== 'object') return null;
+  const withData = new Map(brandsWithData(brands).map(b => [String(b.name).toLowerCase(), b]));
+  let removed = 0;
+  const clean = (arr) => {
+    const list = Array.isArray(arr) ? arr : [];
+    const kept = list.filter(n => withData.has(String(n).toLowerCase()));
+    removed += list.length - kept.length;
+    return kept.map(n => withData.get(String(n).toLowerCase()).name);
+  };
+  const tierCount = {};
+  for (const b of withData.values()) if (b.role !== 'target') tierCount[b.tier || 'unknown'] = (tierCount[b.tier || 'unknown'] || 0) + 1;
+  const tierInsights = (Array.isArray(synth.tierInsights) ? synth.tierInsights : []).map(t => {
+    const n = tierCount[t.tier] || 0;
+    const strength = n >= THIN_EVIDENCE_MIN ? 'adequate' : 'thin';
+    const out = { ...t, evidenceBrands: clean(t.evidenceBrands), evidenceStrength: strength, brandsWithData: n };
+    if (strength === 'thin' && !/thin/i.test(String(t.summary || ''))) out.summary = `Evidence is thin (${n} brand${n === 1 ? '' : 's'} with data in this tier). ${t.summary || ''}`.trim();
+    return out;
+  });
+  const d = synth.differentiation && typeof synth.differentiation === 'object' ? synth.differentiation : {};
+  const differentiation = {
+    nichePlaybook: (Array.isArray(d.nichePlaybook) ? d.nichePlaybook : []).map(x => ({ ...x, evidenceBrands: clean(x.evidenceBrands) })),
+    standOutFromMarketplaces: (Array.isArray(d.standOutFromMarketplaces) ? d.standOutFromMarketplaces : []).map(x => ({ ...x, evidenceBrands: clean(x.evidenceBrands) })),
+  };
+  const partnerPlay = (Array.isArray(synth.partnerPlay) ? synth.partnerPlay : []).map(x => ({ ...x, evidenceBrands: clean(x.evidenceBrands) }));
+  return { tierInsights, differentiation, partnerPlay, removedCitations: removed };
+}
+
+async function generateTierSynthesis(anthropic, brands, coverage, guidelines, market = 'the local market') {
+  const target = (brands || []).find(b => b && b.role === 'target');
+  const prompt = buildTierSynthesisPrompt({ targetName: target?.name || 'this brand', market, evidence: buildTierEvidence(brands), coverage, guidelines });
+  const msg = await anthropic.messages.create({
+    model: MODEL_DEEP,
+    max_tokens: 6000,
+    messages: [{ role: 'user', content: prompt }],
+  });
+  const raw = extractText(msg);
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('synthesis returned no JSON object');
+  return enforceEvidence(JSON.parse(raw.slice(start, end + 1)), brands);
+}
+
 // ─── Content Gap Analysis (Claude) ───────────────────────────────────────────
 
 function buildGuidelinesContext(guidelines) {
@@ -1018,12 +1437,24 @@ function platformStatusLabel(b, platform) {
   return 'not applicable (no account found)';
 }
 
+// Prompt label: role, plus tier and relationship when known (older records have neither).
+function brandLabel(b) {
+  const parts = [b.role];
+  if (b.role !== 'target' && b.tier && b.tier !== 'unknown') parts.push(`tier ${b.tier}`);
+  if (b.relationship === 'partner') parts.push('PARTNER, not a competitor');
+  return parts.join(', ');
+}
+
 function buildPlatformCoverageContext(brands) {
   const platforms = ['instagram', 'tiktok', 'facebook', 'x', 'youtube', 'line'];
   const lines = (brands || []).filter(Boolean).map(b =>
-    `${b.name} (${b.role}): ` + platforms.map(p => `${p}=${platformStatusLabel(b, p)}`).join('; '));
+    `${b.name} (${brandLabel(b)}): ` + platforms.map(p => `${p}=${platformStatusLabel(b, p)}`).join('; '));
   if (!lines.length) return '';
-  return `\nPLATFORM COVERAGE (state plainly when a platform is not applicable or presence-only; never invent metrics for those):\n${lines.join('\n')}\n`;
+  const tiered = (brands || []).some(b => b && b.tier && b.tier !== 'unknown' && b.role !== 'target');
+  const partners = (brands || []).filter(b => b && b.relationship === 'partner').map(b => b.name);
+  return `\nPLATFORM COVERAGE (state plainly when a platform is not applicable or presence-only; never invent metrics for those):\n${lines.join('\n')}\n`
+    + (tiered ? 'Players carry a tier (marketplace, mass, specialty, niche). Compare like with like, and contrast what niche and specialty players do with what marketplaces cannot do. Only cite brands that have data above.\n' : '')
+    + (partners.length ? `${partners.join(', ')} ${partners.length === 1 ? 'is a PARTNER' : 'are PARTNERS'} of the target, not ${partners.length === 1 ? 'a competitor' : 'competitors'}: never frame ${partners.length === 1 ? 'it' : 'them'} as a rival.\n` : '');
 }
 
 async function generateWhiteSpaceOpportunities(anthropic, allBrandsData, guidelines, market = 'the local market') {
@@ -1079,12 +1510,14 @@ Return ONLY a JSON array:
 
 async function generateCompetitionStrategy(anthropic, targetData, competitorData, guidelines, market = 'the local market') {
   const target = targetData;
+  // A partner is studied as a channel, never as a competitor to beat.
+  competitorData = (competitorData || []).filter(c => c && c.relationship !== 'partner');
   const compSummaries = competitorData
     .filter(c => c.summary?.postCount > 0)
     .map(c => {
       const topTheme = c.contentThemes?.[0]?.theme || 'unknown';
       const eng = c.summary?.avgEngagement || 0;
-      return `${c.name}: avg ${eng} eng, ${c.summary?.postingFrequencyPerWeek || 0}/wk, top theme: ${topTheme}`;
+      return `${c.name}${c.tier && c.tier !== 'unknown' ? ` [${c.tier}]` : ''}: avg ${eng} eng, ${c.summary?.postingFrequencyPerWeek || 0}/wk, top theme: ${topTheme}`;
     })
     .join('\n');
 
@@ -1198,7 +1631,7 @@ Identify the 4-5 most impactful content opportunities. Return ONLY a JSON array:
 // YouTube by the channels API (free), LINE by the public add-friend page (free). X has no free
 // check, so a Claude-guessed X handle is recorded as unverified and not scraped, unless an earlier
 // run already scraped real posts from that same handle (prior-scrape evidence).
-const TRUSTED_SOURCES = ['profile', 'structured-data', 'page-scan'];
+const TRUSTED_SOURCES = ['profile', 'structured-data', 'page-scan', 'official'];
 
 function handleKey(h) { return String(h || '').replace(/^@/, '').toLowerCase(); }
 
@@ -1210,9 +1643,10 @@ function handleTrust(source, verified = null, verifiedBy = null) {
 // Trim raw Instagram items to the fields this module reads, so checkpoints stay small.
 function pickInstagramFields(p) {
   if (!p || typeof p !== 'object') return p;
-  const keep = ['type', 'shortCode', 'timestamp', 'taken_at_timestamp', 'likesCount', 'commentsCount', 'caption', 'displayUrl', 'edge_media_preview_like', 'edge_media_to_comment'];
+  const keep = ['type', 'productType', 'isVideo', 'childCount', 'shortCode', 'timestamp', 'taken_at_timestamp', 'likesCount', 'commentsCount', 'caption', 'displayUrl', 'edge_media_preview_like', 'edge_media_to_comment'];
   const out = {};
   for (const k of keep) if (p[k] !== undefined) out[k] = p[k];
+  if (Array.isArray(p.childPosts)) out.childCount = p.childPosts.length; // count only, keeps checkpoints small
   return out;
 }
 
@@ -1233,23 +1667,53 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
   const cache = opts.cache || null;
   const scrapers = opts.scrapers || {}; // tests: { instagram, tiktok, facebook } replace the Apify calls
   const priorVerified = brandInfo.priorVerified || {};
+  const siteAccess = opts.siteAccess || siteAccessDefault;
+  // opts.budget: { mod, slug, opts, state } from runAudit. state.refusedReason is shared by every
+  // brand in the run: after the first refusal no further paid call is attempted (a clean stop).
+  const budget = opts.budget || null;
+  const tier = role === 'target' ? 'target' : normTier(brandInfo.tier);
+  const relationship = role === 'target' ? 'self' : normRelationship(brandInfo.relationship);
+  const official = new Set(brandInfo.officialPlatforms || []);
+  // Marketplaces (Amazon, Rakuten, Yahoo toy categories) have no brand-level toy account: no handle
+  // discovery and no guessing for them. A handle set in the profile is still scraped.
+  const marketplace = role !== 'target' && isMarketplacePlayer({ tier: brandInfo.tier, url });
+  const profileHasAny = !!(brandInfo.handle || brandInfo.tiktokHandle || brandInfo.facebookHandle || brandInfo.xHandle || brandInfo.youtubeHandle || brandInfo.lineId);
+  const noBrandAccount = marketplace && !profileHasAny;
+  const canPay = (platform) => !!(scrapers[platform] || process.env.APIFY_API_TOKEN);
 
-  // Paid platform calls go through here: a checkpointed result is reused instead of paid for again.
-  async function cachedStep(key, fn, keep) {
+  // Paid platform calls go through here: a checkpointed result is reused instead of paid for again,
+  // and a new call first reserves its estimate from the run's Apify budget. A refusal returns
+  // { __budgetSkipped, reason } and the actor is never called.
+  async function cachedStep(key, fn, keep, paid = null) {
     if (cache) {
       const hit = cache.get(key);
       if (hit !== undefined) { log(`  ${name} ${key}: resumed from checkpoint`); return hit; }
     }
-    const value = await fn();
+    let grant = null;
+    if (paid && budget) {
+      if (budget.state.refusedReason) return { __budgetSkipped: true, reason: budget.state.refusedReason };
+      try { grant = budget.mod.reserve(budget.slug, paid.est, `social ${paid.label}`, budget.opts); }
+      catch (err) { grant = { ok: false, reason: `Apify budget ledger unavailable: ${err.message}` }; }
+      if (!grant.ok) {
+        budget.state.refusedReason = grant.reason;
+        log(`  ${name} ${key}: not scraped, ${grant.reason}`);
+        return { __budgetSkipped: true, reason: grant.reason };
+      }
+    }
+    const apify = apifyContext(grant, budget ? budget.mod : null);
+    let value;
+    try { value = await fn(apify); }
+    finally { if (grant) { try { budget.mod.record(budget.slug, grant, combineRuns(apify.runs), budget.opts); } catch (err) { log(`  budget record failed: ${err.message}`); } } }
     if (cache && keep(value)) cache.put(key, value);
     return value;
   }
 
   // ── Handle sources, in priority order: profile > structured data > page scan > Claude
-  const sd = classifySocialLinks(brandInfo.structuredSocialLinks || []);
+  // A marketplace's sameAs links are the marketplace's corporate accounts, not a toy account.
+  const sd = marketplace ? emptySocialLinks() : classifySocialLinks(brandInfo.structuredSocialLinks || []);
   const handleSources = {};
   const pick = (platform, existing, fromSd) => {
-    if (existing) { handleSources[platform] = 'profile'; return existing; }
+    if (existing) { handleSources[platform] = official.has(platform) ? 'official' : 'profile'; return existing; }
     if (fromSd) { handleSources[platform] = 'structured-data'; return fromSd; }
     return null;
   };
@@ -1265,6 +1729,8 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
     id: slug || name.toLowerCase().replace(/\s+/g, '-'),
     name,
     role,
+    tier,
+    relationship,
     handle: existingIgHandle || null,
     platform: 'instagram',
     scrapedAt: new Date().toISOString(),
@@ -1295,6 +1761,9 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
     engagementBasis: null,
     engagementByPlatform: {},
     structuredSocialLinks: (brandInfo.structuredSocialLinks || []).slice(0, 20),
+    // Per-platform blocks {handle, followers, posts, engagementRate, postsPerWeek, topFormats, topThemes, ...}
+    platforms: {},
+    ...(noBrandAccount ? { noBrandAccount: true } : {}),
     contentGaps: [],
     error: null,
     partialData: false,
@@ -1302,17 +1771,31 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
 
   // ── Handle Discovery: Playwright → Claude fallback ─────────────────────────
   // Only for platforms the profile and structured data did not already supply.
-  const canScanPage = url && !opts.skipPageDetection && !isDryRun(opts);
+  // Site access decides how (and whether) the brand's own page is read: 'direct' keeps the Playwright
+  // detectors, 'jp_proxy' reads one page through site_access.fetchPage only, 'denied' reads nothing.
+  let access = { mode: 'denied' };
+  if (url && !opts.skipPageDetection && !isDryRun(opts) && !marketplace) {
+    try { access = siteAccess.accessFor(url); } catch { access = { mode: 'denied' }; }
+  }
+  const canScanPage = access.mode === 'direct' || access.mode === 'jp_proxy';
+  let proxyScan = null;
+  const proxyLinks = async () => (proxyScan || (proxyScan = await scanPageViaFetch(url, siteAccess)));
   const needsDetection = (!existingIgHandle || !existingTtHandle || !existingFbHandle) && canScanPage;
   let claudeHandles = {};
   if (needsDetection) {
-    log(`  Detecting missing handles for ${name}...`);
-    // Playwright passes first
-    const [igDetected, ttDetected, fbDetected] = await Promise.all([
-      existingIgHandle ? Promise.resolve(null) : detectInstagramHandle(url).catch(() => null),
-      existingTtHandle ? Promise.resolve(null) : detectTikTokHandle(url).catch(() => null),
-      existingFbHandle ? Promise.resolve(null) : detectFacebookHandle(url).catch(() => null),
-    ]);
+    log(`  Detecting missing handles for ${name} (${access.mode})...`);
+    let igDetected = null; let ttDetected = null; let fbDetected = null;
+    if (access.mode === 'jp_proxy') {
+      const found = await proxyLinks();
+      igDetected = found.instagram; ttDetected = found.tiktok; fbDetected = found.facebook;
+    } else {
+      // Playwright passes first
+      [igDetected, ttDetected, fbDetected] = await Promise.all([
+        existingIgHandle ? Promise.resolve(null) : detectInstagramHandle(url).catch(() => null),
+        existingTtHandle ? Promise.resolve(null) : detectTikTokHandle(url).catch(() => null),
+        existingFbHandle ? Promise.resolve(null) : detectFacebookHandle(url).catch(() => null),
+      ]);
+    }
     if (!existingIgHandle && igDetected) { brandData.handle = igDetected; handleSources.instagram = 'page-scan'; }
     if (!existingTtHandle && ttDetected) { brandData.tiktokHandle = ttDetected; handleSources.tiktok = 'page-scan'; }
     if (!existingFbHandle && fbDetected) { brandData.facebookHandle = fbDetected; handleSources.facebook = 'page-scan'; }
@@ -1324,7 +1807,7 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
   // (page scan, then Claude) runs only for Japan brands.
   const jpBrand = isJapanMarket({ market, url });
   if (jpBrand && (!xHandle || !ytRef || !lineRef) && canScanPage) {
-    const found = await (opts.detectPageImpl || detectHandlesFromPage)(url).catch(() => emptySocialLinks());
+    const found = access.mode === 'jp_proxy' ? await proxyLinks() : await (opts.detectPageImpl || detectHandlesFromPage)(url).catch(() => emptySocialLinks());
     if (!xHandle && found.x) { xHandle = found.x; handleSources.x = 'page-scan'; }
     if (!ytRef && found.youtube) { ytRef = found.youtube; handleSources.youtube = 'page-scan'; }
     if (!lineRef && found.line) { lineRef = found.line; handleSources.line = 'page-scan'; }
@@ -1333,7 +1816,7 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
   // Claude fallback for anything still missing
   const stillMissingAny = (!brandData.handle && !existingIgHandle) || (!brandData.tiktokHandle && !existingTtHandle) || (!brandData.facebookHandle && !existingFbHandle)
     || (jpBrand && (!xHandle || !ytRef || !lineRef));
-  if (url && stillMissingAny && anthropic && !isDryRun(opts)) {
+  if (url && stillMissingAny && anthropic && !isDryRun(opts) && !marketplace) {
     claudeHandles = await lookupHandlesViaClaude(anthropic, name, url, market, jpBrand).catch(() => ({}));
     if (!brandData.handle && !existingIgHandle && claudeHandles.instagram) { brandData.handle = claudeHandles.instagram; handleSources.instagram = 'claude'; }
     if (!brandData.tiktokHandle && !existingTtHandle && claudeHandles.tiktok) { brandData.tiktokHandle = claudeHandles.tiktok; handleSources.tiktok = 'claude'; }
@@ -1361,45 +1844,57 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
   const igHandle = existingIgHandle || brandData.handle;
   log(`  Instagram: ${igHandle ? '@' + igHandle : 'not found'}`);
 
-  let igPosts = [];
+  const skipped = {}; // platform -> budget refusal reason
+  let igRaw = [];
+  let igNorm = [];
+  let igFollowers = null;
   if (igHandle) {
     advance(`Instagram @${igHandle} (${name})`);
+    let ig = null;
     try {
-      igPosts = await cachedStep(`instagram:${handleKey(igHandle)}`, async () => (await (scrapers.instagram || scrapeInstagramViaApify)(igHandle)).map(pickInstagramFields), v => Array.isArray(v) && v.length > 0);
-      log(`  ${name}: ${igPosts.length} posts via Apify`);
+      const scraper = scrapers.instagram || scrapeInstagramViaApify;
+      ig = await cachedStep(`instagram:${handleKey(igHandle)}`, async (apify) => {
+        const r = toScrapeResult(await scraper(igHandle, apify));
+        return { posts: r.posts.map(pickInstagramFields), followers: r.followers, postsCount: r.postsCount };
+      }, v => Array.isArray(v?.posts) && v.posts.length > 0, canPay('instagram') ? { est: APIFY_EST_USD.instagram, label: `instagram @${igHandle} (${name})` } : null);
     } catch (err) {
       log(`  Apify failed for ${name}: ${err.message}`);
       brandData.partialData = true;
       brandData.error = `Apify scrape failed: ${err.message}`;
     }
-
-    if (igPosts.length === 0 && !brandData.partialData) {
-      log(`  No posts returned: trying profile-scraper fallback for @${igHandle}`);
-      const profile = await cachedStep(`instagram-profile:${handleKey(igHandle)}`, async () => {
-        const p = await scrapeInstagramProfileViaApify(igHandle);
-        return p ? { followersCount: p.followersCount ?? p.followers ?? null, postsCount: p.postsCount ?? p.mediaCount ?? null } : null;
-      }, v => !!v);
-      if (profile) {
-        brandData.summary.followersEstimate = profile.followersCount || null;
-        brandData.summary.estimatedPostCount = profile.postsCount || null;
-        brandData.error = 'Post data unavailable (account may be private or scraper blocked): profile stats only';
-      } else {
-        brandData.error = 'No posts returned from Apify: account may be private, new, or inactive';
-      }
+    if (ig && ig.__budgetSkipped) {
+      skipped.instagram = ig.reason;
       brandData.partialData = true;
+      brandData.error = `Not scraped: ${ig.reason}`;
+      ig = null;
     }
+    if (ig) {
+      igRaw = ig.posts || [];
+      igFollowers = typeof ig.followers === 'number' ? ig.followers : null;
+      brandData.summary.followersEstimate = igFollowers;
+      if (ig.postsCount != null) brandData.summary.estimatedPostCount = ig.postsCount;
+      log(`  ${name}: ${igRaw.length} posts via Apify, followers ${igFollowers ?? 'unknown'}`);
+      if (!igRaw.length) {
+        brandData.error = igFollowers != null
+          ? 'Post data unavailable (account may be private or scraper blocked): profile stats only'
+          : 'No posts returned from Apify: account may be private, new, or inactive';
+        brandData.partialData = true;
+      }
+    }
+    igNorm = newestFirst(normalizePosts(igRaw, 'instagram'));
     brandData.platformStatus.instagram = {
-      status: igPosts.length ? 'ok' : (brandData.error && /Apify scrape failed/.test(brandData.error) ? 'error' : 'no-data'),
-      reason: igPosts.length ? null : brandData.error,
-      ...handleTrust(handleSources.instagram, igPosts.length ? true : null, igPosts.length ? 'scrape-returned-data' : null),
+      status: igNorm.length ? 'ok' : (skipped.instagram ? 'budget-skipped' : (brandData.error && /Apify scrape failed/.test(brandData.error) ? 'error' : 'no-data')),
+      reason: igNorm.length ? null : brandData.error,
+      ...(skipped.instagram ? { budgetSkipped: true } : {}),
+      ...handleTrust(handleSources.instagram, igNorm.length ? true : null, igNorm.length ? 'scrape-returned-data' : null),
     };
   } else {
-    brandData.error = 'Could not detect Instagram handle';
+    brandData.error = noBrandAccount ? NO_BRAND_ACCOUNT_REASON : 'Could not detect Instagram handle';
     brandData.partialData = true;
   }
 
-  if (igPosts.length > 0) {
-    const normalized = normalizePosts(igPosts, 'instagram');
+  if (igNorm.length > 0) {
+    const normalized = igNorm;
     const totalLikes = normalized.reduce((s, p) => s + p.likes, 0);
     const totalComments = normalized.reduce((s, p) => s + p.comments, 0);
     brandData.summary.postCount = normalized.length;
@@ -1410,64 +1905,85 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
     brandData.monthlyTrend = buildMonthlyTrend(normalized);
     brandData.contentThemes = extractContentThemes(normalized);
     brandData.postingPattern = buildPostingPattern(normalized);
-    const igFollowers = typeof brandData.summary.followersEstimate === 'number' ? brandData.summary.followersEstimate : null;
     brandData.engagementByPlatform.instagram = computeEngagement(normalized, igFollowers);
     const hashtagCounts = {};
-    igPosts.forEach(p => {
-      const text = p.caption || '';
+    igRaw.forEach(p => {
+      const text = typeof p.caption === 'string' ? p.caption : '';
       const tags = text.match(/#[\p{L}\p{N}_]+/gu) || []; // Unicode-aware so Japanese hashtags count
       tags.forEach(t => { hashtagCounts[t] = (hashtagCounts[t] || 0) + 1; });
     });
     brandData.topHashtags = Object.entries(hashtagCounts).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([tag, count]) => ({ tag, count }));
-    brandData.recentPosts = normalized.slice(0, 5);
-    brandData.topPosts = [...normalized].sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 3);
-    // Download images immediately while CDN URLs are fresh
-    brandData.topPosts = await downloadPostImages(slug, brandData.topPosts, 'top', opts.dataDir);
-    brandData.recentPosts = await downloadPostImages(slug, brandData.recentPosts, 'rec', opts.dataDir);
-    log(`  ${name}: topPosts=${brandData.topPosts.length}, bestDay=${brandData.postingPattern?.bestDay || 'none'}`);
+    const top = [...normalized].sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 3);
+    // Download images immediately while CDN URLs are fresh (platform CDN links expire). All POSTS_ANALYSED
+    // posts are kept for analysis, but at most POSTS_WITH_IMAGES images are saved per brand: the top posts
+    // first (the dashboard gallery shows them, so a top post must never be left with an expiring link),
+    // then the newest posts that are not already among them.
+    const imageSet = [...top, ...normalized.filter(p => !top.includes(p))].slice(0, POSTS_WITH_IMAGES);
+    const saved = await downloadPostImages(slug, imageSet, 'rec', opts.dataDir);
+    const savedFor = p => { const i = imageSet.indexOf(p); return i >= 0 && saved && saved[i] ? saved[i].imageUrl : null; };
+    brandData.topPosts = top.map(tp => ({ ...tp, imageUrl: savedFor(tp) || tp.imageUrl }));
+    brandData.recentPosts = normalized.map(p => ({ ...p, imageUrl: savedFor(p) }));
+    log(`  ${name}: ${normalized.length} posts analysed, topPosts=${brandData.topPosts.length}, bestDay=${brandData.postingPattern?.bestDay || 'none'}`);
   }
+
+  // Shared handling for a budget refusal on TikTok / Facebook / X.
+  const budgetStatus = (platform, res) => {
+    skipped[platform] = res.reason;
+    return { status: 'budget-skipped', reason: `Not scraped: ${res.reason}`, budgetSkipped: true };
+  };
 
   // ── TikTok ────────────────────────────────────────────────────────────────
   const ttHandle = existingTtHandle || brandData.tiktokHandle;
   log(`  TikTok: ${ttHandle ? '@' + ttHandle : 'not found'}`);
+  let ttPosts = []; let ttFollowers = null;
   if (ttHandle) {
     advance(`TikTok @${ttHandle} (${name})`);
-    let reason = null; let status = 'no-data';
+    let reason = null; let status = 'no-data'; let extra = {};
     try {
-      const tt = await cachedStep(`tiktok:${handleKey(ttHandle)}`, async () => {
-        const raw = await (scrapers.tiktok || scrapeTikTokViaApify)(ttHandle);
-        const followers = raw.map(p => p?.authorMeta?.fans).find(n => typeof n === 'number') ?? null;
-        return { posts: normalizePosts(raw, 'tiktok'), followers };
-      }, v => v.posts.length > 0);
-      if (tt.posts.length > 0) {
+      const tt = await cachedStep(`tiktok:${handleKey(ttHandle)}`, async (apify) => {
+        const r = toScrapeResult(await (scrapers.tiktok || scrapeTikTokViaApify)(ttHandle, apify));
+        const followers = r.followers ?? r.posts.map(p => p?.authorMeta?.fans).find(n => typeof n === 'number') ?? null;
+        return { posts: newestFirst(normalizePosts(r.posts, 'tiktok')), followers };
+      }, v => Array.isArray(v?.posts) && v.posts.length > 0, canPay('tiktok') ? { est: APIFY_EST_USD.tiktok, label: `tiktok @${ttHandle} (${name})` } : null);
+      if (tt.__budgetSkipped) ({ status, reason, ...extra } = budgetStatus('tiktok', tt));
+      else if (tt.posts.length > 0) {
+        ttPosts = tt.posts; ttFollowers = tt.followers;
         brandData.tiktokData = buildPlatformData(tt.posts);
         if (tt.followers != null) brandData.tiktokData.followers = tt.followers;
         brandData.engagementByPlatform.tiktok = computeEngagement(tt.posts, tt.followers);
         status = 'ok';
       } else reason = 'TikTok scrape returned no posts';
     } catch (err) { log(`  TikTok scrape failed for ${name}: ${err.message}`); reason = `TikTok scrape failed: ${err.message}`; status = 'error'; }
-    brandData.platformStatus.tiktok = { status, reason, ...handleTrust(handleSources.tiktok, status === 'ok' ? true : null, status === 'ok' ? 'scrape-returned-data' : null) };
+    brandData.platformStatus.tiktok = { status, reason, ...extra, ...handleTrust(handleSources.tiktok, status === 'ok' ? true : null, status === 'ok' ? 'scrape-returned-data' : null) };
   }
 
   // ── Facebook ──────────────────────────────────────────────────────────────
   const fbHandle = existingFbHandle || brandData.facebookHandle;
   log(`  Facebook: ${fbHandle ? '/' + fbHandle : 'not found'}`);
+  let fbPosts = []; let fbFollowers = null;
   if (fbHandle) {
     advance(`Facebook /${fbHandle} (${name})`);
-    let reason = null; let status = 'no-data';
+    let reason = null; let status = 'no-data'; let extra = {};
     try {
-      const fb = await cachedStep(`facebook:${handleKey(fbHandle)}`, async () => ({ posts: normalizePosts(await (scrapers.facebook || scrapeFacebookViaApify)(fbHandle), 'facebook') }), v => v.posts.length > 0);
-      if (fb.posts.length > 0) {
+      const fb = await cachedStep(`facebook:${handleKey(fbHandle)}`, async (apify) => {
+        const r = toScrapeResult(await (scrapers.facebook || scrapeFacebookViaApify)(fbHandle, apify));
+        return { posts: newestFirst(normalizePosts(r.posts, 'facebook')), followers: r.followers ?? facebookFollowersFrom(r.posts) };
+      }, v => Array.isArray(v?.posts) && v.posts.length > 0, canPay('facebook') ? { est: APIFY_EST_USD.facebook, label: `facebook /${fbHandle} (${name})` } : null);
+      if (fb.__budgetSkipped) ({ status, reason, ...extra } = budgetStatus('facebook', fb));
+      else if (fb.posts.length > 0) {
+        fbPosts = fb.posts; fbFollowers = typeof fb.followers === 'number' ? fb.followers : null;
         brandData.facebookData = buildPlatformData(fb.posts);
-        brandData.engagementByPlatform.facebook = computeEngagement(fb.posts, null);
+        if (fbFollowers != null) brandData.facebookData.followers = fbFollowers;
+        brandData.engagementByPlatform.facebook = computeEngagement(fb.posts, fbFollowers);
         status = 'ok';
       } else reason = 'Facebook scrape returned no posts';
     } catch (err) { log(`  Facebook scrape failed for ${name}: ${err.message}`); reason = `Facebook scrape failed: ${err.message}`; status = 'error'; }
-    brandData.platformStatus.facebook = { status, reason, ...handleTrust(handleSources.facebook, status === 'ok' ? true : null, status === 'ok' ? 'scrape-returned-data' : null) };
+    brandData.platformStatus.facebook = { status, reason, ...extra, ...handleTrust(handleSources.facebook, status === 'ok' ? true : null, status === 'ok' ? 'scrape-returned-data' : null) };
   }
 
   // ── X (Twitter) ──────────────────────────────────────────────────────────
   log(`  X: ${xHandle ? '@' + xHandle : 'not found'}`);
+  let xPosts = []; let xFollowers = null;
   if (xHandle) {
     let trust = handleTrust(handleSources.x);
     if (handleSources.x === 'claude' && priorVerified.x && String(priorVerified.x).toLowerCase() === xHandle.toLowerCase()) {
@@ -1483,17 +1999,22 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
       };
     } else {
       advance(`X @${xHandle} (${name})`);
-      const res = await cachedStep(`x:${handleKey(xHandle)}`, async () => {
-        const r = await scrapeXViaApify(xHandle, { dryRun: opts.dryRun, fixture: fixtures.x });
-        return { posts: normalizePosts(r.posts, 'x'), followers: r.followers ?? null, reason: r.reason, source: r.source, notFound: !!r.notFound };
-      }, v => v.posts.length > 0 || v.notFound);
+      // Only a real actor call is paid for: a fixture, a dry run or a missing token reserves nothing.
+      const xPaid = !Object.prototype.hasOwnProperty.call(fixtures, 'x') && !isDryRun(opts) && process.env.APIFY_API_TOKEN ? { est: APIFY_EST_USD.x, label: `x @${xHandle} (${name})` } : null;
+      let res = await cachedStep(`x:${handleKey(xHandle)}`, async (apify) => {
+        const r = await scrapeXViaApify(xHandle, { dryRun: opts.dryRun, fixture: fixtures.x, apify });
+        return { posts: newestFirst(normalizePosts(r.posts, 'x')), followers: r.followers ?? null, reason: r.reason, source: r.source, notFound: !!r.notFound };
+      }, v => v.posts.length > 0 || v.notFound, xPaid);
+      let xBudget = null;
+      if (res.__budgetSkipped) { xBudget = budgetStatus('x', res); res = { posts: [], followers: null, reason: xBudget.reason, source: null, notFound: false }; }
+      xPosts = res.posts; xFollowers = res.followers;
       if (res.posts.length > 0) {
         brandData.xData = buildPlatformData(res.posts);
         if (brandData.xData && res.followers != null) brandData.xData.followers = res.followers;
         brandData.engagementByPlatform.x = computeEngagement(res.posts, res.followers);
       }
-      const status = brandData.xData ? 'ok' : (res.notFound ? 'handle_not_found' : 'no-data');
-      brandData.platformStatus.x = { status, reason: res.reason, source: res.source, ...trust };
+      const status = brandData.xData ? 'ok' : (res.notFound ? 'handle_not_found' : (xBudget ? 'budget-skipped' : 'no-data'));
+      brandData.platformStatus.x = { status, reason: res.reason, source: res.source, ...(xBudget ? { budgetSkipped: true } : {}), ...trust };
       if (res.notFound) brandData.platformStatus.x.verified = false;
     }
   } else {
@@ -1502,6 +2023,7 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
 
   // ── YouTube ──────────────────────────────────────────────────────────────
   log(`  YouTube: ${ytRef ? `${ytRef.kind} ${ytRef.id}` : 'not found'}`);
+  let ytPosts = [];
   if (ytRef) {
     advance(`YouTube ${ytRef.id} (${name})`);
     const res = await cachedStep(`youtube:${handleKey(ytRef.kind + ':' + ytRef.id)}`, async () => {
@@ -1509,6 +2031,7 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
       return { channel: r.channel, posts: normalizePosts(r.posts, 'youtube'), reason: r.reason, source: r.source };
     }, v => !!v.channel || /channel not found/i.test(v.reason || ''));
     brandData.youtubeChannel = res.channel;
+    ytPosts = newestFirst(res.posts);
     if (res.posts.length > 0) {
       brandData.youtubeData = buildPlatformData(res.posts);
       brandData.engagementByPlatform.youtube = computeEngagement(res.posts, res.channel?.subscriberCount ?? null);
@@ -1563,6 +2086,41 @@ async function processBrand(brandInfo, anthropic, advance = () => {}, opts = {})
   for (const k of Object.keys(brandData.engagementByPlatform)) if (!brandData.engagementByPlatform[k]) delete brandData.engagementByPlatform[k];
   Object.assign(brandData, pickBrandEngagement(brandData.engagementByPlatform));
 
+  // Marketplace with no profile handle: every platform says why there is nothing, in one voice.
+  if (noBrandAccount) {
+    for (const p of BLOCK_PLATFORMS) brandData.platformStatus[p] = { status: 'not-applicable', reason: NO_BRAND_ACCOUNT_REASON };
+  }
+
+  // ── Per-platform blocks ─────────────────────────────────────────────────
+  const yt = brandData.youtubeChannel;
+  const block = (p, handle, posts, followers, followersReason) => {
+    const st = brandData.platformStatus[p];
+    return buildPlatformBlock({
+      handle, posts, followers, followersReason,
+      status: st?.status || (handle ? 'no-data' : 'not-applicable'),
+      budgetSkipped: !!st?.budgetSkipped,
+      reason: posts.length ? null : (st?.reason || (handle ? 'no posts returned' : (noBrandAccount ? NO_BRAND_ACCOUNT_REASON : 'no account found'))),
+    });
+  };
+  brandData.platforms = {
+    instagram: block('instagram', igHandle || null, igNorm, igFollowers, 'Instagram profile scraper returned no follower count'),
+    tiktok: block('tiktok', ttHandle || null, ttPosts, ttFollowers, 'TikTok actor returned no follower count (authorMeta.fans)'),
+    facebook: block('facebook', fbHandle || null, fbPosts, fbFollowers, 'facebook-posts-scraper does not report page followers'),
+    x: block('x', xHandle || null, xPosts, xFollowers, 'X actor returned no author follower count'),
+    youtube: block('youtube', brandData.youtubeHandle, ytPosts, yt?.subscriberCount ?? null, yt?.hiddenSubscriberCount ? 'channel hides its subscriber count' : 'no subscriber count returned'),
+    line: {
+      handle: brandData.lineId || null,
+      status: brandData.platformStatus.line?.status || 'not-applicable',
+      presenceOnly: true,
+      exists: brandData.lineAccount ? brandData.lineAccount.exists : null,
+      followers: null, posts: 0, avgInteractions: null, engagementRate: null,
+      engagementRateUnit: 'percent of followers per post',
+      engagementRateReason: 'LINE has no public feed or follower count',
+      postsPerWeek: null, lastPostAt: null, topFormats: [], topThemes: [],
+      reason: brandData.platformStatus.line?.reason || null,
+    },
+  };
+
   return brandData;
 }
 
@@ -1601,12 +2159,14 @@ function carryForwardBrand(fresh, prev, now = new Date().toISOString()) {
     if (out[dataKey] || !prev[dataKey] || !sameHandle(out[handleKey], prev[handleKey])) continue;
     if (NO_CARRY_STATUSES.includes(status(p))) continue;
     out[dataKey] = prev[dataKey];
+    if (prev.platforms?.[p]) out.platforms = { ...(out.platforms || {}), [p]: { ...prev.platforms[p], stale: true } };
     if (p === 'youtube' && !out.youtubeChannel && prev.youtubeChannel) out.youtubeChannel = prev.youtubeChannel;
     out.platformStatus[p] = { ...(out.platformStatus[p] || {}), stale: true, dataFrom: prev.platformStatus?.[p]?.dataFrom || prev.scrapedAt || null, lastAttempt: now, lastError: out.platformStatus[p]?.reason || 'no data this run' };
     carried.push(p);
   }
   if (!(out.summary?.postCount > 0) && (prev.summary?.postCount || 0) > 0 && sameHandle(out.handle, prev.handle) && !NO_CARRY_STATUSES.includes(status('instagram'))) {
     for (const k of IG_FIELDS) out[k] = prev[k];
+    if (prev.platforms?.instagram) out.platforms = { ...(out.platforms || {}), instagram: { ...prev.platforms.instagram, stale: true } };
     out.platformStatus.instagram = { ...(out.platformStatus.instagram || {}), stale: true, dataFrom: prev.platformStatus?.instagram?.dataFrom || prev.scrapedAt || null, lastAttempt: now, lastError: out.error || 'no data this run' };
     carried.push('instagram');
   }
@@ -1671,6 +2231,9 @@ function failedBrandStub(brand, err) {
     id: brand.slug,
     name: brand.name,
     role: brand.role,
+    tier: brand.role === 'target' ? 'target' : normTier(brand.tier),
+    relationship: brand.role === 'target' ? 'self' : normRelationship(brand.relationship),
+    platforms: {},
     handle: brand.handle || null,
     tiktokHandle: brand.tiktokHandle || null,
     facebookHandle: brand.facebookHandle || null,
@@ -1701,14 +2264,27 @@ function failedBrandStub(brand, err) {
   };
 }
 
-function composeOutput({ slug, brandResults, existing, targetOnly, whiteSpaceOpportunities, competitionStrategy, analysisStatus }) {
+function composeOutput({ slug, brandResults, existing, targetOnly, whiteSpaceOpportunities, competitionStrategy, analysisStatus, tierInsights = null, differentiation = null, partnerPlay = null, coverage = null }) {
   const now = new Date().toISOString();
   if (targetOnly && existing && Array.isArray(existing.brands)) {
     // Patch just the target brand entry, keep existing competitor data + analysis intact
     const patchedBrands = existing.brands.map(b => b.role === 'target' ? brandResults[0] : b);
     return { ...existing, brands: patchedBrands, generatedAt: now, analysisStatus };
   }
-  return { generatedAt: now, brandSlug: slug, brands: brandResults, whiteSpaceOpportunities, competitionStrategy, analysisStatus };
+  return {
+    generatedAt: now, brandSlug: slug, schemaVersion: 2, postsAnalysedPerPlatform: POSTS_ANALYSED,
+    brands: brandResults, whiteSpaceOpportunities, competitionStrategy,
+    tierInsights, differentiation, partnerPlay, coverage, analysisStatus,
+  };
+}
+
+/** Pure: audit order. Target, then partners, then niche, specialty, mass, unknown, marketplace last. */
+// niche first after the partner: what niche brands do is the owner's main question, so a tight budget cuts
+// the marketplaces (usually no brand account at all) before it cuts niche
+const AUDIT_TIER_ORDER = ['niche', 'specialty', 'mass', 'unknown', 'marketplace'];
+function auditOrder(players) {
+  const rank = c => (normRelationship(c.relationship) === 'partner' ? -1 : AUDIT_TIER_ORDER.indexOf(normTier(c.tier)));
+  return (players || []).map((c, i) => ({ c, i })).sort((a, b) => (rank(a.c) - rank(b.c)) || (a.i - b.i)).map(x => x.c);
 }
 
 // ─── Handle provenance (pure) ────────────────────────────────────────────────
@@ -1765,6 +2341,12 @@ function writebackBlocked(r, platform) {
   return false;
 }
 
+// Current tier and relationship from the profile win over whatever a checkpoint or prior run held.
+function withPlayerFields(r, brand) {
+  if (!r) return r;
+  return { ...r, tier: brand.role === 'target' ? 'target' : normTier(brand.tier), relationship: brand.role === 'target' ? 'self' : normRelationship(brand.relationship) };
+}
+
 // ─── Orchestration ────────────────────────────────────────────────────────────
 
 /**
@@ -1793,29 +2375,36 @@ async function runAudit(options = {}) {
   if (guidelines) log(`Loaded brand guidelines (voice: ${(guidelines.brandVoice || []).join(', ')})`);
 
   // 5 competitors as before; a Japan scan covers the whole seeded list (--max-competitors=N overrides).
-  const maxCompetitors = options.maxCompetitors > 0 ? options.maxCompetitors : (isJapanMarket(profile) ? 12 : 5);
+  // Japan: the tiered player list (about 25 with approved niche brands); the Apify budget is the real limit.
+  const maxCompetitors = options.maxCompetitors > 0 ? options.maxCompetitors : (isJapanMarket(profile) ? 30 : 5);
   const marketLabel = profile.market || (isJapanMarket(profile) ? 'Japan' : 'the local market');
 
+  // Official accounts read from the target's own site outrank the profile (see OFFICIAL_HANDLES).
+  const official = officialHandlesFor(profile.url) || {};
+  const officialPlatforms = ['instagram', 'tiktok', 'facebook', 'x', 'youtube', 'line'].filter(p => official[p]);
   const brandsToAudit = [
     {
       slug,
       name: profile.name,
       url: profile.url,
       role: 'target',
-      handle: profile.social?.instagram || null,
-      tiktokHandle: profile.social?.tiktok || null,
-      facebookHandle: profile.social?.facebook || null,
-      xHandle: profile.social?.x || profile.social?.twitter || null,
-      youtubeHandle: profile.social?.youtube || null,
-      lineId: profile.social?.line || null,
+      handle: official.instagram || profile.social?.instagram || null,
+      tiktokHandle: official.tiktok || profile.social?.tiktok || null,
+      facebookHandle: official.facebook || profile.social?.facebook || null,
+      xHandle: official.x || profile.social?.x || profile.social?.twitter || null,
+      youtubeHandle: official.youtube || profile.social?.youtube || null,
+      lineId: official.line || profile.social?.line || null,
+      officialPlatforms,
       handleProvenance: profile.socialProvenance || null,
       market: marketLabel,
     },
-    ...(targetOnly ? [] : (profile.identifiedCompetitors || []).filter(c => c && c.name).slice(0, maxCompetitors).map(c => ({
+    ...(targetOnly ? [] : auditOrder((profile.identifiedCompetitors || []).filter(c => c && c.name)).slice(0, maxCompetitors).map(c => ({
       slug: c.name.toLowerCase().replace(/\s+/g, '-'),
       name: c.name,
       url: c.url,
       role: 'competitor',
+      tier: normTier(c.tier),
+      relationship: normRelationship(c.relationship),
       handle: c.instagramHandle || null,
       tiktokHandle: c.tiktokHandle || null,
       facebookHandle: c.facebookHandle || null,
@@ -1841,7 +2430,17 @@ async function runAudit(options = {}) {
       const have = { instagram: b.handle || sd.instagram, tiktok: b.tiktokHandle || sd.tiktok, facebook: b.facebookHandle || sd.facebook, x: b.xHandle || sd.x, youtube: b.youtubeHandle || sd.youtube, line: b.lineId || sd.line };
       log(`[dry-run] ${b.role} ${b.name}: ${Object.entries(have).map(([k, v]) => `${k}=${v || 'none'}`).join(' ')}`);
     }
-    log(`[dry-run] would audit ${brandsToAudit.length} brands (competitor cap ${maxCompetitors}); no Apify, Claude, checkpoint or file writes made.`);
+    // Upper-bound Apify estimate for the handles known now (discovery may add more, budget gating caps it).
+    let est = 0;
+    for (const b of brandsToAudit) {
+      const mkt = b.role !== 'target' && isMarketplacePlayer(b);
+      const sd = mkt ? emptySocialLinks() : classifySocialLinks(b.structuredSocialLinks || []);
+      if (b.handle || sd.instagram) est += APIFY_EST_USD.instagram;
+      if (b.tiktokHandle || sd.tiktok) est += APIFY_EST_USD.tiktok;
+      if (b.facebookHandle || sd.facebook) est += APIFY_EST_USD.facebook;
+      if (isJapanMarket({ market: b.market, url: b.url }) && (b.xHandle || sd.x)) est += APIFY_EST_USD.x;
+    }
+    log(`[dry-run] would audit ${brandsToAudit.length} brands (competitor cap ${maxCompetitors}), Apify estimate for known handles about $${est.toFixed(2)}; no Apify, Claude, checkpoint or file writes made.`);
     return null;
   }
 
@@ -1851,7 +2450,7 @@ async function runAudit(options = {}) {
   const cp = { dataDir };
 
   // Progress tracking: 6 platform steps per brand (IG, TikTok, FB, X, YouTube, LINE) + 3 Claude analysis steps
-  const totalSteps = brandsToAudit.length * 6 + 3;
+  const totalSteps = brandsToAudit.length * 6 + 4;
   let stepIdx = 0;
   const startedAt = new Date().toISOString();
   writeAuditStatus(slug, { step: `Starting audit for ${profile.name}...`, stepIdx: 0, totalSteps, done: false, startedAt }, dataDir);
@@ -1862,6 +2461,9 @@ async function runAudit(options = {}) {
     log(`[step ${stepIdx}/${totalSteps}] ${step}`);
   }
 
+  // One budget context for the whole run: the ledger lives under the target's slug.
+  const budget = { mod: options.budget || apifyBudget, slug, opts: { dataDir }, state: { refusedReason: null } };
+  const siteAccess = options.siteAccess || siteAccessDefault;
   const brandResults = [];
   for (const brand of brandsToAudit) {
     const key = brand.slug;
@@ -1870,7 +2472,7 @@ async function runAudit(options = {}) {
     if (brandCheckpointMatches(brand, saved)) {
       log(`${brand.name}: resumed from checkpoint (no platform calls repeated)`);
       stepIdx += 6;
-      brandResults.push(carryForwardBrand(saved.result, findPrevBrand(existing, brand)));
+      brandResults.push(withPlayerFields(carryForwardBrand(saved.result, findPrevBrand(existing, brand)), brand));
       continue;
     }
     if (saved !== undefined) log(`${brand.name}: checkpoint ignored (handles changed since it was saved)`);
@@ -1884,18 +2486,23 @@ async function runAudit(options = {}) {
     try {
       // The brand's own site is never requested when its operator blocks automated access (handles then
       // come from the profile and from structured data we already have), see utils/no_contact.js
-      const noContactTarget = brand.role === 'target' && !require('../utils/no_contact').targetContactAllowed(profile);
-      result = await doProcess(brand, anthropic, advance, { ...(options.processBrandOpts || {}), ...(noContactTarget ? { skipPageDetection: true } : {}), dryRun, cache, dataDir });
+      // A jp_proxy authorization (utils/site_access.js) lets processBrand read one page through the
+      // Japanese proxy; any other blocked target is not requested at all.
+      let targetMode = null;
+      if (brand.role === 'target') { try { targetMode = siteAccess.accessFor(profile.url).mode; } catch { targetMode = 'denied'; } }
+      const noContactTarget = brand.role === 'target' && !require('../utils/no_contact').targetContactAllowed(profile) && targetMode !== 'jp_proxy';
+      result = await doProcess(brand, anthropic, advance, { siteAccess, budget, ...(options.processBrandOpts || {}), ...(noContactTarget ? { skipPageDetection: true } : {}), dryRun, cache, dataDir });
     } catch (err) {
       log(`  ${brand.name} failed: ${err.message}`);
       result = failedBrandStub(brand, err);
     }
     if (!result.failed) checkpoint.put(slug, CHECKPOINT_STEP, key, { inputs, result }, cp);
-    brandResults.push(carryForwardBrand(result, prev));
+    brandResults.push(withPlayerFields(carryForwardBrand(result, prev), brand));
   }
 
   const targetResult = brandResults.find(b => b.role === 'target');
-  const competitorResults = brandResults.filter(b => b.role === 'competitor');
+  // Partners stay in brandResults (coverage, partnerPlay) but are never analysed as competitors.
+  const competitorResults = brandResults.filter(b => b.role === 'competitor' && b.relationship !== 'partner');
 
   // Write all discovered handles back to profile.json.
   // Re-read the file first so a dashboard edit made during the audit is not overwritten. Never
@@ -1937,6 +2544,17 @@ async function runAudit(options = {}) {
         socialUpdates[keys[0]] = targetResult[field]; prov[p] = provenanceOf(targetResult, p, targetResult[field]); handleWritebacks++;
       }
     }
+    // Official handles correct a wrong profile value (e.g. Facebook ToysRUsJapan -> toysrusjp).
+    for (const [p, field, , keys] of WRITEBACK) {
+      if (!official[p] || !targetResult[field]) continue;
+      const cur = keys.map(k => freshProfile.social?.[k]).find(Boolean);
+      const norm = v => (p === 'youtube' ? handleKey(youTubeRefToString(toYouTubeRef(v))) : handleKey(v));
+      if (!cur || norm(cur) !== norm(official[p])) {
+        socialUpdates[keys[0]] = official[p];
+        prov[p] = { source: `official (${OFFICIAL_HANDLES[hostOfUrl(profile.url)]?.source || 'site'}, ${OFFICIAL_HANDLES[hostOfUrl(profile.url)]?.checkedAt || ''})`.replace(/, \)$/, ')'), handle: official[p] };
+        handleWritebacks++;
+      }
+    }
     if (Object.keys(socialUpdates).length > 0) updatedProfile.social = { ...freshProfile.social, ...socialUpdates };
     const keptProv = pruneProvenance(freshProfile.socialProvenance, targetProfileInputs(freshProfile.social));
     if (keptProv.changed) { handleWritebacks++; updatedProfile.socialProvenance = keptProv.value; }
@@ -1952,13 +2570,20 @@ async function runAudit(options = {}) {
   // Save the scraped data BEFORE any Claude analysis, so an analysis failure cannot discard it.
   // Until the analyses finish, the previous analyses (if any) stand, marked pending.
   if (existing) archiveData(slug, 'social_intelligence', existing, dataDir);
-  const analysisStatus = { contentGaps: 'pending', whiteSpace: 'pending', strategy: 'pending' };
+  const analysisStatus = { contentGaps: 'pending', whiteSpace: 'pending', strategy: 'pending', synthesis: 'pending' };
   let whiteSpaceOpportunities = existing?.whiteSpaceOpportunities ?? null;
   let competitionStrategy = existing?.competitionStrategy ?? null;
+  let tierInsights = existing?.tierInsights ?? null;
+  let differentiation = existing?.differentiation ?? null;
+  let partnerPlay = existing?.partnerPlay ?? null;
+  let budgetSummary = null;
+  try { budgetSummary = budget.mod.summary(slug, { dataDir }); } catch (err) { log(`  Budget summary unavailable: ${err.message}`); }
+  const coverage = buildCoverage(brandResults, budgetSummary);
+  if (budget.state.refusedReason) coverage.budgetStop = budget.state.refusedReason;
   const prevTarget = existing ? (existing.brands || []).find(b => b && b.role === 'target') : null;
   if (targetResult && !(targetResult.contentGaps || []).length && prevTarget?.contentGaps?.length) targetResult.contentGaps = prevTarget.contentGaps;
   const save = () => saveBrandData(slug, 'social_intelligence.json',
-    composeOutput({ slug, brandResults, existing, targetOnly, whiteSpaceOpportunities, competitionStrategy, analysisStatus: { ...analysisStatus, scrapeSavedAt: new Date().toISOString() } }), dataDir);
+    composeOutput({ slug, brandResults, existing, targetOnly, whiteSpaceOpportunities, competitionStrategy, tierInsights, differentiation, partnerPlay, coverage, analysisStatus: { ...analysisStatus, scrapeSavedAt: new Date().toISOString() } }), dataDir);
   save();
   log(`  Scrape output saved (${brandResults.length} brands) before analysis`);
 
@@ -1984,11 +2609,22 @@ async function runAudit(options = {}) {
       : { ok: false };
     if (cs.ok && cs.value) { competitionStrategy = cs.value; analysisStatus.strategy = 'ok'; }
     else analysisStatus.strategy = competitionStrategy ? 'failed-kept-previous' : 'failed';
+    advance('Tier insights, differentiation and partner play with Claude...');
+    if (targetOnly) analysisStatus.synthesis = 'skipped: target-only run';
+    else {
+      const sy = await runAnalysis('Tier synthesis', () => (an.synthesis || generateTierSynthesis)(anthropic, brandResults, coverage, guidelines, marketLabel));
+      if (sy.ok && sy.value) {
+        const v = enforceEvidence(sy.value, brandResults); // idempotent; also guards a stubbed or older generator
+        tierInsights = v.tierInsights; differentiation = v.differentiation; partnerPlay = v.partnerPlay;
+        coverage.removedCitations = v.removedCitations;
+        analysisStatus.synthesis = 'ok';
+      } else analysisStatus.synthesis = tierInsights ? 'failed-kept-previous' : 'failed';
+    }
   } else {
-    analysisStatus.contentGaps = analysisStatus.whiteSpace = analysisStatus.strategy = 'skipped: no ANTHROPIC_API_KEY';
+    analysisStatus.contentGaps = analysisStatus.whiteSpace = analysisStatus.strategy = analysisStatus.synthesis = 'skipped: no ANTHROPIC_API_KEY';
   }
 
-  const finalOutput = composeOutput({ slug, brandResults, existing, targetOnly, whiteSpaceOpportunities, competitionStrategy, analysisStatus });
+  const finalOutput = composeOutput({ slug, brandResults, existing, targetOnly, whiteSpaceOpportunities, competitionStrategy, tierInsights, differentiation, partnerPlay, coverage, analysisStatus });
   saveBrandData(slug, 'social_intelligence.json', finalOutput, dataDir);
   checkpoint.clear(slug, CHECKPOINT_STEP, cp);
   writeAuditStatus(slug, { step: 'Done', stepIdx: totalSteps, totalSteps, done: true, startedAt, completedAt: new Date().toISOString() }, dataDir);
@@ -2044,6 +2680,30 @@ module.exports = {
   X_ACTOR_ID,
   LANGUAGE_INSTRUCTION,
   CHECKPOINT_STEP,
+  // 360 depth, tiers, budget and coverage (2026-11-18)
+  POSTS_ANALYSED,
+  POSTS_WITH_IMAGES,
+  APIFY_EST_USD,
+  OFFICIAL_HANDLES,
+  NO_BRAND_ACCOUNT_REASON,
+  detectFormat,
+  newestFirst,
+  reuseDownloadedImages,
+  postsPerWeekFrom,
+  formatMix,
+  buildPlatformBlock,
+  buildCoverage,
+  buildTierEvidence,
+  buildTierSynthesisPrompt,
+  enforceEvidence,
+  generateTierSynthesis,
+  auditOrder,
+  isMarketplacePlayer,
+  officialHandlesFor,
+  extractHrefs,
+  scanPageViaFetch,
+  combineRuns,
+  toScrapeResult,
 };
 
 // Only run when executed directly (scheduler and server spawn it as a script); require() is side-effect free.

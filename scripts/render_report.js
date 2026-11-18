@@ -16,7 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const { renderReport } = require('../modules/report_html');
 
-const MODULE_FILES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand', 'site_blueprint'];
+const MODULE_FILES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand', 'site_blueprint', 'strategy_360', 'par_matrix', 'tech_stack'];
 
 function parseArgs(argv) {
   const out = {};

@@ -26,7 +26,7 @@ const traverse = require(path.join(NM, '@babel/traverse')).default
 
 const SRC_DIR = path.join(__dirname, '..', 'dashboard', 'src')
 const OUT = path.join(SRC_DIR, 'i18n', 'ui.en.json')
-const FILES = ['App.jsx', 'SiteBlueprint.jsx']
+const FILES = ['App.jsx', 'SiteBlueprint.jsx', 'Strategy360.jsx', 'Jp360Panels.jsx']
 
 const DOM_TEXT_ATTRS = new Set(['title', 'placeholder', 'aria-label', 'label', 'alt', 'aria-description'])
 // Props of our own components that never carry prose.

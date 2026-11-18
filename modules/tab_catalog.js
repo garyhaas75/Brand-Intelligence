@@ -137,6 +137,12 @@ const MODULE_READERS = {
   jp_demand:            ['personas', 'search', 'action'],
   translations:         ['action'],
   site_blueprint:       ['website', 'action'],
+  // Japan 360 layers: the strategy and the par matrix are Action Plan material; the tech stack is
+  // read by the Website tab too; niche candidates (proposals awaiting approval) live on Competitive.
+  strategy_360:         ['action'],
+  par_matrix:           ['competitive', 'action'],
+  tech_stack:           ['website', 'action'],
+  niche_candidates:     ['competitive', 'action'],
 };
 
 // Only the tab that owns a module may pay for a re-run of it. Brand Profile is
@@ -152,6 +158,10 @@ const MODULE_WRITERS = {
   jp_demand:            ['personas'],
   translations:         ['action'],
   site_blueprint:       ['website'],
+  strategy_360:         ['action'],
+  par_matrix:           ['competitive'],
+  tech_stack:           ['website'],
+  niche_candidates:     ['competitive'],
 };
 
 const API_TAB_MAP = {
@@ -174,6 +184,12 @@ const API_TAB_MAP = {
   'jp_demand':            MODULE_READERS.jp_demand,
   'translations':         MODULE_READERS.translations,
   'site_blueprint':       MODULE_READERS.site_blueprint,
+  'strategy_360':         MODULE_READERS.strategy_360,
+  'par_matrix':           MODULE_READERS.par_matrix,
+  'tech_stack':           MODULE_READERS.tech_stack,
+  'niche_candidates':     MODULE_READERS.niche_candidates,
+  // approve or reject a proposed niche brand: it changes the competitor set, so only the Competitive tab
+  'niche-decision':       ['competitive'],
 
   // ---- Per-tab extras ------------------------------------------------------
   'persona-chat':         ['personas'],

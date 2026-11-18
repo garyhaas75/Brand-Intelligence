@@ -1,0 +1,2977 @@
+{
+ "_fixture": "FIXTURE data for tests and screenshots only. Shapes of strategy_360, par_matrix, tech_stack, niche_candidates and social_intelligence v2. Not real observations.",
+ "strategy_360": {
+  "_fixture": true,
+  "generatedAt": "2026-11-18T21:00:00.000Z",
+  "brandSlug": "toysrus-jp",
+  "targetObserved": false,
+  "evidenceBasis": {
+   "players": 12,
+   "socialBrandsWithData": 8,
+   "techObserved": 10,
+   "parObserved": 10,
+   "marketplaceItems": 240,
+   "reviews": 180,
+   "demandTerms": 60,
+   "personas": 4,
+   "approvedNiche": 1
+  },
+  "executiveSummary": [
+   "FIXTURE. Marketplaces win on price and next-day delivery; we cannot out-Amazon Amazon, so the own site should win on gifting, discovery by age and the store network.",
+   "Specialty players turn stores into the reason to buy online: pickup, stock check and events. These are the biggest par gaps to confirm.",
+   "Don Quijote is a channel: the planned shop-in-shop should be fed by LINE and the app, not treated as a rival."
+  ],
+  "positioningByTier": [
+   {
+    "tier": "marketplace",
+    "whoWins": "Amazon.co.jp",
+    "howTheyWin": "Assortment depth, next-day delivery and points stacking.",
+    "implication": "Do not compete on price alone; compete on curation and gifting.",
+    "evidence": [
+     "par_matrix: same/next day 3 of 3",
+     "marketplace: 240 best sellers"
+    ]
+   },
+   {
+    "tier": "mass",
+    "whoWins": "Aeon",
+    "howTheyWin": "Store network plus WAON points and store pickup.",
+    "implication": "Match pickup and stock check before adding new features.",
+    "evidence": [
+     "par_matrix: store pickup 2 of 2"
+    ]
+   },
+   {
+    "tier": "specialty",
+    "whoWins": "Nishimatsuya",
+    "howTheyWin": "Age-based navigation and value for young families.",
+    "implication": "Build an age and occasion finder.",
+    "evidence": [
+     "tech_stack: ZETA SEARCH"
+    ]
+   },
+   {
+    "tier": "niche",
+    "whoWins": "Pokemon Center Online",
+    "howTheyWin": "Exclusives and drops that sell out.",
+    "implication": "Use exclusives as traffic events.",
+    "evidence": [
+     "social: TikTok drop videos"
+    ]
+   }
+  ],
+  "standOut": [
+   {
+    "move": "Gift concierge with wrapping and noshi",
+    "whyMarketplacesCannot": "Third-party sellers cannot guarantee wrapping or presentation.",
+    "evidence": [
+     "par_matrix: gift wrap 6 of 10"
+    ]
+   },
+   {
+    "move": "Store events booked online",
+    "whyMarketplacesCannot": "Marketplaces have no stores.",
+    "evidence": [
+     "par_matrix: in-store events 5 of 10"
+    ]
+   }
+  ],
+  "channelMap": [
+   {
+    "channel": "own site",
+    "role": "convert",
+    "currentState": "",
+    "bestInClass": "Nishimatsuya age navigation",
+    "moves": [
+     "Age and occasion finder",
+     "Store stock on product pages"
+    ]
+   },
+   {
+    "channel": "LINE",
+    "role": "retain",
+    "currentState": "Account exists, cadence unknown",
+    "bestInClass": "Aeon weekly coupons",
+    "moves": [
+     "Weekly coupon plus new arrivals"
+    ]
+   },
+   {
+    "channel": "Don Quijote shop-in-shop",
+    "role": "drive to store",
+    "currentState": "Planned, not open",
+    "bestInClass": "",
+    "moves": [
+     "QR to app download at the shelf"
+    ]
+   }
+  ],
+  "onlineToStore": [
+   {
+    "tactic": "Reserve online, pick up in store",
+    "howItWorks": "Hold stock for 3 days at the chosen store.",
+    "bestInClassExample": "Aeon",
+    "impact": "high",
+    "effort": "medium",
+    "evidence": [
+     "par_matrix: store pickup"
+    ]
+   },
+   {
+    "tactic": "Event booking",
+    "howItWorks": "Book a play session from the site and LINE.",
+    "bestInClassExample": "Kiddy Land",
+    "impact": "medium",
+    "effort": "low",
+    "evidence": []
+   }
+  ],
+  "partnerPlay": {
+   "summary": "Use the Don Quijote shop-in-shop as a discovery point for the app and LINE.",
+   "moves": [
+    "Shelf QR codes to LINE",
+    "Joint seasonal campaign"
+   ],
+   "risks": [
+    "Price perception next to discount aisles"
+   ]
+  },
+  "techLandscape": {
+   "summary": "Most specialty players run a hosted platform with Japanese site search and local payments.",
+   "categories": [
+    {
+     "category": "Search",
+     "bestInClassUses": "ZETA SEARCH",
+     "ourStatus": "",
+     "recommendation": "Confirm current search vendor."
+    },
+    {
+     "category": "Payments",
+     "bestInClassUses": "PayPay, Paidy",
+     "ourStatus": "confirm",
+     "recommendation": "Add PayPay if missing."
+    }
+   ]
+  },
+  "parGaps": [
+   {
+    "capability": "In-store pickup",
+    "parShare": "0.7",
+    "ourStatus": "not evidenced",
+    "action": "Confirm whether pickup exists; if not, pilot in 10 stores."
+   },
+   {
+    "capability": "Gift wrapping",
+    "parShare": "60%",
+    "ourStatus": "not evidenced",
+    "action": "Confirm and surface on product pages."
+   }
+  ],
+  "roadmap": [
+   {
+    "phase": "30 days",
+    "actions": [
+     "Confirm the par gaps with the client team"
+    ]
+   },
+   {
+    "phase": "60 days",
+    "actions": [
+     "Launch the age and occasion finder"
+    ]
+   },
+   {
+    "phase": "90 days",
+    "actions": [
+     "Pickup pilot",
+     "LINE coupon cadence"
+    ]
+   }
+  ],
+  "openQuestions": [
+   "Does the site offer in-store pickup today?",
+   "Which search vendor runs site search?",
+   "When does the Don Quijote shop-in-shop open?"
+  ]
+ },
+ "par_matrix": {
+  "_fixture": true,
+  "generatedAt": "2026-11-18T20:00:00.000Z",
+  "capabilities": [
+   {
+    "key": "online_checkout",
+    "label": "Online checkout",
+    "labelJa": "オンライン購入"
+   },
+   {
+    "key": "store_pickup",
+    "label": "In-store pickup",
+    "labelJa": "店舗受け取り"
+   },
+   {
+    "key": "store_stock_check",
+    "label": "Store stock check",
+    "labelJa": "店舗在庫確認"
+   },
+   {
+    "key": "same_or_next_day_delivery",
+    "label": "Same or next day delivery",
+    "labelJa": "当日・翌日配送"
+   },
+   {
+    "key": "free_shipping_threshold",
+    "label": "Free shipping threshold",
+    "labelJa": "送料無料ライン"
+   },
+   {
+    "key": "gift_wrap",
+    "label": "Gift wrapping",
+    "labelJa": "ラッピング・ギフト包装"
+   },
+   {
+    "key": "special_packaging",
+    "label": "Special packaging (limited packaging, noshi)",
+    "labelJa": "特別包装・のし"
+   },
+   {
+    "key": "exclusives",
+    "label": "Exclusive products",
+    "labelJa": "限定商品"
+   },
+   {
+    "key": "app",
+    "label": "Shopping app",
+    "labelJa": "公式アプリ"
+   },
+   {
+    "key": "line_account",
+    "label": "LINE official account",
+    "labelJa": "LINE公式アカウント"
+   },
+   {
+    "key": "loyalty_points",
+    "label": "Loyalty points",
+    "labelJa": "ポイント・会員プログラム"
+   },
+   {
+    "key": "local_payments",
+    "label": "Local payment methods",
+    "labelJa": "国内決済手段"
+   },
+   {
+    "key": "product_reviews",
+    "label": "Product reviews",
+    "labelJa": "商品レビュー"
+   },
+   {
+    "key": "instore_events",
+    "label": "In-store events",
+    "labelJa": "店舗イベント・体験"
+   },
+   {
+    "key": "store_finder",
+    "label": "Store finder",
+    "labelJa": "店舗検索"
+   },
+   {
+    "key": "gift_or_age_finder",
+    "label": "Gift or age finder",
+    "labelJa": "ギフト・年齢別で探す"
+   },
+   {
+    "key": "low_price_guarantee",
+    "label": "Low price guarantee",
+    "labelJa": "低価格保証"
+   },
+   {
+    "key": "easy_returns",
+    "label": "Easy returns",
+    "labelJa": "返品・交換のしやすさ"
+   },
+   {
+    "key": "english_site",
+    "label": "English site",
+    "labelJa": "英語サイト"
+   }
+  ],
+  "players": [
+   {
+    "name": "Toys R Us Japan",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "target",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "store_stock_check": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "same_or_next_day_delivery": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "free_shipping_threshold": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "gift_wrap": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "special_packaging": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "exclusives": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "app": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "line_account": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "product_reviews": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "instore_events": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "low_price_guarantee": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "easy_returns": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     },
+     "english_site": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": "",
+      "confirm": true
+     }
+    }
+   },
+   {
+    "name": "Amazon.co.jp",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store stock check\" wording seen on the home page",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/local_payments",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"product reviews\" wording seen on the home page",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"instore events\" wording seen on the home page",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"low price guarantee\" wording seen on the home page",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Rakuten Ichiba",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store stock check\" wording seen on the home page",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"same or next day delivery\" wording seen on the home page",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"free shipping threshold\" wording seen on the home page",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": "",
+      "amountYen": 3980
+     },
+     "gift_wrap": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"local payments\" wording seen on the home page",
+      "url": "https://example.jp/local_payments",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"low price guarantee\" wording seen on the home page",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Yahoo! Shopping",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"free shipping threshold\" wording seen on the home page",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": "",
+      "amountYen": 3980
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"exclusives\" wording seen on the home page",
+      "url": "https://example.jp/exclusives",
+      "detail": ""
+     },
+     "app": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"local payments\" wording seen on the home page",
+      "url": "https://example.jp/local_payments",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"product reviews\" wording seen on the home page",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Aeon",
+    "tier": "mass",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": ""
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"exclusives\" wording seen on the home page",
+      "url": "https://example.jp/exclusives",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"product reviews\" wording seen on the home page",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Ito-Yokado",
+    "tier": "mass",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"free shipping threshold\" wording seen on the home page",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": "",
+      "amountYen": 3980
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Nishimatsuya",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store stock check\" wording seen on the home page",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"exclusives\" wording seen on the home page",
+      "url": "https://example.jp/exclusives",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"local payments\" wording seen on the home page",
+      "url": "https://example.jp/local_payments",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"product reviews\" wording seen on the home page",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"instore events\" wording seen on the home page",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"low price guarantee\" wording seen on the home page",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Akachan Honpo",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store stock check\" wording seen on the home page",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"same or next day delivery\" wording seen on the home page",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"free shipping threshold\" wording seen on the home page",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": "",
+      "amountYen": 3980
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"exclusives\" wording seen on the home page",
+      "url": "https://example.jp/exclusives",
+      "detail": ""
+     },
+     "app": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"instore events\" wording seen on the home page",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Kiddy Land",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store stock check\" wording seen on the home page",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"free shipping threshold\" wording seen on the home page",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": "",
+      "amountYen": 3980
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"instore events\" wording seen on the home page",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"low price guarantee\" wording seen on the home page",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Pokemon Center Online",
+    "tier": "niche",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"online checkout\" wording seen on the home page",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_wrap": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift wrap\" wording seen on the home page",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/exclusives",
+      "detail": ""
+     },
+     "app": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Hakuhinkan Toy Park",
+    "tier": "niche",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": 0,
+    "cells": {
+     "online_checkout": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store stock check\" wording seen on the home page",
+      "url": "https://example.jp/store_stock_check",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"same or next day delivery\" wording seen on the home page",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"free shipping threshold\" wording seen on the home page",
+      "url": "https://example.jp/free_shipping_threshold",
+      "detail": "",
+      "amountYen": 3980
+     },
+     "gift_wrap": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"exclusives\" wording seen on the home page",
+      "url": "https://example.jp/exclusives",
+      "detail": ""
+     },
+     "app": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"local payments\" wording seen on the home page",
+      "url": "https://example.jp/local_payments",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"product reviews\" wording seen on the home page",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"instore events\" wording seen on the home page",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"low price guarantee\" wording seen on the home page",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   },
+   {
+    "name": "Don Quijote",
+    "tier": "mass",
+    "relationship": "partner",
+    "role": "partner",
+    "observed": 6,
+    "cells": {
+     "online_checkout": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/online_checkout",
+      "detail": ""
+     },
+     "store_pickup": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store pickup\" wording seen on the home page",
+      "url": "https://example.jp/store_pickup",
+      "detail": ""
+     },
+     "store_stock_check": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "same_or_next_day_delivery": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"same or next day delivery\" wording seen on the home page",
+      "url": "https://example.jp/same_or_next_day_delivery",
+      "detail": ""
+     },
+     "free_shipping_threshold": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "gift_wrap": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/gift_wrap",
+      "detail": ""
+     },
+     "special_packaging": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"special packaging\" wording seen on the home page",
+      "url": "https://example.jp/special_packaging",
+      "detail": ""
+     },
+     "exclusives": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "app": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"app\" wording seen on the home page",
+      "url": "https://example.jp/app",
+      "detail": ""
+     },
+     "line_account": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"line account\" wording seen on the home page",
+      "url": "https://example.jp/line_account",
+      "detail": ""
+     },
+     "loyalty_points": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"loyalty points\" wording seen on the home page",
+      "url": "https://example.jp/loyalty_points",
+      "detail": ""
+     },
+     "local_payments": {
+      "status": "unknown",
+      "evidence": "",
+      "url": "",
+      "detail": ""
+     },
+     "product_reviews": {
+      "status": "no",
+      "evidence": "FIXTURE: help page states it is not offered",
+      "url": "https://example.jp/product_reviews",
+      "detail": ""
+     },
+     "instore_events": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"instore events\" wording seen on the home page",
+      "url": "https://example.jp/instore_events",
+      "detail": ""
+     },
+     "store_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"store finder\" wording seen on the home page",
+      "url": "https://example.jp/store_finder",
+      "detail": ""
+     },
+     "gift_or_age_finder": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"gift or age finder\" wording seen on the home page",
+      "url": "https://example.jp/gift_or_age_finder",
+      "detail": ""
+     },
+     "low_price_guarantee": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"low price guarantee\" wording seen on the home page",
+      "url": "https://example.jp/low_price_guarantee",
+      "detail": ""
+     },
+     "easy_returns": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"easy returns\" wording seen on the home page",
+      "url": "https://example.jp/easy_returns",
+      "detail": ""
+     },
+     "english_site": {
+      "status": "yes",
+      "evidence": "FIXTURE: \"english site\" wording seen on the home page",
+      "url": "https://example.jp/english_site",
+      "detail": ""
+     }
+    }
+   }
+  ],
+  "par": {
+   "online_checkout": {
+    "yesShare": 0.78,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "targetStatus": "yes",
+    "yes": 7,
+    "observed": 9
+   },
+   "store_pickup": {
+    "yesShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Ito-Yokado",
+     "Nishimatsuya"
+    ],
+    "targetStatus": "unknown",
+    "yes": 6,
+    "observed": 9
+   },
+   "store_stock_check": {
+    "yesShare": 0.56,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Nishimatsuya"
+    ],
+    "targetStatus": "unknown",
+    "yes": 5,
+    "observed": 9
+   },
+   "same_or_next_day_delivery": {
+    "yesShare": 0.22,
+    "leaders": [
+     "Rakuten Ichiba",
+     "Akachan Honpo"
+    ],
+    "targetStatus": "unknown",
+    "yes": 2,
+    "observed": 9
+   },
+   "free_shipping_threshold": {
+    "yesShare": 0.56,
+    "leaders": [
+     "Rakuten Ichiba",
+     "Yahoo! Shopping",
+     "Ito-Yokado"
+    ],
+    "targetStatus": "unknown",
+    "yes": 5,
+    "observed": 9
+   },
+   "gift_wrap": {
+    "yesShare": 0.89,
+    "leaders": [
+     "Amazon.co.jp",
+     "Yahoo! Shopping",
+     "Aeon"
+    ],
+    "targetStatus": "unknown",
+    "yes": 8,
+    "observed": 9
+   },
+   "special_packaging": {
+    "yesShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "targetStatus": "unknown",
+    "yes": 6,
+    "observed": 9
+   },
+   "exclusives": {
+    "yesShare": 0.44,
+    "leaders": [
+     "Yahoo! Shopping",
+     "Aeon",
+     "Nishimatsuya"
+    ],
+    "targetStatus": "unknown",
+    "yes": 4,
+    "observed": 9
+   },
+   "app": {
+    "yesShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Aeon"
+    ],
+    "targetStatus": "unknown",
+    "yes": 6,
+    "observed": 9
+   },
+   "line_account": {
+    "yesShare": 1,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "targetStatus": "unknown",
+    "yes": 9,
+    "observed": 9
+   },
+   "loyalty_points": {
+    "yesShare": 0.56,
+    "leaders": [
+     "Yahoo! Shopping",
+     "Ito-Yokado",
+     "Nishimatsuya"
+    ],
+    "targetStatus": "yes",
+    "yes": 5,
+    "observed": 9
+   },
+   "local_payments": {
+    "yesShare": 0.33,
+    "leaders": [
+     "Rakuten Ichiba",
+     "Yahoo! Shopping",
+     "Nishimatsuya"
+    ],
+    "targetStatus": "unknown",
+    "yes": 3,
+    "observed": 9
+   },
+   "product_reviews": {
+    "yesShare": 0.44,
+    "leaders": [
+     "Amazon.co.jp",
+     "Yahoo! Shopping",
+     "Aeon"
+    ],
+    "targetStatus": "unknown",
+    "yes": 4,
+    "observed": 9
+   },
+   "instore_events": {
+    "yesShare": 0.44,
+    "leaders": [
+     "Amazon.co.jp",
+     "Nishimatsuya",
+     "Akachan Honpo"
+    ],
+    "targetStatus": "unknown",
+    "yes": 4,
+    "observed": 9
+   },
+   "store_finder": {
+    "yesShare": 0.56,
+    "leaders": [
+     "Rakuten Ichiba",
+     "Yahoo! Shopping",
+     "Aeon"
+    ],
+    "targetStatus": "yes",
+    "yes": 5,
+    "observed": 9
+   },
+   "gift_or_age_finder": {
+    "yesShare": 0.78,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "targetStatus": "unknown",
+    "yes": 7,
+    "observed": 9
+   },
+   "low_price_guarantee": {
+    "yesShare": 0.44,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Nishimatsuya"
+    ],
+    "targetStatus": "unknown",
+    "yes": 4,
+    "observed": 9
+   },
+   "easy_returns": {
+    "yesShare": 0.78,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Aeon"
+    ],
+    "targetStatus": "unknown",
+    "yes": 7,
+    "observed": 9
+   },
+   "english_site": {
+    "yesShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Aeon"
+    ],
+    "targetStatus": "unknown",
+    "yes": 6,
+    "observed": 9
+   }
+  },
+  "gaps": [
+   {
+    "key": "store_pickup",
+    "label": "In-store pickup",
+    "labelJa": "店舗受け取り",
+    "targetStatus": "unknown",
+    "parShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Ito-Yokado",
+     "Nishimatsuya"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "store_stock_check",
+    "label": "Store stock check",
+    "labelJa": "店舗在庫確認",
+    "targetStatus": "unknown",
+    "parShare": 0.56,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Nishimatsuya"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "free_shipping_threshold",
+    "label": "Free shipping threshold",
+    "labelJa": "送料無料ライン",
+    "targetStatus": "unknown",
+    "parShare": 0.56,
+    "leaders": [
+     "Rakuten Ichiba",
+     "Yahoo! Shopping",
+     "Ito-Yokado"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "gift_wrap",
+    "label": "Gift wrapping",
+    "labelJa": "ラッピング・ギフト包装",
+    "targetStatus": "unknown",
+    "parShare": 0.89,
+    "leaders": [
+     "Amazon.co.jp",
+     "Yahoo! Shopping",
+     "Aeon"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "special_packaging",
+    "label": "Special packaging (limited packaging, noshi)",
+    "labelJa": "特別包装・のし",
+    "targetStatus": "unknown",
+    "parShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "app",
+    "label": "Shopping app",
+    "labelJa": "公式アプリ",
+    "targetStatus": "unknown",
+    "parShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Aeon"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "line_account",
+    "label": "LINE official account",
+    "labelJa": "LINE公式アカウント",
+    "targetStatus": "unknown",
+    "parShare": 1,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "gift_or_age_finder",
+    "label": "Gift or age finder",
+    "labelJa": "ギフト・年齢別で探す",
+    "targetStatus": "unknown",
+    "parShare": 0.78,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Yahoo! Shopping"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "easy_returns",
+    "label": "Easy returns",
+    "labelJa": "返品・交換のしやすさ",
+    "targetStatus": "unknown",
+    "parShare": 0.78,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Aeon"
+    ],
+    "note": "FIXTURE"
+   },
+   {
+    "key": "english_site",
+    "label": "English site",
+    "labelJa": "英語サイト",
+    "targetStatus": "unknown",
+    "parShare": 0.67,
+    "leaders": [
+     "Amazon.co.jp",
+     "Rakuten Ichiba",
+     "Aeon"
+    ],
+    "note": "FIXTURE"
+   }
+  ]
+ },
+ "tech_stack": {
+  "_fixture": true,
+  "generatedAt": "2026-11-18T20:00:00.000Z",
+  "players": [
+   {
+    "name": "Toys R Us Japan",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "target",
+    "observed": true,
+    "via": "jp_proxy",
+    "platform": {
+     "name": "Salesforce Commerce Cloud",
+     "confidence": "medium"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [],
+     "reviews": [],
+     "search": [],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "d払い"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": []
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite"
+     ]
+    },
+    "app": {
+     "ios": true,
+     "android": true
+    },
+    "notes": ""
+   },
+   {
+    "name": "Amazon.co.jp",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "Custom",
+     "confidence": "high"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [
+      "Yotpo"
+     ],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [
+      "KARAKURI"
+     ],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "Paidy"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": [
+      "Own points"
+     ]
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite",
+      "Product",
+      "BreadcrumbList"
+     ]
+    },
+    "app": {
+     "ios": false,
+     "android": false
+    },
+    "notes": ""
+   },
+   {
+    "name": "Rakuten Ichiba",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "Shopify Plus",
+     "confidence": "medium"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "d払い"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": []
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite"
+     ]
+    },
+    "app": {
+     "ios": true,
+     "android": true
+    },
+    "notes": ""
+   },
+   {
+    "name": "Yahoo! Shopping",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "ecbeing",
+     "confidence": "high"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [],
+     "reviews": [
+      "Yotpo"
+     ],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "Paidy"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": [
+      "Own points"
+     ]
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite",
+      "Product",
+      "BreadcrumbList"
+     ]
+    },
+    "app": {
+     "ios": false,
+     "android": false
+    },
+    "notes": ""
+   },
+   {
+    "name": "Aeon",
+    "tier": "mass",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "futureshop",
+     "confidence": "medium"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [],
+     "search": [],
+     "chat": [
+      "KARAKURI"
+     ],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "d払い"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": []
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite"
+     ]
+    },
+    "app": {
+     "ios": true,
+     "android": true
+    },
+    "notes": "",
+    "stale": true
+   },
+   {
+    "name": "Ito-Yokado",
+    "tier": "mass",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "Salesforce Commerce Cloud",
+     "confidence": "high"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [
+      "Yotpo"
+     ],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "Paidy"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": [
+      "Own points"
+     ]
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite",
+      "Product",
+      "BreadcrumbList"
+     ]
+    },
+    "app": {
+     "ios": false,
+     "android": false
+    },
+    "notes": ""
+   },
+   {
+    "name": "Nishimatsuya",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "Custom",
+     "confidence": "medium"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [],
+     "reviews": [],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "d払い"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": []
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite"
+     ]
+    },
+    "app": {
+     "ios": true,
+     "android": true
+    },
+    "notes": ""
+   },
+   {
+    "name": "Akachan Honpo",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "Shopify Plus",
+     "confidence": "high"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [
+      "Yotpo"
+     ],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [
+      "KARAKURI"
+     ],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "Paidy"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": [
+      "Own points"
+     ]
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite",
+      "Product",
+      "BreadcrumbList"
+     ]
+    },
+    "app": {
+     "ios": false,
+     "android": false
+    },
+    "notes": ""
+   },
+   {
+    "name": "Kiddy Land",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "ecbeing",
+     "confidence": "medium"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [],
+     "search": [],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "d払い"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": []
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite"
+     ]
+    },
+    "app": {
+     "ios": true,
+     "android": true
+    },
+    "notes": ""
+   },
+   {
+    "name": "Pokemon Center Online",
+    "tier": "niche",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "futureshop",
+     "confidence": "high"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [],
+     "reviews": [
+      "Yotpo"
+     ],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "Paidy"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": [
+      "Own points"
+     ]
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite",
+      "Product",
+      "BreadcrumbList"
+     ]
+    },
+    "app": {
+     "ios": false,
+     "android": false
+    },
+    "notes": ""
+   },
+   {
+    "name": "Hakuhinkan Toy Park",
+    "tier": "niche",
+    "relationship": "competitor",
+    "role": "competitor",
+    "observed": false,
+    "via": "direct",
+    "platform": null,
+    "categories": {},
+    "structuredData": {
+     "jsonLdTypes": []
+    },
+    "app": {},
+    "notes": ""
+   },
+   {
+    "name": "Don Quijote",
+    "tier": "mass",
+    "relationship": "partner",
+    "role": "partner",
+    "observed": true,
+    "via": "direct",
+    "platform": {
+     "name": "Custom",
+     "confidence": "high"
+    },
+    "categories": {
+     "analytics": [
+      "Google Analytics 4"
+     ],
+     "crm": [
+      "Salesforce Marketing Cloud"
+     ],
+     "reviews": [
+      "Yotpo"
+     ],
+     "search": [
+      "ZETA SEARCH"
+     ],
+     "chat": [],
+     "payments": [
+      "PayPay",
+      "Amazon Pay",
+      "Paidy"
+     ],
+     "ads": [
+      "Criteo"
+     ],
+     "loyalty": [
+      "Own points"
+     ]
+    },
+    "structuredData": {
+     "jsonLdTypes": [
+      "Organization",
+      "WebSite",
+      "Product",
+      "BreadcrumbList"
+     ]
+    },
+    "app": {
+     "ios": false,
+     "android": false
+    },
+    "notes": ""
+   }
+  ],
+  "summary": {
+   "platformShare": {
+    "Salesforce Commerce Cloud": 0.3
+   },
+   "mostCommon": {
+    "payments": "PayPay",
+    "analytics": "Google Analytics 4",
+    "search": "ZETA SEARCH"
+   }
+  }
+ },
+ "niche_candidates": {
+  "_fixture": true,
+  "generatedAt": "2026-11-18T20:30:00.000Z",
+  "candidates": [
+   {
+    "id": "n1",
+    "name": "Hakuhinkan Toy Park",
+    "nameJa": "博品館",
+    "kind": "specialty store",
+    "url": "https://example.jp/hakuhinkan",
+    "handles": {},
+    "evidence": [
+     {
+      "source": "marketplace",
+      "text": "FIXTURE: appears in 4 best seller lists"
+     },
+     {
+      "source": "search",
+      "text": "FIXTURE: ranks for ginza toys"
+     }
+    ],
+    "whyInteresting": "Flagship experience store with events.",
+    "status": "pending"
+   },
+   {
+    "id": "n2",
+    "name": "Bornelund",
+    "nameJa": "ボーネルンド",
+    "kind": "brand",
+    "url": "https://example.jp/bornelund",
+    "handles": {},
+    "evidence": [
+     {
+      "source": "social",
+      "text": "FIXTURE: 120k Instagram followers"
+     }
+    ],
+    "whyInteresting": "Play spaces drive store visits.",
+    "status": "pending"
+   },
+   {
+    "id": "n3",
+    "name": "Toy Sapiens",
+    "kind": "online shop",
+    "url": "https://example.jp/ts",
+    "handles": {},
+    "evidence": [],
+    "whyInteresting": "Curated educational toys.",
+    "status": "approved"
+   }
+  ],
+  "approved": [
+   "n3"
+  ],
+  "rejected": []
+ },
+ "social_v2": {
+  "schemaVersion": 2,
+  "brands": [
+   {
+    "name": "Toys R Us Japan",
+    "role": "target",
+    "tier": "specialty",
+    "relationship": "self",
+    "platforms": {
+     "instagram": {
+      "handle": "toysrus_jp",
+      "status": "ok",
+      "followers": 48200,
+      "posts": 25,
+      "engagementRate": 0.42,
+      "postsPerWeek": 3.5,
+      "lastPostAt": null,
+      "topFormats": [
+       {
+        "format": "carousel",
+        "count": 12,
+        "share": 0.48
+       },
+       {
+        "format": "reel",
+        "count": 9,
+        "share": 0.36
+       }
+      ],
+      "topThemes": []
+     },
+     "x": {
+      "handle": "ToysRUs_JP",
+      "status": "ok",
+      "followers": 91000,
+      "posts": 25,
+      "engagementRate": 0.08,
+      "postsPerWeek": 9.1,
+      "lastPostAt": null,
+      "topFormats": [
+       {
+        "format": "image",
+        "count": 20,
+        "share": 0.8
+       }
+      ],
+      "topThemes": []
+     },
+     "tiktok": {
+      "handle": null,
+      "status": "no-data",
+      "followers": null,
+      "posts": 0,
+      "engagementRate": null,
+      "postsPerWeek": null,
+      "lastPostAt": null,
+      "topFormats": [],
+      "topThemes": [],
+      "budgetSkipped": true,
+      "reason": "not scraped: Apify budget cap reached"
+     }
+    }
+   },
+   {
+    "name": "Amazon.co.jp",
+    "tier": "marketplace",
+    "relationship": "competitor",
+    "platforms": {
+     "x": {
+      "handle": "AmazonJP",
+      "status": "ok",
+      "followers": 1200000,
+      "posts": 25,
+      "engagementRate": 0.01,
+      "postsPerWeek": 14,
+      "lastPostAt": null,
+      "topFormats": [
+       {
+        "format": "image",
+        "count": 25,
+        "share": 1
+       }
+      ],
+      "topThemes": []
+     }
+    }
+   },
+   {
+    "name": "Nishimatsuya",
+    "tier": "specialty",
+    "relationship": "competitor",
+    "platforms": {
+     "instagram": {
+      "handle": "nishimatsuya_official",
+      "status": "ok",
+      "followers": 310000,
+      "posts": 25,
+      "engagementRate": 0.95,
+      "postsPerWeek": 5.2,
+      "lastPostAt": null,
+      "topFormats": [
+       {
+        "format": "reel",
+        "count": 15,
+        "share": 0.6
+       }
+      ],
+      "topThemes": []
+     },
+     "line": {
+      "handle": "@nishimatsuya",
+      "status": "presence-only",
+      "followers": null,
+      "posts": 0,
+      "engagementRate": null,
+      "postsPerWeek": null,
+      "lastPostAt": null,
+      "topFormats": [],
+      "topThemes": [],
+      "reason": "Badge not shown on the public add-friend page"
+     }
+    }
+   },
+   {
+    "name": "Don Quijote",
+    "tier": "mass",
+    "relationship": "partner",
+    "platforms": {
+     "tiktok": {
+      "handle": "donki_official",
+      "status": "ok",
+      "followers": 520000,
+      "posts": 25,
+      "engagementRate": 2.1,
+      "postsPerWeek": 6,
+      "lastPostAt": null,
+      "topFormats": [
+       {
+        "format": "video",
+        "count": 25,
+        "share": 1
+       }
+      ],
+      "topThemes": []
+     }
+    }
+   },
+   {
+    "name": "Hakuhinkan Toy Park",
+    "tier": "niche",
+    "relationship": "competitor",
+    "noBrandAccount": true,
+    "platforms": {}
+   }
+  ],
+  "tierInsights": [
+   {
+    "tier": "marketplace",
+    "summary": "Price and deal posts on X, little brand storytelling.",
+    "formats": "image, link",
+    "cadence": "14 per week",
+    "typicalEngagement": "0.01%",
+    "evidenceBrands": [
+     "Amazon.co.jp"
+    ],
+    "evidenceStrength": "thin",
+    "brandsWithData": 1
+   },
+   {
+    "tier": "specialty",
+    "summary": "Parenting tips and new arrivals as Reels, steady cadence.",
+    "formats": "reel, carousel",
+    "cadence": "4 to 5 per week",
+    "typicalEngagement": "0.4% to 1%",
+    "evidenceBrands": [
+     "Nishimatsuya",
+     "Toys R Us Japan"
+    ],
+    "evidenceStrength": "adequate",
+    "brandsWithData": 2
+   }
+  ],
+  "differentiation": {
+   "nichePlaybook": [
+    {
+     "move": "Drop-style exclusives announced 48h ahead",
+     "evidenceBrands": [
+      "Pokemon Center Online"
+     ]
+    }
+   ],
+   "standOutFromMarketplaces": [
+    {
+     "move": "Unboxing and play demos by store staff",
+     "why": "Marketplaces post deals, not play.",
+     "platform": "TikTok",
+     "evidenceBrands": [
+      "Don Quijote"
+     ]
+    }
+   ]
+  },
+  "partnerPlay": [
+   {
+    "idea": "Shop-in-shop opening countdown",
+    "platform": "TikTok",
+    "how": "Co-post with Don Quijote, staff-led tour.",
+    "evidenceBrands": [
+     "Don Quijote"
+    ]
+   }
+  ],
+  "coverage": {
+   "brands": 5,
+   "byTier": {},
+   "platforms": 6,
+   "brandsWithData": 4,
+   "brandsTotal": 5,
+   "budget": {
+    "capUsd": 15,
+    "runSpentUsd": 11.4,
+    "socialSpentUsd": 6.2
+   },
+   "budgetStop": true
+  }
+ }
+}

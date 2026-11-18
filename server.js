@@ -92,6 +92,21 @@ function mergeBrandSeedData(slug) {
     if (added.length) { saveBrandsRegistry(brandsData); console.log(`[seed] registered brands: ${added.join(', ')}`); }
   } catch (e) { console.error('[seed] brand registration failed:', e.message); }
   brandsData.brands.forEach(b => mergeBrandSeedData(b.slug));
+  // Profile migrations the key-level seed merge cannot do (it never touches an existing key): tiers and
+  // the partner relationship on players, and the proxy authorization inside the existing scrape block.
+  // Each migration runs once (marker in profile.migrations), so a player a user removes stays removed.
+  for (const b of brandsData.brands) {
+    try {
+      const livePath = path.join(BRANDS_DIR, b.slug, 'profile.json');
+      const seedPath = path.join(__dirname, 'seed_data', 'brands', b.slug, 'profile.json');
+      if (!fs.existsSync(livePath) || !fs.existsSync(seedPath)) continue;
+      const r = require('./modules/profile_migrations').migrateProfile(b.slug, JSON.parse(fs.readFileSync(livePath, 'utf8')), JSON.parse(fs.readFileSync(seedPath, 'utf8')));
+      if (r && r.changed) {
+        fs.writeFileSync(livePath + '.tmp', JSON.stringify(r.profile, null, 2)); fs.renameSync(livePath + '.tmp', livePath);
+        console.log(`[migrate:${b.slug}] ${(r.report || []).join('; ')}`);
+      }
+    } catch (e) { console.error(`[migrate:${b.slug}] failed:`, e.message); }
+  }
   // Also seed the demo brand if seed dir exists
   const demoBrandSeedDir = path.join(__dirname, 'seed_data', 'brands', 'demo-brand');
   if (fs.existsSync(demoBrandSeedDir) && !brandsData.brands.find(b => b.slug === 'demo-brand')) {
@@ -956,6 +971,11 @@ const BRAND_MODULES = [
   { name: 'jp_demand',            file: 'jp_demand.json',            script: 'analysis/jp_demand.js' },
   { name: 'translations',         file: 'translations.json',         script: 'analysis/translate_outputs.js' },
   { name: 'site_blueprint',       file: 'site_blueprint.json',       script: 'analysis/site_blueprint.js' },
+  // Japan 360: tech stack, par matrix, niche candidates (proposals only) and the 360 strategy
+  { name: 'tech_stack',           file: 'tech_stack.json',           script: 'analysis/tech_stack.js' },
+  { name: 'par_matrix',           file: 'par_matrix.json',           script: 'analysis/par_matrix.js' },
+  { name: 'niche_candidates',     file: 'niche_candidates.json',     script: 'analysis/niche_discovery.js' },
+  { name: 'strategy_360',         file: 'strategy_360.json',         script: 'analysis/strategy_360.js' },
 ];
 
 // ?lang=orig|en|ja on any module read. 'en' keeps Japanese text and adds the English beside it;
@@ -988,7 +1008,7 @@ BRAND_MODULES.forEach(({ name, file }) => {
 });
 
 // ─── Full report, English or Japanese ──────────────────────────────────────────
-const REPORT_MODULES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand', 'site_blueprint'];
+const REPORT_MODULES = ['competitive_analysis', 'personas', 'social_intelligence', 'site_intelligence', 'search_seo', 'action_plan', 'marketplace', 'jp_demand', 'site_blueprint', 'strategy_360', 'par_matrix', 'tech_stack'];
 
 function buildReportHtml(slug, lang, res) {
   const { renderReport } = require('./modules/report_html');
@@ -1089,13 +1109,36 @@ app.post('/api/brands/:slug/refresh/all', (req, res) => {
   const logFile = path.join(DATA_DIR, 'brands', slug, 'discovery.log');
   const logStream = fs.openSync(logFile, 'w');
   const child = spawn('node', spawnArgs, {
-    env: { ...process.env },
+    // one Apify budget run for the whole refresh (utils/apify_budget.js); the Japan phased run keeps it
+    env: { ...process.env, BI_RUN_ID: `refresh-all-${slug}-${new Date().toISOString()}` },
     cwd: __dirname,
     detached: true,
     stdio: ['ignore', logStream, logStream],
   });
   child.unref();
   res.json({ ok: true, slug, status: 'running' });
+});
+
+// Approve or reject a proposed niche brand. Approval adds it to the competitor set (tier niche), so the
+// next run scans it; nothing is scanned or paid for before a person approves it here.
+app.post('/api/brands/:slug/niche-decision', (req, res) => {
+  const { slug } = req.params;
+  const { id, decision } = req.body || {};
+  if (!loadBrandsRegistry().brands.find(b => b.slug === slug)) return res.status(404).json({ error: 'Brand not found' });
+  if (typeof id !== 'string' || !id || !['approve', 'reject'].includes(decision)) return res.status(400).json({ error: 'id and decision (approve or reject) are required' });
+  if (require('./utils/run_lock').status(slug, { dataDir: DATA_DIR }).held) return res.status(409).json({ error: 'A full refresh is running for this brand, decide after it finishes' });
+  const doc = loadBrandData(slug, 'niche_candidates.json');
+  const profile = loadBrandData(slug, 'profile.json');
+  if (!doc || !profile) return res.status(404).json({ error: 'No niche candidates for this brand yet' });
+  const r = require('./analysis/niche_discovery').applyDecision(doc, profile, { id, decision }, { now: new Date().toISOString() });
+  if (r.error) return res.status(400).json({ error: r.error });
+  if (r.changed) {
+    // profile first: if the second write fails, the candidate is still pending and the decision can be repeated safely
+    const write = (f, data) => { const p = path.join(BRANDS_DIR, slug, f); fs.writeFileSync(p + '.tmp', JSON.stringify(data, null, 2)); fs.renameSync(p + '.tmp', p); };
+    write('profile.json', r.profile);
+    write('niche_candidates.json', r.doc);
+  }
+  res.json({ ok: true, changed: !!r.changed, candidates: r.doc });
 });
 
 app.post('/api/brands/:slug/refresh/:module', (req, res) => {
@@ -1107,7 +1150,7 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
   const mod = BRAND_MODULES.find(m => m.name === moduleName);
   if (!mod) return res.status(400).json({ error: `Unknown module: ${moduleName}` });
   // These modules cost model calls and exist only for the Japan market: refuse them for any other brand
-  if (['translations', 'site_blueprint', 'marketplace', 'jp_demand'].includes(moduleName)) {
+  if (['translations', 'site_blueprint', 'marketplace', 'jp_demand', 'tech_stack', 'par_matrix', 'niche_candidates', 'strategy_360'].includes(moduleName)) {
     let isJp = false;
     try { isJp = require('./utils/market').isJapanMarket(JSON.parse(fs.readFileSync(path.join(BRANDS_DIR, slug, 'profile.json'), 'utf8'))); } catch (_) {}
     if (!isJp) return res.status(400).json({ error: 'This module is only available for Japan-market brands' });
@@ -1122,7 +1165,8 @@ app.post('/api/brands/:slug/refresh/:module', (req, res) => {
     moduleStdio = ['ignore', logFd, logFd];
   } catch (_) {}
   const child = spawn('node', [path.join(__dirname, mod.script), `--slug=${slug}`], {
-    env: { ...process.env },
+    // a single-module refresh is its own Apify budget run, so it never draws on a shared daily pot
+    env: { ...process.env, BI_RUN_ID: `module-${moduleName}-${slug}-${new Date().toISOString()}` },
     cwd: __dirname,
     detached: true,
     stdio: moduleStdio,

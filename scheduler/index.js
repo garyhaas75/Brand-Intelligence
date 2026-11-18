@@ -58,7 +58,8 @@ function runForAllBrands(script, delayMs = 90000) {
     setTimeout(() => {
       log(`  Spawning ${script} for ${brand.name} (${brand.slug})`);
       const child = spawn('node', [path.join(__dirname, '..', script), `--slug=${brand.slug}`], {
-        env: { ...process.env },
+        // each scheduled job is its own Apify budget run (utils/apify_budget.js), not a shared daily pot
+        env: { ...process.env, BI_RUN_ID: `sched-${path.basename(script, '.js')}-${brand.slug}-${new Date().toISOString()}` },
         cwd: path.join(__dirname, '..'),
         detached: true,
         stdio: 'ignore',

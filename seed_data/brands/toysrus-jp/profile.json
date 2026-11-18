@@ -7,63 +7,282 @@
   "identifiedCompetitors": [
     {
       "name": "Amazon.co.jp Toys",
+      "nameJa": "Amazon おもちゃ",
       "url": "https://www.amazon.co.jp/toys/",
-      "rationale": "Large online marketplace competing for Japanese toy and baby shoppers."
+      "tier": "marketplace",
+      "relationship": "competitor",
+      "rationale": "Largest online marketplace in Japan; sets the delivery-speed and price expectation for toy shoppers.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
     },
     {
       "name": "Rakuten Ichiba Toys",
+      "nameJa": "楽天市場 おもちゃ",
       "url": "https://www.rakuten.co.jp/category/566382/",
-      "rationale": "Large online marketplace competing for Japanese toy and baby shoppers."
+      "tier": "marketplace",
+      "relationship": "competitor",
+      "rationale": "Points-driven mall marketplace where many toy shops, including chains, run storefronts.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
     },
     {
       "name": "Yahoo! Shopping Games and Toys",
+      "nameJa": "Yahoo!ショッピング ゲーム、おもちゃ",
       "url": "https://shopping.yahoo.co.jp/category/2511/recommend",
-      "rationale": "Large online marketplace competing for Japanese toy and baby shoppers."
+      "tier": "marketplace",
+      "relationship": "competitor",
+      "rationale": "PayPay-linked marketplace competing on points and campaigns for toy purchases.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
     },
     {
-      "name": "Kiddy Land",
-      "url": "https://www.kiddyland.co.jp/",
-      "rationale": "Specialty toy retailer competing for Japanese toy and baby shoppers."
-    },
-    {
-      "name": "Nishimatsuya",
-      "url": "https://www.24028.jp/",
-      "rationale": "Baby and kids retailer competing for Japanese toy and baby shoppers."
-    },
-    {
-      "name": "Akachan Honpo",
-      "url": "https://www.akachan.jp/",
-      "rationale": "Baby and kids retailer competing for Japanese toy and baby shoppers."
-    },
-    {
-      "name": "Premium Bandai",
-      "url": "https://p-bandai.jp/",
-      "rationale": "Manufacturer direct online store competing for Japanese toy and baby shoppers."
-    },
-    {
-      "name": "Sanrio Online Shop",
-      "url": "https://shop.sanrio.co.jp/",
-      "rationale": "Manufacturer direct online store competing for Japanese toy and baby shoppers."
-    },
-    {
-      "name": "Don Quijote",
-      "url": "https://www.donki.com/",
-      "rationale": "Discount general retailer competing for Japanese toy and baby shoppers."
+      "name": "Mercari",
+      "nameJa": "メルカリ",
+      "url": "https://jp.mercari.com/",
+      "tier": "marketplace",
+      "relationship": "competitor",
+      "rationale": "Largest resale app in Japan; secondhand and collectible toys compete with new-item sales.",
+      "xHandle": "mercari_jp",
+      "facebookHandle": "mercarijp",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
     },
     {
       "name": "AEON.com",
+      "nameJa": "イオンドットコム",
       "url": "https://www.aeon.com/",
-      "rationale": "General merchandise retailer competing for Japanese toy and baby shoppers."
+      "tier": "mass",
+      "relationship": "competitor",
+      "rationale": "Largest general merchandise group in Japan with toy departments nationwide and online.",
+      "xHandle": "AEON_JAPAN",
+      "facebookHandle": "aeonretail",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Ito-Yokado",
+      "nameJa": "イトーヨーカドー",
+      "url": "https://www.itoyokado.co.jp/",
+      "tier": "mass",
+      "relationship": "competitor",
+      "rationale": "General merchandise chain with toy floors and seasonal toy catalogues.",
+      "xHandle": "lets_go_yokado",
+      "facebookHandle": "itoyokado",
+      "instagramHandle": "itoyokado_official",
+      "youtubeHandle": "https://www.youtube.com/channel/UC9dz0cMdpw_BXiQF1P8LoZA",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
     },
     {
       "name": "Joshin",
+      "nameJa": "ジョーシン",
       "url": "https://joshinweb.jp/",
-      "rationale": "Electronics and mass retailer competing for Japanese toy and baby shoppers."
+      "tier": "mass",
+      "relationship": "competitor",
+      "rationale": "Electronics chain with a large toy and hobby department and strong online sales.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 403,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Nishimatsuya",
+      "nameJa": "西松屋",
+      "url": "https://www.24028.jp/",
+      "tier": "mass",
+      "relationship": "competitor",
+      "rationale": "Value baby and kids chain with a toy assortment at everyday low prices.",
+      "instagramHandle": "24028.jp",
+      "youtubeHandle": "https://www.youtube.com/channel/UCPc1yG6UsVnA1rI-ZKcYa0g",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Akachan Honpo",
+      "nameJa": "アカチャンホンポ",
+      "url": "https://www.akachan.jp/",
+      "tier": "mass",
+      "relationship": "competitor",
+      "rationale": "Baby specialty chain; competes directly with Babies\"R\"Us Japan.",
+      "instagramHandle": "akachanhonpo_smile",
+      "tiktokHandle": "akachanhonpo_official",
+      "facebookHandle": "akachanhonpo",
+      "xHandle": "akachanhonpo",
+      "youtubeHandle": "https://www.youtube.com/channel/UCrW_zOFeyKcQQsfPAUkJBzw",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Kiddy Land",
+      "nameJa": "キデイランド",
+      "url": "https://www.kiddyland.co.jp/",
+      "tier": "specialty",
+      "relationship": "competitor",
+      "rationale": "Character goods and toy specialty chain with flagship tourist stores.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Hakuhinkan Toy Park",
+      "nameJa": "博品館TOY PARK",
+      "url": "https://www.hakuhinkan.co.jp/toypark/",
+      "tier": "specialty",
+      "relationship": "competitor",
+      "rationale": "Ginza destination toy store; benchmark for experiential and gift-led toy retail.",
+      "xHandle": "toypark_ginza",
+      "facebookHandle": "HAKUHINKANTOYPARK",
+      "instagramHandle": "hakuhinkan_toypark",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Pokemon Center Online",
+      "nameJa": "ポケモンセンターオンライン",
+      "url": "https://www.pokemoncenter-online.com/",
+      "tier": "specialty",
+      "relationship": "competitor",
+      "rationale": "Official Pokemon goods and card store; captures the biggest character franchise directly.",
+      "xHandle": "pokemoncenterPR",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Premium Bandai",
+      "nameJa": "プレミアムバンダイ",
+      "url": "https://p-bandai.jp/",
+      "tier": "specialty",
+      "relationship": "competitor",
+      "rationale": "Bandai Namco direct store for limited and pre-order figures and collectibles.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl",
+        "finalUrl": "https://p-bandai.jp/global_newpc.html"
+      }
+    },
+    {
+      "name": "Sanrio Online Shop",
+      "nameJa": "サンリオオンラインショップ",
+      "url": "https://shop.sanrio.co.jp/",
+      "tier": "specialty",
+      "relationship": "competitor",
+      "rationale": "Sanrio direct store; character goods sold to kids and adult fans.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Bornelund",
+      "nameJa": "ボーネルンド",
+      "url": "https://www.bornelund.co.jp/",
+      "tier": "niche",
+      "relationship": "competitor",
+      "rationale": "Premium educational and play-equipment importer and retailer with indoor play spaces.",
+      "instagramHandle": "bornelund",
+      "xHandle": "BorneLund_PL",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Gashapon Official (Bandai)",
+      "nameJa": "ガシャポンオフィシャルサイト",
+      "url": "https://gashapon.jp/",
+      "tier": "niche",
+      "relationship": "competitor",
+      "rationale": "Bandai capsule toys and official Gashapon shops; impulse and collectible spend.",
+      "xHandle": "Gashapon_Bandai",
+      "instagramHandle": "gashapon_instabu",
+      "tiktokHandle": "gashapon_bandai",
+      "youtubeHandle": "https://www.youtube.com/channel/UC2lvffCZhyY8Z5ZIKGIiDwQ",
+      "lineId": "@wvp1993r",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Animate Online Shop",
+      "nameJa": "アニメイト通販",
+      "url": "https://www.animate-onlineshop.jp/",
+      "tier": "niche",
+      "relationship": "competitor",
+      "rationale": "Anime and character goods chain; competes for teen and adult collector spend.",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 403,
+        "via": "curl"
+      }
+    },
+    {
+      "name": "Don Quijote",
+      "nameJa": "ドン・キホーテ",
+      "url": "https://www.donki.com/",
+      "tier": "mass",
+      "relationship": "partner",
+      "rationale": "PARTNER, not a competitor: Toys\"R\"Us Japan retail partner (deal signed; shop-in-shop inside Don Quijote planned, not open). Studied as a channel.",
+      "instagramHandle": "donki_jp",
+      "tiktokHandle": "donki_cp",
+      "facebookHandle": "donki.majicaglobal.jp",
+      "xHandle": "donki_donki",
+      "youtubeHandle": "https://www.youtube.com/user/DonQuijotekoushiki",
+      "verifiedAt": {
+        "date": "2026-11-18",
+        "status": 200,
+        "via": "curl"
+      }
     }
   ],
-  "discoveryNotes": "Created by hand for the Japan scan: toysrus.co.jp is Cloudflare-blocked so brand_discovery cannot run. Competitors seeded from scrapers/jp_competitors.js.",
+  "discoveryNotes": "Created by hand for the Japan scan: toysrus.co.jp is Cloudflare-blocked so brand_discovery cannot run. Players (tier, relationship, verified URL, handles linked from each homepage) seeded from scrapers/jp_competitors.js, approved set 2026-11-18. Don Quijote is the PARTNER, never scored as a competitor. Unverified candidates are listed in JP_UNVERIFIED there.",
   "scrape": {
     "skipApifyRetry": true,
-    "note": "toysrus.co.jp is operated by Y.K. Toysrus Internet Japan behind Cloudflare and blocks automated access. Do not retry through proxies. Use data/brands/toysrus-jp/manual_capture/toysrus-jp.html (and .png) or get the operator to allowlist us."
+    "note": "toysrus.co.jp is geo-fenced to Japan. skipApifyRetry keeps every direct request and the generic Apify retry off. Reading is allowed only through the authorized Japanese residential proxy in access (utils/site_access.js), a few read-only pages per module per run. The manual capture in data/brands/toysrus-jp/manual_capture/toysrus-jp.html (and .png) is the fallback when the proxied load fails.",
+    "access": {
+      "mode": "jp_proxy",
+      "authorizedBy": "WHP (Gary Haas, brand owner side)",
+      "authorizedAt": "2026-11-18",
+      "reason": "Site is geo-fenced to Japan to keep sales in the licensed territory; brand owner authorized read-only review through a Japanese proxy",
+      "maxPagesPerModule": 8
+    },
+    "apifyCapUsd": 15
   }
 }

@@ -17,6 +17,7 @@ const { scrapeBrands, manualCaptureFor, isFailedResult, scrapeStatusLine } = req
 const { isJapanMarket } = require('../utils/market');
 const { getBrandContext } = require('../utils/brand_context');
 const checkpoint = require('../utils/checkpoint');
+const { playersFor, competitorsOnly } = require('../utils/players');
 
 const CHECKPOINT_STEP = 'website-scrape';
 
@@ -139,6 +140,34 @@ function neutralizeUnobservedAudit(a) {
   return x;
 }
 
+/**
+ * The target plus the competitors to benchmark. Partners (relationship 'partner', for
+ * Toys R Us Japan: Don Quijote) are never benchmarked, and a player with no website
+ * (url null, e.g. an approved niche brand) is skipped rather than turned into a URL.
+ * The cap applies to competitors with a website, after both filters.
+ */
+function buildBrandsToScrape(profile, slug) {
+  const competitors = competitorsOnly(playersFor(profile))
+    .map(c => ({ c, url: competitorUrl(c.url) }))
+    .filter(x => x.url)
+    .slice(0, isJapanMarket(profile) ? 12 : 6);
+  return [
+    { id: slug, name: profile.name, url: profile.url, role: 'target', takeScreenshot: true, skipApifyRetry: !!(profile.scrape && profile.scrape.skipApifyRetry), manualCapture: manualCaptureFor(slug, slug) },
+    ...competitors.map(({ c, url }) => ({
+      id: String(c.name).toLowerCase().replace(/\s+/g, '-'),
+      name: c.name, url, role: 'competitor',
+    })),
+  ];
+}
+
+/** A scrapeable URL from a profile value, or null. Never builds a URL from null/empty. */
+function competitorUrl(u) {
+  if (typeof u !== 'string') return null;
+  const t = u.trim();
+  if (!t || /^(null|undefined)$/i.test(t)) return null;
+  return /^https?:\/\//i.test(t) ? t : `https://${t}`;
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
@@ -149,15 +178,11 @@ async function run() {
 
   log(`Starting website audit for: ${profile.name}`);
 
-  const brandsToScrape = [
-    { id: slug, name: profile.name, url: profile.url, role: 'target', takeScreenshot: true, skipApifyRetry: !!(profile.scrape && profile.scrape.skipApifyRetry), manualCapture: manualCaptureFor(slug, slug) },
-    ...(profile.identifiedCompetitors || []).slice(0, isJapanMarket(profile) ? 12 : 6).map(c => ({
-      id: c.name.toLowerCase().replace(/\s+/g, '-'),
-      name: c.name, url: /^https?:\/\//i.test(c.url) ? c.url : `https://${c.url}`, role: 'competitor',
-    })),
-  ];
+  const brandsToScrape = buildBrandsToScrape(profile, slug);
 
   const logFile = path.join(__dirname, '../logs', `website_audit_${slug}.log`);
+  const targetAccess = require('../utils/site_access').accessFor(profile.url);
+  if (targetAccess.mode === 'jp_proxy') log(`Target ${profile.url}: live scrape via Japanese proxy (authorized ${targetAccess.authorization.by} ${targetAccess.authorization.at}); manual capture only as fallback`);
   log(`Scraping ${brandsToScrape.length} sites...`);
   // Sites that block a datacentre IP now retry through Apify's residential proxy,
   // which turns a 2-second failure into a minutes-long attempt. The old budget
@@ -331,6 +356,9 @@ Generate at least 5 navGaps, 3 messagingGaps, and 5 topOpportunities.`;
     // Said last so the model cannot override it: was the target's own site observed in this run?
     targetObserved: !targetUnobserved,
     auditBasis: targetUnobserved ? 'benchmark' : 'observed',
+    // How the target was observed: a live scrape through the authorized Japanese proxy, a manual capture, or direct.
+    targetObservedVia: targetUnobserved ? null : (targetSite.manualCapture ? 'manual_capture' : targetSite.via === 'jp_proxy' ? 'jp_proxy' : 'direct'),
+    ...(targetSite.budgetSkipped ? { targetBudgetSkipped: true, targetBudgetReason: targetSite.budgetReason || null } : {}),
     ...(targetUnobserved ? { auditNote: 'The target site was not observed in this run. The items below are recommendations drawn from competitors, not findings about the current site. See the website blueprint for the full direction and a checklist to verify.' } : {}),
   };
 
@@ -386,6 +414,9 @@ function fillUnfinished(brands, finished, existingData, reason, now = new Date()
  * for the live page, or when this run's scrape of the target was bot-blocked.
  */
 function lighthouseSkipReason(profile, targetBrand, targetScraped) {
+  // Read only through the authorized Japanese proxy: a few pages per run, and a Lighthouse run would be
+  // many requests outside that budget (and would time the proxy, not the site).
+  if (targetScraped && targetScraped.via === 'jp_proxy' && !targetScraped.manualCapture) return 'target site is read only through the authorized Japanese proxy, within a small page budget; Lighthouse is not run through it';
   if (targetBrand && targetBrand.manualCapture) return 'target site blocks automated access; a manual capture is in use, so there is no live page to audit';
   if ((targetBrand && targetBrand.skipApifyRetry) || (profile && profile.scrape && profile.scrape.skipApifyRetry)) return 'target site blocks automated access (profile.scrape.skipApifyRetry)';
   if (targetScraped && targetScraped.botBlocked) return 'target site served a bot challenge to this run, so Lighthouse would only score the block page';
@@ -438,4 +469,4 @@ if (require.main === module) {
   run().catch(err => { log(`FATAL: ${err.message}`); process.exit(1); });
 }
 
-module.exports = { competitorContextBlock, existingBrandsById, fillUnfinished, lighthouseSkipReason, persistOutput, neutralizeUnobservedAudit, CHECKPOINT_STEP };
+module.exports = { buildBrandsToScrape, competitorUrl, competitorContextBlock, existingBrandsById, fillUnfinished, lighthouseSkipReason, persistOutput, neutralizeUnobservedAudit, CHECKPOINT_STEP };

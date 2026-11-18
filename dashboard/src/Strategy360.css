@@ -1,0 +1,92 @@
+/* Japan 360 panels (Strategy360.jsx, Jp360Panels.jsx). Colours come inline from the theme object. */
+.s360 { margin-bottom: 32px; min-width: 0; }
+.s360-block { margin-bottom: 28px; }
+.s360 p { margin: 0 0 6px; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.s360-head { margin-bottom: 14px; }
+.s360-head h2 { font-size: 22px; font-weight: 800; margin: 2px 0 4px; line-height: 1.3; }
+.s360-eyebrow { font-size: 11px !important; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 !important; }
+.s360-basis { font-size: 13px !important; }
+.s360-title { margin: 22px 0 10px; }
+.s360-box .s360-title { margin-top: 0; }
+.s360-title h3 { font-size: 16px; font-weight: 700; margin: 0 0 2px; }
+.s360-title p { font-size: 13px !important; margin: 0 !important; }
+.s360-box { border: 1px solid; border-radius: 12px; padding: 16px 18px; min-width: 0; }
+.s360-exec { margin-top: 12px; }
+.s360-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+/* Few cards: let them stretch to fill the row instead of leaving empty tracks. */
+.s360-grid.s360-fill { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.s360-roadmap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.s360-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 8px; }
+.s360-k { font-size: 11px !important; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 10px 0 2px !important; }
+.s360-list { margin: 4px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
+.s360-list li { margin-bottom: 4px; overflow-wrap: anywhere; }
+.s360-list.tight { font-size: 13px; padding-left: 16px; }
+.s360-plain { list-style: none; margin: 6px 0 0; padding: 0; font-size: 14px; }
+.s360-plain li { margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.s360-chip { display: inline-block; font-size: 12px; font-weight: 600; border: 1px solid; border-color: transparent; border-radius: 6px; padding: 1px 8px; white-space: nowrap; line-height: 1.6; }
+.s360-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+.s360-ev { font-size: 12px !important; margin-top: 8px !important; }
+.s360-notice { border: 1px solid; border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 1.5; margin: 10px 0; }
+.s360-p { margin-bottom: 10px !important; }
+.s360-scrollwrap { position: relative; max-width: 100%; min-width: 0; }
+.s360-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid; border-radius: 10px; max-width: 100%; }
+.s360-fade { position: absolute; top: 1px; right: 1px; bottom: 1px; width: 28px; pointer-events: none; border-radius: 0 10px 10px 0; }
+/* Pinned first column (ScrollTable). Background comes inline so rows do not show through. */
+.s360-pinned .s360-pin { position: sticky; left: 0; z-index: 1; max-width: 240px; box-shadow: 1px 0 0 rgba(148, 163, 184, 0.35); }
+.s360-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.s360-table th, .s360-table td { border-bottom: 1px solid; padding: 8px 10px; text-align: left; vertical-align: top; }
+.s360-table thead th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.s360-table td { min-width: 120px; }
+.s360-table .s360-list { margin: 0; }
+.s360-tech td { min-width: 0; }
+.s360-tech td:first-child { min-width: 150px; }
+.s360-namecell { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.s360-stack { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+.s360-sub { display: block; font-size: 12px; }
+.s360-lines { display: flex; flex-direction: column; gap: 2px; }
+.s360-nowrap { white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.s360-matrix td { min-width: 0; text-align: center; }
+.s360-matrix thead th.s360-col { text-transform: none; letter-spacing: 0; vertical-align: bottom; min-width: 112px; width: 112px; white-space: normal; }
+.s360-matrix thead th.s360-col .s360-chip { font-size: 11px; padding: 1px 6px; }
+.s360-matrix th.s360-share { min-width: 64px; }
+.s360-matrix .s360-cell .s360-chip { font-size: 11px; }
+.s360-capname { display: block; }
+.s360-gapline { display: block; margin-top: 4px; }
+.s360-colname { display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+.s360-sticky { position: sticky; left: 0; z-index: 2; min-width: 170px; max-width: 220px; text-align: left !important; font-size: 13px; font-weight: 600; box-shadow: 1px 0 0 rgba(148, 163, 184, 0.35); }
+.s360-cell { display: block; width: 100%; min-height: 36px; border: 0; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.s360-cell:focus-visible { outline: 2px solid currentColor !important; outline-offset: -2px; }
+.s360-confirm { font-size: 11px; font-weight: 700; }
+.s360-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; margin-bottom: 8px; }
+.s360-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; }
+.s360-detail { margin-top: 10px; }
+.s360-url { font-size: 12px !important; word-break: break-all; }
+.s360-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.s360-actions button:disabled { opacity: 0.6; cursor: wait; }
+.s360-decided { margin-top: 14px; }
+.s360-kpis { display: flex; flex-wrap: wrap; gap: 28px; }
+.s360-kpis p { font-size: 13px; margin: 0; }
+.s360-big { font-size: 22px !important; font-weight: 800; }
+.s360-details { margin-top: 10px; font-size: 13px; }
+.s360-details summary { cursor: pointer; font-weight: 600; }
+.s360-dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 13px; margin: 6px 0 0; }
+.s360-dl dt { font-weight: 700; }
+.s360-dl dd { margin: 0; overflow-wrap: anywhere; }
+.s360-item { border-top: 1px solid; padding-top: 10px; margin-top: 10px; }
+.s360-partner { margin-top: 18px; }
+/* Japanese: break between words only, strict kinsoku. */
+.s360-ja th, .s360-ja td, .s360-ja h3, .s360-ja p, .s360-ja li, .s360-ja dd, .s360-ja dt, .s360-ja .s360-colname, .s360-ja .s360-chip, .s360-ja .s360-k { word-break: keep-all; line-break: strict; overflow-wrap: break-word; }
+.s360-ja p, .s360-ja li, .s360-ja dd { overflow-wrap: break-word; }
+@media (max-width: 900px) {
+  .s360-roadmap { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .s360-pinned .s360-pin { max-width: 40vw; min-width: 0 !important; }
+  .s360-tech td:first-child { min-width: 0; }
+  .s360-matrix thead th.s360-col { min-width: 104px; width: 104px; }
+  .s360-head h2 { font-size: 19px; }
+  .s360-box { padding: 14px; }
+  .s360-grid, .s360-two { grid-template-columns: 1fr; }
+  .s360-sticky { min-width: 0; width: 40vw; max-width: 40vw; }
+  .s360-kpis { gap: 16px; }
+}

@@ -274,6 +274,124 @@ const DICT = {
     whereToLook: 'Where to look',
     ifMissing: 'If missing',
     ifPresent: 'If present',
+    s_strategy: "360 web strategy",
+    s_par: "Capability par",
+    s_tech: "Technology landscape",
+    s_parGrid: "Appendix: capability grid by player",
+    x_s360NotObserved: "The client's own site was not observed. Everything in this chapter is a recommendation built from competitor, marketplace, social and technology evidence, not a finding about the current site. Items marked confirm need the client team to check.",
+    x_s360Stale: "The last refresh failed, so this is the previous version of the strategy.",
+    x_execSummary: "Executive summary",
+    x_positioning: "Positioning by tier",
+    x_tier: "Tier",
+    x_whoWins: "Who wins",
+    x_howTheyWin: "How they win",
+    x_implication: "What it means for us",
+    x_standOut: "How to stand out from the marketplaces",
+    x_move: "Move",
+    x_whyNotMarketplace: "Why marketplaces cannot match it",
+    x_channelMap: "Channel map",
+    x_channel: "Channel",
+    x_role: "Role",
+    x_currentState: "Current state",
+    x_bestInClass: "Best in class",
+    x_moves: "Moves",
+    x_onlineToStore: "Online to store",
+    x_tactic: "Tactic",
+    x_howItWorks: "How it works",
+    x_impact: "Impact",
+    x_effort: "Effort",
+    x_partnerPlay: "Partner play: Don Quijote",
+    x_partnerNote: "Don Quijote is our partner: a channel, never a competitor. The shop-in-shop is planned, not open.",
+    x_risks: "Risks",
+    x_techLandscape: "Technology landscape",
+    x_category: "Category",
+    x_bestUses: "What the best players use",
+    x_ourStatus: "Our status",
+    x_recommendation: "Recommendation",
+    x_parGaps: "Par gaps",
+    x_capability: "Capability",
+    x_parShare: "Share offering it",
+    x_action: "Action",
+    x_roadmap: "Roadmap",
+    x_openQuestions: "Questions for the client team to confirm",
+    x_openIntro: "Only the client team can confirm these. Each answer sharpens the plan.",
+    x_evidence: "Evidence",
+    x_builtFrom: "Built from",
+    x_players: "{n} players",
+    x_socialBrands: "{n} brands with social data",
+    x_techObs: "{n} sites with technology read",
+    x_parObs: "{n} sites in the par matrix",
+    x_mpItems: "{n} marketplace best sellers",
+    x_reviews: "{n} customer reviews",
+    x_terms: "{n} search-demand terms",
+    x_personas: "{n} personas",
+    x_niche: "{n} approved niche players",
+    x_parIntro: "Share of observed players offering each capability, overall and by tier, and whether we have been seen to offer it. Confirm means not evidenced on the pages read, never missing.",
+    x_all: "All",
+    x_us: "Us",
+    x_yes: "Yes",
+    x_no: "No",
+    x_unknown: "Unknown",
+    x_confirm: "Confirm",
+    x_gap: "Gap",
+    x_partner: "Partner",
+    x_partnerExcluded: "The partner is not counted in par shares.",
+    t_marketplace: "Marketplaces",
+    t_mass: "Mass retail",
+    t_specialty: "Specialty",
+    t_niche: "Niche",
+    t_unknown: "Unclassified",
+    x_gridIntro: "Y = offered, N = states it does not, ? = not evidenced on the pages read. Our column reads Confirm wherever we have not been seen offering it.",
+    x_techIntro: "What each site runs on, read from its public pages. A dash means it was not seen, not that it is absent.",
+    x_player: "Player",
+    x_platform: "Platform",
+    x_payments: "Payments",
+    x_crm: "CRM",
+    x_reviewsTool: "Reviews",
+    x_search: "Search",
+    x_chat: "Chat",
+    x_loyalty: "Loyalty",
+    x_app: "App",
+    x_structured: "Structured data",
+    x_observed: "Observed",
+    x_notObserved: "Not observed",
+    x_mostCommon: "Most common",
+    x_platformMetrics: "Platform metrics by brand",
+    x_followers: "Followers",
+    x_engagement: "Engagement",
+    x_postsWeek: "Posts per week",
+    x_topFormats: "Top formats",
+    x_status: "Status",
+    x_skippedBudget: "Skipped: budget cap",
+    x_tierInsights: "What each tier does on social",
+    x_formats: "Formats",
+    x_cadence: "Cadence",
+    x_typicalEng: "Typical engagement",
+    x_thin: "Evidence is thin",
+    x_nichePlaybook: "Niche playbook",
+    x_standOutSocial: "Stand out from the marketplaces",
+    x_why: "Why",
+    x_partnerSocial: "Partner play on social",
+    x_idea: "Idea",
+    x_how: "How",
+    x_coverage: "Coverage",
+    x_brandsWithData: "Brands with social data",
+    x_apify: "Apify spend this run",
+    x_apifyVal: "{spent} of {cap} cap",
+    x_apifySocial: "social {usd}",
+    x_question: "Question",
+    x_days: "{n} days",
+    x_firstDays: "First {n} days",
+    x_rangeDays: "{a} to {b} days",
+    x_notEvidenced: "Not evidenced",
+    x_perWeek: "{n} per week",
+    x_analytics: "Analytics",
+    x_ads: "Ads",
+    x_skipped: "Platforms skipped or empty",
+    r_acquire: "Acquire",
+    r_convert: "Convert",
+    r_retain: "Retain",
+    "r_drive to store": "Drive to store",
   },
   ja: {
     docTitle: 'ブランド・インテリジェンス・レポート',
@@ -531,33 +649,158 @@ const DICT = {
     whereToLook: '確認方法',
     ifMissing: '未対応の場合',
     ifPresent: '対応済みの場合',
+    s_strategy: "360度ウェブ戦略",
+    s_par: "機能の業界標準",
+    s_tech: "テクノロジー環境",
+    s_parGrid: "付録：事業者別の機能一覧",
+    x_s360NotObserved: "クライアント自身のサイトは確認できていません。本章の内容はすべて、競合・マーケットプレイス・ソーシャル・技術の根拠に基づく推奨事項であり、現在のサイトについての所見ではありません。「要確認」の項目はクライアントチームによる確認が必要です。",
+    x_s360Stale: "前回の更新に失敗したため、これは以前の戦略です。",
+    x_execSummary: "エグゼクティブサマリー",
+    x_positioning: "階層別ポジショニング",
+    x_tier: "階層",
+    x_whoWins: "勝者",
+    x_howTheyWin: "勝ち方",
+    x_implication: "当社への示唆",
+    x_standOut: "マーケットプレイスとの差別化の方法",
+    x_move: "施策",
+    x_whyNotMarketplace: "マーケットプレイスが対抗できない理由",
+    x_channelMap: "チャネルマップ",
+    x_channel: "チャネル",
+    x_role: "役割",
+    x_currentState: "現状",
+    x_bestInClass: "ベストインクラス",
+    x_moves: "施策",
+    x_onlineToStore: "オンラインから店舗へ",
+    x_tactic: "施策",
+    x_howItWorks: "仕組み",
+    x_impact: "効果",
+    x_effort: "工数",
+    x_partnerPlay: "パートナー施策：ドン・キホーテ",
+    x_partnerNote: "ドン・キホーテは当社のパートナーであり、競合ではなく販売チャネルです。ショップインショップは計画段階で、まだ開店していません。",
+    x_risks: "リスク",
+    x_techLandscape: "テクノロジー環境",
+    x_category: "カテゴリー",
+    x_bestUses: "トップ企業が使用しているもの",
+    x_ourStatus: "当社の状況",
+    x_recommendation: "推奨事項",
+    x_parGaps: "業界標準とのギャップ",
+    x_capability: "機能",
+    x_parShare: "提供率",
+    x_action: "アクション",
+    x_roadmap: "ロードマップ",
+    x_openQuestions: "クライアントチームに確認いただきたい質問",
+    x_openIntro: "クライアントチームにしか確認できない事項です。回答ごとに計画の精度が上がります。",
+    x_evidence: "根拠",
+    x_builtFrom: "作成の根拠",
+    x_players: "事業者{n}社",
+    x_socialBrands: "ソーシャルデータのあるブランド{n}社",
+    x_techObs: "技術を読み取ったサイト{n}件",
+    x_parObs: "業界標準マトリクスの対象サイト{n}件",
+    x_mpItems: "マーケットプレイスの売れ筋商品{n}点",
+    x_reviews: "顧客レビュー{n}件",
+    x_terms: "検索需要キーワード{n}件",
+    x_personas: "ペルソナ{n}件",
+    x_niche: "承認済みニッチ事業者{n}社",
+    x_parIntro: "確認できた事業者のうち各機能を提供している割合(全体および階層別)と、当社での提供が確認できたかを示します。「要確認」は読み込んだページで根拠が見つからなかったことを意味し、未提供という意味ではありません。",
+    x_all: "全体",
+    x_us: "当社",
+    x_yes: "あり",
+    x_no: "なし",
+    x_unknown: "不明",
+    x_confirm: "要確認",
+    x_gap: "ギャップ",
+    x_partner: "パートナー",
+    x_partnerExcluded: "パートナーは提供率の計算に含めていません。",
+    t_marketplace: "マーケットプレイス",
+    t_mass: "量販店",
+    t_specialty: "専門店",
+    t_niche: "ニッチ",
+    t_unknown: "未分類",
+    x_gridIntro: "Y = 提供あり、N = 提供なしと明記、? = 読み込んだページで根拠なし。当社の列は、提供が確認できていない項目を「要確認」と表示します。",
+    x_techIntro: "各サイトの公開ページから読み取った利用技術です。「-」は確認できなかったことを示し、導入していないという意味ではありません。",
+    x_player: "事業者",
+    x_platform: "プラットフォーム",
+    x_payments: "決済",
+    x_crm: "CRM",
+    x_reviewsTool: "レビュー",
+    x_search: "検索",
+    x_chat: "チャット",
+    x_loyalty: "ロイヤルティ",
+    x_app: "アプリ",
+    x_structured: "構造化データ",
+    x_observed: "確認済み",
+    x_notObserved: "未確認",
+    x_mostCommon: "最も多い技術",
+    x_platformMetrics: "ブランド別プラットフォーム指標",
+    x_followers: "フォロワー",
+    x_engagement: "エンゲージメント",
+    x_postsWeek: "週あたり投稿数",
+    x_topFormats: "主なフォーマット",
+    x_status: "状況",
+    x_skippedBudget: "スキップ：予算上限",
+    x_tierInsights: "階層ごとのソーシャル活用",
+    x_formats: "フォーマット",
+    x_cadence: "投稿頻度",
+    x_typicalEng: "標準的なエンゲージメント",
+    x_thin: "根拠が限定的",
+    x_nichePlaybook: "ニッチ事業者の手法",
+    x_standOutSocial: "マーケットプレイスとの差別化",
+    x_why: "理由",
+    x_partnerSocial: "ソーシャルでのパートナー施策",
+    x_idea: "アイデア",
+    x_how: "方法",
+    x_coverage: "収集範囲",
+    x_brandsWithData: "ソーシャルデータのあるブランド",
+    x_apify: "今回の実行でのApify利用額",
+    x_apifyVal: "{spent}(上限 {cap})",
+    x_apifySocial: "ソーシャル {usd}",
+    x_question: "確認事項",
+    x_days: "{n}日間",
+    x_firstDays: "最初の{n}日間",
+    x_rangeDays: "{a}〜{b}日",
+    x_notEvidenced: "根拠未確認",
+    x_perWeek: "週{n}回",
+    x_analytics: "アナリティクス",
+    x_ads: "広告",
+    x_skipped: "スキップまたはデータなしのプラットフォーム",
+    r_acquire: "集客",
+    r_convert: "購入転換",
+    r_retain: "継続利用",
+    "r_drive to store": "来店促進",
   },
 };
 
 const SECTION_ORDER = [
+  ['strategy', 's_strategy'],
   ['summary', 's_summary'],
   ['action', 's_action'],
   ['competitors', 's_competitors'],
+  ['par', 's_par'],
   ['website', 's_website'],
   ['blueprint', 's_blueprint'],
+  ['tech', 's_tech'],
   ['marketplace', 's_marketplace'],
   ['social', 's_social'],
   ['personas', 's_personas'],
   ['search', 's_search'],
   ['demand', 's_demand'],
+  ['parGrid', 's_parGrid'],
   ['notes', 's_notes'],
 ];
 
 // Modules that exist only for the Japan market: for any other brand they are not applicable, so
 // they must not appear as 'No data yet' in the summary line or the freshness table.
-const JAPAN_ONLY = new Set(['site_blueprint', 'marketplace', 'jp_demand']);
+const JAPAN_ONLY = new Set(['site_blueprint', 'marketplace', 'jp_demand', 'strategy_360', 'par_matrix', 'tech_stack']);
 const sectionApplies = (dataKey, ctx) => !JAPAN_ONLY.has(dataKey) || !!ctx.data[dataKey] || require('../utils/market').isJapanMarket(ctx.profile);
 
 const MODULE_KEYS = [
+  ['strategy_360', 's_strategy'],
   ['action_plan', 's_action'],
   ['competitive_analysis', 's_competitors'],
   ['site_intelligence', 's_website'],
   ['site_blueprint', 's_blueprint'],
+  ['par_matrix', 's_par'],
+  ['tech_stack', 's_tech'],
   ['marketplace', 's_marketplace'],
   ['social_intelligence', 's_social'],
   ['personas', 's_personas'],
@@ -963,7 +1206,7 @@ function secBlueprint(ctx) {
   if (vf.length) parts.push(h3(t('verifyFirst')) + `<p class="small muted intro">${esc(t('verifyIntro'))}</p>` + table([t('checkDone'), t('check'), t('whereToLook'), t('ifMissing'), t('ifPresent')],
     vf.map(x => ['<span class="box" aria-hidden="true"></span>', `<strong>${esc(x.check)}</strong>`, esc(x.how), esc(x.ifMissing), esc(x.ifPresent)]), { cls: 'compact verify' }));
   const rm = arr(b.roadmap).filter(x => isObj(x) && arr(x.actions).length);
-  if (rm.length) parts.push(h3(t('roadmap')) + `<div class="phases">${rm.map(x => `<div class="phase"><h4>${esc(x.phase)}</h4>${ul(arr(x.actions).map(a => str(a).replace(/\bverifyFirst\b/g, t('verifyFirst'))), 10)}</div>`).join('')}</div>`);
+  if (rm.length) parts.push(h3(t('roadmap')) + `<div class="phases">${rm.map(x => `<div class="phase"><h4>${esc(s360Phase(x.phase, t))}</h4>${ul(arr(x.actions).map(a => str(a).replace(/\bverifyFirst\b/g, t('verifyFirst'))), 10)}</div>`).join('')}</div>`);
   return parts.join('');
 }
 
@@ -1036,10 +1279,237 @@ function secSocial(ctx) {
       if (s) parts.push(`<h3>${esc(target.name)}${staleTag(target, t, lang)}</h3>` + s);
     }
   }
+  parts.push(socialV2(ctx, so));
   const ws = arr(so.whiteSpaceOpportunities).filter(isObj);
   if (ws.length) parts.push(h3(t('socialWhiteSpace')) + table([t('opportunity'), t('detail'), t('format'), t('priority')], ws.map(w => [`<strong>${esc(w.theme)}</strong>`, esc(w.description), esc(w.suggestedFormat), esc(vocab(w.priority, t))])));
   const cs = arr(so.competitionStrategy).filter(isObj);
   if (cs.length) parts.push(h3(t('howToCompete')) + table([t('tactic'), t('rationale'), t('priority')], cs.map(c => [`<strong>${esc(c.tactic)}</strong>`, esc(c.rationale), esc(vocab(c.priority, t))])));
+  return parts.join('');
+}
+
+// ---------- Japan 360 chapters ----------
+
+const P_TIERS = ['marketplace', 'mass', 'specialty', 'niche'];
+const tierName = (v, t) => { const k = 't_' + str(v).trim().toLowerCase(); const o = t(k); return o === k ? (str(v) || t('t_unknown')) : o; };
+const isPartnerP = (p) => isObj(p) && str(p.relationship).toLowerCase() === 'partner';
+const isSelfP = (p) => isObj(p) && (str(p.role).toLowerCase() === 'target' || str(p.relationship).toLowerCase() === 'self');
+const evSmall = (xs) => (arr(xs).map(str).filter(Boolean).length ? `<div class="ev small muted">${esc(arr(xs).map(str).filter(Boolean).join('; '))}</div>` : '');
+const pct = (v, lang) => (typeof v === 'number' && Number.isFinite(v) ? `${fmtNum(Math.round(v * 100), lang, 0)}%` : '');
+const sjoin = (xs, lang) => arr(xs).map(str).filter(Boolean).join(lang === 'ja' ? '、' : ', ');
+
+function s360Basis(b, t, lang) {
+  if (!isObj(b)) return '';
+  const keys = [['players', 'x_players'], ['socialBrandsWithData', 'x_socialBrands'], ['techObserved', 'x_techObs'], ['parObserved', 'x_parObs'], ['marketplaceItems', 'x_mpItems'], ['reviews', 'x_reviews'], ['demandTerms', 'x_terms'], ['personas', 'x_personas'], ['approvedNiche', 'x_niche']];
+  const bits = keys.filter(([k]) => typeof b[k] === 'number' && b[k] > 0).map(([k, d]) => t(d, { n: fmtNum(b[k], lang, 0) }));
+  return bits.length ? `<p class="evidence-line"><strong>${esc(t('x_builtFrom'))}</strong>: ${esc(bits.join(lang === 'ja' ? '、' : ', '))}</p>` : '';
+}
+
+// Status enums the analysis writes ("confirm", "not evidenced", ...). Free text passes through.
+function s360Status(v, t) {
+  const s = str(v).trim();
+  const low = s.toLowerCase();
+  if (!s || low === 'confirm' || low === 'unknown') return lbl(t('x_confirm'), t);
+  if (/^(yes|offered)$/.test(low)) return esc(t('x_yes'));
+  if (low === 'observed') return esc(t('x_observed'));
+  if (low === 'not evidenced') return `${lbl(t('x_confirm'), t)} ${esc(t('x_notEvidenced'))}`;
+  if (low === 'not observed') return `${lbl(t('x_confirm'), t)} ${esc(t('x_notObserved'))}`;
+  return `${lbl(t('x_confirm'), t)} ${esc(s)}`;
+}
+function s360Phase(v, t) {
+  const x = str(v).trim();
+  let m = x.match(/^(\d+)\s*days?$/i);
+  if (m) return t('x_days', { n: m[1] });
+  m = x.match(/^first\s+(\d+)\s*days?$/i);
+  if (m) return t('x_firstDays', { n: m[1] });
+  m = x.match(/^(?:days\s+)?(\d+)\s*(?:to|-|〜)\s*(\d+)\s*(?:days?)?$/i);
+  if (m) return t('x_rangeDays', { a: m[1], b: m[2] });
+  return x;
+}
+function techCat(k, t) { const m = { payments: 'x_payments', analytics: 'x_analytics', search: 'x_search', crm: 'x_crm', reviews: 'x_reviewsTool', chat: 'x_chat', loyalty: 'x_loyalty', ads: 'x_ads', platform: 'x_platform' }[str(k).toLowerCase()]; return m ? t(m) : str(k); }
+function perWeek(v, t, lang) {
+  const m = str(v).trim().match(/^(\d+(?:\.\d+)?)(?:\s*(?:to|-|〜)\s*(\d+(?:\.\d+)?))?\s*(?:posts?\s*)?per week$/i);
+  if (!m) return str(v);
+  return t('x_perWeek', { n: m[2] ? `${m[1]}${lang === 'ja' ? '〜' : ' to '}${m[2]}` : m[1] });
+}
+
+function secStrategy(ctx) {
+  const { t, data, lang } = ctx;
+  const s = data.strategy_360;
+  if (!isObj(s)) return '';
+  const parts = [];
+  if (s.targetObserved === false) parts.push(`<div class="callout callout-note">${esc(t('x_s360NotObserved'))}</div>`);
+  if (s.stale === true) parts.push(`<div class="callout callout-warn">${esc(t('x_s360Stale'))}</div>`);
+  parts.push(s360Basis(s.evidenceBasis, t, lang));
+  const ex = arr(s.executiveSummary).map(str).filter(Boolean);
+  if (ex.length) parts.push(h3(t('x_execSummary')) + `<ul class="lead-list">${ex.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`);
+  const pos = arr(s.positioningByTier).filter(x => isObj(x) && (str(x.whoWins) || str(x.howTheyWin)));
+  if (pos.length) parts.push(h3(t('x_positioning')) + table([t('x_tier'), t('x_whoWins'), t('x_howTheyWin'), t('x_implication')],
+    pos.map(x => [`<strong class="kw">${esc(tierName(x.tier, t))}</strong>`, esc(x.whoWins), `${esc(x.howTheyWin)}${evSmall(x.evidence)}`, esc(x.implication)]), { cls: 'compact' }));
+  const so = arr(s.standOut).filter(x => isObj(x) && str(x.move));
+  if (so.length) parts.push(h3(t('x_standOut')) + table([t('x_move'), t('x_whyNotMarketplace')], so.map(x => [`<strong>${esc(x.move)}</strong>`, `${esc(x.whyMarketplacesCannot)}${evSmall(x.evidence)}`]), { cls: 'compact' }));
+  const ch = arr(s.channelMap).filter(x => isObj(x) && str(x.channel));
+  if (ch.length) parts.push(h3(t('x_channelMap')) + table([t('x_channel'), t('x_role'), t('x_currentState'), t('x_bestInClass'), t('x_moves')],
+    ch.map(x => [`<strong>${esc(x.channel)}</strong>`, lbl(t('r_' + str(x.role).toLowerCase()) === 'r_' + str(x.role).toLowerCase() ? x.role : t('r_' + str(x.role).toLowerCase()), t), esc(x.currentState) || esc(t('x_notObserved')), esc(x.bestInClass), ul(x.moves, 6)]), { cls: 'compact' }));
+  const o2s = arr(s.onlineToStore).filter(x => isObj(x) && str(x.tactic));
+  if (o2s.length) parts.push(h3(t('x_onlineToStore')) + table([t('x_tactic'), t('x_howItWorks'), t('x_bestInClass'), `${t('x_impact')} / ${t('x_effort')}`],
+    o2s.map(x => [`<strong>${esc(x.tactic)}</strong>`, `${esc(x.howItWorks)}${evSmall(x.evidence)}`, esc(x.bestInClassExample), `<div class="pec"><span class="pec-k">${esc(t('x_impact'))}</span>${lbl(x.impact, t)}</div><div class="pec"><span class="pec-k">${esc(t('x_effort'))}</span>${lbl(x.effort, t)}</div>`]), { cls: 'compact' }));
+  const pp = isObj(s.partnerPlay) ? s.partnerPlay : null;
+  if (pp && (str(pp.summary) || arr(pp.moves).length)) {
+    parts.push(h3(t('x_partnerPlay')) + `<div class="callout callout-note">${esc(t('x_partnerNote'))}</div>` + para(pp.summary) +
+      (arr(pp.moves).length ? `<h4>${esc(t('x_moves'))}</h4>${ul(pp.moves, 10)}` : '') + (arr(pp.risks).length ? `<h4>${esc(t('x_risks'))}</h4>${ul(pp.risks, 8)}` : ''));
+  }
+  const tl = isObj(s.techLandscape) ? s.techLandscape : null;
+  if (tl && (str(tl.summary) || arr(tl.categories).length)) parts.push(h3(t('x_techLandscape')) + para(tl.summary) + table([t('x_category'), t('x_bestUses'), t('x_ourStatus'), t('x_recommendation')],
+    arr(tl.categories).filter(x => isObj(x) && str(x.category)).map(x => [`<strong>${esc(x.category)}</strong>`, esc(x.bestInClassUses), str(x.ourStatus) ? s360Status(x.ourStatus, t) : esc(t('x_notObserved')), esc(x.recommendation)]), { cls: 'compact' }));
+  const pg = arr(s.parGaps).filter(x => isObj(x) && str(x.capability));
+  if (pg.length) parts.push(h3(t('x_parGaps')) + table([t('x_capability'), t('x_parShare'), t('x_ourStatus'), t('x_action')],
+    pg.map(x => { const n = Number(str(x.parShare).replace('%', '')); const sh = str(x.parShare) && Number.isFinite(n) ? `${Math.round(/%/.test(str(x.parShare)) || n > 1 ? n : n * 100)}%` : str(x.parShare); return [`<strong>${esc(x.capability)}</strong>`, esc(sh), s360Status(x.ourStatus, t), esc(x.action)]; }), { cls: 'compact' }));
+  const rm = arr(s.roadmap).filter(x => isObj(x) && arr(x.actions).length);
+  if (rm.length) parts.push(h3(t('x_roadmap')) + `<div class="phases">${rm.map(x => `<div class="phase"><h4>${esc(s360Phase(x.phase, t))}</h4>${ul(x.actions, 10)}</div>`).join('')}</div>`);
+  const oq = arr(s.openQuestions).map(str).filter(Boolean);
+  if (oq.length) parts.push(h3(t('x_openQuestions')) + `<p class="small muted intro">${esc(t('x_openIntro'))}</p>` + table(['', t('x_question')], oq.map(q => ['<span class="box" aria-hidden="true"></span>', esc(q)]), { cls: 'compact verify' }));
+  return parts.join('');
+}
+
+function parStatusLabel(status, t) {
+  return status === 'yes' ? t('x_yes') : status === 'no' ? t('x_no') : t('x_confirm');
+}
+
+function capName(c, lang) { return (lang === 'ja' && str(c.labelJa)) || str(c.label) || str(c.key); }
+
+function secPar(ctx) {
+  const { t, data, lang } = ctx;
+  const pm = data.par_matrix;
+  if (!isObj(pm)) return '';
+  const caps = arr(pm.capabilities).filter(c => isObj(c) && str(c.key));
+  const players = arr(pm.players).filter(p => isObj(p) && str(p.name));
+  if (!caps.length || !players.length) return '';
+  const scored = players.filter(p => !isSelfP(p) && !isPartnerP(p));
+  const target = players.find(isSelfP);
+  const partner = players.find(isPartnerP);
+  const par = isObj(pm.par) ? pm.par : {};
+  const gapKeys = new Set(arr(pm.gaps).map(g => isObj(g) && g.key).filter(Boolean));
+  const tiers = P_TIERS.filter(tr => scored.some(p => str(p.tier).toLowerCase() === tr));
+  const share = (ps, k) => {
+    const obs = ps.filter(p => isObj(p.cells) && isObj(p.cells[k]) && p.cells[k].status !== undefined);
+    if (!obs.length) return '-';
+    const y = obs.filter(p => p.cells[k].status === 'yes').length;
+    return `${y}/${obs.length}`;
+  };
+  const head = [t('x_capability'), t('x_all'), ...tiers.map(tr => tierName(tr, t)), t('x_us')];
+  if (partner) head.push(`${partner.name} (${t("x_partner")})`);
+  const rows = caps.map(c => {
+    const k = c.key;
+    const p = par[k] || {};
+    const ts = target && isObj(target.cells) && isObj(target.cells[k]) ? target.cells[k].status : (p.targetStatus || 'unknown');
+    const row = [`<strong>${esc(capName(c, lang))}</strong>${gapKeys.has(k) ? ` <span class="tag tag-stale">${esc(t('x_gap'))}</span>` : ''}`,
+      esc(pct(p.yesShare, lang) || share(scored, k)), ...tiers.map(tr => esc(share(scored.filter(x => str(x.tier).toLowerCase() === tr), k))),
+      ts === 'yes' ? esc(t('x_yes')) : lbl(parStatusLabel(ts, t), t)];
+    if (partner) { const st = isObj(partner.cells) && isObj(partner.cells[k]) ? partner.cells[k].status : 'unknown'; row.push(esc(st === 'yes' ? t('x_yes') : st === 'no' ? t('x_no') : t('x_unknown'))); }
+    return row;
+  });
+  return `<p class="small muted intro">${esc(t('x_parIntro'))}${partner ? ' ' + esc(t('x_partnerExcluded')) : ''}</p>` + table(head, rows, { cls: 'compact par' });
+}
+
+function secParGrid(ctx) {
+  const { t, data, lang } = ctx;
+  const pm = data.par_matrix;
+  if (!isObj(pm)) return '';
+  const caps = arr(pm.capabilities).filter(c => isObj(c) && str(c.key));
+  const players = arr(pm.players).filter(p => isObj(p) && str(p.name));
+  if (!caps.length || players.length < 2) return '';
+  const order = [...players].sort((a, b) => (isSelfP(b) - isSelfP(a)) || (isPartnerP(a) - isPartnerP(b)) || (P_TIERS.indexOf(str(a.tier).toLowerCase()) - P_TIERS.indexOf(str(b.tier).toLowerCase())));
+  const mark = (s) => (s === 'yes' ? 'Y' : s === 'no' ? 'N' : '?');
+  // Even split: 12 players print as 6 and 6, never 8 and 4.
+  const nChunks = Math.ceil(order.length / 8);
+  const size = Math.ceil(order.length / nChunks);
+  const chunks = [];
+  for (let i = 0; i < order.length; i += size) chunks.push(order.slice(i, i + size));
+  const cell = (p, c) => {
+    const s0 = isObj(p.cells) && isObj(p.cells[c.key]) ? p.cells[c.key].status : 'unknown';
+    const s = s0 === 'yes' || s0 === 'no' ? s0 : 'unknown';
+    // Our own unknown reads Confirm, as on the dashboard: not evidenced, never missing.
+    if (isSelfP(p) && s !== 'yes') return { cls: 'g-c', html: esc(t('x_confirm')) };
+    return { cls: s === 'yes' ? 'g-y' : s === 'no' ? 'g-n' : 'g-u', html: esc(mark(s)) };
+  };
+  return `<p class="small muted intro">${esc(t('x_gridIntro'))}</p>` + chunks.map(ps => table(
+    [t('x_capability'), ...ps.map(p => `${p.name}${isSelfP(p) ? ` (${t('x_us')})` : isPartnerP(p) ? ` (${t('x_partner')})` : ` (${tierName(p.tier, t)})`}`)],
+    caps.map(c => [`<strong>${esc(capName(c, lang))}</strong>`, ...ps.map(p => { const x = cell(p, c); return `<span class="${x.cls}">${x.html}</span>`; })]),
+    { cls: 'compact grid' })).join('');
+}
+
+const vend = (v) => {
+  if (Array.isArray(v)) return v.map(x => (isObj(x) ? str(x.name || x.vendor) : str(x))).filter(Boolean).join(', ');
+  if (isObj(v)) return str(v.name || v.vendor);
+  return str(v);
+};
+
+function secTech(ctx) {
+  const { t, data } = ctx;
+  const ts = data.tech_stack;
+  if (!isObj(ts)) return '';
+  const players = arr(ts.players).filter(p => isObj(p) && str(p.name));
+  if (!players.length) return '';
+  const order = [...players].sort((a, b) => (isSelfP(b) - isSelfP(a)) || (isPartnerP(a) - isPartnerP(b)) || (P_TIERS.indexOf(str(a.tier).toLowerCase()) - P_TIERS.indexOf(str(b.tier).toLowerCase())));
+  const d = (v) => esc(v) || '-';
+  const rows = order.map(p => {
+    const c = isObj(p.categories) ? p.categories : {};
+    const app = isObj(p.app) ? [p.app.ios && 'iOS', p.app.android && 'Android'].filter(Boolean).join(', ') : '';
+    const observed = !(p.observed === false || p.observed === 0);
+    const tag = isSelfP(p) ? t('x_us') : isPartnerP(p) ? t('x_partner') : tierName(p.tier, t);
+    return [`<strong>${esc(p.name)}</strong><div class="small muted">${esc(tag)}</div>`, d(isObj(p.platform) ? p.platform.name : ''), d(vend(c.payments)), d(vend(c.crm)), d(vend(c.reviews)), d(vend(c.search)), d(vend(c.chat)), d(vend(c.loyalty)), d(app),
+      d(arr(isObj(p.structuredData) ? p.structuredData.jsonLdTypes : []).join(', ')), observed ? esc(t('x_observed')) + staleTag(p, t, ctx.lang) : lbl(t('x_notObserved'), t)];
+  });
+  const most = isObj(ts.summary) && isObj(ts.summary.mostCommon) ? Object.entries(ts.summary.mostCommon).filter(([, v]) => vend(v)).slice(0, 8) : [];
+  return `<p class="small muted intro">${esc(t('x_techIntro'))}</p>` + (most.length ? kv([[t('x_mostCommon'), esc(most.map(([k, v]) => `${techCat(k, t)}${ctx.lang === 'ja' ? '：' : ': '}${vend(v)}`).join(' · '))]]) : '') +
+    table([t('x_player'), t('x_platform'), t('x_payments'), t('x_crm'), t('x_reviewsTool'), t('x_search'), t('x_chat'), t('x_loyalty'), t('x_app'), t('x_structured'), t('x_observed')], rows, { cls: 'compact tech' });
+}
+
+const SOCIAL_PLATS = [['instagram', 'Instagram'], ['tiktok', 'TikTok'], ['facebook', 'Facebook'], ['x', 'X'], ['youtube', 'YouTube'], ['line', 'LINE']];
+
+function socialV2(ctx, so) {
+  const { t, lang } = ctx;
+  if (!(Number(so.schemaVersion) >= 2)) return '';
+  const parts = [];
+  const cov = isObj(so.coverage) ? so.coverage : null;
+  const brands = arr(so.brands).filter(b => isObj(b) && str(b.name));
+  const rows = [];
+  let skipped = 0;
+  for (const b of [...brands].sort((a, c) => (isSelfP(c) - isSelfP(a)) || (isPartnerP(a) - isPartnerP(c)) || (P_TIERS.indexOf(str(a.tier).toLowerCase()) - P_TIERS.indexOf(str(c.tier).toLowerCase())))) {
+    const plats = isObj(b.platforms) ? b.platforms : {};
+    for (const [k, label] of SOCIAL_PLATS) {
+      const p = plats[k];
+      if (!isObj(p)) continue;
+      if (p.budgetSkipped || (!p.posts && str(p.reason))) skipped++;
+      if (!p.handle && !p.followers && !p.posts && !p.budgetSkipped) continue;
+      const tag = isSelfP(b) || b.role === 'target' ? t('x_us') : isPartnerP(b) ? t('x_partner') : tierName(b.tier, t);
+      rows.push([`<strong>${esc(b.name)}</strong><div class="small muted">${esc(tag)}</div>`, `${esc(label)}${str(p.handle) ? `<div class="small muted u">@${esc(str(p.handle).replace(/^@/, ''))}</div>` : ''}`,
+        esc(fmtNum(p.followers, lang, 0)) || '-', typeof p.engagementRate === 'number' ? `${esc(fmtNum(p.engagementRate, lang, 2))}%` : '-',
+        esc(fmtNum(p.postsPerWeek, lang, 1)) || '-', esc(arr(p.topFormats).filter(isObj).slice(0, 3).map(f => str(f.format)).filter(Boolean).join(', ')) || '-',
+        p.budgetSkipped ? lbl(t('x_skippedBudget'), t) : esc(fmtNum(p.posts, lang, 0))]);
+    }
+  }
+  if (cov) {
+    const b = isObj(cov.budget) ? cov.budget : {};
+    const usd = (v) => (typeof v === 'number' && Number.isFinite(v) ? `$${v.toFixed(2)}` : '-');
+    parts.push(h3(t('x_coverage')) + kv([
+      [t('x_brandsWithData'), typeof cov.brandsTotal === 'number' ? esc(`${cov.brandsWithData ?? 0} / ${cov.brandsTotal}`) : ''],
+      [t('x_apify'), typeof b.capUsd === 'number' ? esc(t('x_apifyVal', { spent: usd(b.runSpentUsd), cap: usd(b.capUsd) }) + (typeof b.socialSpentUsd === 'number' ? (lang === 'ja' ? `（${t('x_apifySocial', { usd: usd(b.socialSpentUsd) })}）` : ` (${t('x_apifySocial', { usd: usd(b.socialSpentUsd) })})`) : '')) : ''],
+      [t('x_skipped'), skipped ? esc(String(skipped)) : ''],
+    ]));
+  }
+  if (rows.length) parts.push(h3(t('x_platformMetrics')) + table([t('name'), t('x_platform'), t('x_followers'), t('x_engagement'), t('x_postsWeek'), t('x_topFormats'), t('x_status')], rows, { cls: 'compact' }));
+  const ti = arr(so.tierInsights).filter(x => isObj(x) && (str(x.summary) || str(x.formats)));
+  if (ti.length) parts.push(h3(t('x_tierInsights')) + table([t('x_tier'), t('x_tierInsights'), `${t('x_formats')} / ${t('x_cadence')} / ${t('x_typicalEng')}`],
+    ti.map(x => [`<strong>${esc(tierName(x.tier, t))}</strong>${str(x.evidenceStrength).toLowerCase() === 'thin' ? `<div>${lbl(t('x_thin'), t)}</div>` : ''}`, `${esc(x.summary)}${arr(x.evidenceBrands).length ? `<div class="ev small muted">${esc(t('x_evidence'))}: ${esc(sjoin(x.evidenceBrands, lang))}</div>` : ''}`,
+      [str(x.formats), perWeek(x.cadence, t, lang), str(x.typicalEngagement)].filter(Boolean).map(v => esc(v)).join('<br>')]), { cls: 'compact' }));
+  const diff = isObj(so.differentiation) ? so.differentiation : {};
+  const st = arr(diff.standOutFromMarketplaces).filter(x => isObj(x) && str(x.move));
+  if (st.length) parts.push(h3(t('x_standOutSocial')) + table([t('x_move'), t('x_why'), t('x_platform')], st.map(x => [`<strong>${esc(x.move)}</strong>${arr(x.evidenceBrands).length ? `<div class="ev small muted">${esc(sjoin(x.evidenceBrands, lang))}</div>` : ''}`, esc(x.why), esc(x.platform)]), { cls: 'compact' }));
+  const np = arr(diff.nichePlaybook).filter(x => isObj(x) && str(x.move));
+  if (np.length) parts.push(h3(t('x_nichePlaybook')) + table([t('x_move'), t('x_evidence')], np.map(x => [`<strong>${esc(x.move)}</strong>`, esc(sjoin(x.evidenceBrands, lang))]), { cls: 'compact' }));
+  const pp = arr(so.partnerPlay).filter(x => isObj(x) && str(x.idea));
+  if (pp.length) parts.push(h3(t('x_partnerSocial')) + table([t('x_idea'), t('x_platform'), t('x_how')], pp.map(x => [`<strong>${esc(x.idea)}</strong>`, esc(x.platform), esc(x.how)]), { cls: 'compact' }));
   return parts.join('');
 }
 
@@ -1312,6 +1782,16 @@ table.bp .ev { margin-top: 0.8mm; line-height: 1.3; }
 table.verify td:first-child, table.verify th:first-child { min-width: 0; width: 9mm; text-align: center; }
 .box { display: inline-block; width: 3.2mm; height: 3.2mm; border: 1px solid #374151; border-radius: 0.5mm; margin-top: 0.6mm; }
 .phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.kw { word-break: keep-all; white-space: nowrap; }
+table.grid { table-layout: fixed; }
+table.grid th:first-child, table.grid td:first-child { width: 30%; }
+table.grid th:not(:first-child) { font-size: 7.5pt; word-break: keep-all; line-break: strict; overflow-wrap: anywhere; }
+table.grid td:not(:first-child) { text-align: center; padding: 0.6mm; }
+table.grid td span { display: block; border-radius: 1mm; padding: 0.6mm 0; font-weight: 700; }
+table.grid .g-y { background: #d1fae5; color: #065f46; }
+table.grid .g-n { background: #fee2e2; color: #991b1b; }
+table.grid .g-u { background: #f3f4f6; color: #6b7280; }
+table.grid .g-c { background: #fef3c7; color: #92400e; font-size: 7pt; }
 .phase { border-top: 3px solid #1d4ed8; background: #f9fafb; padding: 2mm 3mm; break-inside: avoid; font-size: 8.5pt; }
 .phase h4 { margin-top: 0; }
 .tag-partial { color: #92400e; font-weight: 700; font-size: 8pt; }
@@ -1360,6 +1840,7 @@ function renderReportInner(opts) {
     summary: secSummary, action: secAction, competitors: secCompetitors, website: secWebsite, blueprint: secBlueprint,
     marketplace: secMarketplace, social: secSocial, personas: secPersonas, search: secSearch,
     demand: secDemand, notes: secNotes,
+    strategy: secStrategy, par: secPar, tech: secTech, parGrid: secParGrid,
   };
   const hasText = (html) => !!html.replace(/<[^>]*>/g, '').trim();
   const bodies = {};
@@ -1369,8 +1850,8 @@ function renderReportInner(opts) {
       if (id === 'summary' || id === 'notes') continue;
       try { bodies[id] = builders[id](ctx) || ''; } catch { bodies[id] = ''; }
     }
-    const SECTION_DATA = { blueprint: 'site_blueprint', marketplace: 'marketplace', demand: 'jp_demand' };
-    const empty = SECTION_ORDER.filter(([id]) => id !== 'summary' && id !== 'notes' && !hasText(bodies[id]) && (!SECTION_DATA[id] || sectionApplies(SECTION_DATA[id], ctx)));
+    const SECTION_DATA = { blueprint: 'site_blueprint', marketplace: 'marketplace', demand: 'jp_demand', strategy: 'strategy_360', par: 'par_matrix', tech: 'tech_stack', parGrid: 'par_matrix' };
+    const empty = SECTION_ORDER.filter(([id]) => id !== 'summary' && id !== 'notes' && id !== 'parGrid' && !hasText(bodies[id]) && (!SECTION_DATA[id] || sectionApplies(SECTION_DATA[id], ctx)));
     ctx.emptySections = empty.map(([, key]) => t(key));
     try { bodies.notes = builders.notes(ctx) || ''; } catch { bodies.notes = ''; }
     try { bodies.summary = builders.summary(ctx) || ''; } catch { bodies.summary = ''; }

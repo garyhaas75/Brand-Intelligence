@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const runLock = require('../utils/run_lock');
 
-const PHASE_ORDER = ['collect', 'analyse', 'personas', 'blueprint', 'plan', 'translate'];
+const PHASE_ORDER = ['collect', 'analyse', 'discover', 'personas', 'blueprint', 'strategy', 'plan', 'translate'];
 
 // Between the click and the orchestrator taking its lock there is a gap of a second or two (a new
 // process has to start). The route drops a marker file then, so the brand reads as running from

@@ -66,6 +66,6 @@ test('stale translations are signalled, the profile is localized for the report,
 
 test('model-cost Japan modules refuse a refresh for any other market', () => {
   const src = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
-  assert.match(src, /\['translations', 'site_blueprint', 'marketplace', 'jp_demand'\]\.includes\(moduleName\)/);
+  assert.match(src, /\['translations', 'site_blueprint', 'marketplace', 'jp_demand', 'tech_stack', 'par_matrix', 'niche_candidates', 'strategy_360'\]\.includes\(moduleName\)/);
   assert.match(src, /only available for Japan-market brands/);
 });

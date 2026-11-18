@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
 import { auth } from './auth.jsx'
 import { BlueprintPanel, VerifyFirstPanel, BenchmarkNotice, BlueprintMissing } from './SiteBlueprint.jsx'
+import { Strategy360Panel, Strategy360Missing } from './Strategy360.jsx'
+import { TierPlayers, ParMatrix, NicheApprovals, TechStackTable, SocialDepth } from './Jp360Panels.jsx'
 import { useT as useTr, tFor, tEnum, fmt, LangContext, useLang } from './i18n.js'
 
 const API = '/api'
@@ -81,6 +83,23 @@ function useModuleFetch() {
     }
     return res.json()
   }, [lang, onTranslationsHeader])
+}
+
+// Optional Japan 360 module: undefined while loading, null when not generated
+// (a 404 body or an error), else the data. Non-Japan brands never fetch.
+function useOptionalModule(slug, module, enabled, dataVersion, valid = d => !!d) {
+  const getModule = useModuleFetch()
+  const [val, setVal] = useState(undefined)
+  useEffect(() => {
+    if (!slug || !enabled) { setVal(undefined); return }
+    let live = true
+    getModule(slug, module)
+      .then(d => { if (live) setVal(d && !d.error && valid(d) ? d : null) })
+      .catch(() => { if (live) setVal(null) })
+    return () => { live = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, module, enabled, dataVersion, getModule])
+  return val
 }
 
 const TABS = [
@@ -493,8 +512,10 @@ function BrandProfileTab({ slug, onRefresh, running }) {
     onRefresh('social_intelligence')
   }
 
-  async function removeCompetitor(url) {
-    const updated = { ...form, identifiedCompetitors: (form.identifiedCompetitors || []).filter(c => c.url !== url) }
+  // Remove by position: approved niche players can share url null, so a url
+  // filter would remove every url-less player at once.
+  async function removeCompetitor(idx) {
+    const updated = { ...form, identifiedCompetitors: (form.identifiedCompetitors || []).filter((_, i) => i !== idx) }
     setForm(updated)
     await fetch(`${API}/brands/${slug}/profile`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) })
     setData(updated)
@@ -620,7 +641,7 @@ function BrandProfileTab({ slug, onRefresh, running }) {
                     <input value={c.facebookHandle || ''} onChange={e => update('facebookHandle', e.target.value)} placeholder={t('page handle')} style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
                   </td>
                   <td style={{ padding: '10px 12px' }}>
-                    <button onClick={() => removeCompetitor(c.url)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: ink(T, '#ef4444'), cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>✕</button>
+                    <button onClick={() => removeCompetitor(idx)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: ink(T, '#ef4444'), cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>✕</button>
                   </td>
                 </tr>
               )})}
@@ -738,11 +759,21 @@ function BrandProfileTab({ slug, onRefresh, running }) {
 }
 
 // ─── Competitive Analysis Tab ───────────────────────────────────────────────────
-function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
+function CompetitiveTab({ slug, brand, onRefresh, running, dataVersion }) {
   const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const getModule = useModuleFetch()
+  const japan = isJapanBrand(brand, slug)
+  const par = useOptionalModule(slug, 'par_matrix', japan, dataVersion, d => Array.isArray(d.players))
+  const niche = useOptionalModule(slug, 'niche_candidates', japan, dataVersion, d => Array.isArray(d.candidates))
+  const jp360 = japan ? (
+    <>
+      {par && <TierPlayers T={T} players={par.players} />}
+      {par && <ParMatrix T={T} data={par} />}
+      {niche && <NicheApprovals T={T} slug={slug} data={niche} api={API} />}
+    </>
+  ) : null
 
   useEffect(() => {
     if (!slug) return
@@ -751,7 +782,7 @@ function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
     return () => { live = false }
   }, [slug, dataVersion, getModule])
 
-  if (!data) return <EmptyState message={t('Competitive analysis not yet generated.')} cta={t('Run Competitive Analysis')} onCta={() => onRefresh('competitive_analysis')} />
+  if (!data) return <div>{jp360}<EmptyState message={t('Competitive analysis not yet generated.')} cta={t('Run Competitive Analysis')} onCta={() => onRefresh('competitive_analysis')} /></div>
 
   const pricingColors = { budget: 'green', mid: 'blue', premium: 'purple', luxury: 'red' }
 
@@ -762,6 +793,8 @@ function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
         <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>{t('Competitive Analysis')}</h2>
         <RefreshButton onClick={() => onRefresh('competitive_analysis')} loading={running} />
       </div>
+
+      {jp360}
 
       {data.positioningMap?.narrative && (
         <Card style={{ marginBottom: 24 }}>
@@ -987,7 +1020,7 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
 }
 
 // ─── Social Audit Tab ───────────────────────────────────────────────────────────
-function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
+function SocialAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
   const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
@@ -1124,6 +1157,8 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
         </div>
         <RefreshButton onClick={() => onRefresh('social_intelligence')} loading={running} />
       </div>
+
+      {isJapanBrand(brand, slug) && <SocialDepth T={T} data={data} />}
 
       {/* ── Section 1: 3 KPI cards ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 28 }}>
@@ -1329,6 +1364,7 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
   // undefined = still loading, null = not generated.
   const [blueprint, setBlueprint] = useState(undefined)
   const japan = isJapanBrand(brand, slug)
+  const tech = useOptionalModule(slug, 'tech_stack', japan, dataVersion, d => Array.isArray(d.players))
   useEffect(() => {
     if (!slug || !japan) return
     let live = true
@@ -1344,10 +1380,12 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
       <VerifyFirstPanel key={slug} T={T} slug={slug} items={blueprint.verifyFirst} />
     </>
   )
+  const techBlock = japan && tech ? <TechStackTable T={T} data={tech} /> : null
 
   if (!data) return (
     <div>
       {blueprintBlock}
+      {techBlock}
       <EmptyState message={t('Website audit not yet generated.')} cta={t('Run Website Audit')} onCta={() => onRefresh('site_intelligence')} />
     </div>
   )
@@ -1372,6 +1410,7 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
       {/* The blueprint carries its own "not observed" banner; the page notice only stands in when there is no blueprint. */}
       {benchmark && (!japan || blueprint === null) && <BenchmarkNotice T={T} note={data.auditNote} />}
       {blueprintBlock}
+      {techBlock}
 
       {lh?.scores && !benchmark && (
         <Card style={{ marginBottom: 24 }}>
@@ -2274,6 +2313,9 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
   const seoUnobserved = siteBenchmark || seoOwn?.skipped === true || seoOwn?.blocked === true || seoData?.sitemapAnalysis?.skipped === true
   const seoLebanon = isLebanonBrand(brand, slug)
   const dark = T.bg === DARK_T.bg
+  const japan360 = isJapanBrand(brand, slug)
+  const s360 = useOptionalModule(slug, 'strategy_360', japan360, dataVersion, d => !!(d.executiveSummary || d.positioningByTier))
+  const s360Block = !japan360 || s360 === undefined ? null : s360 === null ? <Strategy360Missing T={T} /> : <Strategy360Panel T={T} data={s360} />
 
   useEffect(() => {
     if (!slug) return
@@ -2322,7 +2364,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
     await navigator.clipboard.writeText(d.shareUrl).catch(() => {})
   }
 
-  if (!data) return <EmptyState message={t('Action plan not yet generated.')} cta={t('Generate Action Plan')} onCta={() => onRefresh('action_plan')} />
+  if (!data) return <div>{s360Block}<EmptyState message={t('Action plan not yet generated.')} cta={t('Generate Action Plan')} onCta={() => onRefresh('action_plan')} /></div>
 
   const moduleSourceColors = { competitive: 'purple', social: 'blue', website: 'yellow', search: 'green', personas: 'red' }
 
@@ -2459,6 +2501,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
   return (
     <div style={{ maxWidth: 860, margin: '0 auto' }}>
       {running && <RunningBanner moduleLabel={t('Action Plan')} detail={t('Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes.')} />}
+      {s360Block}
 
       {/* ── COVER HEADER ── */}
       <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '28px 32px', marginBottom: 8 }}>
@@ -3461,9 +3504,9 @@ export default function App() {
             <PortfolioTab brands={brands} onSelectBrand={selectBrand} onAddBrand={() => setShowAddBrand(true)} onRefresh={handleRefreshAll} />
           )}
           {tab === 'profile' && activeBrand && <BrandProfileTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!(refreshingAt['competitive_analysis'] || refreshingAt['site_intelligence'] || refreshingAt['social_intelligence'])} />}
-          {tab === 'competitive' && activeBrand && <CompetitiveTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['competitive_analysis']} dataVersion={moduleVersions['competitive_analysis'] || 0} />}
+          {tab === 'competitive' && activeBrand && <CompetitiveTab slug={activeBrand} brand={activeBrandData} onRefresh={handleRefreshModule} running={!!refreshingAt['competitive_analysis']} dataVersion={moduleVersions['competitive_analysis'] || 0} />}
           {tab === 'personas' && activeBrand && <PersonasTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['personas']} dataVersion={moduleVersions['personas'] || 0} />}
-          {tab === 'social' && activeBrand && <SocialAuditTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['social_intelligence']} dataVersion={moduleVersions['social_intelligence'] || 0} />}
+          {tab === 'social' && activeBrand && <SocialAuditTab slug={activeBrand} brand={activeBrandData} onRefresh={handleRefreshModule} running={!!refreshingAt['social_intelligence']} dataVersion={moduleVersions['social_intelligence'] || 0} />}
           {tab === 'website' && activeBrand && <WebsiteAuditTab slug={activeBrand} brand={activeBrandData} onRefresh={handleRefreshModule} running={!!refreshingAt['site_intelligence']} dataVersion={moduleVersions['site_intelligence'] || 0} />}
           {tab === 'search' && activeBrand && <SearchSeoTab slug={activeBrand} onRefresh={handleRefreshModule} running={!!refreshingAt['search_seo']} dataVersion={moduleVersions['search_seo'] || 0} />}
           {tab === 'action' && activeBrand && <ActionPlanTab slug={activeBrand} brand={activeBrandData} brandName={activeBrandData?.name} onRefresh={handleRefreshModule} running={!!refreshingAt['action_plan']} dataVersion={moduleVersions['action_plan'] || 0} pdfMode={pdfMode} />}

@@ -1,79 +1,83 @@
 [
  {
   "text": "\"Arts & Crafts Toys Lebanon | Toys R Us\"",
-  "at": "App.jsx:2969"
+  "at": "App.jsx:3012"
  },
  {
   "text": "\"Arts & Crafts Toys for Kids in Lebanon.\"",
-  "at": "App.jsx:2969"
+  "at": "App.jsx:3012"
  },
  {
   "text": "\"Lebanon's Favourite Toy Store - Thousands of Toys for Every Age.\"",
-  "at": "App.jsx:3011"
+  "at": "App.jsx:3054"
  },
  {
   "text": "\"Lebanon's official Toys R Us - thousands of toys for every age, fast delivery across Lebanon. Shop LEGO, Barbie, Hot Wheels and more.\"",
-  "at": "App.jsx:2990"
+  "at": "App.jsx:3033"
  },
  {
   "text": "\"Shop [Category] toys in Lebanon at Toys R Us. Huge range, trusted brands, fast delivery.\"",
-  "at": "App.jsx:2990"
+  "at": "App.jsx:3033"
  },
  {
   "text": "\"Toys R Us Lebanon - Official Toy Store | Shop Online\"",
-  "at": "App.jsx:3011"
+  "at": "App.jsx:3054"
  },
  {
   "text": "\"Toys R Us\"",
-  "at": "App.jsx:3006"
+  "at": "App.jsx:3049"
  },
  {
   "text": "\"Toys for 6-year-olds\" is one of the highest-intent toy searches in every market. Parents and grandparents search by age - not by brand or category. Age-based landing pages (3–5, 6–8, 9–12, Teens) are how toy retailers capture this intent and rank for it on Google.",
-  "at": "App.jsx:2809"
+  "at": "App.jsx:2852"
  },
  {
   "text": "\"{h1}\" is a campaign headline, not a statement of what this page is. It will be replaced at the end of the promotion, so Google never gets a stable read on the page's subject. Make the H1 permanent, for example \"Toys, Games and Gifts for Every Age\", and run the seasonal message as an H2 or a banner above it.",
-  "at": "App.jsx:1631"
+  "at": "App.jsx:1670"
  },
  {
   "text": "\"{h1}\" is too thin to describe the page. Expand it to name the products and the audience, for example \"Toys and Games for Kids of Every Age\".",
-  "at": "App.jsx:1637"
+  "at": "App.jsx:1676"
  },
  {
   "text": "(none)",
-  "at": "App.jsx:2965"
+  "at": "App.jsx:3008"
+ },
+ {
+  "text": "(social {usd})",
+  "at": "Jp360Panels.jsx:354"
  },
  {
   "text": "+ Add",
-  "at": "App.jsx:633"
+  "at": "App.jsx:654"
  },
  {
   "text": "+ Add Brand",
-  "at": "App.jsx:3382"
+  "at": "App.jsx:3425"
  },
  {
   "text": "+ Suggest Adjacent",
-  "at": "App.jsx:906"
+  "at": "App.jsx:939"
  },
  {
   "text": "- available at {competitorsWithIt}",
-  "at": "App.jsx:2849"
+  "at": "App.jsx:2892"
  },
  {
   "text": "- title tags, H1s, structured content, age/occasion pages - is the fastest path to appearing in both Google results and AI-generated recommendations. The queries below show exactly where you're being mentioned (or missed) by AI agents today.",
-  "at": "App.jsx:2182"
+  "at": "App.jsx:2221"
  },
  {
   "text": ". This is a front-end change, not a platform migration.",
-  "at": "App.jsx:3011"
+  "at": "App.jsx:3054"
  },
  {
   "text": ". To Google, they look like identical pages. This means they compete against each other and none of them rank for anything.",
-  "at": "App.jsx:2965"
+  "at": "App.jsx:3008"
  },
  {
   "text": "1 day",
-  "at": "App.jsx:2483"
+  "at": "App.jsx:2526"
  },
  {
   "text": "1+ month",
@@ -85,243 +89,303 @@
  },
  {
   "text": "14 days",
-  "at": "App.jsx:2485"
+  "at": "App.jsx:2528"
  },
  {
   "text": "140–160 characters each.",
-  "at": "App.jsx:2990"
+  "at": "App.jsx:3033"
  },
  {
   "text": "30 days",
-  "at": "App.jsx:2486"
+  "at": "App.jsx:2529"
+ },
+ {
+  "text": "360 Strategy",
+  "at": "Strategy360.jsx:214"
+ },
+ {
+  "text": "360 Strategy not generated yet.",
+  "at": "Strategy360.jsx:357"
  },
  {
   "text": "7 days",
-  "at": "App.jsx:2484"
+  "at": "App.jsx:2527"
  },
  {
   "text": "A customer who lands on your website has already found you - but the site has to convert them. This section surfaces the specific gaps that are costing you sales today: missing customer segments, content your competitors have that you don't, and messaging that isn't landing.",
-  "at": "App.jsx:2746"
- },
- {
-  "text": "A sitemap tells Google which pages exist on your site. Yours has {totalUrls} URLs but zero product pages. That means Google may not know your product catalog exists at all. Every product page that's missing from the sitemap is a product that can't rank in search. It's also not referenced in your robots.txt, so Google has to discover it on its own rather than being told where to look.",
-  "at": "App.jsx:3027"
- },
- {
-  "text": "AI Queries",
-  "at": "App.jsx:1568"
- },
- {
-  "text": "AI Search Queries",
-  "at": "App.jsx:2450"
- },
- {
-  "text": "AI Search Visibility",
-  "at": "App.jsx:1720"
- },
- {
-  "text": "AI assistants like ChatGPT, Claude, and Google AI Overviews pull answers from pages that rank well in traditional search.",
-  "at": "App.jsx:2182"
- },
- {
-  "text": "Accessibility",
-  "at": "App.jsx:1385"
- },
- {
-  "text": "Action",
-  "at": "App.jsx:1088"
- },
- {
-  "text": "Action Plan",
-  "at": "App.jsx:2461"
- },
- {
-  "text": "Action Plan@@nav",
-  "at": "App.jsx:94"
- },
- {
-  "text": "Action plan not yet generated.",
-  "at": "App.jsx:2325"
- },
- {
-  "text": "Add Brand",
-  "at": "App.jsx:285"
- },
- {
-  "text": "Add a Gift Finder",
   "at": "App.jsx:2789"
  },
  {
+  "text": "A full refresh is running for this brand. Decide after it finishes.",
+  "at": "Jp360Panels.jsx:209"
+ },
+ {
+  "text": "A sitemap tells Google which pages exist on your site. Yours has {totalUrls} URLs but zero product pages. That means Google may not know your product catalog exists at all. Every product page that's missing from the sitemap is a product that can't rank in search. It's also not referenced in your robots.txt, so Google has to discover it on its own rather than being told where to look.",
+  "at": "App.jsx:3070"
+ },
+ {
+  "text": "AI Queries",
+  "at": "App.jsx:1607"
+ },
+ {
+  "text": "AI Search Queries",
+  "at": "App.jsx:2492"
+ },
+ {
+  "text": "AI Search Visibility",
+  "at": "App.jsx:1759"
+ },
+ {
+  "text": "AI assistants like ChatGPT, Claude, and Google AI Overviews pull answers from pages that rank well in traditional search.",
+  "at": "App.jsx:2221"
+ },
+ {
+  "text": "Accessibility",
+  "at": "App.jsx:1424"
+ },
+ {
+  "text": "Acquire",
+  "at": "Strategy360.jsx:190"
+ },
+ {
+  "text": "Action",
+  "at": "App.jsx:1121"
+ },
+ {
+  "text": "Action Plan",
+  "at": "App.jsx:2503"
+ },
+ {
+  "text": "Action Plan@@nav",
+  "at": "App.jsx:113"
+ },
+ {
+  "text": "Action plan not yet generated.",
+  "at": "App.jsx:2367"
+ },
+ {
+  "text": "Add Brand",
+  "at": "App.jsx:304"
+ },
+ {
+  "text": "Add a Gift Finder",
+  "at": "App.jsx:2832"
+ },
+ {
   "text": "Add a live-text H1 on or next to the hero that names what you sell and who it is for, and make the page title name the brand and the category. This is a front-end change, not a platform migration.",
-  "at": "App.jsx:3012"
+  "at": "App.jsx:3055"
  },
  {
   "text": "Add a live-text H1 overlaid on or adjacent to the hero:",
-  "at": "App.jsx:3011"
+  "at": "App.jsx:3054"
  },
  {
   "text": "Add an Infant & Toddler Category (0–2 Years)",
-  "at": "App.jsx:2773"
+  "at": "App.jsx:2816"
  },
  {
   "text": "Add these to your homepage headings, main category page titles, and meta descriptions. Each major category should have its own dedicated page optimized around these terms.",
-  "at": "App.jsx:2392"
+  "at": "App.jsx:2434"
  },
  {
   "text": "Adjacent Segments to Consider",
-  "at": "App.jsx:969"
+  "at": "App.jsx:1002"
+ },
+ {
+  "text": "Ads",
+  "at": "Strategy360.jsx:57"
  },
  {
   "text": "Age Group Keywords",
-  "at": "App.jsx:2396"
+  "at": "App.jsx:2438"
  },
  {
   "text": "Age Groups",
-  "at": "App.jsx:1563"
+  "at": "App.jsx:1602"
  },
  {
   "text": "All Brands",
-  "at": "App.jsx:3376"
+  "at": "App.jsx:3419"
  },
  {
   "text": "All Clusters",
-  "at": "App.jsx:2016"
+  "at": "App.jsx:2055"
  },
  {
   "text": "All signals passing",
-  "at": "App.jsx:1783"
+  "at": "App.jsx:1822"
  },
  {
   "text": "Always Do",
-  "at": "App.jsx:709"
+  "at": "App.jsx:730"
  },
  {
   "text": "Analysis",
-  "at": "App.jsx:518"
+  "at": "App.jsx:539"
+ },
+ {
+  "text": "Analytics",
+  "at": "Strategy360.jsx:51"
  },
  {
   "text": "Analyzing...",
-  "at": "App.jsx:906"
+  "at": "App.jsx:939"
+ },
+ {
+  "text": "Apify budget cap reached",
+  "at": "Jp360Panels.jsx:324"
+ },
+ {
+  "text": "Apify spend this run: {spent} of {cap} cap",
+  "at": "Jp360Panels.jsx:354"
+ },
+ {
+  "text": "App",
+  "at": "Jp360Panels.jsx:290"
+ },
+ {
+  "text": "Approve",
+  "at": "Jp360Panels.jsx:244"
+ },
+ {
+  "text": "Approved",
+  "at": "Jp360Panels.jsx:225"
  },
  {
   "text": "Ask about shopping habits, preferences, or brand reactions.",
-  "at": "App.jsx:947"
+  "at": "App.jsx:980"
  },
  {
   "text": "Ask your developer to regenerate the sitemap to include all product and category URLs, reference it in robots.txt and submit it in Google Search Console. This is a one-time configuration fix.",
-  "at": "App.jsx:3032"
+  "at": "App.jsx:3075"
  },
  {
   "text": "Ask your developer to regenerate the sitemap to include all product and category URLs, then add",
-  "at": "App.jsx:3031"
+  "at": "App.jsx:3074"
  },
  {
   "text": "Ask {name}...",
-  "at": "App.jsx:959"
+  "at": "App.jsx:992"
  },
  {
   "text": "Audience / Age Groups",
-  "at": "App.jsx:1507"
+  "at": "App.jsx:1546"
  },
  {
   "text": "Audit which competitors rank for each term, then create or improve pages that target those specific keywords. Even ranking on page 1 for 20% of these terms can meaningfully move your organic traffic.",
-  "at": "App.jsx:2446"
+  "at": "App.jsx:2488"
  },
  {
   "text": "Average engagement per post across competitors - shows the level of audience activity you're entering",
-  "at": "App.jsx:2667"
+  "at": "App.jsx:2710"
  },
  {
   "text": "Avg engagement per post by channel - click any handle to view the account",
-  "at": "App.jsx:1167"
+  "at": "App.jsx:1202"
  },
  {
   "text": "Based on 6 on-page signals",
-  "at": "App.jsx:1778"
+  "at": "App.jsx:1817"
  },
  {
   "text": "Best Practices",
-  "at": "App.jsx:1386"
+  "at": "App.jsx:1425"
+ },
+ {
+  "text": "Best in class",
+  "at": "Strategy360.jsx:270"
  },
  {
   "text": "Best practices",
   "at": "SiteBlueprint.jsx:157"
  },
  {
+  "text": "Best-in-class e-commerce in Japan: where to win",
+  "at": "Strategy360.jsx:217"
+ },
+ {
   "text": "Brand",
-  "at": "App.jsx:1171"
+  "at": "App.jsx:1206"
  },
  {
   "text": "Brand Archetype",
-  "at": "App.jsx:551"
+  "at": "App.jsx:572"
  },
  {
   "text": "Brand Awareness",
-  "at": "App.jsx:1080"
+  "at": "App.jsx:1113"
  },
  {
   "text": "Brand Discovery",
-  "at": "App.jsx:208"
+  "at": "App.jsx:227"
  },
  {
   "text": "Brand Fit",
-  "at": "App.jsx:936"
+  "at": "App.jsx:969"
  },
  {
   "text": "Brand Guidelines",
-  "at": "App.jsx:648"
+  "at": "App.jsx:669"
  },
  {
   "text": "Brand Intelligence",
-  "at": "App.jsx:3365"
+  "at": "App.jsx:3408"
  },
  {
   "text": "Brand Intelligence Report",
-  "at": "App.jsx:2468"
+  "at": "App.jsx:2511"
  },
  {
   "text": "Brand Keywords",
-  "at": "App.jsx:2414"
+  "at": "App.jsx:2456"
  },
  {
   "text": "Brand Name",
-  "at": "App.jsx:534"
+  "at": "App.jsx:555"
  },
  {
   "text": "Brand Profile",
-  "at": "App.jsx:520"
+  "at": "App.jsx:541"
  },
  {
   "text": "Brand Profile@@nav",
-  "at": "App.jsx:88"
+  "at": "App.jsx:107"
  },
  {
   "text": "Brand Voice",
-  "at": "App.jsx:677"
+  "at": "App.jsx:698"
  },
  {
   "text": "Brand fit:",
-  "at": "App.jsx:2599"
+  "at": "App.jsx:2642"
  },
  {
   "text": "Brands / Lines",
-  "at": "App.jsx:1499"
+  "at": "App.jsx:1538"
+ },
+ {
+  "text": "Brands with social data",
+  "at": "Jp360Panels.jsx:353"
  },
  {
   "text": "Browse All Keywords",
-  "at": "App.jsx:2144"
+  "at": "App.jsx:2183"
+ },
+ {
+  "text": "Budget cap reached.",
+  "at": "Jp360Panels.jsx:357"
  },
  {
   "text": "Build Age-Based Landing Pages",
-  "at": "App.jsx:2805"
+  "at": "App.jsx:2848"
  },
  {
   "text": "Build a landing page per key occasion, such as christmas toys or birthday gifts by age, and keep the URL live year-round so it accrues authority. Update hero banners 2 to 3 weeks before each occasion.",
-  "at": "App.jsx:2410"
+  "at": "App.jsx:2452"
  },
  {
   "text": "Build a simple Gift Finder page with 3 filters: age bracket, interest category, and price range. It can be as simple as a filtered product grid. Add it to main navigation. This is the single highest-converting page type in toy retail: it captures intent at the exact moment of purchase decision.",
-  "at": "App.jsx:2797"
+  "at": "App.jsx:2840"
  },
  {
   "text": "Built from {value}.",
@@ -329,131 +393,175 @@
  },
  {
   "text": "CRITICAL",
-  "at": "App.jsx:2960"
+  "at": "App.jsx:3003"
+ },
+ {
+  "text": "CRM",
+  "at": "Strategy360.jsx:53"
+ },
+ {
+  "text": "CRM, chat, loyalty",
+  "at": "Jp360Panels.jsx:290"
  },
  {
   "text": "CTA Effectiveness",
-  "at": "App.jsx:1485"
+  "at": "App.jsx:1524"
+ },
+ {
+  "text": "Cadence",
+  "at": "Jp360Panels.jsx:387"
  },
  {
   "text": "Campaign Tentpoles",
-  "at": "App.jsx:693"
+  "at": "App.jsx:714"
  },
  {
   "text": "Can Win",
-  "at": "App.jsx:1270"
+  "at": "App.jsx:1305"
  },
  {
   "text": "Cancel",
-  "at": "App.jsx:304"
+  "at": "App.jsx:323"
  },
  {
   "text": "Canonical Tag",
-  "at": "App.jsx:1645"
+  "at": "App.jsx:1684"
+ },
+ {
+  "text": "Capabilities most players offer that we have not been seen offering. Confirm before acting.",
+  "at": "Strategy360.jsx:325"
+ },
+ {
+  "text": "Capability",
+  "at": "Strategy360.jsx:326"
  },
  {
   "text": "Categories",
-  "at": "App.jsx:1562"
+  "at": "App.jsx:1601"
  },
  {
   "text": "Categories competitors give a clear place in their navigation. Your own site was not observed, so check which of these it already has.",
-  "at": "App.jsx:2842"
+  "at": "App.jsx:2885"
  },
  {
   "text": "Category",
-  "at": "App.jsx:2231"
+  "at": "App.jsx:2270"
  },
  {
   "text": "Category Keywords",
-  "at": "App.jsx:2387"
+  "at": "App.jsx:2429"
  },
  {
   "text": "Category pages can use a template:",
-  "at": "App.jsx:2990"
+  "at": "App.jsx:3033"
+ },
+ {
+  "text": "Channel",
+  "at": "Strategy360.jsx:270"
+ },
+ {
+  "text": "Channel map",
+  "at": "Strategy360.jsx:269"
  },
  {
   "text": "Chapter 1",
-  "at": "App.jsx:2524"
+  "at": "App.jsx:2567"
  },
  {
   "text": "Chapter 2",
-  "at": "App.jsx:2608"
+  "at": "App.jsx:2651"
  },
  {
   "text": "Chapter 3",
-  "at": "App.jsx:2656"
+  "at": "App.jsx:2699"
  },
  {
   "text": "Chapter 4",
-  "at": "App.jsx:2739"
+  "at": "App.jsx:2782"
  },
  {
   "text": "Chapter 5",
-  "at": "App.jsx:2915"
+  "at": "App.jsx:2958"
+ },
+ {
+  "text": "Character brand",
+  "at": "Jp360Panels.jsx:28"
+ },
+ {
+  "text": "Chat",
+  "at": "Strategy360.jsx:55"
  },
  {
   "text": "Chat with {name}",
-  "at": "App.jsx:946"
+  "at": "App.jsx:979"
  },
  {
   "text": "Close",
-  "at": "App.jsx:338"
+  "at": "App.jsx:357"
+ },
+ {
+  "text": "Collectibles",
+  "at": "Jp360Panels.jsx:30"
  },
  {
   "text": "Combined",
-  "at": "App.jsx:2201"
+  "at": "App.jsx:2240"
  },
  {
   "text": "Competitive",
-  "at": "App.jsx:2342"
+  "at": "App.jsx:2384"
  },
  {
   "text": "Competitive Analysis",
-  "at": "App.jsx:760"
+  "at": "App.jsx:791"
  },
  {
   "text": "Competitive Presence",
-  "at": "App.jsx:1166"
+  "at": "App.jsx:1201"
  },
  {
   "text": "Competitive analysis not yet generated.",
-  "at": "App.jsx:754"
+  "at": "App.jsx:785"
  },
  {
   "text": "Competitor",
-  "at": "App.jsx:591"
+  "at": "App.jsx:612"
  },
  {
   "text": "Competitor Engagement - What the Bar Looks Like",
-  "at": "App.jsx:2666"
+  "at": "App.jsx:2709"
  },
  {
   "text": "Competitor Gap Keywords",
-  "at": "App.jsx:2441"
+  "at": "App.jsx:2483"
  },
  {
   "text": "Competitor Posts Analyzed",
-  "at": "App.jsx:1156"
+  "at": "App.jsx:1191"
  },
  {
   "text": "Competitor SEO Comparison",
-  "at": "App.jsx:1910"
+  "at": "App.jsx:1949"
  },
  {
   "text": "Competitor example: {competitorExample}",
-  "at": "App.jsx:2831"
+  "at": "App.jsx:2874"
  },
  {
   "text": "Competitor name",
-  "at": "App.jsx:631"
+  "at": "App.jsx:652"
  },
  {
   "text": "Competitor scraping and analysis is running. Competitive, Website, and Social tabs will update when complete.",
-  "at": "App.jsx:518"
+  "at": "App.jsx:539"
  },
  {
   "text": "Competitors Also Mentioned",
-  "at": "App.jsx:2231"
+  "at": "App.jsx:2270"
+ },
+ {
+  "text": "Confirm",
+  "at": "Strategy360.jsx:30"
  },
  {
   "text": "Confirm these on the live site with the team that runs it. Each answer turns a recommendation into a finding.",
@@ -461,55 +569,63 @@
  },
  {
   "text": "Content Gap",
-  "at": "App.jsx:2112"
+  "at": "App.jsx:2151"
  },
  {
   "text": "Content Gaps",
-  "at": "App.jsx:1519"
+  "at": "App.jsx:1558"
  },
  {
   "text": "Content Gaps ({length})",
-  "at": "App.jsx:2018"
+  "at": "App.jsx:2057"
  },
  {
   "text": "Content gaps no competitor is filling",
-  "at": "App.jsx:2698"
+  "at": "App.jsx:2741"
  },
  {
   "text": "Content in Images",
-  "at": "App.jsx:1439"
+  "at": "App.jsx:1478"
  },
  {
   "text": "Content they engage with",
-  "at": "App.jsx:2583"
+  "at": "App.jsx:2626"
  },
  {
   "text": "Content to Create",
-  "at": "App.jsx:2033"
+  "at": "App.jsx:2072"
+ },
+ {
+  "text": "Convert",
+  "at": "Strategy360.jsx:191"
  },
  {
   "text": "Could not scrape",
-  "at": "App.jsx:1836"
+  "at": "App.jsx:1875"
  },
  {
   "text": "Could not scrape this page - it may be JavaScript-rendered or bot-protected. Search engines may see the same empty content.",
-  "at": "App.jsx:1842"
+  "at": "App.jsx:1881"
+ },
+ {
+  "text": "Coverage",
+  "at": "Jp360Panels.jsx:351"
  },
  {
   "text": "Crawler & AI Visibility",
-  "at": "App.jsx:1425"
+  "at": "App.jsx:1464"
  },
  {
   "text": "Create 4–5 static landing pages organized by age bracket, tagged with relevant SEO keywords. Cross-link from homepage and navigation. These pages compound over time, once indexed, they drive organic traffic indefinitely.",
-  "at": "App.jsx:2813"
+  "at": "App.jsx:2856"
  },
  {
   "text": "Create a dedicated \"Ages 0–2\" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities on Instagram. One page, immediate SEO lift, long-term customer acquisition.",
-  "at": "App.jsx:2781"
+  "at": "App.jsx:2824"
  },
  {
   "text": "Create age-based landing pages (e.g. \"Toys for 3-5 Year Olds\"). Add age ranges to product descriptions and category page copy. Competitors who do this consistently outrank stores that don't.",
-  "at": "App.jsx:2401"
+  "at": "App.jsx:2443"
  },
  {
   "text": "Critical",
@@ -517,123 +633,167 @@
  },
  {
   "text": "Critical: Your homepage hero is invisible to Google and AI",
-  "at": "App.jsx:2756"
+  "at": "App.jsx:2799"
  },
  {
   "text": "Current Value",
-  "at": "App.jsx:1796"
+  "at": "App.jsx:1835"
+ },
+ {
+  "text": "Current state",
+  "at": "Strategy360.jsx:270"
  },
  {
   "text": "Currently missing",
-  "at": "App.jsx:2830"
+  "at": "App.jsx:2873"
  },
  {
   "text": "Customer Personas",
-  "at": "App.jsx:902"
+  "at": "App.jsx:935"
  },
  {
   "text": "Data language",
-  "at": "App.jsx:3092"
+  "at": "App.jsx:3135"
  },
  {
   "text": "Data not yet generated for this section. Run the analysis to populate.",
-  "at": "App.jsx:2353"
+  "at": "App.jsx:2395"
+ },
+ {
+  "text": "Decided",
+  "at": "Jp360Panels.jsx:252"
+ },
+ {
+  "text": "Direct-to-consumer brand",
+  "at": "Jp360Panels.jsx:27"
  },
  {
   "text": "Discovery",
-  "at": "App.jsx:1079"
+  "at": "App.jsx:1112"
  },
  {
   "text": "Dismiss report error",
-  "at": "App.jsx:3451"
+  "at": "App.jsx:3494"
+ },
+ {
+  "text": "Don Quijote is our partner: a channel, never a competitor. The shop-in-shop is planned, not open.",
+  "at": "Strategy360.jsx:303"
  },
  {
   "text": "Done",
-  "at": "App.jsx:327"
+  "at": "App.jsx:346"
  },
  {
   "text": "Download report",
-  "at": "App.jsx:3139"
+  "at": "App.jsx:3182"
  },
  {
   "text": "Download report ▾",
-  "at": "App.jsx:3136"
+  "at": "App.jsx:3179"
  },
  {
   "text": "Download the full report as a PDF",
-  "at": "App.jsx:3132"
+  "at": "App.jsx:3175"
+ },
+ {
+  "text": "Drive to store",
+  "at": "Strategy360.jsx:193"
  },
  {
   "text": "Drop your brand guidelines PDF here",
-  "at": "App.jsx:666"
+  "at": "App.jsx:687"
  },
  {
   "text": "Each category page needs a unique title and H1 that includes the category name and \"Lebanon.\" Example:",
-  "at": "App.jsx:2969"
+  "at": "App.jsx:3012"
  },
  {
   "text": "Each category page needs a unique title and H1 that includes the category name. This is a template change: one developer fix applies to all pages at once.",
-  "at": "App.jsx:2970"
+  "at": "App.jsx:3013"
  },
  {
   "text": "Each of these is a page or category that competitors with smaller budgets have already built - and that shoppers in your market are actively searching for.",
-  "at": "App.jsx:2766"
+  "at": "App.jsx:2809"
  },
  {
   "text": "Edit",
-  "at": "App.jsx:526"
+  "at": "App.jsx:547"
+ },
+ {
+  "text": "Educational",
+  "at": "Jp360Panels.jsx:29"
+ },
+ {
+  "text": "Engagement",
+  "at": "Jp360Panels.jsx:370"
+ },
+ {
+  "text": "Engagement is interactions per post as a percent of followers. A dash means it was not available.",
+  "at": "Jp360Panels.jsx:369"
  },
  {
   "text": "English",
-  "at": "App.jsx:3445"
+  "at": "App.jsx:3488"
  },
  {
   "text": "English PDF",
-  "at": "App.jsx:3108"
+  "at": "App.jsx:3151"
  },
  {
   "text": "Ensure every brand you carry has its own category page with the brand name in the title, H1, and URL. Add brand logos and descriptions. Cross-link between brand pages and product listings.",
-  "at": "App.jsx:2419"
+  "at": "App.jsx:2461"
  },
  {
   "text": "Ensure your brand name appears in the homepage title tag, H1, and meta description. Claim and fully complete your Google Business Profile. Keep your NAP (Name, Address, Phone) consistent across all platforms.",
-  "at": "App.jsx:2428"
+  "at": "App.jsx:2470"
  },
  {
   "text": "Enter the brand's website URL. We'll automatically discover the brand, identify competitors, and run the full analysis pipeline.",
-  "at": "App.jsx:289"
+  "at": "App.jsx:308"
  },
  {
   "text": "Every category page has the same title and H1 - Google sees them as duplicates",
-  "at": "App.jsx:2961"
+  "at": "App.jsx:3004"
  },
  {
   "text": "Every category page we checked has the same title tag:",
-  "at": "App.jsx:2965"
+  "at": "App.jsx:3008"
  },
  {
   "text": "Every decision in this report connects back to these customers. Understanding who they are - what they worry about, what drives them to buy, and where they spend their time - is the foundation for everything that follows.",
-  "at": "App.jsx:2526"
+  "at": "App.jsx:2569"
+ },
+ {
+  "text": "Every player we track, grouped by how they compete. The partner is shown on its own and never scored.",
+  "at": "Jp360Panels.jsx:76"
  },
  {
   "text": "Evidence",
   "at": "SiteBlueprint.jsx:63"
  },
  {
+  "text": "Evidence is thin",
+  "at": "Jp360Panels.jsx:382"
+ },
+ {
   "text": "Executive Summary",
-  "at": "App.jsx:2516"
+  "at": "App.jsx:2559"
+ },
+ {
+  "text": "Executive summary",
+  "at": "Strategy360.jsx:227"
  },
  {
   "text": "Existing pages to optimize",
-  "at": "App.jsx:2032"
+  "at": "App.jsx:2071"
  },
  {
   "text": "Facebook page handle",
-  "at": "App.jsx:566"
+  "at": "App.jsx:587"
  },
  {
   "text": "Fashion Goals",
-  "at": "App.jsx:926"
+  "at": "App.jsx:959"
  },
  {
   "text": "Fast",
@@ -641,123 +801,143 @@
  },
  {
   "text": "Finding the right gift is the #1 reason people visit a toy store. JouéClub Lebanon, The Toy Store LB, and Hamley's all have a Gift Finder in their navigation - a tool that filters by age, gender, and budget. Toys R Us Lebanon doesn't. Every shopper who arrives asking \"what should I buy for a 7-year-old?\" leaves to find an answer somewhere else.",
-  "at": "App.jsx:2793"
+  "at": "App.jsx:2836"
  },
  {
   "text": "Fix these and you build the foundation for both organic search and AI search at once. When ChatGPT, Google AI Overviews, or Claude answer \"best toy store in Lebanon,\" they pull from pages that already rank well in traditional search. The work is the same - do it once, win twice.",
-  "at": "App.jsx:2928"
+  "at": "App.jsx:2971"
  },
  {
   "text": "Fix these and you build the foundation for both organic search and AI search at once. When ChatGPT, Google AI Overviews, or Claude answer \"best toy store,\" they pull from pages that already rank well in traditional search. The work is the same: do it once, win twice.",
-  "at": "App.jsx:2937"
+  "at": "App.jsx:2980"
  },
  {
   "text": "Fix:",
-  "at": "App.jsx:2968"
+  "at": "App.jsx:3011"
  },
  {
   "text": "Fixing your SEO first",
-  "at": "App.jsx:2182"
+  "at": "App.jsx:2221"
+ },
+ {
+  "text": "Followers",
+  "at": "Jp360Panels.jsx:370"
+ },
+ {
+  "text": "Formats",
+  "at": "Jp360Panels.jsx:386"
  },
  {
   "text": "Found",
-  "at": "App.jsx:1882"
+  "at": "App.jsx:1921"
  },
  {
   "text": "Fresh",
-  "at": "App.jsx:117"
+  "at": "App.jsx:136"
  },
  {
   "text": "From an earlier run",
   "at": "SiteBlueprint.jsx:122"
  },
  {
+  "text": "Gacha",
+  "at": "Jp360Panels.jsx:31"
+ },
+ {
+  "text": "Gap",
+  "at": "Jp360Panels.jsx:144"
+ },
+ {
   "text": "Gap Terms",
-  "at": "App.jsx:1567"
+  "at": "App.jsx:1606"
+ },
+ {
+  "text": "Gap: most players offer it, we have not been seen offering it",
+  "at": "Jp360Panels.jsx:120"
  },
  {
   "text": "Generate Action Plan",
-  "at": "App.jsx:2325"
+  "at": "App.jsx:2367"
  },
  {
   "text": "Generate Personas",
-  "at": "App.jsx:896"
+  "at": "App.jsx:929"
  },
  {
   "text": "Generated {toLocaleDateString}",
-  "at": "App.jsx:2471"
+  "at": "App.jsx:2514"
  },
  {
   "text": "Generating PDF...",
-  "at": "App.jsx:2478"
+  "at": "App.jsx:2521"
  },
  {
   "text": "Generating keyword universe, scraping on-page SEO signals, and testing AI search visibility.",
-  "at": "App.jsx:1715"
+  "at": "App.jsx:1754"
  },
  {
   "text": "Generating personas from competitive, social, and site intelligence using Claude Opus.",
-  "at": "App.jsx:902"
+  "at": "App.jsx:935"
  },
  {
   "text": "Generating report…",
-  "at": "App.jsx:3136"
+  "at": "App.jsx:3179"
  },
  {
   "text": "Generating the",
-  "at": "App.jsx:3445"
+  "at": "App.jsx:3488"
  },
  {
   "text": "Gift-driven searches spike around birthdays, the holidays your market observes, and back to school. Someone searching \"birthday gift for 7 year old\" is ready to buy, so these convert well.",
-  "at": "App.jsx:2409"
+  "at": "App.jsx:2451"
  },
  {
   "text": "Go to Portfolio",
-  "at": "App.jsx:3481"
+  "at": "App.jsx:3524"
  },
  {
   "text": "H1 Heading",
-  "at": "App.jsx:1628"
+  "at": "App.jsx:1667"
  },
  {
   "text": "HIGH",
-  "at": "App.jsx:3001"
+  "at": "App.jsx:3044"
  },
  {
   "text": "Hero Headline",
-  "at": "App.jsx:1538"
+  "at": "App.jsx:1577"
  },
  {
   "text": "Hero text is",
-  "at": "App.jsx:1432"
+  "at": "App.jsx:1471"
  },
  {
   "text": "Hero text:",
-  "at": "App.jsx:1427"
+  "at": "App.jsx:1466"
  },
  {
   "text": "High",
-  "at": "i18n-core.js:41"
+  "at": "Strategy360.jsx:69"
  },
  {
   "text": "High Opportunity ({length})",
-  "at": "App.jsx:2019"
+  "at": "App.jsx:2058"
  },
  {
   "text": "High-value missed searches",
-  "at": "App.jsx:2034"
+  "at": "App.jsx:2073"
  },
  {
   "text": "High-value searches where your site has no matching page - each is a missed ranking opportunity.",
-  "at": "App.jsx:2049"
+  "at": "App.jsx:2088"
  },
  {
   "text": "Highest performing posts across all brands and channels",
-  "at": "App.jsx:1233"
+  "at": "App.jsx:1268"
  },
  {
   "text": "Highest-impact site improvements",
-  "at": "App.jsx:2893"
+  "at": "App.jsx:2936"
  },
  {
   "text": "Homepage",
@@ -765,27 +945,31 @@
  },
  {
   "text": "Homepage SEO Score",
-  "at": "App.jsx:1773"
+  "at": "App.jsx:1812"
  },
  {
   "text": "Homepage example:",
-  "at": "App.jsx:2990"
+  "at": "App.jsx:3033"
  },
  {
   "text": "Homepage first impression: what's working and what's not",
-  "at": "App.jsx:2860"
+  "at": "App.jsx:2903"
  },
  {
   "text": "Homepage hero text is baked into an image - invisible to Google",
-  "at": "App.jsx:3002"
+  "at": "App.jsx:3045"
  },
  {
   "text": "How long the share link stays alive",
-  "at": "App.jsx:2481"
+  "at": "App.jsx:2524"
  },
  {
   "text": "How they shop",
-  "at": "App.jsx:2574"
+  "at": "App.jsx:2617"
+ },
+ {
+  "text": "How they win",
+  "at": "Strategy360.jsx:241"
  },
  {
   "text": "How to apply",
@@ -793,19 +977,23 @@
  },
  {
   "text": "How to improve",
-  "at": "App.jsx:2207"
+  "at": "App.jsx:2246"
+ },
+ {
+  "text": "How to stand out from the marketplaces",
+  "at": "Strategy360.jsx:253"
  },
  {
   "text": "How to use these:",
-  "at": "App.jsx:3065"
+  "at": "App.jsx:3108"
  },
  {
   "text": "How:",
-  "at": "App.jsx:2780"
+  "at": "App.jsx:2823"
  },
  {
   "text": "Identified Competitors ({length})",
-  "at": "App.jsx:584"
+  "at": "App.jsx:605"
  },
  {
   "text": "If missing",
@@ -821,11 +1009,11 @@
  },
  {
   "text": "Industry",
-  "at": "App.jsx:534"
+  "at": "App.jsx:555"
  },
  {
   "text": "Industry unknown",
-  "at": "App.jsx:364"
+  "at": "App.jsx:383"
  },
  {
   "text": "Informed by a manual capture",
@@ -833,47 +1021,51 @@
  },
  {
   "text": "Inspired by:",
-  "at": "App.jsx:2729"
+  "at": "App.jsx:2772"
  },
  {
   "text": "Instagram Avg Engagement",
-  "at": "App.jsx:2674"
+  "at": "App.jsx:2717"
  },
  {
   "text": "Instagram handle",
-  "at": "App.jsx:564"
+  "at": "App.jsx:585"
  },
  {
   "text": "Invisible to crawlers - SEO risk",
-  "at": "App.jsx:1433"
+  "at": "App.jsx:1472"
  },
  {
   "text": "Issues to Fix",
-  "at": "App.jsx:1781"
+  "at": "App.jsx:1820"
+ },
+ {
+  "text": "It is built by Refresh all once the competitive, social and technology evidence is in.",
+  "at": "Strategy360.jsx:357"
  },
  {
   "text": "Japanese",
-  "at": "App.jsx:3445"
+  "at": "App.jsx:3488"
  },
  {
   "text": "Keyword Clusters by Opportunity",
-  "at": "App.jsx:2075"
+  "at": "App.jsx:2114"
  },
  {
   "text": "Keyword clusters identified",
-  "at": "App.jsx:2035"
+  "at": "App.jsx:2074"
  },
  {
   "text": "Keyword intelligence not yet generated. Re-run Search & SEO analysis to unlock opportunity clusters, content gaps, and ranked recommendations.",
-  "at": "App.jsx:2007"
+  "at": "App.jsx:2046"
  },
  {
   "text": "Keyword targets to go after once the foundation is fixed",
-  "at": "App.jsx:3043"
+  "at": "App.jsx:3086"
  },
  {
   "text": "Keywords{value}",
-  "at": "App.jsx:1720"
+  "at": "App.jsx:1759"
  },
  {
   "text": "Large",
@@ -881,67 +1073,87 @@
  },
  {
   "text": "Lifestyle",
-  "at": "App.jsx:926"
+  "at": "App.jsx:959"
  },
  {
   "text": "Lighthouse Technical Audit",
-  "at": "App.jsx:1379"
+  "at": "App.jsx:1418"
  },
  {
   "text": "Local",
-  "at": "App.jsx:1566"
- },
- {
-  "text": "Local Keywords",
-  "at": "App.jsx:2432"
- },
- {
-  "text": "Low",
-  "at": "i18n-core.js:41"
- },
- {
-  "text": "Market Leader",
-  "at": "App.jsx:1131"
- },
- {
-  "text": "Market Opportunity",
-  "at": "App.jsx:1142"
- },
- {
-  "text": "Medium",
-  "at": "i18n-core.js:41"
- },
- {
-  "text": "Medium speed - consider image compression and reducing JavaScript to improve rankings and reduce bounce rate.",
-  "at": "App.jsx:1665"
- },
- {
-  "text": "Mentioned?",
-  "at": "App.jsx:2231"
- },
- {
-  "text": "Messaging Gaps",
-  "at": "App.jsx:1474"
- },
- {
-  "text": "Messaging Pillars",
-  "at": "App.jsx:685"
- },
- {
-  "text": "Messaging moves that will set you apart",
-  "at": "App.jsx:2824"
- },
- {
-  "text": "Meta Description",
   "at": "App.jsx:1605"
  },
  {
+  "text": "Local Keywords",
+  "at": "App.jsx:2474"
+ },
+ {
+  "text": "Low",
+  "at": "Strategy360.jsx:71"
+ },
+ {
+  "text": "Loyalty",
+  "at": "Strategy360.jsx:56"
+ },
+ {
+  "text": "Maker",
+  "at": "Jp360Panels.jsx:26"
+ },
+ {
+  "text": "Market Leader",
+  "at": "App.jsx:1166"
+ },
+ {
+  "text": "Market Opportunity",
+  "at": "App.jsx:1177"
+ },
+ {
+  "text": "Marketplace",
+  "at": "Jp360Panels.jsx:43"
+ },
+ {
+  "text": "Marketplaces",
+  "at": "Strategy360.jsx:18"
+ },
+ {
+  "text": "Mass retail",
+  "at": "Strategy360.jsx:19"
+ },
+ {
+  "text": "Medium",
+  "at": "Strategy360.jsx:70"
+ },
+ {
+  "text": "Medium speed - consider image compression and reducing JavaScript to improve rankings and reduce bounce rate.",
+  "at": "App.jsx:1704"
+ },
+ {
+  "text": "Mentioned?",
+  "at": "App.jsx:2270"
+ },
+ {
+  "text": "Messaging Gaps",
+  "at": "App.jsx:1513"
+ },
+ {
+  "text": "Messaging Pillars",
+  "at": "App.jsx:706"
+ },
+ {
+  "text": "Messaging moves that will set you apart",
+  "at": "App.jsx:2867"
+ },
+ {
+  "text": "Meta Description",
+  "at": "App.jsx:1644"
+ },
+ {
   "text": "Missing",
-  "at": "App.jsx:1882"
+  "at": "App.jsx:1921"
  },
  {
   "text": "Missing Categories",
-  "at": "App.jsx:1460"
+  "at": "App.jsx:1499"
  },
  {
   "text": "Moderate",
@@ -949,15 +1161,23 @@
  },
  {
   "text": "Motivators",
-  "at": "App.jsx:926"
+  "at": "App.jsx:959"
+ },
+ {
+  "text": "Moves",
+  "at": "Strategy360.jsx:270"
+ },
+ {
+  "text": "Moves a marketplace cannot copy.",
+  "at": "Strategy360.jsx:253"
  },
  {
   "text": "Multi-Page SEO Analysis",
-  "at": "App.jsx:1820"
+  "at": "App.jsx:1859"
  },
  {
   "text": "Name your cities and suburbs on the homepage, contact page and any store pages. Set up Google Business Profile with accurate locations and hours. Publish content covering local delivery and collection options, local holidays and local pricing.",
-  "at": "App.jsx:2437"
+  "at": "App.jsx:2479"
  },
  {
   "text": "Navigation",
@@ -965,23 +1185,23 @@
  },
  {
   "text": "Navigation Analysis",
-  "at": "App.jsx:1448"
+  "at": "App.jsx:1487"
  },
  {
   "text": "Navigation Comparison",
-  "at": "App.jsx:1532"
+  "at": "App.jsx:1571"
  },
  {
   "text": "Navigation categories your competitors have that you don't",
-  "at": "App.jsx:2841"
+  "at": "App.jsx:2884"
  },
  {
   "text": "Needs Improvement",
-  "at": "App.jsx:1486"
+  "at": "App.jsx:1525"
  },
  {
   "text": "Needs Refresh",
-  "at": "App.jsx:117"
+  "at": "App.jsx:136"
  },
  {
   "text": "Needs improvement",
@@ -997,243 +1217,363 @@
  },
  {
   "text": "Never Do",
-  "at": "App.jsx:717"
+  "at": "App.jsx:738"
  },
  {
   "text": "Never Run",
-  "at": "App.jsx:117"
+  "at": "App.jsx:136"
  },
  {
   "text": "New pages needed",
-  "at": "App.jsx:2033"
+  "at": "App.jsx:2072"
  },
  {
   "text": "New-parent spending is at its peak in the 0–2 age window - strollers, bouncers, sensory toys, first books. Chez Les Petits, Wild Willy Toys, The Toy Store LB, Mumzworld, and FirstCry Lebanon all have dedicated Baby & Toddler sections. Toys R Us Lebanon doesn't - meaning you're ceding the highest-spending parent demographic to every competitor at once.",
-  "at": "App.jsx:2777"
+  "at": "App.jsx:2820"
+ },
+ {
+  "text": "Niche",
+  "at": "Strategy360.jsx:21"
+ },
+ {
+  "text": "Niche brands found in marketplace, search and social evidence. Approved ones join the next run; nothing is scanned until you approve it.",
+  "at": "Jp360Panels.jsx:228"
+ },
+ {
+  "text": "Niche candidates to review",
+  "at": "Jp360Panels.jsx:228"
+ },
+ {
+  "text": "Niche playbook",
+  "at": "Jp360Panels.jsx:413"
  },
  {
   "text": "No",
-  "at": "App.jsx:2241"
+  "at": "App.jsx:2280"
  },
  {
   "text": "No H1 heading. Every page should have one main headline naming its subject. Search engines lean on it to understand what the page is about, so leaving it out wastes the strongest on-page signal you own.",
-  "at": "App.jsx:1628"
+  "at": "App.jsx:1667"
  },
  {
   "text": "No Page",
-  "at": "App.jsx:2094"
- },
- {
-  "text": "No brands tracked yet. Add your first brand to begin the analysis pipeline.",
-  "at": "App.jsx:353"
- },
- {
-  "text": "No canonical tag - when Google finds the same product at multiple URLs (e.g. with filters or sorting applied), it splits your ranking power across duplicates. One line of code tells Google which version to credit.",
-  "at": "App.jsx:1645"
- },
- {
-  "text": "No clusters match this filter.",
   "at": "App.jsx:2133"
  },
  {
+  "text": "No brand account found",
+  "at": "Jp360Panels.jsx:336"
+ },
+ {
+  "text": "No brands tracked yet. Add your first brand to begin the analysis pipeline.",
+  "at": "App.jsx:372"
+ },
+ {
+  "text": "No canonical tag - when Google finds the same product at multiple URLs (e.g. with filters or sorting applied), it splits your ranking power across duplicates. One line of code tells Google which version to credit.",
+  "at": "App.jsx:1684"
+ },
+ {
+  "text": "No clusters match this filter.",
+  "at": "App.jsx:2172"
+ },
+ {
   "text": "No competitor data yet",
-  "at": "App.jsx:1152"
+  "at": "App.jsx:1187"
  },
  {
   "text": "No data yet",
-  "at": "App.jsx:1138"
+  "at": "App.jsx:1173"
+ },
+ {
+  "text": "No evidence was found on the pages read.",
+  "at": "Jp360Panels.jsx:176"
  },
  {
   "text": "No meta description - this is the text snippet under your link in Google results. Without it, Google picks random body text, which looks unprofessional and gets fewer clicks. Write 140–160 characters that make people want to visit.",
-  "at": "App.jsx:1605"
+  "at": "App.jsx:1644"
  },
  {
   "text": "No meta descriptions on any page - Google writes your search snippet for you",
-  "at": "App.jsx:2982"
+  "at": "App.jsx:3025"
+ },
+ {
+  "text": "No posts read",
+  "at": "Jp360Panels.jsx:333"
  },
  {
   "text": "No score: your site was not observed",
-  "at": "App.jsx:1741"
+  "at": "App.jsx:1780"
  },
  {
   "text": "No sections assigned yet",
-  "at": "App.jsx:164"
+  "at": "App.jsx:183"
  },
  {
   "text": "No structured data - adding product and organization markup helps Google display star ratings, prices, and breadcrumbs directly in search results, increasing click-through rate without any extra ad spend.",
-  "at": "App.jsx:1653"
+  "at": "App.jsx:1692"
  },
  {
   "text": "No terms in this category yet.",
-  "at": "App.jsx:2168"
+  "at": "App.jsx:2207"
  },
  {
   "text": "No title tag at all - this is the headline Google shows in search results. Without it Google guesses, often using random text. Add a 50–60 character title describing what you sell and where.",
-  "at": "App.jsx:1577"
+  "at": "App.jsx:1616"
  },
  {
   "text": "None",
-  "at": "App.jsx:1653"
+  "at": "App.jsx:1692"
  },
  {
   "text": "Not checked",
-  "at": "App.jsx:1881"
+  "at": "App.jsx:1920"
+ },
+ {
+  "text": "Not evidenced",
+  "at": "Strategy360.jsx:31"
  },
  {
   "text": "Not found",
-  "at": "App.jsx:1947"
+  "at": "App.jsx:1986"
  },
  {
   "text": "Not observed",
-  "at": "App.jsx:1515"
+  "at": "App.jsx:1554"
  },
  {
   "text": "Not observed in this run",
-  "at": "App.jsx:1427"
+  "at": "App.jsx:1466"
+ },
+ {
+  "text": "Not saved.",
+  "at": "Jp360Panels.jsx:229"
  },
  {
   "text": "Not set",
-  "at": "App.jsx:539"
+  "at": "App.jsx:560"
+ },
+ {
+  "text": "Nothing waiting for a decision.",
+  "at": "Jp360Panels.jsx:230"
+ },
+ {
+  "text": "Observed",
+  "at": "Strategy360.jsx:36"
  },
  {
   "text": "Observed on competitor sites",
-  "at": "App.jsx:2881"
+  "at": "App.jsx:2924"
  },
  {
   "text": "Occasion & Gift Keywords",
-  "at": "App.jsx:2405"
+  "at": "App.jsx:2447"
  },
  {
   "text": "Occasions",
-  "at": "App.jsx:1564"
+  "at": "App.jsx:1603"
  },
  {
   "text": "Occupation",
-  "at": "App.jsx:926"
+  "at": "App.jsx:959"
+ },
+ {
+  "text": "Offered",
+  "at": "Strategy360.jsx:35"
  },
  {
   "text": "On-Page SEO",
-  "at": "App.jsx:1720"
+  "at": "App.jsx:1759"
+ },
+ {
+  "text": "Online to store",
+  "at": "Strategy360.jsx:283"
  },
  {
   "text": "Only basic markup present - adding product schema lets Google show prices and availability directly in search results (\"rich results\"), which can significantly increase clicks compared to plain text results.",
-  "at": "App.jsx:1656"
+  "at": "App.jsx:1695"
  },
  {
   "text": "Open",
-  "at": "App.jsx:402"
+  "at": "App.jsx:421"
  },
  {
   "text": "Open Dashboard Now →",
-  "at": "App.jsx:336"
+  "at": "App.jsx:355"
  },
  {
   "text": "Opportunities",
-  "at": "App.jsx:814"
+  "at": "App.jsx:847"
  },
  {
   "text": "Opportunities ranked by impact on discovery, brand awareness, and site traffic",
-  "at": "App.jsx:1271"
+  "at": "App.jsx:1306"
  },
  {
   "text": "Opportunity 1",
-  "at": "App.jsx:2772"
+  "at": "App.jsx:2815"
  },
  {
   "text": "Opportunity 2",
-  "at": "App.jsx:2788"
+  "at": "App.jsx:2831"
  },
  {
   "text": "Opportunity 3",
-  "at": "App.jsx:2804"
+  "at": "App.jsx:2847"
  },
  {
   "text": "Original",
-  "at": "App.jsx:54"
+  "at": "App.jsx:56"
  },
  {
   "text": "Original language",
-  "at": "App.jsx:54"
+  "at": "App.jsx:56"
+ },
+ {
+  "text": "Other",
+  "at": "Jp360Panels.jsx:35"
+ },
+ {
+  "text": "Our status",
+  "at": "Strategy360.jsx:317"
  },
  {
   "text": "Overview",
-  "at": "App.jsx:2516"
+  "at": "App.jsx:2559"
  },
  {
   "text": "Page Speed",
-  "at": "App.jsx:1665"
+  "at": "App.jsx:1704"
  },
  {
   "text": "Page loads slowly - Google uses speed as a direct ranking factor, especially on mobile. Every second of delay loses roughly 7% of visitors before they even see your products.",
-  "at": "App.jsx:1665"
+  "at": "App.jsx:1704"
  },
  {
   "text": "Pain Points",
-  "at": "App.jsx:926"
+  "at": "App.jsx:959"
+ },
+ {
+  "text": "Par gaps",
+  "at": "Strategy360.jsx:325"
+ },
+ {
+  "text": "Par matrix",
+  "at": "Jp360Panels.jsx:117"
+ },
+ {
+  "text": "Par share",
+  "at": "Jp360Panels.jsx:127"
  },
  {
   "text": "Parents shop by age. \"Toys for 3 year olds\" and \"gifts for 8 year old\" are among the most common toy searches - parents want to know something is right for their child's stage.",
-  "at": "App.jsx:2400"
+  "at": "App.jsx:2442"
+ },
+ {
+  "text": "Partner",
+  "at": "Strategy360.jsx:22"
+ },
+ {
+  "text": "Partner play on social",
+  "at": "Jp360Panels.jsx:427"
+ },
+ {
+  "text": "Partner play: Don Quijote",
+  "at": "Strategy360.jsx:303"
+ },
+ {
+  "text": "Partner, not a competitor",
+  "at": "Jp360Panels.jsx:87"
+ },
+ {
+  "text": "Payments",
+  "at": "Strategy360.jsx:50"
  },
  {
   "text": "Performance",
-  "at": "App.jsx:1384"
+  "at": "App.jsx:1423"
  },
  {
   "text": "Personas",
-  "at": "App.jsx:2346"
+  "at": "App.jsx:2388"
  },
  {
   "text": "Personas not yet generated.",
-  "at": "App.jsx:896"
+  "at": "App.jsx:929"
  },
  {
   "text": "Pick a brand to download its report",
-  "at": "App.jsx:3132"
+  "at": "App.jsx:3175"
  },
  {
   "text": "Pipeline running...",
-  "at": "App.jsx:371"
+  "at": "App.jsx:390"
+ },
+ {
+  "text": "Platform",
+  "at": "Strategy360.jsx:58"
+ },
+ {
+  "text": "Platform metrics by brand",
+  "at": "Jp360Panels.jsx:369"
+ },
+ {
+  "text": "Platforms skipped or empty",
+  "at": "Jp360Panels.jsx:355"
+ },
+ {
+  "text": "Player",
+  "at": "Jp360Panels.jsx:290"
+ },
+ {
+  "text": "Players by tier",
+  "at": "Jp360Panels.jsx:76"
  },
  {
   "text": "Portfolio",
-  "at": "App.jsx:3390"
+  "at": "App.jsx:3433"
  },
  {
   "text": "Positioning",
-  "at": "App.jsx:544"
+  "at": "App.jsx:565"
  },
  {
   "text": "Positioning Landscape",
-  "at": "App.jsx:768"
+  "at": "App.jsx:801"
+ },
+ {
+  "text": "Positioning by tier",
+  "at": "Strategy360.jsx:234"
  },
  {
   "text": "Positive",
   "at": "i18n-core.js:41"
  },
  {
+  "text": "Posts per week",
+  "at": "Jp360Panels.jsx:370"
+ },
+ {
   "text": "Price Visibility",
-  "at": "App.jsx:1514"
+  "at": "App.jsx:1553"
  },
  {
   "text": "Priority Actions",
-  "at": "App.jsx:1750"
+  "at": "App.jsx:1789"
  },
  {
   "text": "Processed from your style guide PDF - informs all audit recommendations.",
-  "at": "App.jsx:649"
+  "at": "App.jsx:670"
  },
  {
   "text": "Processed from {sourceFile} on {toLocaleDateString}",
-  "at": "App.jsx:732"
+  "at": "App.jsx:753"
  },
  {
   "text": "Processing…",
-  "at": "App.jsx:652"
+  "at": "App.jsx:673"
  },
  {
   "text": "Product Content Review",
-  "at": "App.jsx:1495"
+  "at": "App.jsx:1534"
  },
  {
   "text": "Product and category pages",
@@ -1241,43 +1581,47 @@
  },
  {
   "text": "Query",
-  "at": "App.jsx:2231"
+  "at": "App.jsx:2270"
  },
  {
   "text": "Query-by-Query AI Mention Audit",
-  "at": "App.jsx:2217"
+  "at": "App.jsx:2256"
+ },
+ {
+  "text": "Questions for the client team to confirm",
+  "at": "Strategy360.jsx:347"
  },
  {
   "text": "Quick Win",
-  "at": "App.jsx:2093"
+  "at": "App.jsx:2132"
  },
  {
   "text": "Quick Wins",
-  "at": "App.jsx:2032"
+  "at": "App.jsx:2071"
  },
  {
   "text": "Quick Wins ({length})",
-  "at": "App.jsx:2017"
+  "at": "App.jsx:2056"
  },
  {
   "text": "Ranked by business impact across all SEO signals - homepage, category pages, product pages, sitemap, and competitor comparison.",
-  "at": "App.jsx:1751"
+  "at": "App.jsx:1790"
  },
  {
   "text": "Ranked by potential to increase traffic and conversions.",
-  "at": "App.jsx:2894"
+  "at": "App.jsx:2937"
  },
  {
   "text": "Re-discover",
-  "at": "App.jsx:527"
+  "at": "App.jsx:548"
  },
  {
   "text": "Real examples from your competitors showing what better SEO looks like - and what it costs you to fall behind.",
-  "at": "App.jsx:1963"
+  "at": "App.jsx:2002"
  },
  {
   "text": "Recommendation",
-  "at": "App.jsx:1847"
+  "at": "App.jsx:1886"
  },
  {
   "text": "Recommendations, not findings.",
@@ -1285,79 +1629,103 @@
  },
  {
   "text": "Recommended Action",
-  "at": "App.jsx:2116"
+  "at": "App.jsx:2155"
  },
  {
   "text": "Recommended categories",
-  "at": "App.jsx:1460"
+  "at": "App.jsx:1499"
  },
  {
   "text": "Recommended messaging",
-  "at": "App.jsx:1474"
+  "at": "App.jsx:1513"
  },
  {
   "text": "Recommended messaging moves",
-  "at": "App.jsx:2824"
+  "at": "App.jsx:2867"
  },
  {
   "text": "Recommended navigation categories",
-  "at": "App.jsx:2841"
+  "at": "App.jsx:2884"
  },
  {
   "text": "Recommended opportunities",
-  "at": "App.jsx:1406"
+  "at": "App.jsx:1445"
  },
  {
   "text": "Recommended site improvements",
-  "at": "App.jsx:2893"
+  "at": "App.jsx:2936"
  },
  {
   "text": "Refresh",
-  "at": "App.jsx:183"
+  "at": "App.jsx:202"
  },
  {
   "text": "Regenerate",
-  "at": "App.jsx:2491"
+  "at": "App.jsx:2534"
+ },
+ {
+  "text": "Reject",
+  "at": "Jp360Panels.jsx:245"
+ },
+ {
+  "text": "Rejected",
+  "at": "Jp360Panels.jsx:225"
  },
  {
   "text": "Report date: {toLocaleDateString}",
-  "at": "App.jsx:2472"
+  "at": "App.jsx:2515"
  },
  {
   "text": "Report download failed.",
-  "at": "App.jsx:3219"
+  "at": "App.jsx:3262"
  },
  {
   "text": "Reprocess",
-  "at": "App.jsx:652"
+  "at": "App.jsx:673"
+ },
+ {
+  "text": "Retain",
+  "at": "Strategy360.jsx:192"
+ },
+ {
+  "text": "Reviews",
+  "at": "Strategy360.jsx:54"
+ },
+ {
+  "text": "Risks",
+  "at": "Strategy360.jsx:307"
  },
  {
   "text": "Roadmap",
   "at": "SiteBlueprint.jsx:169"
  },
  {
+  "text": "Role",
+  "at": "Strategy360.jsx:270"
+ },
+ {
   "text": "Run Competitive Analysis",
-  "at": "App.jsx:754"
+  "at": "App.jsx:785"
  },
  {
   "text": "Run Search & SEO Analysis",
-  "at": "App.jsx:1692"
+  "at": "App.jsx:1731"
  },
  {
   "text": "Run Social Audit",
-  "at": "App.jsx:1030"
+  "at": "App.jsx:1063"
  },
  {
   "text": "Run Website Audit",
-  "at": "App.jsx:1351"
+  "at": "App.jsx:1389"
  },
  {
   "text": "Running Analysis Pipeline",
-  "at": "App.jsx:285"
+  "at": "App.jsx:304"
  },
  {
   "text": "Running...",
-  "at": "App.jsx:188"
+  "at": "App.jsx:207"
  },
  {
   "text": "SEO and AI visibility",
@@ -1365,59 +1733,63 @@
  },
  {
   "text": "Save & Re-analyze",
-  "at": "App.jsx:523"
+  "at": "App.jsx:544"
  },
  {
   "text": "Save Changes",
-  "at": "App.jsx:524"
+  "at": "App.jsx:545"
  },
  {
   "text": "Saving...",
-  "at": "App.jsx:523"
+  "at": "App.jsx:544"
  },
  {
   "text": "Saving…",
-  "at": "App.jsx:585"
+  "at": "App.jsx:606"
  },
  {
   "text": "Schema",
-  "at": "App.jsx:1915"
+  "at": "App.jsx:1954"
  },
  {
   "text": "Schema Markup",
-  "at": "App.jsx:1653"
- },
- {
-  "text": "Score",
-  "at": "App.jsx:1796"
- },
- {
-  "text": "Scraping Instagram, TikTok, and Facebook for all brands...",
-  "at": "App.jsx:1108"
- },
- {
-  "text": "Scraping brand and competitor sites with screenshots, running Lighthouse, then analyzing with Claude vision.",
-  "at": "App.jsx:1366"
- },
- {
-  "text": "Scraping competitor sites and analyzing strengths, opportunities, and positioning with Claude.",
-  "at": "App.jsx:760"
- },
- {
-  "text": "Search & SEO",
-  "at": "App.jsx:1715"
- },
- {
-  "text": "Search & SEO - Your Biggest Untapped Growth Channel",
-  "at": "App.jsx:2915"
- },
- {
-  "text": "Search & SEO analysis not yet generated.",
   "at": "App.jsx:1692"
  },
  {
+  "text": "Score",
+  "at": "App.jsx:1835"
+ },
+ {
+  "text": "Scraping Instagram, TikTok, and Facebook for all brands...",
+  "at": "App.jsx:1141"
+ },
+ {
+  "text": "Scraping brand and competitor sites with screenshots, running Lighthouse, then analyzing with Claude vision.",
+  "at": "App.jsx:1404"
+ },
+ {
+  "text": "Scraping competitor sites and analyzing strengths, opportunities, and positioning with Claude.",
+  "at": "App.jsx:791"
+ },
+ {
+  "text": "Search",
+  "at": "Strategy360.jsx:52"
+ },
+ {
+  "text": "Search & SEO",
+  "at": "App.jsx:1754"
+ },
+ {
+  "text": "Search & SEO - Your Biggest Untapped Growth Channel",
+  "at": "App.jsx:2958"
+ },
+ {
+  "text": "Search & SEO analysis not yet generated.",
+  "at": "App.jsx:1731"
+ },
+ {
   "text": "Search & SEO@@nav",
-  "at": "App.jsx:93"
+  "at": "App.jsx:112"
  },
  {
   "text": "Search and discovery",
@@ -1425,11 +1797,11 @@
  },
  {
   "text": "Searches like \"toy store near me\", \"toy shop open now\" or a city name plus your category come from someone ready to buy today. Note that locals rarely add their own country to a search, so the terms that matter are \"near me\", delivery and collection phrasing, and city or suburb names.",
-  "at": "App.jsx:2436"
+  "at": "App.jsx:2478"
  },
  {
   "text": "Searches where people already know your name. These should be the easiest rankings to own - but if your website isn't properly optimized, competitors can appear above you for your own brand name.",
-  "at": "App.jsx:2427"
+  "at": "App.jsx:2469"
  },
  {
   "text": "Seasonal calendar",
@@ -1437,71 +1809,87 @@
  },
  {
   "text": "See how: {competitor}",
-  "at": "App.jsx:1280"
+  "at": "App.jsx:1315"
  },
  {
   "text": "Select a brand to view {tab}.",
-  "at": "App.jsx:3481"
+  "at": "App.jsx:3524"
  },
  {
   "text": "Select...",
-  "at": "App.jsx:554"
+  "at": "App.jsx:575"
  },
  {
   "text": "Send",
-  "at": "App.jsx:960"
+  "at": "App.jsx:993"
  },
  {
   "text": "Sentiment",
-  "at": "App.jsx:2231"
+  "at": "App.jsx:2270"
  },
  {
   "text": "Share Link",
-  "at": "App.jsx:2489"
+  "at": "App.jsx:2532"
  },
  {
   "text": "Share link copied:",
-  "at": "App.jsx:2497"
+  "at": "App.jsx:2540"
+ },
+ {
+  "text": "Share of players offering it",
+  "at": "Strategy360.jsx:326"
+ },
+ {
+  "text": "Shop",
+  "at": "Jp360Panels.jsx:32"
  },
  {
   "text": "Shoppers searching for a brand you stock, such as \"lego duplo\" or \"barbie dreamhouse\", are brand-loyal and high-intent. If your site is not optimized for the brand names you carry, you lose these customers to retailers who are.",
-  "at": "App.jsx:2418"
+  "at": "App.jsx:2460"
  },
  {
   "text": "Show data in {name}",
-  "at": "App.jsx:3096"
+  "at": "App.jsx:3139"
+ },
+ {
+  "text": "Show skipped platforms ({n})",
+  "at": "Jp360Panels.jsx:360"
  },
  {
   "text": "Sign out",
-  "at": "App.jsx:3412"
+  "at": "App.jsx:3455"
  },
  {
   "text": "Signal",
-  "at": "App.jsx:1796"
+  "at": "App.jsx:1835"
  },
  {
   "text": "Signed in as {email}. Use Sign out above to switch accounts.",
-  "at": "App.jsx:170"
+  "at": "App.jsx:189"
  },
  {
   "text": "Site Traffic",
-  "at": "App.jsx:1081"
+  "at": "App.jsx:1114"
  },
  {
   "text": "Site blocked our scan, so no signals were read. Nothing here counts for or against them.",
-  "at": "App.jsx:1941"
+  "at": "App.jsx:1980"
  },
  {
   "text": "Sitemap",
-  "at": "App.jsx:1879"
+  "at": "App.jsx:1918"
  },
  {
   "text": "Sitemap looks healthy - all major URL types present and listed in robots.txt.",
-  "at": "App.jsx:1902"
+  "at": "App.jsx:1941"
  },
  {
   "text": "Sitemap: https://toysrus.com.lb/sitemap.xml",
-  "at": "App.jsx:3031"
+  "at": "App.jsx:3074"
+ },
+ {
+  "text": "Skipped: budget",
+  "at": "Jp360Panels.jsx:333"
  },
  {
   "text": "Slow",
@@ -1513,63 +1901,87 @@
  },
  {
   "text": "Social",
-  "at": "App.jsx:1135"
+  "at": "App.jsx:1170"
  },
  {
   "text": "Social Audit",
-  "at": "App.jsx:91"
+  "at": "App.jsx:110"
  },
  {
   "text": "Social Handles",
-  "at": "App.jsx:561"
+  "at": "App.jsx:582"
  },
  {
   "text": "Social Intelligence",
-  "at": "App.jsx:1122"
+  "at": "App.jsx:1155"
  },
  {
   "text": "Social Media - What's Working in This Market",
-  "at": "App.jsx:2656"
+  "at": "App.jsx:2699"
  },
  {
   "text": "Social Media Audit - Running",
-  "at": "App.jsx:1105"
+  "at": "App.jsx:1138"
  },
  {
   "text": "Social audit not yet generated.",
-  "at": "App.jsx:1030"
+  "at": "App.jsx:1063"
+ },
+ {
+  "text": "Social ideas with Don Quijote, our partner.",
+  "at": "Jp360Panels.jsx:427"
  },
  {
   "text": "Some text changed since the last translation and is shown untranslated.",
-  "at": "App.jsx:3442"
+  "at": "App.jsx:3485"
+ },
+ {
+  "text": "Specialty",
+  "at": "Strategy360.jsx:20"
+ },
+ {
+  "text": "Specialty store",
+  "at": "Jp360Panels.jsx:33"
  },
  {
   "text": "Specific moves - inspired by what's working for competitors - that are available to you right now.",
-  "at": "App.jsx:2720"
+  "at": "App.jsx:2763"
  },
  {
   "text": "Speed",
-  "at": "App.jsx:1915"
+  "at": "App.jsx:1954"
  },
  {
   "text": "Stale",
-  "at": "App.jsx:117"
+  "at": "App.jsx:136"
+ },
+ {
+  "text": "Stale.",
+  "at": "Strategy360.jsx:223"
+ },
+ {
+  "text": "Stand out from the marketplaces",
+  "at": "Jp360Panels.jsx:401"
  },
  {
   "text": "Start a conversation...",
-  "at": "App.jsx:950"
+  "at": "App.jsx:983"
  },
  {
   "text": "Starting discovery...",
-  "at": "App.jsx:302"
+  "at": "App.jsx:321"
+ },
+ {
+  "text": "Status",
+  "at": "Jp360Panels.jsx:370"
  },
  {
   "text": "Stops working on {toLocaleDateString}. Anyone with this link can read the full report until then.",
-  "at": "App.jsx:2499"
+  "at": "App.jsx:2542"
  },
  {
   "text": "Strengths",
-  "at": "App.jsx:808"
+  "at": "App.jsx:841"
  },
  {
   "text": "Strong",
@@ -1577,23 +1989,35 @@
  },
  {
   "text": "Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes.",
-  "at": "App.jsx:2461"
+  "at": "App.jsx:2503"
  },
  {
   "text": "Tactics to compete and win",
-  "at": "App.jsx:2719"
+  "at": "App.jsx:2762"
  },
  {
   "text": "Tagline",
-  "at": "App.jsx:534"
+  "at": "App.jsx:555"
  },
  {
   "text": "Target Audience",
-  "at": "App.jsx:701"
+  "at": "App.jsx:722"
+ },
+ {
+  "text": "Technology landscape",
+  "at": "Strategy360.jsx:314"
+ },
+ {
+  "text": "Technology stack",
+  "at": "Jp360Panels.jsx:283"
+ },
+ {
+  "text": "That decision was not accepted: {reason}",
+  "at": "Jp360Panels.jsx:210"
  },
  {
   "text": "The Competition - Who You're Up Against",
-  "at": "App.jsx:2608"
+  "at": "App.jsx:2651"
  },
  {
   "text": "The brand site was not observed, so this audit is built from competitor and market evidence.",
@@ -1604,12 +2028,28 @@
   "at": "SiteBlueprint.jsx:127"
  },
  {
+  "text": "The client's own site was not observed, so nothing here describes the current site. Anything marked Confirm needs the client team to check.",
+  "at": "Strategy360.jsx:221"
+ },
+ {
+  "text": "The decision could not be saved. Try again.",
+  "at": "Jp360Panels.jsx:211"
+ },
+ {
+  "text": "The last refresh failed, so this is the previous version of the strategy.",
+  "at": "Strategy360.jsx:223"
+ },
+ {
   "text": "The meta description is the 2-line preview text under your link in Google results. It's how you tell a searcher \"click here, not the competitor below you.\" Every page on your site - homepage, every category page - has a blank meta description. Google fills it in with random body text, which looks unprofessional and gets significantly fewer clicks.",
-  "at": "App.jsx:2986"
+  "at": "App.jsx:3029"
  },
  {
   "text": "The report took too long to generate. Try again in a minute.",
-  "at": "App.jsx:3218"
+  "at": "App.jsx:3261"
+ },
+ {
+  "text": "The run stopped paying for social scrapes at the cap; the rest are marked skipped.",
+  "at": "Jp360Panels.jsx:357"
  },
  {
   "text": "The website blueprint is generated at the end of a full refresh.",
@@ -1617,159 +2057,183 @@
  },
  {
   "text": "Their Value",
-  "at": "App.jsx:1975"
+  "at": "App.jsx:2014"
  },
  {
   "text": "These are suggested keyword clusters based on your product categories, age groups, and market. They don't have verified search volume behind them - treat them as a starting map, not a definitive list. A proper keyword audit with Google Search Console or a tool like Ahrefs will show you which ones have the most traffic.",
-  "at": "App.jsx:3045"
+  "at": "App.jsx:3088"
  },
  {
   "text": "These are terms your competitors currently rank for but you don't. Every search on this list is a customer you're losing right now. They represent the fastest path to incremental traffic.",
-  "at": "App.jsx:2445"
+  "at": "App.jsx:2487"
  },
  {
   "text": "These are the brands competing for the same customers described above. Understanding their positioning - what they stand for, where they're strong, and where they leave gaps - reveals exactly where you can differentiate.",
-  "at": "App.jsx:2610"
+  "at": "App.jsx:2653"
  },
  {
   "text": "These are the highest-opportunity keywords in your market. Shoppers who don't know which store to use type these - ranking here means reaching customers before your competitors do.",
-  "at": "App.jsx:2391"
+  "at": "App.jsx:2433"
  },
  {
   "text": "These are the questions people ask ChatGPT, Google AI Overview, and Perplexity when looking for toy recommendations. AI assistants are increasingly the first stop for shopping decisions - appearing in these answers builds brand awareness with buyers who haven't decided yet.",
-  "at": "App.jsx:2454"
+  "at": "App.jsx:2496"
  },
  {
   "text": "These are topics your customers want content about that nobody in this market is creating - first-mover advantage is available.",
-  "at": "App.jsx:2699"
+  "at": "App.jsx:2742"
  },
  {
   "text": "These are value messages your competitors are already communicating: adding them to your site is a fast, high-leverage way to increase trust and conversion.",
-  "at": "App.jsx:2825"
+  "at": "App.jsx:2868"
  },
  {
   "text": "These findings were built from a bot-block page in an earlier run and will be replaced by the next refresh.",
-  "at": "App.jsx:1743"
+  "at": "App.jsx:1782"
  },
  {
   "text": "These were verified by directly fetching your pages. Every issue below is real.",
-  "at": "App.jsx:2947"
+  "at": "App.jsx:2990"
+ },
+ {
+  "text": "Things only the client team can confirm. Each answer sharpens the plan.",
+  "at": "Strategy360.jsx:347"
  },
  {
   "text": "This is a template change - one developer fix applies to all pages at once.",
-  "at": "App.jsx:2969"
+  "at": "App.jsx:3012"
  },
  {
   "text": "This takes 8–12 minutes. You can close this window - the pipeline continues in the background.",
-  "at": "App.jsx:309"
+  "at": "App.jsx:328"
  },
  {
   "text": "This typically takes 2–5 minutes. Results will load automatically when complete.",
-  "at": "App.jsx:200"
+  "at": "App.jsx:219"
  },
  {
   "text": "Three revenue unlocks hiding in plain sight",
-  "at": "App.jsx:2764"
+  "at": "App.jsx:2807"
  },
  {
   "text": "TikTok Avg Engagement",
-  "at": "App.jsx:2675"
+  "at": "App.jsx:2718"
  },
  {
   "text": "TikTok handle",
-  "at": "App.jsx:565"
+  "at": "App.jsx:586"
  },
  {
   "text": "Title Tag",
-  "at": "App.jsx:1577"
+  "at": "App.jsx:1616"
  },
  {
   "text": "Title is too long ({length} chars) - Google cuts it off at around 60 characters in search results, hiding key info from shoppers",
-  "at": "App.jsx:1600"
+  "at": "App.jsx:1639"
  },
  {
   "text": "Title is too short ({length} chars) - aim for 50–60 characters that describe what you sell and where you operate",
-  "at": "App.jsx:1594"
+  "at": "App.jsx:1633"
  },
  {
   "text": "Too long ({length} chars) - Google will cut it off; trim to 160 characters",
-  "at": "App.jsx:1614"
+  "at": "App.jsx:1653"
  },
  {
   "text": "Too short ({length} chars) - aim for 140–160 characters so Google shows your full message",
-  "at": "App.jsx:1608"
+  "at": "App.jsx:1647"
  },
  {
   "text": "Top Assortment Gaps",
-  "at": "App.jsx:785"
+  "at": "App.jsx:818"
  },
  {
   "text": "Top Brands",
-  "at": "App.jsx:1565"
+  "at": "App.jsx:1604"
  },
  {
   "text": "Top Categories",
-  "at": "App.jsx:1452"
+  "at": "App.jsx:1491"
  },
  {
   "text": "Top Content Gaps",
-  "at": "App.jsx:2048"
+  "at": "App.jsx:2087"
  },
  {
   "text": "Top Issues to Fix",
-  "at": "App.jsx:1390"
+  "at": "App.jsx:1429"
  },
  {
   "text": "Top Nav Categories",
-  "at": "App.jsx:1539"
+  "at": "App.jsx:1578"
  },
  {
   "text": "Top Opportunities",
-  "at": "App.jsx:1406"
+  "at": "App.jsx:1445"
  },
  {
   "text": "Top Theme",
-  "at": "App.jsx:1171"
+  "at": "App.jsx:1206"
+ },
+ {
+  "text": "Top formats",
+  "at": "Jp360Panels.jsx:370"
  },
  {
   "text": "Total Opportunities",
-  "at": "App.jsx:2035"
+  "at": "App.jsx:2074"
  },
  {
   "text": "Translations are not ready for this brand yet. Showing the original text.",
-  "at": "App.jsx:3439"
+  "at": "App.jsx:3482"
  },
  {
   "text": "Trust and service",
   "at": "SiteBlueprint.jsx:16"
  },
  {
+  "text": "Turning online attention into store visits.",
+  "at": "Strategy360.jsx:283"
+ },
+ {
   "text": "Twitter/X handle",
-  "at": "App.jsx:567"
+  "at": "App.jsx:588"
+ },
+ {
+  "text": "Typical engagement",
+  "at": "Jp360Panels.jsx:388"
+ },
+ {
+  "text": "Unclassified",
+  "at": "Strategy360.jsx:23"
  },
  {
   "text": "Unknown",
-  "at": "i18n-core.js:41"
+  "at": "Jp360Panels.jsx:109"
  },
  {
   "text": "Update the page title to",
-  "at": "App.jsx:3011"
+  "at": "App.jsx:3054"
  },
  {
   "text": "Uploading…",
-  "at": "App.jsx:666"
+  "at": "App.jsx:687"
+ },
+ {
+  "text": "Us",
+  "at": "Jp360Panels.jsx:60"
  },
  {
   "text": "Value",
-  "at": "App.jsx:1847"
+  "at": "App.jsx:1886"
  },
  {
   "text": "Value messages competitors communicate. Your own site was not observed, so confirm on the live site before acting.",
-  "at": "App.jsx:2825"
+  "at": "App.jsx:2868"
  },
  {
   "text": "Values",
-  "at": "App.jsx:926"
+  "at": "App.jsx:959"
  },
  {
   "text": "Verify first",
@@ -1777,27 +2241,27 @@
  },
  {
   "text": "View post ↗",
-  "at": "App.jsx:1258"
+  "at": "App.jsx:1293"
  },
  {
   "text": "Visible to crawlers and AI agents",
-  "at": "App.jsx:1433"
+  "at": "App.jsx:1472"
  },
  {
   "text": "Visual Direction",
-  "at": "App.jsx:727"
+  "at": "App.jsx:748"
  },
  {
   "text": "Visual analysis included",
-  "at": "App.jsx:1380"
+  "at": "App.jsx:1419"
  },
  {
   "text": "We checked your homepage, category pages, and product pages. Issues appearing across multiple page types signal a site-wide problem, not just a homepage fix.",
-  "at": "App.jsx:1822"
+  "at": "App.jsx:1861"
  },
  {
   "text": "We crawled your site and your competitors' sites. What we found is a clean sweep of fixable technical problems - the kind that are invisible to you but very visible to Google. Each one below is confirmed from the actual page data, not estimated.",
-  "at": "App.jsx:2925"
+  "at": "App.jsx:2968"
  },
  {
   "text": "Weak",
@@ -1805,23 +2269,23 @@
  },
  {
   "text": "Website",
-  "at": "App.jsx:2344"
+  "at": "App.jsx:2386"
  },
  {
   "text": "Website Audit",
-  "at": "App.jsx:1366"
+  "at": "App.jsx:1404"
  },
  {
   "text": "Website Audit@@nav",
-  "at": "App.jsx:92"
+  "at": "App.jsx:111"
  },
  {
   "text": "Website URL",
-  "at": "App.jsx:534"
+  "at": "App.jsx:555"
  },
  {
   "text": "Website audit not yet generated.",
-  "at": "App.jsx:1351"
+  "at": "App.jsx:1389"
  },
  {
   "text": "Website blueprint",
@@ -1829,47 +2293,63 @@
  },
  {
   "text": "What This Means",
-  "at": "App.jsx:1796"
+  "at": "App.jsx:1835"
  },
  {
   "text": "What competitors are doing - and where the market opportunities are",
-  "at": "App.jsx:1123"
+  "at": "App.jsx:1156"
  },
  {
   "text": "What competitors do better",
-  "at": "App.jsx:2881"
+  "at": "App.jsx:2924"
  },
  {
   "text": "What drives them to buy",
-  "at": "App.jsx:2565"
+  "at": "App.jsx:2608"
+ },
+ {
+  "text": "What each site runs on, read from its public pages. A dash means it was not seen, not that it is absent.",
+  "at": "Jp360Panels.jsx:283"
+ },
+ {
+  "text": "What each tier does on social",
+  "at": "Jp360Panels.jsx:376"
  },
  {
   "text": "What frustrates them",
-  "at": "App.jsx:2557"
+  "at": "App.jsx:2600"
+ },
+ {
+  "text": "What it means for us",
+  "at": "Strategy360.jsx:243"
  },
  {
   "text": "What leading competitors do on their homepages",
-  "at": "App.jsx:2860"
+  "at": "App.jsx:2903"
+ },
+ {
+  "text": "What the best players use",
+  "at": "Strategy360.jsx:317"
  },
  {
   "text": "What the crawl actually found - confirmed issues, not estimates",
-  "at": "App.jsx:2945"
+  "at": "App.jsx:2988"
  },
  {
   "text": "What to do",
-  "at": "App.jsx:1989"
+  "at": "App.jsx:2028"
  },
  {
   "text": "What's Working",
-  "at": "App.jsx:1232"
+  "at": "App.jsx:1267"
  },
  {
   "text": "What's landing",
-  "at": "App.jsx:2864"
+  "at": "App.jsx:2907"
  },
  {
   "text": "What's missing",
-  "at": "App.jsx:2872"
+  "at": "App.jsx:2915"
  },
  {
   "text": "When",
@@ -1877,187 +2357,207 @@
  },
  {
   "text": "When a customer arrives looking for something your navigation doesn't clearly offer, they leave. These are the specific categories where competitors are capturing traffic you're missing.",
-  "at": "App.jsx:2842"
+  "at": "App.jsx:2885"
  },
  {
   "text": "Where",
-  "at": "App.jsx:1270"
+  "at": "App.jsx:1305"
  },
  {
   "text": "Where Competitors Outperform You",
-  "at": "App.jsx:1962"
+  "at": "App.jsx:2001"
  },
  {
   "text": "Where they spend time",
-  "at": "App.jsx:2591"
+  "at": "App.jsx:2634"
  },
  {
   "text": "Where they're strong",
-  "at": "App.jsx:2633"
+  "at": "App.jsx:2676"
  },
  {
   "text": "Where they're vulnerable",
-  "at": "App.jsx:2641"
+  "at": "App.jsx:2684"
  },
  {
   "text": "Where to look",
   "at": "SiteBlueprint.jsx:240"
  },
  {
+  "text": "Which players offer each capability. Tap a cell for the evidence. Our column says Confirm wherever we have not been seen offering it.",
+  "at": "Jp360Panels.jsx:117"
+ },
+ {
   "text": "White Space Opportunities",
-  "at": "App.jsx:772"
+  "at": "App.jsx:805"
  },
  {
   "text": "Who does it",
   "at": "SiteBlueprint.jsx:162"
  },
  {
+  "text": "Who wins",
+  "at": "Strategy360.jsx:239"
+ },
+ {
+  "text": "Who wins in each tier, how, and what it means for us.",
+  "at": "Strategy360.jsx:234"
+ },
+ {
   "text": "Why",
-  "at": "App.jsx:2830"
+  "at": "App.jsx:2873"
+ },
+ {
+  "text": "Why marketplaces cannot match it",
+  "at": "Strategy360.jsx:258"
  },
  {
   "text": "Why this matters: SEO is the foundation of AI search",
-  "at": "App.jsx:2180"
+  "at": "App.jsx:2219"
  },
  {
   "text": "Write a unique description for the homepage and use a template for category pages that names the category and what makes the store worth the click. 140 to 160 characters each.",
-  "at": "App.jsx:2991"
+  "at": "App.jsx:3034"
  },
  {
   "text": "Write blog posts or FAQ pages that answer these questions directly, for example \"the best toys for a 5 year old\". Clear, structured answers that name your brand are more likely to be cited by an AI assistant. This is a long-term investment that compounds.",
-  "at": "App.jsx:2455"
+  "at": "App.jsx:2497"
  },
  {
   "text": "Yes",
-  "at": "App.jsx:1929"
+  "at": "App.jsx:1968"
  },
  {
   "text": "You",
-  "at": "App.jsx:1270"
+  "at": "App.jsx:1305"
  },
  {
   "text": "Your Arts & Crafts page, Clothing page, and every other category page all have the same title tag:",
-  "at": "App.jsx:2965"
+  "at": "App.jsx:3008"
  },
  {
   "text": "Your Brand Keywords",
-  "at": "App.jsx:2423"
+  "at": "App.jsx:2465"
  },
  {
   "text": "Your Customers - Who You're Selling To",
-  "at": "App.jsx:2524"
+  "at": "App.jsx:2567"
  },
  {
   "text": "Your Digital Presence: Where You're Losing Customers",
-  "at": "App.jsx:2739"
+  "at": "App.jsx:2782"
  },
  {
   "text": "Your Digital Presence: Where to Focus",
-  "at": "App.jsx:2739"
+  "at": "App.jsx:2782"
  },
  {
   "text": "Your H1 repeats the brand name and nothing else. Google already knows the brand from the title and domain. Use the headline to say what you sell, which is the part it cannot infer.",
-  "at": "App.jsx:1634"
+  "at": "App.jsx:1673"
  },
  {
   "text": "Your Value",
-  "at": "App.jsx:1979"
+  "at": "App.jsx:2018"
  },
  {
   "text": "Your account can sign in to Brand Intelligence but has not been given access to any section of it yet. Ask an administrator to grant you the sections you need in the WHP sign-in console, then sign in again. Nothing is missing or broken.",
-  "at": "App.jsx:166"
+  "at": "App.jsx:185"
  },
  {
   "text": "Your competitors are active on Instagram and TikTok and building real audiences. The engagement numbers and content patterns below are based on scraped competitor data - they show exactly what resonates with your shared customer base and where gaps exist that you can be first to own.",
-  "at": "App.jsx:2658"
+  "at": "App.jsx:2701"
  },
  {
   "text": "Your homepage H1 is empty, so Google and AI search crawlers have no live headline that says what the store sells.",
-  "at": "App.jsx:3007"
+  "at": "App.jsx:3050"
  },
  {
   "text": "Your homepage H1 is empty. The headline \"Fun for the whole family!\" exists only as part of a banner image - Google and AI search crawlers can't read it. The homepage title tag is just",
-  "at": "App.jsx:3006"
+  "at": "App.jsx:3049"
  },
  {
   "text": "Your own site was not observed in this run (the operator blocks automated access), so there is no on-page SEO score. See the priority actions below and the Website blueprint verify-first checklist.",
-  "at": "App.jsx:1742"
+  "at": "App.jsx:1781"
  },
  {
   "text": "Your own website could not be observed in this run, so this section does not say what is wrong with it. It shows the search and AI-visibility evidence the tool did collect, and what to verify on your live site.",
-  "at": "App.jsx:2919"
+  "at": "App.jsx:2962"
  },
  {
   "text": "Your own website could not be observed in this run, so this section does not say what it contains. It shows what leading competitors do and what the market evidence recommends, with a checklist to confirm each point on your live site.",
-  "at": "App.jsx:2742"
+  "at": "App.jsx:2785"
  },
  {
   "text": "Your site was not observed in this run, so no signals were read.",
-  "at": "App.jsx:1925"
+  "at": "App.jsx:1964"
  },
  {
   "text": "Your sitemap has {totalUrls} URLs - but 0 product pages",
-  "at": "App.jsx:3023"
+  "at": "App.jsx:3066"
  },
  {
   "text": "Your title is only your brand name, so shoppers who don't already know you scroll past it. Say what you sell alongside the name: \"{brandName} | Toys, Games and Gifts for Every Age\".",
-  "at": "App.jsx:1591"
+  "at": "App.jsx:1630"
  },
  {
   "text": "Your title is your brand name twice over and nothing else, so it spends every one of Google's ~60 visible characters saying something a searcher already knew. Replace the duplicate with what you sell: \"{brandName} | Toys, Games and Gifts for Every Age\".",
-  "at": "App.jsx:1590"
+  "at": "App.jsx:1629"
  },
  {
   "text": "and the same H1:",
-  "at": "App.jsx:2965"
+  "at": "App.jsx:3008"
  },
  {
   "text": "avg score",
-  "at": "App.jsx:2203"
+  "at": "App.jsx:2242"
  },
  {
   "text": "does this better",
-  "at": "App.jsx:1970"
+  "at": "App.jsx:2009"
  },
  {
   "text": "image-embedded",
-  "at": "App.jsx:1432"
+  "at": "App.jsx:1471"
  },
  {
   "text": "live HTML",
-  "at": "App.jsx:1432"
+  "at": "App.jsx:1471"
  },
  {
   "text": "or click to browse",
-  "at": "App.jsx:667"
+  "at": "App.jsx:688"
  },
  {
   "text": "page handle",
-  "at": "App.jsx:620"
+  "at": "App.jsx:641"
  },
  {
   "text": "queries mentioned",
-  "at": "App.jsx:2195"
+  "at": "App.jsx:2234"
  },
  {
   "text": "report. This can take up to a minute.",
-  "at": "App.jsx:3445"
+  "at": "App.jsx:3488"
  },
  {
   "text": "to robots.txt. Submit the sitemap directly in Google Search Console. This is a one-time configuration fix.",
-  "at": "App.jsx:3031"
+  "at": "App.jsx:3074"
+ },
+ {
+  "text": "unknown reason",
+  "at": "Jp360Panels.jsx:210"
  },
  {
   "text": "with H1",
-  "at": "App.jsx:2969"
+  "at": "App.jsx:3012"
  },
  {
   "text": "with nothing else. A competitor searching for \"toy store Lebanon\" in Google is not finding you through your homepage headline because there isn't one.",
-  "at": "App.jsx:3006"
+  "at": "App.jsx:3049"
  },
  {
   "text": "{bestEng} avg engagement ·",
-  "at": "App.jsx:1135"
+  "at": "App.jsx:1170"
  },
  {
   "text": "{confidence} confidence",
@@ -2065,11 +2565,11 @@
  },
  {
   "text": "{contentInImagesLevel} image content",
-  "at": "App.jsx:1440"
+  "at": "App.jsx:1479"
  },
  {
   "text": "{depth} navigation",
-  "at": "App.jsx:1449"
+  "at": "App.jsx:1488"
  },
  {
   "text": "{done} of {length} checked",
@@ -2077,7 +2577,7 @@
  },
  {
   "text": "{d}d ago",
-  "at": "App.jsx:1024"
+  "at": "App.jsx:1057"
  },
  {
   "text": "{effort} effort",
@@ -2085,31 +2585,51 @@
  },
  {
   "text": "{estimatedMonthlySearches} searches/mo",
-  "at": "App.jsx:2055"
+  "at": "App.jsx:2094"
  },
  {
   "text": "{floor}y ago",
-  "at": "App.jsx:1027"
+  "at": "App.jsx:1060"
  },
  {
   "text": "{length} competitors · across Instagram & TikTok",
-  "at": "App.jsx:1160"
+  "at": "App.jsx:1195"
  },
  {
   "text": "{length} of {length2} clusters",
-  "at": "App.jsx:2076"
+  "at": "App.jsx:2115"
+ },
+ {
+  "text": "{level} confidence",
+  "at": "Jp360Panels.jsx:293"
+ },
+ {
+  "text": "{level} effort",
+  "at": "Strategy360.jsx:290"
+ },
+ {
+  "text": "{level} impact",
+  "at": "Strategy360.jsx:289"
  },
  {
   "text": "{moduleLabel} - Running",
-  "at": "App.jsx:199"
+  "at": "App.jsx:218"
  },
  {
   "text": "{mo}mo ago",
-  "at": "App.jsx:1026"
+  "at": "App.jsx:1059"
  },
  {
   "text": "{name} leads with {bestEng} avg engagement - the content types and themes driving that are documented below.",
-  "at": "App.jsx:1149"
+  "at": "App.jsx:1184"
+ },
+ {
+  "text": "{n} approved niche players",
+  "at": "Strategy360.jsx:133"
+ },
+ {
+  "text": "{n} brands with social data",
+  "at": "Strategy360.jsx:126"
  },
  {
   "text": "{n} customer review",
@@ -2118,6 +2638,10 @@
  {
   "text": "{n} customer reviews",
   "at": "SiteBlueprint.jsx:30"
+ },
+ {
+  "text": "{n} days",
+  "at": "Strategy360.jsx:44"
  },
  {
   "text": "{n} item",
@@ -2136,12 +2660,24 @@
   "at": "SiteBlueprint.jsx:29"
  },
  {
+  "text": "{n} per week",
+  "at": "Jp360Panels.jsx:55"
+ },
+ {
   "text": "{n} persona",
   "at": "SiteBlueprint.jsx:32"
  },
  {
   "text": "{n} personas",
   "at": "SiteBlueprint.jsx:32"
+ },
+ {
+  "text": "{n} players",
+  "at": "Strategy360.jsx:125"
+ },
+ {
+  "text": "{n} posts",
+  "at": "Jp360Panels.jsx:333"
  },
  {
   "text": "{n} search-demand term",
@@ -2152,91 +2688,99 @@
   "at": "SiteBlueprint.jsx:31"
  },
  {
+  "text": "{n} sites in the par matrix",
+  "at": "Strategy360.jsx:128"
+ },
+ {
+  "text": "{n} sites with technology read",
+  "at": "Strategy360.jsx:127"
+ },
+ {
   "text": "{priority} priority",
   "at": "SiteBlueprint.jsx:42"
  },
  {
   "text": "{reduce} posts",
-  "at": "App.jsx:1158"
+  "at": "App.jsx:1193"
  },
  {
   "text": "{totalCount} total terms",
-  "at": "App.jsx:2146"
+  "at": "App.jsx:2185"
  },
  {
   "text": "{totalFreq}/wk avg",
-  "at": "App.jsx:1187"
+  "at": "App.jsx:1222"
  },
  {
   "text": "{totalUrls} URLs",
-  "at": "App.jsx:1885"
+  "at": "App.jsx:1924"
  },
  {
   "text": "{value} Competition",
-  "at": "App.jsx:2099"
+  "at": "App.jsx:2138"
  },
  {
   "text": "{value} Opportunity",
-  "at": "App.jsx:2096"
+  "at": "App.jsx:2135"
  },
  {
   "text": "{value} is most active",
-  "at": "App.jsx:1146"
+  "at": "App.jsx:1181"
  },
  {
   "text": "{value}k",
-  "at": "App.jsx:1250"
+  "at": "App.jsx:1285"
  },
  {
   "text": "· {collection} categories",
-  "at": "App.jsx:1887"
+  "at": "App.jsx:1926"
  },
  {
   "text": "· {product} products",
-  "at": "App.jsx:1886"
+  "at": "App.jsx:1925"
  },
  {
   "text": "↓ Export PDF",
-  "at": "App.jsx:2478"
+  "at": "App.jsx:2521"
  },
  {
   "text": "↻ Refresh All",
-  "at": "App.jsx:403"
+  "at": "App.jsx:422"
  },
  {
   "text": "⚠ Bot-protected - limited data",
-  "at": "App.jsx:805"
+  "at": "App.jsx:838"
  },
  {
   "text": "⚠ Discovery failed - check brand URL and try again",
-  "at": "App.jsx:376"
+  "at": "App.jsx:395"
  },
  {
   "text": "✓ Save & Run Analysis",
-  "at": "App.jsx:585"
+  "at": "App.jsx:606"
  },
  {
   "text": "⟳ Running…",
-  "at": "App.jsx:403"
+  "at": "App.jsx:422"
  },
  {
   "text": "日本語 PDF",
-  "at": "App.jsx:3109"
+  "at": "App.jsx:3152"
  },
  {
   "text": "🎵 TikTok",
-  "at": "App.jsx:1171"
+  "at": "App.jsx:1206"
  },
  {
   "text": "👥 Facebook",
-  "at": "App.jsx:1171"
+  "at": "App.jsx:1206"
  },
  {
   "text": "📸 Instagram",
-  "at": "App.jsx:1171"
+  "at": "App.jsx:1206"
  },
  {
   "text": "🔍 Discovery running...",
-  "at": "App.jsx:3423"
+  "at": "App.jsx:3466"
  }
 ]

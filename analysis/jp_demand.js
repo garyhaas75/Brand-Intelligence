@@ -176,7 +176,13 @@ function parseTrendsItems(items, terms) {
 }
 
 // Every return carries ok (at least one term has a real timeline) and, when not ok, error.
-async function fetchTrends(terms, { log, dryRun, deps, timeRange }) {
+// apify/google-trends-scraper: priced per result, one result per search term. Estimate per term
+// plus a small start fee, reserved generously; maxItems = terms.length keeps the result count bounded.
+const TRENDS_USD_PER_TERM = 0.02;
+const TRENDS_BASE_USD = 0.05;
+function trendsEstimateUsd(n) { return Number((TRENDS_BASE_USD + TRENDS_USD_PER_TERM * Math.max(0, n)).toFixed(2)); }
+
+async function fetchTrends(terms, { log, dryRun, deps, timeRange, slug = null, dataDir }) {
   const notes = [];
   const blank = () => terms.map(t => ({ term: t.term, termEn: t.termEn, interestOverTime: null, topRelated: [] }));
   if (!terms.length) return { trends: [], ok: false, error: 'no terms', notes: ['No Japanese terms could be derived, so Google Trends was skipped.'] };
@@ -195,10 +201,26 @@ async function fetchTrends(terms, { log, dryRun, deps, timeRange }) {
   if (!token) {
     return { trends: blank(), ok: false, error: 'APIFY_API_TOKEN is not set', notes: ['APIFY_API_TOKEN is not set, so Google Trends (geo=JP) was skipped. Terms are listed without interest data.'] };
   }
+  // Per-run Apify spend cap (utils/apify_budget.js).
+  const budget = deps.budget || require('../utils/apify_budget');
+  const budgetOpts = dataDir ? { dataDir } : {};
+  let grant = null;
+  if (slug) {
+    grant = budget.reserve(slug, trendsEstimateUsd(terms.length), `google trends JP (${terms.length} terms)`, budgetOpts);
+    if (!grant.ok) {
+      log(`Google Trends skipped: ${grant.reason}`);
+      return { trends: blank(), ok: false, error: grant.reason, budgetSkipped: true, budgetReason: grant.reason, notes: [`Google Trends not called: ${grant.reason}`] };
+    }
+  }
+  let run = null;
   try {
     const client = deps.apifyClientFactory(token);
     log(`Calling ${TRENDS_ACTOR} for ${input.searchTerms.join(', ')}`);
-    const run = await client.actor(TRENDS_ACTOR).call(input, { timeout: 300 });
+    try {
+      run = await client.actor(TRENDS_ACTOR).call(input, budget.callOptions(grant, { timeout: 300 }));
+    } finally {
+      if (grant) { try { budget.record(slug, grant, run, budgetOpts); } catch (e) { log(`Apify spend not recorded: ${e.message}`); } }
+    }
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
     const trends = parseTrendsItems(items, terms);
     const empty = trends.filter(t => !t.interestOverTime).length;
@@ -354,7 +376,7 @@ async function collectDemand({ slug, profile, log = defaultLog, dryRun = false, 
   let tr = resumed('trends', v => v.termKey === termKey && Array.isArray(v.trends));
   if (tr) tr = { ...tr, notes: [...(tr.notes || []), 'Google Trends resumed from checkpoint.'] };
   else {
-    tr = await fetchTrends(terms, { log, dryRun, deps: d, timeRange });
+    tr = await fetchTrends(terms, { log, dryRun, deps: d, timeRange, slug, dataDir });
     if (tr.ok && !dryRun) checkpoint.put(slug, CHECKPOINT_STEP, 'trends', { termKey, trends: tr.trends, notes: tr.notes, ok: true }, cpOpts);
   }
   let dm = resumed('estat', v => v.demographics && typeof v.demographics === 'object');
@@ -394,6 +416,8 @@ async function collectDemand({ slug, profile, log = defaultLog, dryRun = false, 
     trends,
     demographics,
     notes: [...notes, ...tr.notes, ...dm.notes],
+    // The per-run Apify cap refused the Trends call: reports say what was not covered.
+    ...(tr.budgetSkipped ? { budgetSkipped: true, budgetReason: tr.budgetReason, budgetSkippedUnits: ['trends'] } : {}),
   };
   if (!dryRun) {
     fs.mkdirSync(brandDir, { recursive: true });
@@ -411,6 +435,7 @@ async function collectDemand({ slug, profile, log = defaultLog, dryRun = false, 
 }
 
 module.exports = {
+  trendsEstimateUsd,
   collectDemand,
   deriveTerms,
   normalizeCategoryLabel,

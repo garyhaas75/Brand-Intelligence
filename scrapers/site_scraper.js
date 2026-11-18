@@ -13,6 +13,18 @@ const fs = require('fs');
 const path = require('path');
 const { fetchCategoriesFromSitemap } = require('./sitemap_categories');
 const checkpoint = require('../utils/checkpoint');
+const siteAccess = require('../utils/site_access');
+const apifyBudget = require('../utils/apify_budget');
+
+// One page of apify/playwright-scraper on residential proxy: about 0.05 compute units plus proxy
+// traffic. Reserved generously so the cap is never under-counted.
+const APIFY_SITE_ESTIMATE_USD = 0.10;
+
+/** The log line that proves a request went through the authorized proxy route. */
+function proxyLogLine(brand, access) {
+  const a = (access && access.authorization) || {};
+  return `  ${brand.name}: requesting ${brand.url} via Japanese proxy (authorized ${a.by || 'unknown'} ${a.at || 'unknown date'})`;
+}
 
 /**
  * Whether a nav link's text is a merchandising category. Applied to
@@ -257,11 +269,28 @@ const APIFY_PAGE_FUNCTION = `async function pageFunction(context) {
   return { navigation: nav, heroContent: { headline: heroTexts.find(t => t.length >= (/[\\u3040-\\u30ff\\u3400-\\u9fff]/.test(t) ? 2 : 6) && t.length < 120) || '', allText: heroTexts.slice(0, 10) }, promoBanners: [...promoSet].slice(0, 10), featuredCategories: nav.map(l => l.text).filter(isFeaturedCategory).slice(0, 40) };
 }`;
 
-async function scrapeWithApifyFallback(brand, logFile) {
-  if (!process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
-  const apifyClient = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
+/**
+ * One page through apify/playwright-scraper. opts.slug makes it ask the per-run Apify budget first
+ * (utils/apify_budget.js); a refusal throws an error with err.budgetSkipped = true and makes no call.
+ * opts.client is a test seam for the ApifyClient.
+ */
+async function scrapeWithApifyFallback(brand, logFile, opts = {}) {
+  if (!opts.client && !process.env.APIFY_API_TOKEN) throw new Error('APIFY_API_TOKEN not set');
+  const budgetSlug = opts.slug || null;
+  const budget = opts.budget || apifyBudget;
+  let grant = null;
+  if (budgetSlug) {
+    grant = budget.reserve(budgetSlug, APIFY_SITE_ESTIMATE_USD, `site scrape ${brand.name}`);
+    if (!grant.ok) {
+      log(`  ${brand.name}: Apify call skipped: ${grant.reason}`, logFile);
+      const e = new Error(grant.reason); e.budgetSkipped = true; throw e;
+    }
+  }
+  const apifyClient = opts.client || new ApifyClient({ token: process.env.APIFY_API_TOKEN });
   log(`  Using Apify for ${brand.name}...`, logFile);
-  const run = await apifyClient.actor('apify/playwright-scraper').call({
+  let run = null;
+  try {
+  run = await apifyClient.actor('apify/playwright-scraper').call({
     startUrls: [{ url: brand.url }],
     pageFunction: APIFY_PAGE_FUNCTION,
     proxyConfiguration: {
@@ -271,12 +300,15 @@ async function scrapeWithApifyFallback(brand, logFile) {
     },
     maxRequestsPerCrawl: 1,
     launchContext: { launchOptions: { headless: true } },
-  }, {
+  }, budget.callOptions(grant, {
     // Bound the run on Apify's side. Without this, a caller that gives up after its own
     // timeout leaves the actor running (and billing) until Apify's default run timeout.
     waitSecs: Math.floor(APIFY_RETRY_TIMEOUT_MS / 1000) - 10,
     timeout: Math.floor(APIFY_RETRY_TIMEOUT_MS / 1000) + 30,
-  });
+  }));
+  } finally {
+    if (grant) { try { budget.record(budgetSlug, grant, run); } catch (e) { log(`  Apify spend not recorded: ${e.message}`, logFile); } }
+  }
   if (run.status !== 'SUCCEEDED') {
     try { await apifyClient.run(run.id).abort(); } catch (_) {}
     throw new Error(`Apify run ${run.status}, no data`);
@@ -378,7 +410,97 @@ function scrapeStatusLine(r) {
   if (r.error) return `error: ${r.error} (no usable data)`;
   if (r.botBlocked) return r.skippedNoDirectRequest ? 'not scraped: site blocks automated access (no data)' : 'bot-blocked (limited data)';
   if ((r.featuredCategories || []).length === 0) return 'scraped, but no categories found (limited data)';
-  return `success (scraped ${r.scrapedAt || 'this run'})`;
+  return `success (scraped ${r.scrapedAt || 'this run'}${r.via === 'jp_proxy' ? ', via Japanese proxy' : ''}${r.manualCapture ? ', from a manual capture' : ''})`;
+}
+
+const UA_DESKTOP = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+const BLOCK_PAGE_TITLE = /just a moment|attention required|access denied|you have been blocked|are you a robot|checking your browser/i;
+
+/**
+ * A live scrape of a site the brand owner authorized for reading only through a Japanese proxy.
+ * One page (the brand URL), counted against the per-module page budget, in a browser context whose
+ * every request goes through the proxy. Never a direct request, never a sitemap GET, never Apify.
+ */
+async function scrapeViaJpProxy(brand, access, { getBrowser, logFile, proxyFor = siteAccess.playwrightProxy, takePage = siteAccess.takePage, pace = siteAccess.pace }) {
+  const auth = (access && access.authorization) || {};
+  const base = { id: brand.id || brand.name, name: brand.name, url: brand.url, role: brand.role || 'competitor', scrapedAt: new Date().toISOString(), navigation: [], heroContent: {}, promoBanners: [], featuredCategories: [], botBlocked: false, error: null, via: 'jp_proxy', access: { mode: 'jp_proxy', authorizedBy: auth.by || null, authorizedAt: auth.at || null } };
+  if (!takePage(brand.url, access.maxPages)) {
+    log(`  ${brand.name}: not requested, page budget for this site reached (${access.maxPages} per module per run)`, logFile);
+    return { ...base, error: `Page budget for this site reached (${access.maxPages} per module per run)` };
+  }
+  let proxy;
+  try { proxy = await proxyFor(); } catch (err) {
+    log(`  ${brand.name}: not requested, Japanese proxy unavailable: ${err.message}`, logFile);
+    return { ...base, error: `Japanese proxy unavailable: ${err.message}` };
+  }
+  await pace(brand.url);
+  log(proxyLogLine(brand, access), logFile);
+  const loc = localeFor(brand);
+  let context = null;
+  let result;
+  try {
+    context = await (await getBrowser()).newContext({
+      proxy,
+      ...(loc.locale ? { locale: loc.locale } : {}),
+      ...(loc.timezoneId ? { timezoneId: loc.timezoneId } : {}),
+      ...(loc.acceptLanguage ? { extraHTTPHeaders: { 'Accept-Language': loc.acceptLanguage } } : {}),
+      userAgent: UA_DESKTOP,
+      viewport: { width: 1440, height: 900 },
+      ...(brand.takeScreenshot ? { deviceScaleFactor: 1.75 } : {}),
+    });
+    await siteAccess.guardContext(context, 'jp_proxy');
+    const page = await context.newPage();
+    // Images and fonts only cost proxy traffic, unless the vision audit needs the screenshot.
+    if (!brand.takeScreenshot) await page.route('**/*.{png,jpg,jpeg,gif,webp,svg,woff,woff2,ttf}', route => route.abort());
+    result = { ...base, ...(await scrapeBrand(page, brand, logFile)), via: 'jp_proxy', access: base.access };
+    if (!result.error && BLOCK_PAGE_TITLE.test(result.titleTag || '')) {
+      result.botBlocked = true;
+      result.note = `Proxied load returned a block page ("${String(result.titleTag).slice(0, 60)}")`;
+      log(`  ${brand.name}: proxied load returned a block page`, logFile);
+    }
+    if (brand.takeScreenshot && !result.error && !result.botBlocked) {
+      try {
+        const buf = await page.screenshot({ fullPage: false, type: 'jpeg', quality: 85 });
+        result.screenshotBase64 = buf.toString('base64');
+        log(`  ${brand.name}: screenshot captured via Japanese proxy (${Math.round(buf.length / 1024)}KB)`, logFile);
+      } catch (err) { log(`  ${brand.name}: screenshot failed: ${err.message}`, logFile); }
+    }
+  } catch (err) {
+    result = { ...base, error: err.message };
+    log(`  ${brand.name}: proxied scrape failed: ${err.message}`, logFile);
+  } finally {
+    if (context) { try { await context.close(); } catch (_) {} }
+  }
+  return result;
+}
+
+/**
+ * The saved capture served in place of the network: the brand URL answers with the saved HTML and
+ * every other request is refused, so this makes no outbound request at all.
+ */
+async function scrapeFromManualCapture(brand, { getBrowser, logFile }) {
+  const context = await (await getBrowser()).newContext({ userAgent: UA_DESKTOP, viewport: { width: 1440, height: 900 } });
+  try {
+    await siteAccess.guardContext(context);
+    const page = await context.newPage();
+    const html = fs.readFileSync(brand.manualCapture.htmlPath, 'utf8');
+    const isCapturedUrl = manualCaptureMatcher(brand.url);
+    await page.route('**/*', route => isCapturedUrl(route.request().url())
+      ? route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: html })
+      : route.abort());
+    log(`  ${brand.name}: using manual capture (${brand.manualCapture.capturedAt})`, logFile);
+    const r = await scrapeBrand(page, brand, logFile);
+    r.manualCapture = true;
+    r.manualCaptureAt = brand.manualCapture.capturedAt;
+    if (r.navigation.length > 0) { r.botBlocked = false; delete r.note; }
+    if (brand.manualCapture.screenshotPath && brand.takeScreenshot) {
+      r.screenshotBase64 = fs.readFileSync(brand.manualCapture.screenshotPath).toString('base64');
+      log(`  ${brand.name}: manual screenshot used`, logFile);
+    }
+    return r;
+  } finally {
+    try { await context.close(); } catch (_) {}
+  }
 }
 
 /**
@@ -398,6 +520,9 @@ async function scrapeBrands(brands, opts = {}) {
   // signal (AbortSignal): a caller that gave up (deadline passed) aborts it, and this
   // loop then starts no new brand and writes no further checkpoint.
   const { logFile, existingData = {}, collector, slug, checkpointStep, checkpointDataDir, scrapeOne, signal } = opts;
+  // Test seams: accessFor (route decision), launchBrowser (Playwright), apifyClient.
+  const accessFor = opts.accessFor || siteAccess.accessFor;
+  const budgetSlug = slug || null;
   const aborted = () => !!(signal && signal.aborted);
   const useCheckpoint = !!(slug && checkpointStep);
   const cpOpts = checkpointDataDir ? { dataDir: checkpointDataDir } : {};
@@ -405,7 +530,7 @@ async function scrapeBrands(brands, opts = {}) {
   // run (or a test) never starts Chromium.
   let browser = null;
   const getBrowser = async () => {
-    if (!browser) browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    if (!browser) browser = opts.launchBrowser ? await opts.launchBrowser() : await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     return browser;
   };
   const results = [];
@@ -417,6 +542,13 @@ async function scrapeBrands(brands, opts = {}) {
   try {
   for (const brand of brands) {
     if (aborted()) { log(`  Scrape aborted by caller, not starting ${brand.name} or later brands`, logFile); break; }
+    if (!brand.url) {
+      // A player with no website (an approved niche candidate can have url:null): nothing to load,
+      // so no browser, no sitemap, no budget reservation and no Apify call.
+      log(`  ${brand.name}: no website on file, nothing to scrape`, logFile);
+      finish({ id: brand.id || brand.name, name: brand.name, url: null, role: brand.role || 'competitor', scrapedAt: new Date().toISOString(), navigation: [], heroContent: {}, promoBanners: [], featuredCategories: [], botBlocked: false, error: null, noWebsite: true, note: 'No website on file' });
+      continue;
+    }
     if (useCheckpoint) {
       const saved = reusableCheckpoint(checkpoint.get(slug, checkpointStep, brand.id, cpOpts));
       if (saved) {
@@ -426,6 +558,7 @@ async function scrapeBrands(brands, opts = {}) {
       }
     }
     let brandResult;
+    let access = { mode: 'direct' };
     if (scrapeOne) {
       try {
         brandResult = await scrapeOne(brand);
@@ -444,12 +577,25 @@ async function scrapeBrands(brands, opts = {}) {
       }
       brandResult = { id: brand.id || brand.name, name: brand.name, url: brand.url, role: brand.role || 'competitor', scrapedAt: new Date().toISOString(), navigation: [], heroContent: {}, promoBanners: [], featuredCategories: [], botBlocked: false, error: null };
       try {
-        const apifyData = await scrapeWithApifyFallback(brand, logFile);
+        const apifyData = await scrapeWithApifyFallback(brand, logFile, { slug: budgetSlug, client: opts.apifyClient, budget: opts.budget });
         Object.assign(brandResult, apifyData);
       } catch (err) {
         brandResult.error = err.message;
+        if (err.budgetSkipped) { brandResult.budgetSkipped = true; brandResult.budgetReason = err.message; }
         log(`  ${brand.name} Apify ERROR: ${err.message}`, logFile);
       }
+    } else if ((access = accessFor(brand.url)).mode === 'jp_proxy') {
+      brandResult = await scrapeViaJpProxy(brand, access, { getBrowser, logFile, ...(opts.proxyFor ? { proxyFor: opts.proxyFor } : {}), ...(opts.pace ? { pace: opts.pace } : {}) });
+      if (isFailedResult(brandResult) && brand.manualCapture) {
+        log(`  ${brand.name}: proxied scrape unusable (${brandResult.error || (brandResult.botBlocked ? 'blocked' : 'no categories')}), falling back to the manual capture`, logFile);
+        const proxyAttempt = { error: brandResult.error || null, botBlocked: !!brandResult.botBlocked, at: brandResult.scrapedAt };
+        brandResult = await scrapeFromManualCapture(brand, { getBrowser, logFile });
+        brandResult.proxyAttempt = proxyAttempt;
+      }
+    } else if (access.mode === 'denied' && !brand.manualCapture) {
+      // Never requested at all (no direct request, no proxy authorization).
+      log(`  ${brand.name}: skipped, no request made (${noDirectRequestReason(brand) || access.reason}) and no manual capture available`, logFile);
+      brandResult = { id: brand.id || brand.name, name: brand.name, url: brand.url, role: brand.role || 'competitor', scrapedAt: new Date().toISOString(), navigation: [], heroContent: {}, promoBanners: [], featuredCategories: [], botBlocked: true, error: null, skippedNoDirectRequest: true, note: 'Site blocks automated access; supply a manual capture' };
     } else if (brand.skipApifyRetry && !brand.manualCapture) {
       // Blocked by its operator and no manual capture: do not touch the host at all.
       log(`  ${brand.name}: skipped, no direct request made (${noDirectRequestReason(brand)}) and no manual capture available`, logFile);
@@ -468,6 +614,9 @@ async function scrapeBrands(brands, opts = {}) {
         // (CTAs, promo copy, nav labels) becomes legible to the audit.
         ...(brand.takeScreenshot ? { deviceScaleFactor: 1.75 } : {}),
       });
+      // Every request this direct context makes (redirects, subresources) is checked: a hop to a
+      // denied or proxy-only host is aborted, never loaded directly.
+      await siteAccess.guardContext(context);
       const page = await context.newPage();
       if (brand.manualCapture) {
         // Serve the saved HTML for the brand URL and refuse everything else, so a manual
@@ -559,7 +708,7 @@ async function scrapeBrands(brands, opts = {}) {
           // Cap each retry. Apify runs its own internal retries against hostile
           // sites and can sit there for many minutes; without a per-site ceiling a
           // couple of stubborn competitors consume the caller's entire budget.
-          const apifyCall = scrapeWithApifyFallback(brand, logFile);
+          const apifyCall = scrapeWithApifyFallback(brand, logFile, { slug: budgetSlug, client: opts.apifyClient, budget: opts.budget });
           apifyCall.catch(() => {}); // a late rejection after the timeout won must not become an unhandled rejection
           const apifyData = await Promise.race([
             apifyCall,
@@ -581,6 +730,7 @@ async function scrapeBrands(brands, opts = {}) {
           }
         } catch (err) {
           // Leave the original blocked/errored result intact rather than masking it.
+          if (err.budgetSkipped) { brandResult.budgetSkipped = true; brandResult.budgetReason = err.message; }
           log(`  ${brand.name}: Apify retry failed: ${err.message}`, logFile);
         }
       }
@@ -601,7 +751,7 @@ async function scrapeBrands(brands, opts = {}) {
   return results;
 }
 
-module.exports = { scrapeBrand, scrapeBrands, scrapeWithApifyFallback, localeFor, isFeaturedCategory, APIFY_PAGE_FUNCTION, manualCaptureFor, carryForward, checkpointCopy, reusableCheckpoint, isFailedResult, noDirectRequestReason, scrapeStatusLine, manualCaptureMatcher, CHECKPOINT_SCREENSHOT_MAX_BYTES };
+module.exports = { scrapeBrand, scrapeBrands, scrapeWithApifyFallback, scrapeViaJpProxy, scrapeFromManualCapture, APIFY_SITE_ESTIMATE_USD, localeFor, isFeaturedCategory, APIFY_PAGE_FUNCTION, manualCaptureFor, carryForward, checkpointCopy, reusableCheckpoint, isFailedResult, noDirectRequestReason, scrapeStatusLine, manualCaptureMatcher, CHECKPOINT_SCREENSHOT_MAX_BYTES };
 
 // ─── CLI entrypoint (standalone run) ───────────────────────────────────────────
 if (require.main === module) {
@@ -625,7 +775,7 @@ if (require.main === module) {
   const outPath = path.join(__dirname, '../data/brands', slug, 'site_intelligence.json');
   let existingData = {};
   try { existingData = Object.fromEntries((JSON.parse(fs.readFileSync(outPath, 'utf8')).brands || []).filter(b => b && b.id).map(b => [b.id, b])); } catch { /* no previous output */ }
-  scrapeBrands(brands, { logFile, existingData }).then(results => {
+  scrapeBrands(brands, { logFile, existingData, slug }).then(results => {
     fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date().toISOString(), brandSlug: slug, brands: results }, null, 2));
     console.log(`Saved to ${outPath}`);
   }).catch(err => { console.error(err.message); process.exit(1); });

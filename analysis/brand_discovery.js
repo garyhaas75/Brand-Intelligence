@@ -52,6 +52,8 @@ async function scrapeHomepage(url) {
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1440, height: 900 },
   });
+  // Redirects and subresources to a denied or proxy-only host are aborted, never loaded directly.
+  await require('../utils/site_access').guardContext(context);
   const page = await context.newPage();
   await page.route('**/*.{png,jpg,jpeg,gif,webp,svg,woff,woff2,ttf}', route => route.abort());
 
@@ -120,8 +122,9 @@ function seedCompetitorsFor(market, industryText, targetUrl) {
   for (const seed of COMPETITOR_SEEDS) {
     if (seed.market !== market || !seed.industry.test(industryText || '')) continue;
     for (const c of seed.list(targetUrl)) {
-      if (c.type === 'target') continue;
-      out.push({ name: c.name, nameLocal: c.nameJa || undefined, url: c.url, type: c.type, seeded: true });
+      if (c.type === 'target' || c.relationship === 'self') continue;
+      // tier and relationship travel with the seed: a partner (Don Quijote) is a channel, never ranked
+      out.push({ name: c.name, nameLocal: c.nameJa || undefined, url: c.url, type: c.type, tier: c.tier, relationship: c.relationship, seeded: true });
     }
   }
   return out;
@@ -437,15 +440,24 @@ async function runJapanPhased(slug) {
   process.on('exit', () => runLock.release(slug));
   try { require('../modules/run_info').clearRequested(slug, DATA_DIR); } catch (_) {}
   const startedAt = new Date().toISOString();
+  // one id per run so utils/apify_budget.js holds every module of this run to the same spend cap
+  process.env.BI_RUN_ID = process.env.BI_RUN_ID || `run-${startedAt}`;
   const phases = [
     // jp_demand reads marketplace.json for its search terms, so it runs after the collect phase
     // (run 1 on Railway ran it alongside marketplace and it fell back to industry terms only).
-    { name: 'collect', scripts: ['website_audit.js', '../scrapers/marketplace_jp.js'], env: {} },
-    { name: 'analyse', scripts: ['jp_demand.js', 'social_audit.js', 'competitive_analysis.js', 'search_seo.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
+    // tech_stack reads each player's homepage plus up to 2 pages (the target through the authorized
+    // Japanese proxy) and saves page digests that par_matrix classifies in the next phase
+    { name: 'collect', scripts: ['website_audit.js', '../scrapers/marketplace_jp.js', 'tech_stack.js'], env: {} },
+    { name: 'analyse', scripts: ['jp_demand.js', 'social_audit.js', 'competitive_analysis.js', 'search_seo.js', 'par_matrix.js'], env: { BI_SKIP_MARKETPLACE_HOOK: '1' } },
+    // niche discovery reads marketplace, social and demand output and only PROPOSES brands; nothing is
+    // scanned until someone approves a candidate in the dashboard
+    { name: 'discover', scripts: ['niche_discovery.js'], env: {} },
     { name: 'personas', scripts: ['personas.js'], env: {} },
     // the blueprint reads personas, marketplace, demand, search and the competitor scrape, and the
     // action plan then builds on it
     { name: 'blueprint', scripts: ['site_blueprint.js'], env: {} },
+    // the 360 strategy reads every layer (social tiers, tech, par gaps, blueprint) and the action plan follows it
+    { name: 'strategy', scripts: ['strategy_360.js'], env: {} },
     { name: 'plan', scripts: ['action_plan.js'], env: {} },
     // translations last: they read every module's final output (English to Japanese for the report,
     // Japanese to English for the dashboard and the English report)

@@ -45,16 +45,30 @@ function archiveData(slug, module, data) {
 
 // ─── HTTP fetch helper (no npm deps — uses built-in https/http) ───────────────
 
-function fetchText(url, timeoutMs = 10000) {
+function fetchTextDirect(url, timeoutMs = 10000) { return fetchText(url, timeoutMs); }
+
+// A direct GET. The first URL and every redirect hop must be 'direct' under utils/site_access.js: a
+// denied host or a proxy-only host is never requested here (proxy URLs go through fetchPage, via
+// makeProxyFetchText). This also covers every sitemap and child sitemap URL analyzeSitemap reads.
+const FETCH_TEXT_MAX_HOPS = 5;
+function fetchText(url, timeoutMs = 10000, _hops = 0) {
   return new Promise((resolve, reject) => {
     let parsed;
     try { parsed = new URL(url); } catch (e) { return reject(new Error(`Invalid URL: ${url}`)); }
+    const acc = require('../utils/site_access').accessFor(url);
+    if (acc.mode !== 'direct') {
+      return reject(new Error(`Not requested: ${acc.mode === 'jp_proxy' ? 'this host is reachable only through the authorized proxy route' : acc.reason} (${url})`));
+    }
     const lib = parsed.protocol === 'https:' ? https : http;
     const req = lib.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SEOBot/1.0)' } }, (res) => {
-      if (res.statusCode >= 400) return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
-      // Follow redirect
+      if (res.statusCode >= 400) { res.resume(); return reject(new Error(`HTTP ${res.statusCode} for ${url}`)); }
+      // Follow redirect by hand, re-checking the route on every hop
       if (res.statusCode >= 300 && res.headers.location) {
-        return fetchText(res.headers.location, timeoutMs).then(resolve).catch(reject);
+        res.resume();
+        if (_hops >= FETCH_TEXT_MAX_HOPS) return reject(new Error(`Too many redirects for ${url}`));
+        let next;
+        try { next = new URL(res.headers.location, url).href; } catch (_) { return reject(new Error(`Bad redirect from ${url}`)); }
+        return fetchText(next, timeoutMs, _hops + 1).then(resolve).catch(reject);
       }
       const chunks = [];
       res.on('data', c => chunks.push(c));
@@ -87,10 +101,106 @@ function detectBlocked(seo) {
   return !seo.titleTag && !seo.h1 && !(seo.schemaMarkup || []).length && !seo.canonicalTag;
 }
 
+// ─── Proxy route (a site authorized for reading only through a Japanese proxy) ──
+//
+// utils/site_access.js decides the route. A jp_proxy host is never requested directly: every GET
+// goes through siteAccess.fetchPage, which holds the per-module page budget and the polite pace.
+
+const siteAccess = require('../utils/site_access');
+
+function proxyLogLine(url, access) {
+  const a = (access && access.authorization) || {};
+  return `Requesting ${url} via Japanese proxy (authorized ${a.by || 'unknown'} ${a.at || 'unknown date'})`;
+}
+
+/** A fetchText-compatible function that goes through the proxy route. Throws when not fetched. */
+function makeProxyFetchText(fetchPage = siteAccess.fetchPage, access = null) {
+  return async (url, timeoutMs) => {
+    log(proxyLogLine(url, access || siteAccess.accessFor(url)));
+    const r = await fetchPage(url, { timeoutMs: Math.max(timeoutMs || 0, 30000) });
+    if (r.skipped) throw new Error(`Not requested: ${r.reason}`);
+    if (!r.ok) throw new Error(r.blocked ? `Blocked page for ${url}` : `HTTP ${r.status} for ${url}`);
+    return r.text;
+  };
+}
+
+const decodeHtml = (s) => String(s || '')
+  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/\s+/g, ' ').trim();
+const stripTags = (s) => decodeHtml(String(s || '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' '));
+
+/** The on-page SEO fields read from raw HTML (same shape as the browser scrape). */
+function seoFromHtml(url, html) {
+  const h = String(html || '');
+  const attr = (tag, name) => { const m = tag.match(new RegExp(`${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, 'i')); return m ? decodeHtml(m[2] != null ? m[2] : m[3]) : ''; };
+  const metaTag = (h.match(/<meta[^>]+name\s*=\s*["']description["'][^>]*>/i) || [])[0] || '';
+  const canonTag = (h.match(/<link[^>]+rel\s*=\s*["']canonical["'][^>]*>/i) || [])[0] || '';
+  const schemas = [];
+  for (const m of h.matchAll(/<script[^>]+type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try { const j = JSON.parse(m[1]); [].concat(j).forEach(x => x && x['@type'] && schemas.push(...[].concat(x['@type']))); } catch (_) {}
+  }
+  return {
+    url,
+    titleTag: stripTags((h.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || ''),
+    metaDescription: attr(metaTag, 'content'),
+    h1: stripTags((h.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || ''),
+    h2s: [...h.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/gi)].map(m => stripTags(m[1])).filter(t => t.length > 1).slice(0, 8),
+    schemaMarkup: [...new Set(schemas)],
+    canonicalTag: attr(canonTag, 'href') || null,
+    // Timing through a residential proxy says nothing about the site's own speed.
+    pageSpeedSignal: 'unknown',
+    error: null,
+  };
+}
+
+/** On-page SEO of one page fetched through the proxy route. */
+async function scrapeOnPageSeoViaProxy(url, { fetchPage = siteAccess.fetchPage, access = null } = {}) {
+  const acc = access || siteAccess.accessFor(url);
+  log(proxyLogLine(url, acc));
+  let r;
+  try { r = await fetchPage(url, { timeoutMs: 45000 }); } catch (err) { r = { ok: false, error: err.message }; }
+  if (r.skipped) return { url, skipped: true, blocked: true, error: null, reason: r.reason, via: 'jp_proxy', titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: '', pageSpeedSignal: 'unknown' };
+  if (r.error || !r.text) return { url, blocked: true, error: r.error || `HTTP ${r.status}`, via: 'jp_proxy', titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: null, pageSpeedSignal: 'unknown' };
+  const seo = { ...seoFromHtml(url, r.text), finalUrl: r.url || url, httpStatus: r.status, via: 'jp_proxy', observedAt: new Date().toISOString() };
+  seo.blocked = !r.ok || detectBlocked(seo);
+  if (seo.blocked) log(`  ${url}: proxied page unusable (status ${r.status}${r.blocked ? ', block page' : ''}, title="${seo.titleTag.slice(0, 40)}")`);
+  else log(`  ${url} (via Japanese proxy): title="${seo.titleTag.slice(0, 40)}", schema=[${seo.schemaMarkup.join(',')}]`);
+  return seo;
+}
+
+/**
+ * Category pages for the proxy route, from the target's own navigation in site_intelligence.json
+ * (the proxied scrape). Same host only, not the home page, not account or cart pages.
+ */
+function proxiedCategoryUrls(profile, siteIntel, max = 3) {
+  const t = siteIntel && Array.isArray(siteIntel.brands) ? siteIntel.brands.find(b => b.role === 'target') : null;
+  if (!t || t.stale || t.manualCapture) return [];
+  let host;
+  try { host = new URL(profile.url).hostname.replace(/^www\./, ''); } catch { return []; }
+  const out = [];
+  for (const n of t.navigation || []) {
+    try {
+      const u = new URL(n.href);
+      if (u.hostname.replace(/^www\./, '') !== host) continue;
+      if (u.pathname.split('/').filter(Boolean).length < 2) continue;
+      if (/login|cart|account|mypage|register|search|help|faq|store|shop-list|guide/i.test(u.pathname)) continue;
+      u.hash = '';
+      if (!out.includes(u.href)) out.push(u.href);
+    } catch (_) {}
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
 // ─── Sitemap analysis ─────────────────────────────────────────────────────────
 
-async function analyzeSitemap(baseUrl) {
-  if (!require('../utils/no_contact').hostAllowed(baseUrl)) return { skipped: true, found: null, url: null, totalUrls: 0, byType: { product: 0, collection: 0 }, issues: [], reason: require('../utils/no_contact').NO_CONTACT_REASON };
+/**
+ * opts.fetchText replaces the direct fetch (the proxy route passes makeProxyFetchText()), and
+ * opts.maxChildren bounds the child sitemaps read (the proxy route has a small page budget).
+ */
+async function analyzeSitemap(baseUrl, opts = {}) {
+  if (!opts.viaProxy && !require('../utils/no_contact').hostAllowed(baseUrl)) return { skipped: true, found: null, url: null, totalUrls: 0, byType: { product: 0, collection: 0 }, issues: [], reason: require('../utils/no_contact').NO_CONTACT_REASON };
+  const fetchText = opts.fetchText || fetchTextDirect;
   const result = {
     found: false,
     url: null,
@@ -143,7 +253,7 @@ async function analyzeSitemap(baseUrl) {
   // sitemap were never seen. And child <loc> values carry XML-escaped query strings
   // (?from=1&amp;to=2), which have to be decoded or the fetch asks for a URL the server does not
   // recognise. Read every child now, bounded by MAX_CHILD_SITEMAPS, and say so when the bound bites.
-  const MAX_CHILD_SITEMAPS = 30;
+  const MAX_CHILD_SITEMAPS = opts.maxChildren != null ? opts.maxChildren : 30;
   const decodeXml = (s) => s
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'");
@@ -161,8 +271,10 @@ async function analyzeSitemap(baseUrl) {
     let failed = 0;
     // Small parallel batches: 15 sequential fetches of a half-megabyte each is slow enough to
     // trip the module timeout on a large catalogue.
-    for (let i = 0; i < toRead.length; i += 5) {
-      const batch = toRead.slice(i, i + 5);
+    // The proxy route reads one at a time (its fetch keeps a polite pace anyway).
+    const step = opts.viaProxy ? 1 : 5;
+    for (let i = 0; i < toRead.length; i += step) {
+      const batch = toRead.slice(i, i + step);
       const results = await Promise.all(batch.map(u =>
         fetchText(u, 15000).then(locsIn).catch(() => { failed++; return null; })
       ));
@@ -242,6 +354,7 @@ async function discoverMultiPageUrls(profile) {
         const context = await browser.newContext({
           userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         });
+        await siteAccess.guardContext(context); // redirects and subresources to denied or proxy-only hosts are aborted
         const page = await context.newPage();
         await page.goto(categoryUrls[0], { waitUntil: 'domcontentloaded', timeout: 20000 });
         await page.waitForTimeout(2000);
@@ -280,6 +393,7 @@ async function scrapeOnPageSeoWithBrowser(url, browser) {
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1440, height: 900 },
   });
+  await siteAccess.guardContext(context); // redirects and subresources to denied or proxy-only hosts are aborted
   const page = await context.newPage();
   const result = { url, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: null, pageSpeedSignal: 'unknown', error: null };
 
@@ -312,6 +426,8 @@ async function scrapeOnPageSeoWithBrowser(url, browser) {
 }
 
 async function scrapeOnPageSeo(url) {
+  const acc = siteAccess.accessFor(url);
+  if (acc.mode === 'jp_proxy') return scrapeOnPageSeoViaProxy(url, { access: acc });
   if (!require('../utils/no_contact').hostAllowed(url)) return { url, skipped: true, blocked: true, error: null, reason: require('../utils/no_contact').NO_CONTACT_REASON, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: '', pageSpeedSignal: 'unknown' };
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   try {
@@ -329,7 +445,8 @@ async function scrapeMultiplePages(urlGroups) {
   try {
     for (const { url, pageType } of urlGroups) {
       log(`Scraping ${pageType} page: ${url}`);
-      const seo = await scrapeOnPageSeoWithBrowser(url, browser).catch(err => ({
+      const acc = siteAccess.accessFor(url);
+      const seo = await (acc.mode === 'jp_proxy' ? scrapeOnPageSeoViaProxy(url, { access: acc }) : scrapeOnPageSeoWithBrowser(url, browser)).catch(err => ({
         url, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: null, pageSpeedSignal: 'unknown', error: err.message,
       }));
       results.push({ ...seo, pageType });
@@ -628,9 +745,16 @@ function fallbackGeoQueries(profile) {
   ];
 }
 
+// Players to compare against: competitors only (a partner such as Don Quijote is never scored or
+// ranked) and only those with a website, in profile order. Every "first N competitors" slice uses this.
+const { playersFor, competitorsOnly } = require('../utils/players');
+function scoredCompetitors(profile) {
+  return competitorsOnly(playersFor(profile || {})).filter(p => p && p.url);
+}
+
 async function runGeoAnalysis(anthropic, profile, keywordUniverse) {
   const brandName = profile.name;
-  const competitorNames = (profile.identifiedCompetitors || []).slice(0, 8).map(c => c.name);
+  const competitorNames = scoredCompetitors(profile).slice(0, 8).map(c => c.name);
   const aiQueries = (keywordUniverse.aiDiscoveryQueries || []).slice(0, 10);
 
   const japan = isJapanMarket(profile);
@@ -762,7 +886,7 @@ async function runSerpRankCheck(profile, keywordUniverse, { fetchJson } = {}) {
   if (!apiKey) return { skipped: true, reason: 'SERP_API_KEY is not set, so google.co.jp rankings were not checked.', params };
   const get = fetchJson || (async (url) => JSON.parse(await fetchText(url, 20000)));
   const targetHost = hostOf(profile.url);
-  const comps = (profile.identifiedCompetitors || []).slice(0, 8).map(c => ({ name: c.name, host: hostOf(c.url) })).filter(c => c.host);
+  const comps = scoredCompetitors(profile).slice(0, 8).map(c => ({ name: c.name, host: hostOf(c.url) })).filter(c => c.host);
   const glosses = keywordUniverse?.glosses || {};
   const results = [];
   for (const term of pickSerpTerms(keywordUniverse)) {
@@ -986,6 +1110,38 @@ Valid values: impact = "High" | "Medium" | "Low", effort = "Quick Win" | "1-2 we
 
 // ─── Main orchestrator ────────────────────────────────────────────────────────
 
+const unobservedOnPage = (url, reason) => ({ url, skipped: true, blocked: true, error: null, reason, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: '', pageSpeedSignal: 'unknown' });
+
+/**
+ * The target's homepage, robots.txt, sitemap and category pages through the proxy route. Order is
+ * by value, so the page budget runs out on the least important pages: homepage, robots, sitemap
+ * (at most 2 sections), then category pages with what is left. When the homepage could not be read
+ * through the proxy, the result keeps the "not observed" shape (skipped), so nothing is claimed.
+ */
+async function auditTargetViaProxy(profile, siteIntel, { access = null, fetchPage = siteAccess.fetchPage } = {}) {
+  const acc = access || siteAccess.accessFor(profile.url);
+  const home = await scrapeOnPageSeoViaProxy(profile.url, { fetchPage, access: acc });
+  if (home.blocked || home.error || home.skipped) {
+    const why = home.skipped ? home.reason : `the page could not be read through the Japanese proxy (${home.error || 'block page or empty page'})`;
+    log(`Target homepage not observed via proxy: ${why}`);
+    return {
+      onPageSeo: { ...unobservedOnPage(profile.url, `Not observed: ${why}`), via: 'jp_proxy', proxyAttempted: true },
+      sitemapAnalysis: { skipped: true, found: null, url: null, totalUrls: 0, byType: { product: 0, collection: 0 }, issues: [], reason: 'Homepage could not be read through the Japanese proxy, so the sitemap was not requested.', via: 'jp_proxy' },
+      pageAnalyses: [],
+    };
+  }
+  const sitemapAnalysis = await analyzeSitemap(profile.url, { viaProxy: true, fetchText: makeProxyFetchText(fetchPage, acc), maxChildren: 2 })
+    .then(r => ({ ...r, via: 'jp_proxy' }))
+    .catch(err => { log(`Sitemap via proxy error: ${err.message}`); return null; });
+  const pageAnalyses = [];
+  for (const url of proxiedCategoryUrls(profile, siteIntel, 3)) {
+    const seo = await scrapeOnPageSeoViaProxy(url, { fetchPage, access: acc });
+    if (seo.skipped) { log(`  ${url}: ${seo.reason}`); break; }
+    pageAnalyses.push({ ...seo, pageType: 'category' });
+  }
+  return { onPageSeo: home, sitemapAnalysis, pageAnalyses };
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const slug = (args.find(a => a.startsWith('--slug=')) || '').replace('--slug=', '');
@@ -1002,7 +1158,12 @@ async function run() {
   // A brand whose operator blocks automated access is never requested (home page, sitemap, robots.txt,
   // category pages). The result says so plainly instead of scoring a block page.
   const contactTarget = require('../utils/no_contact').targetContactAllowed(profile);
-  if (!contactTarget) log(`Not requesting ${profile.url}: ${require('../utils/no_contact').NO_CONTACT_REASON}`);
+  // A site the brand owner authorized for reading only through a Japanese proxy: homepage, robots,
+  // sitemap and a few category pages go through siteAccess.fetchPage, inside its page budget.
+  const targetAccess = siteAccess.accessFor(profile.url);
+  const proxyTarget = !contactTarget && targetAccess.mode === 'jp_proxy';
+  if (proxyTarget) log(`Target ${profile.url} reachable only via Japanese proxy (authorized ${targetAccess.authorization.by} ${targetAccess.authorization.at}), at most ${targetAccess.maxPages} pages this run`);
+  else if (!contactTarget) log(`Not requesting ${profile.url}: ${require('../utils/no_contact').NO_CONTACT_REASON}`);
 
   // 1. Discover multi-page URLs
   log('Discovering multi-page URLs from site intelligence...');
@@ -1013,7 +1174,11 @@ async function run() {
 
   // 2. Sitemap analysis
   let sitemapAnalysis;
-  if (contactTarget) {
+  let onPageSeo;
+  let proxiedPages = null;
+  if (proxyTarget) {
+    ({ onPageSeo, sitemapAnalysis, pageAnalyses: proxiedPages } = await auditTargetViaProxy(profile, loadBrandData(slug, 'site_intelligence.json'), { access: targetAccess }));
+  } else if (contactTarget) {
     log(`Analyzing sitemap for ${profile.url}...`);
     sitemapAnalysis = await analyzeSitemap(profile.url).catch(err => {
       log(`Sitemap error: ${err.message}`);
@@ -1024,8 +1189,9 @@ async function run() {
   }
 
   // 3. Scrape homepage
-  let onPageSeo;
-  if (contactTarget) {
+  if (proxyTarget) {
+    // done above
+  } else if (contactTarget) {
     log(`Scraping on-page SEO for ${profile.url}...`);
     onPageSeo = await scrapeOnPageSeo(profile.url);
   } else {
@@ -1037,8 +1203,8 @@ async function run() {
     ...categoryUrls.map(url => ({ url, pageType: 'category' })),
     ...productUrls.map(url => ({ url, pageType: 'product' })),
   ];
-  let pageAnalyses = [];
-  if (multiPageGroups.length > 0) {
+  let pageAnalyses = proxiedPages || [];
+  if (!proxyTarget && multiPageGroups.length > 0) {
     log(`Scraping ${multiPageGroups.length} additional pages (category/product)...`);
     pageAnalyses = await scrapeMultiplePages(multiPageGroups).catch(err => {
       log(`Multi-page scraping error: ${err.message}`);
@@ -1050,7 +1216,7 @@ async function run() {
   const allPageAnalyses = [{ ...onPageSeo, pageType: 'homepage' }, ...pageAnalyses];
 
   // 5. Scrape competitor homepages (top 3)
-  const competitorUrls = (profile.identifiedCompetitors || []).slice(0, 3);
+  const competitorUrls = scoredCompetitors(profile).slice(0, 3);
   const competitorSeos = [];
   for (const comp of competitorUrls) {
     log(`Scraping competitor SEO: ${comp.url}`);
@@ -1129,6 +1295,14 @@ async function run() {
 }
 
 module.exports = {
+  auditTargetViaProxy,
+  fetchText,
+  scoredCompetitors,
+  scrapeOnPageSeoWithBrowser,
+  seoFromHtml,
+  scrapeOnPageSeoViaProxy,
+  proxiedCategoryUrls,
+  analyzeSitemap,
   buildUnrequestedPriorityActions,
   isJapanMarket,
   serpParamsFor,

@@ -583,7 +583,11 @@ async function fetchRakutenRankingApi({ env = process.env, genreId = RAKUTEN_TOY
  * Generic Apify page fetch with a JP residential proxy. Never calls Apify on a dry run or
  * without APIFY_API_TOKEN; prints the intended call instead.
  */
-async function apifyFetchHtml({ url, env = process.env, dryRun = false, log = () => {}, clientFactory } = {}) {
+// One page of apify/cheerio-scraper on JP residential proxy: well under a cent of compute plus proxy
+// traffic for one heavy marketplace page. Reserved generously.
+const APIFY_PAGE_ESTIMATE_USD = 0.05;
+
+async function apifyFetchHtml({ url, env = process.env, dryRun = false, log = () => {}, clientFactory, slug = null, budgetOpts = {}, budget = require('../utils/apify_budget') } = {}) {
   const input = {
     startUrls: [{ url }],
     maxRequestsPerCrawl: 1,
@@ -595,13 +599,25 @@ async function apifyFetchHtml({ url, env = process.env, dryRun = false, log = ()
     log(`[apify ${dryRun ? 'dry-run' : 'skipped, APIFY_API_TOKEN not set'}] would call ${APIFY_ACTOR} for ${url} (proxy RESIDENTIAL/JP)`);
     return { skipped: true, reason: dryRun ? 'dry run' : 'APIFY_API_TOKEN not set', intended: { actor: APIFY_ACTOR, input } };
   }
+  // Per-run Apify spend cap (utils/apify_budget.js). Without a slug there is no ledger to charge.
+  let grant = null;
+  if (slug) {
+    grant = budget.reserve(slug, APIFY_PAGE_ESTIMATE_USD, `marketplace page ${url}`, budgetOpts);
+    if (!grant.ok) {
+      log(`[apify skipped, budget] ${url}: ${grant.reason}`);
+      return { skipped: true, budgetSkipped: true, reason: grant.reason };
+    }
+  }
+  let run = null;
   try {
     const client = clientFactory ? clientFactory(token) : new (require('apify-client').ApifyClient)({ token });
-    const run = await client.actor(APIFY_ACTOR).call(input, { timeout: 120 });
-    const { items } = await client.dataset(run.defaultDatasetId).listItems();
+    run = await client.actor(APIFY_ACTOR).call(input, budget.callOptions(grant, { timeout: 120 }));
+    if (grant) { try { budget.record(slug, grant, run, budgetOpts); } catch (_) {} grant = null; }
+    const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: 1 });
     const html = items && items[0] && items[0].html;
     return html ? { html } : { skipped: true, reason: 'apify returned no html' };
   } catch (err) {
+    if (grant) { try { budget.record(slug, grant, run, budgetOpts); } catch (_) {} }
     return { skipped: true, reason: `apify error: ${err.message}` };
   }
 }
@@ -650,7 +666,7 @@ function capReviewsFairly(bySource, max) {
 async function collectMarketplace({
   slug, categories, log = m => console.log(`[marketplace_jp] ${m}`), dryRun = false, write = true,
   dataDir = DATA_DIR, env = process.env, maxReviews = MAX_REVIEWS, fetcher: injected, fetchImpl,
-  retryDelayMs = RETRY_DELAY_MS,
+  retryDelayMs = RETRY_DELAY_MS, apifyClientFactory, budget,
 } = {}) {
   const cats = (categories && categories.length ? categories : DEFAULT_CATEGORIES)
     .filter(c => c && c.url && (c.source === 'amazon_jp' || c.source === 'rakuten'));
@@ -706,9 +722,10 @@ async function collectMarketplace({
     let html = res.html;
     let block = res.error ? { blocked: true, reason: `error: ${res.error}` } : detectBlock({ html, status: res.status, url: res.finalUrl });
     if (block && apify) {
-      const ap = await apifyFetchHtml({ url: c.url, env, log });
+      const ap = await apifyFetchHtml({ url: c.url, env, log, slug: write ? slug : null, budgetOpts: { dataDir }, ...(apifyClientFactory ? { clientFactory: apifyClientFactory } : {}), ...(budget ? { budget } : {}) });
       if (ap.html && !detectBlock({ html: ap.html })) { html = ap.html; block = null; notes.push(`apify used for ${c.url}`); }
       else notes.push(`apify not used for ${c.url}: ${ap.reason || 'still blocked'}`);
+      if (ap.budgetSkipped && block) block = { ...block, budgetSkipped: true, budgetReason: ap.reason };
     }
     return block ? { block } : { html };
   };
@@ -744,7 +761,7 @@ async function collectMarketplace({
           continue;
         }
         log(`${key} blocked (${r.block.reason})`);
-        recordFailed(c, r.block.reason);
+        recordFailed(c, r.block.reason, r.block.budgetSkipped ? { budgetSkipped: true, budgetReason: r.block.budgetReason } : {});
         continue;
       }
       const topItems = parseCategory(c.source, r.html);
