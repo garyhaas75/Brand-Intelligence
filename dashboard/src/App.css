@@ -4,10 +4,32 @@ body { background: var(--bg, #f9fafb); transition: background 0.2s; }
 #root { width: 100%; min-height: 100vh; }
 input, select, textarea { color-scheme: light dark; }
 
-/* Tab bars — hide scrollbar, allow horizontal scroll */
+/* Tab bars - hide scrollbar, allow horizontal scroll */
 .ak-tabs, .ak-sub-tabs { overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
 .ak-tabs::-webkit-scrollbar, .ak-sub-tabs::-webkit-scrollbar { display: none; }
 
 /* Responsive grid helpers */
 .ak-grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
 .ak-grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+
+/* ── Top nav (App.jsx .bi-nav): labels never wrap mid-word; the tab strip
+   scrolls instead of the page, and under 760px the nav wraps into rows with the
+   tabs on their own full-width scrolling row. ── */
+.bi-nav > * { flex-shrink: 0; white-space: nowrap; }
+.bi-nav > .bi-nav-spacer { flex: 1 1 0; min-width: 0; }
+.bi-nav > .bi-nav-tabs { flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent; }
+.bi-nav-tabs > button { white-space: nowrap; flex-shrink: 0; }
+.bi-nav-tabs::-webkit-scrollbar { height: 4px; }
+.bi-nav-tabs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+/* Eight tabs next to the logo, brand switcher and account controls do not fit
+   below about 1500px (less in Japanese), so the tabs take their own row there. */
+@media (max-width: 1500px) {
+  .bi-nav { flex-wrap: wrap; height: auto !important; padding: 8px 24px !important; row-gap: 6px; }
+  .bi-nav > .bi-nav-tabs { order: 10; flex: 1 1 100%; }
+}
+@media (max-width: 760px) {
+  .bi-nav { flex-wrap: wrap; height: auto !important; padding: 8px 12px !important; gap: 8px !important; }
+  .bi-nav > .bi-nav-spacer { display: none; }
+  .bi-nav > .bi-nav-tabs { order: 10; flex: 1 1 100%; }
+  .bi-nav > select { max-width: 150px; }
+}

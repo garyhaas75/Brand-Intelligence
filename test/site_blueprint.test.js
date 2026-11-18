@@ -264,3 +264,74 @@ test('truncation never cuts a word in half, and the summary keeps up to 1400 cha
   const cut = bp.normalizeBlueprint({ summary: 'word '.repeat(400) });
   assert.doesNotMatch(cut.summary, /\bwor…$/);
 });
+
+test('no module requests a brand whose operator blocks automated access (search and social included)', () => {
+  const { targetContactAllowed, NO_CONTACT_REASON } = require('../utils/no_contact');
+  assert.strictEqual(targetContactAllowed({ scrape: { skipApifyRetry: true } }), false);
+  assert.strictEqual(targetContactAllowed({}), true);
+  assert.strictEqual(targetContactAllowed(null), true);
+  assert.match(NO_CONTACT_REASON, /blocks automated access/);
+  const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+  const seo = read('analysis/search_seo.js');
+  assert.match(seo, /const contactTarget = require\('\.\.\/utils\/no_contact'\)\.targetContactAllowed\(profile\)/);
+  assert.match(seo, /contactTarget \? await discoverMultiPageUrls/);
+  assert.match(seo, /if \(contactTarget\) \{\s*log\(`Analyzing sitemap/);
+  assert.match(seo, /if \(contactTarget\) \{\s*log\(`Scraping on-page SEO/);
+  assert.match(seo, /onPageSeo\.skipped \? \[\] : await generateCompetitorBenchmarks/);
+  assert.match(read('analysis/social_audit.js'), /noContactTarget = brand\.role === 'target' && !require\('\.\.\/utils\/no_contact'\)\.targetContactAllowed\(profile\)/);
+  assert.match(read('analysis/social_audit.js'), /noContactTarget \? \{ skipPageDetection: true \} : \{\}/);
+  const acts = require('../analysis/search_seo').buildUnrequestedPriorityActions();
+  assert.strictEqual(acts.length, 5);
+  assert.ok(acts.every(a => a.action && a.why && a.impact));
+  assert.ok(!JSON.stringify(acts).includes('\u2014'));
+  assert.doesNotMatch(JSON.stringify(acts), /Attention Required|Cloudflare\b.*currently|is missing|has no/i);
+});
+
+test('the no-contact rule is host based: the blocked site is refused even when it appears as a competitor in another brand', () => {
+  const nc = require('../utils/no_contact');
+  assert.strictEqual(nc.hostAllowed('https://www.toysrus.co.jp/'), false);
+  assert.strictEqual(nc.hostAllowed('https://toysrus.co.jp/c/1'), false);
+  assert.strictEqual(nc.hostAllowed('https://shop.toysrus.co.jp/'), false, 'subdomains too');
+  assert.strictEqual(nc.hostAllowed('https://www.toysrus.com.lb/'), true, 'a different brand domain is untouched');
+  assert.strictEqual(nc.hostAllowed('https://www.amazon.co.jp/toys/'), true);
+  assert.strictEqual(nc.hostAllowed('not a url'), true);
+  assert.strictEqual(nc.targetContactAllowed({ url: 'https://www.toysrus.co.jp/' }), false, 'host alone blocks, no profile flag needed');
+  assert.strictEqual(nc.targetContactAllowed({ url: 'https://www.akachan.jp/' }), true);
+  assert.strictEqual(nc.targetContactAllowed({ url: 'https://www.akachan.jp/', scrape: { skipApifyRetry: true } }), false);
+  process.env.BI_NO_CONTACT_HOSTS = 'example-blocked.test';
+  try { assert.strictEqual(nc.hostAllowed('https://www.example-blocked.test/'), false); } finally { delete process.env.BI_NO_CONTACT_HOSTS; }
+  // the Japan competitor set never offers a host we cannot request
+  const { jpCompetitorsFor } = require('../scrapers/jp_competitors');
+  assert.ok(!jpCompetitorsFor('https://www.akachan.jp/').some(c => /toysrus\.co\.jp/.test(c.url)));
+  const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+  for (const [f, pat] of [['analysis/search_seo.js', /async function analyzeSitemap\(baseUrl\) \{\n  if \(!require\('\.\.\/utils\/no_contact'\)\.hostAllowed\(baseUrl\)\)/], ['analysis/search_seo.js', /async function scrapeOnPageSeo\(url\) \{\n  if \(!require\('\.\.\/utils\/no_contact'\)\.hostAllowed\(url\)\)/], ['analysis/search_seo.js', /async function scrapeOnPageSeoWithBrowser\(url, browser\) \{\n  if \(!require/], ['scrapers/site_scraper.js', /host not requested/], ['analysis/social_audit.js', /async function detectHandlesFromPage\(brandUrl\) \{\n  if \(!require\('\.\.\/utils\/no_contact'\)\.hostAllowed\(brandUrl\)\) return emptySocialLinks\(\)/], ['analysis/brand_discovery.js', /async function scrapeHomepage\(url\) \{\n  if \(!require\('\.\.\/utils\/no_contact'\)\.hostAllowed\(url\)\) throw/]]) assert.match(read(f), pat, f + ' ' + pat);
+});
+
+test('neutral unrequested actions are brand aware, carry an effort field, and never mention a vendor or another market', () => {
+  const { buildUnrequestedPriorityActions: b } = require('../analysis/search_seo');
+  const lb = b({ name: 'Toys R Us Lebanon', market: 'Lebanon', url: 'https://toysrus.com.lb' });
+  const jp = b({ name: 'Toys R Us Japan', market: 'Japan', url: 'https://www.toysrus.co.jp/' });
+  for (const list of [lb, jp]) { assert.strictEqual(list.length, 5); assert.ok(list.every(a => a.effort && a.timeframe === a.effort && a.impact && a.why)); assert.doesNotMatch(JSON.stringify(list), /Cloudflare/); }
+  assert.match(lb[1].action, /Toys R Us Lebanon/);
+  assert.doesNotMatch(JSON.stringify(lb), /Japanese/);
+  assert.match(jp[4].action, /in Japanese/);
+});
+
+test('a brand flagged skipApifyRetry denies its host everywhere, including as a competitor elsewhere, and the three social detectors are gated', () => {
+  const nc = require('../utils/no_contact');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nc-'));
+  fs.mkdirSync(path.join(dir, 'newbrand'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'newbrand/profile.json'), JSON.stringify({ url: 'https://www.new-blocked-shop.example/', scrape: { skipApifyRetry: true } }));
+  fs.mkdirSync(path.join(dir, 'normal'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'normal/profile.json'), JSON.stringify({ url: 'https://ok-shop.example/' }));
+  assert.strictEqual(nc.hostAllowed('https://new-blocked-shop.example/x', [dir]), false);
+  assert.strictEqual(nc.hostAllowed('https://shop.new-blocked-shop.example/', [dir]), false);
+  assert.strictEqual(nc.hostAllowed('https://ok-shop.example/', [dir]), true);
+  assert.strictEqual(nc.hostAllowed('https://www.toysrus.co.jp/', [dir]), false, 'built-in list still applies');
+  const src = fs.readFileSync(path.join(__dirname, '../analysis/social_audit.js'), 'utf8');
+  for (const fn of ['detectInstagramHandle', 'detectTikTokHandle', 'detectFacebookHandle', 'detectHandlesFromPage']) {
+    const at = src.indexOf('async function ' + fn + '(brandUrl) {');
+    assert.ok(at >= 0, fn + ' exists');
+    assert.ok(src.slice(at, at + 260).includes('hostAllowed(brandUrl)'), fn + ' checks the host before loading the page');
+  }
+});

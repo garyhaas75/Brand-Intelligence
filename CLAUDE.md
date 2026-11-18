@@ -61,6 +61,7 @@ pkill -f "node server.js"
 - `toysrus-jp` is seeded with `scheduled:false`, so no cron job runs it. It refreshes only on demand (Refresh all runs the phased Japan run in `analysis/brand_discovery.js`; a per-brand run lock returns 409 if one is already active).
 - Its site (toysrus.co.jp) is operated by another company behind Cloudflare. The profile sets `scrape.skipApifyRetry`, so nothing requests that site. A hand-saved capture goes in `data/brands/<slug>/manual_capture/<brand-id>.html` (and `.png`).
 - Runs save progress per brand and per source (`utils/checkpoint.js`, 24h, `BI_FORCE=1` ignores it). A failed unit keeps its previous data marked stale, and prompts label it STALE.
+- **No module may request a brand's own site when its profile has `scrape.skipApifyRetry`** (`utils/no_contact.js`: `targetContactAllowed`). This covers the website scrape, sitemap and robots fetches, Lighthouse, the search/SEO audit (home page, sitemap, category pages) and the social handle page scan. It was found on 2026-11-17 that `search_seo.js` still requested toysrus.co.jp on every run and scored the Cloudflare block page; fixed. When adding any module that fetches URLs, grep the live module log for the brand's host after a run and confirm only the 'Not requesting' line appears.
 - A handle Claude guessed is saved to a profile only if the scrape returned real data. X, YouTube and LINE are scraped for Japan brands only.
 - Any config/data that must always be available must have a hardcoded default in server code (not just a seed file).
 

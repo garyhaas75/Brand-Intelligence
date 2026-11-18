@@ -446,3 +446,12 @@ test('a translations.json built under older English rules is not reused; the sam
   await outputs.run({ slug: 'demo', dataDir, client: c2, log: quiet, cacheFile: path.join(dataDir, 'cache.json') });
   assert.strictEqual(c2.calls.length, 0, 'same version: nothing is re-sent');
 });
+
+test('buildPrompt: opts.context adds one guidance line; without it the prompt is unchanged', () => {
+  const { buildPrompt } = T;
+  const plain = buildPrompt(['x'], 'ja').system;
+  assert.equal(buildPrompt(['x'], 'ja', { context: '' }).system, plain);
+  assert.equal(buildPrompt(['x'], 'ja', { context: '   ' }).system, plain);
+  const withCtx = buildPrompt(['x'], 'ja', { context: 'These are dashboard button and menu labels.' }).system;
+  assert.equal(withCtx, plain.replace('\nInput is a JSON object', '\nContext: These are dashboard button and menu labels.\nInput is a JSON object'));
+});

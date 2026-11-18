@@ -45,6 +45,7 @@ function updateRegistryStatus(slug, updates) {
 }
 
 async function scrapeHomepage(url) {
+  if (!require('../utils/no_contact').hostAllowed(url)) throw new Error('This site blocks automated access and is not requested by this tool. Create the profile by hand.');
   log(`Launching Playwright for: ${url}`);
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   const context = await browser.newContext({

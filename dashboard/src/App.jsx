@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
 import { auth } from './auth.jsx'
 import { BlueprintPanel, VerifyFirstPanel, BenchmarkNotice, BlueprintMissing } from './SiteBlueprint.jsx'
+import { useT as useTr, tFor, tEnum, fmt, LangContext, useLang } from './i18n.js'
 
 const API = '/api'
 
@@ -20,6 +21,25 @@ const DARK_T = {
   navText: '#f1f5f9', tabBg: '#1e293b', tabBorder: '#334155', inputBg: '#1e293b',
   inputBorder: '#475569', codeBg: '#111827', stripeBg: '#0f172a',
 }
+// Light pastel panels and dark ink read as glaring blocks on the dark theme: pb()
+// swaps a pastel for its hue at about 12% alpha, ink() swaps dark text for a light
+// shade of the same hue (4.5:1 or better on #1e293b). Light theme is unchanged.
+const PASTEL_DARK = {
+  '#f0fdf4': 'rgba(16,185,129,0.12)', '#ecfdf5': 'rgba(16,185,129,0.12)', '#d1fae5': 'rgba(16,185,129,0.16)',
+  '#fef2f2': 'rgba(239,68,68,0.12)', '#fff5f5': 'rgba(239,68,68,0.12)', '#fff1f2': 'rgba(244,63,94,0.12)', '#fee2e2': 'rgba(239,68,68,0.16)',
+  '#fffbeb': 'rgba(245,158,11,0.12)', '#fef3c7': 'rgba(245,158,11,0.16)', '#fff7ed': 'rgba(249,115,22,0.12)',
+  '#eff6ff': 'rgba(59,130,246,0.12)', '#dbeafe': 'rgba(59,130,246,0.16)', '#f0f9ff': 'rgba(14,165,233,0.12)',
+  '#ede9fe': 'rgba(139,92,246,0.16)', '#f3f4f6': 'rgba(148,163,184,0.16)', '#f5f3ff': 'rgba(139,92,246,0.12)', '#faf5ff': 'rgba(168,85,247,0.12)',
+}
+const INK_DARK = {
+  '#991b1b': '#fca5a5', '#7f1d1d': '#fca5a5', '#b91c1c': '#fca5a5', '#dc2626': '#f87171', '#ef4444': '#f87171',
+  '#78350f': '#fcd34d', '#92400e': '#fcd34d', '#9a3412': '#fdba74', '#7c2d12': '#fdba74',
+  '#065f46': '#6ee7b7', '#14532d': '#86efac', '#059669': '#34d399', '#10b981': '#34d399',
+  '#1e40af': '#93c5fd', '#1e3a8a': '#93c5fd', '#1d4ed8': '#93c5fd', '#2563eb': '#60a5fa', '#0369a1': '#7dd3fc',
+  '#5b21b6': '#c4b5fd', '#4c1d95': '#c4b5fd', '#7c3aed': '#c4b5fd', '#9f1239': '#fda4af', '#374151': '#cbd5e1',
+}
+const pb = (T, c) => (T === DARK_T && PASTEL_DARK[String(c).toLowerCase()]) || c
+const ink = (T, c) => (T === DARK_T && INK_DARK[String(c).toLowerCase()]) || c
 const ThemeContext = React.createContext(LIGHT_T)
 const useT = () => React.useContext(ThemeContext)
 
@@ -46,8 +66,7 @@ function storeLang(v) {
   try { window.localStorage.setItem(LANG_KEY, v) } catch { /* storage blocked: keep it for this session only */ }
 }
 const langQuery = lang => (lang === 'en' || lang === 'ja' ? `?lang=${lang}` : '')
-const LangContext = React.createContext({ lang: 'orig', onTranslationsHeader: () => {} })
-const useLang = () => React.useContext(LangContext)
+// LangContext and useLang live in i18n.js so the interface strings share the switch.
 
 // Returns a getter for one brand module's JSON in the current language. Its
 // identity changes with the language, so an effect that lists it as a
@@ -66,13 +85,13 @@ function useModuleFetch() {
 
 const TABS = [
   { id: 'portfolio', label: 'Portfolio' },
-  { id: 'profile', label: 'Brand Profile' },
+  { id: 'profile', label: 'Brand Profile', nav: 'Brand Profile@@nav' },
   { id: 'competitive', label: 'Competitive Analysis' },
   { id: 'personas', label: 'Personas' },
   { id: 'social', label: 'Social Audit' },
-  { id: 'website', label: 'Website Audit' },
-  { id: 'search', label: 'Search & SEO' },
-  { id: 'action', label: 'Action Plan' },
+  { id: 'website', label: 'Website Audit', nav: 'Website Audit@@nav' },
+  { id: 'search', label: 'Search & SEO', nav: 'Search & SEO@@nav' },
+  { id: 'action', label: 'Action Plan', nav: 'Action Plan@@nav' },
 ]
 
 // ─── Shared components ─────────────────────────────────────────────────────────
@@ -82,17 +101,20 @@ function Card({ children, style }) {
 }
 
 function Badge({ label, color = 'gray' }) {
+  const t = useTr()
+  const T = useT()
   const colors = {
     green: { bg: '#d1fae5', text: '#065f46' }, yellow: { bg: '#fef3c7', text: '#92400e' },
     red: { bg: '#fee2e2', text: '#991b1b' }, blue: { bg: '#dbeafe', text: '#1e40af' },
     purple: { bg: '#ede9fe', text: '#5b21b6' }, gray: { bg: '#f3f4f6', text: '#374151' },
   }
   const c = colors[color] || colors.gray
-  return <span style={{ display: 'inline-block', background: c.bg, color: c.text, fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+  return <span style={{ display: 'inline-block', background: pb(T, c.bg), color: ink(T, c.text), fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tEnum(t, label)}</span>
 }
 
 function HealthBadge({ status }) {
-  const map = { fresh: ['Fresh', 'green'], stale: ['Stale', 'yellow'], needs_refresh: ['Needs Refresh', 'red'], never_run: ['Never Run', 'gray'] }
+  const t = useTr()
+  const map = { fresh: [t('Fresh'), 'green'], stale: [t('Stale'), 'yellow'], needs_refresh: [t('Needs Refresh'), 'red'], never_run: [t('Never Run'), 'gray'] }
   const [label, color] = map[status] || map.never_run
   return <Badge label={label} color={color} />
 }
@@ -128,25 +150,24 @@ function EmptyState({ message, cta, onCta }) {
 
 // The label a person would read in the nav for a tab id, so a message about a
 // section can name it instead of saying "this section".
-const tabLabel = id => (TABS.find(t => t.id === id) || {}).label || 'this section'
+const tabLabel = (id, t = fmt) => t((TABS.find(x => x.id === id) || {}).label || 'this section')
 
 // Signed in, granted nothing. A card rather than the centred icon-and-a-line of
 // EmptyState, because this is not an empty dataset and must not look like one.
 // Neutral colours on purpose: no red, no amber. Nobody has hit a fault.
 function NoAccessCard({ email }) {
+  const t = useTr()
   const T = useT()
   return (
     <div style={{ maxWidth: 520, margin: '48px auto', background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: 28 }}>
       <div style={{ fontSize: 28, marginBottom: 10 }}>🔑</div>
-      <h2 style={{ color: T.text, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>No sections assigned yet</h2>
+      <h2 style={{ color: T.text, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>{t('No sections assigned yet')}</h2>
       <p style={{ color: T.textMuted, fontSize: 14, lineHeight: 1.6 }}>
-        Your account can sign in to Brand Intelligence but has not been given access to any
-        section of it yet. Ask an administrator to grant you the sections you need in the WHP
-        sign-in console, then sign in again. Nothing is missing or broken.
+        {t('Your account can sign in to Brand Intelligence but has not been given access to any section of it yet. Ask an administrator to grant you the sections you need in the WHP sign-in console, then sign in again. Nothing is missing or broken.')}
       </p>
       {email && (
         <p style={{ color: T.textFaint, fontSize: 12, marginTop: 14 }}>
-          Signed in as {email}. Use Sign out above to switch accounts.
+          {t('Signed in as {email}. Use Sign out above to switch accounts.', { email })}
         </p>
       )}
     </div>
@@ -157,23 +178,26 @@ function Spinner() {
   return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}><div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /></div>
 }
 
-function RefreshButton({ onClick, loading, label = 'Refresh' }) {
+function RefreshButton({ onClick, loading, label: labelProp }) {
+  const t = useTr()
+  const label = labelProp ?? t('Refresh')
   const T = useT()
   return (
-    <button onClick={onClick} disabled={loading} style={{ background: loading ? '#dbeafe' : 'none', border: `1px solid ${loading ? '#93c5fd' : T.border}`, borderRadius: 8, padding: '6px 14px', fontSize: 13, color: loading ? '#1e40af' : T.textSub, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+    <button onClick={onClick} disabled={loading} style={{ whiteSpace: 'nowrap', background: loading ? '#dbeafe' : 'none', border: `1px solid ${loading ? '#93c5fd' : T.border}`, borderRadius: 8, padding: '6px 14px', fontSize: 13, color: loading ? '#1e40af' : T.textSub, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
       <span style={{ display: 'inline-block', animation: loading ? 'spin 1s linear infinite' : 'none' }}>↻</span>
-      {loading ? 'Running...' : label}
+      {loading ? t('Running...') : label}
     </button>
   )
 }
 
 function RunningBanner({ moduleLabel, detail }) {
+  const t = useTr()
   return (
     <div style={{ background: '#dbeafe', border: '1px solid #93c5fd', borderRadius: 10, padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
       <span style={{ fontSize: 22, display: 'inline-block', animation: 'spin 1.2s linear infinite', flexShrink: 0 }}>⟳</span>
       <div>
-        <p style={{ color: '#1e40af', fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{moduleLabel} — Running</p>
-        <p style={{ color: '#1e3a8a', fontSize: 13 }}>{detail || 'This typically takes 2–5 minutes. Results will load automatically when complete.'}</p>
+        <p style={{ color: '#1e40af', fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{t('{moduleLabel} - Running', { moduleLabel })}</p>
+        <p style={{ color: '#1e3a8a', fontSize: 13 }}>{detail || t('This typically takes 2–5 minutes. Results will load automatically when complete.')}</p>
       </div>
     </div>
   )
@@ -191,6 +215,7 @@ const PIPELINE_STEPS = [
 ]
 
 function AddBrandModal({ onClose, onAdded }) {
+  const t = useTr()
   const T = useT()
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -257,11 +282,11 @@ function AddBrandModal({ onClose, onAdded }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
       <div style={{ background: T.surface, borderRadius: 16, padding: 32, width: isInProgress ? 520 : 480, maxWidth: '90vw' }}>
-        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{isInProgress ? 'Running Analysis Pipeline' : 'Add Brand'}</h2>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{isInProgress ? t('Running Analysis Pipeline') : t('Add Brand')}</h2>
 
         {!isInProgress ? (
           <>
-            <p style={{ color: T.textMuted, fontSize: 14, marginBottom: 24 }}>Enter the brand's website URL. We'll automatically discover the brand, identify competitors, and run the full analysis pipeline.</p>
+            <p style={{ color: T.textMuted, fontSize: 14, marginBottom: 24 }}>{t('Enter the brand\'s website URL. We\'ll automatically discover the brand, identify competitors, and run the full analysis pipeline.')}</p>
             <input
               type="url"
               placeholder="https://www.brandname.com"
@@ -271,17 +296,17 @@ function AddBrandModal({ onClose, onAdded }) {
               style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 15, marginBottom: 8, boxSizing: 'border-box' }}
               autoFocus
             />
-            {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 8 }}>{error}</p>}
+            {error && <p style={{ color: ink(T, '#ef4444'), fontSize: 13, marginBottom: 8 }}>{error}</p>}
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
               <button onClick={handleAdd} disabled={loading || !url} style={{ flex: 1, background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: loading ? 'wait' : 'pointer', opacity: loading || !url ? 0.7 : 1 }}>
-                {loading ? 'Starting discovery...' : 'Add Brand'}
+                {loading ? t('Starting discovery...') : t('Add Brand')}
               </button>
-              <button onClick={onClose} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, color: T.textSub, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={onClose} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, color: T.textSub, cursor: 'pointer' }}>{t('Cancel')}</button>
             </div>
           </>
         ) : (
           <>
-            <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>This takes 8–12 minutes. You can close this window — the pipeline continues in the background.</p>
+            <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>{t('This takes 8–12 minutes. You can close this window - the pipeline continues in the background.')}</p>
 
             {/* Progress bar */}
             <div style={{ background: T.surfaceAlt, borderRadius: 8, height: 8, marginBottom: 20, overflow: 'hidden' }}>
@@ -298,9 +323,9 @@ function AddBrandModal({ onClose, onAdded }) {
                 return (
                   <div key={step.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, background: bgColors[state], transition: 'background 0.4s' }}>
                     <span style={{ fontSize: 16, color: colors[state], fontWeight: 800, width: 20, textAlign: 'center', animation: state === 'running' ? 'spin 1s linear infinite' : 'none' }}>{icons[state]}</span>
-                    <span style={{ fontSize: 14, fontWeight: state === 'running' ? 700 : 400, color: state === 'pending' ? T.textFaint : T.text }}>{step.label}</span>
-                    {state === 'done' && <span style={{ marginLeft: 'auto', fontSize: 11, color: '#059669', fontWeight: 600 }}>Done</span>}
-                    {state === 'running' && <span style={{ marginLeft: 'auto', fontSize: 11, color: T.accent, fontWeight: 600 }}>Running...</span>}
+                    <span style={{ fontSize: 14, fontWeight: state === 'running' ? 700 : 400, color: state === 'pending' ? T.textFaint : T.text }}>{t(step.label)}</span>
+                    {state === 'done' && <span style={{ marginLeft: 'auto', fontSize: 11, color: ink(T, '#059669'), fontWeight: 600 }}>{t('Done')}</span>}
+                    {state === 'running' && <span style={{ marginLeft: 'auto', fontSize: 11, color: T.accent, fontWeight: 600 }}>{t('Running...')}</span>}
                   </div>
                 )
               })}
@@ -308,9 +333,9 @@ function AddBrandModal({ onClose, onAdded }) {
 
             <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
               <button onClick={() => { onAdded(discoverySlug) }} style={{ flex: 1, background: T.surfaceAlt, color: T.textSub, border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, cursor: 'pointer' }}>
-                Open Dashboard Now →
+                {t('Open Dashboard Now →')}
               </button>
-              <button onClick={onClose} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, color: T.textSub, cursor: 'pointer' }}>Close</button>
+              <button onClick={onClose} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 20px', fontSize: 14, color: T.textSub, cursor: 'pointer' }}>{t('Close')}</button>
             </div>
           </>
         )}
@@ -321,10 +346,11 @@ function AddBrandModal({ onClose, onAdded }) {
 
 // ─── Portfolio Tab ──────────────────────────────────────────────────────────────
 function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
+  const t = useTr()
   const T = useT()
 
   if (brands.length === 0) {
-    return <EmptyState message="No brands tracked yet. Add your first brand to begin the analysis pipeline." cta="Add Brand" onCta={onAddBrand} />
+    return <EmptyState message={t('No brands tracked yet. Add your first brand to begin the analysis pipeline.')} cta={t('Add Brand')} onCta={onAddBrand} />
   }
 
   return (
@@ -335,19 +361,19 @@ function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
               <div>
                 <h3 style={{ color: T.text, fontSize: 17, fontWeight: 700, marginBottom: 4 }}>{brand.name}</h3>
-                <p style={{ color: T.textMuted, fontSize: 13 }}>{brand.industry || 'Industry unknown'}</p>
+                <p style={{ color: T.textMuted, fontSize: 13 }}>{brand.industry || t('Industry unknown')}</p>
               </div>
               <HealthBadge status={brand.healthStatus} />
             </div>
             <p style={{ color: T.textFaint, fontSize: 12, marginBottom: 16 }}>{brand.url}</p>
             {brand.discoveryStatus === 'running' && (
-              <div style={{ background: '#dbeafe', color: '#1e40af', fontSize: 12, padding: '6px 12px', borderRadius: 8, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span> Pipeline running...
+              <div style={{ background: pb(T, '#dbeafe'), color: ink(T, '#1e40af'), fontSize: 12, padding: '6px 12px', borderRadius: 8, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span> {t('Pipeline running...')}
               </div>
             )}
             {brand.discoveryStatus === 'failed' && (
-              <div style={{ background: '#fee2e2', color: '#991b1b', fontSize: 12, padding: '6px 12px', borderRadius: 8, marginBottom: 12 }}>
-                ⚠ Discovery failed — check brand URL and try again
+              <div style={{ background: pb(T, '#fee2e2'), color: ink(T, '#991b1b'), fontSize: 12, padding: '6px 12px', borderRadius: 8, marginBottom: 12 }}>
+                {t('⚠ Discovery failed - check brand URL and try again')}
               </div>
             )}
             {/* Pipeline progress steps */}
@@ -357,7 +383,7 @@ function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
                   const mod = brand.moduleStatus?.find(m => m.module === step.file)
                   const done = step.key === 'discovery' ? brand.discoveryStatus === 'complete' : mod?.exists
                   return (
-                    <div key={step.key} title={step.label} style={{ flex: 1, height: 4, borderRadius: 2, background: done ? '#6366f1' : T.surfaceAlt, transition: 'background 0.3s' }} />
+                    <div key={step.key} title={t(step.label)} style={{ flex: 1, height: 4, borderRadius: 2, background: done ? '#6366f1' : T.surfaceAlt, transition: 'background 0.3s' }} />
                   )
                 })}
               </div>
@@ -366,15 +392,15 @@ function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
                   const mod = brand.moduleStatus?.find(m => m.module === step.file)
                   return (
                     <span key={step.key} style={{ fontSize: 10, color: mod?.exists ? '#059669' : T.textFaint, background: mod?.exists ? '#d1fae5' : T.surfaceAlt, padding: '2px 7px', borderRadius: 4, fontWeight: mod?.exists ? 600 : 400 }}>
-                      {mod?.exists ? '✓' : '○'} {step.label}
+                      {mod?.exists ? '✓' : '○'} {t(step.label)}
                     </span>
                   )
                 })}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => onSelectBrand(brand.slug)} style={{ flex: 1, background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Open</button>
-              <button onClick={() => onRefresh(brand.slug)} disabled={brand.discoveryStatus === 'running'} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: brand.discoveryStatus === 'running' ? T.textFaint : T.textSub, cursor: brand.discoveryStatus === 'running' ? 'not-allowed' : 'pointer' }}>{brand.discoveryStatus === 'running' ? '⟳ Running…' : '↻ Refresh All'}</button>
+              <button onClick={() => onSelectBrand(brand.slug)} style={{ flex: 1, background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{t('Open')}</button>
+              <button onClick={() => onRefresh(brand.slug)} disabled={brand.discoveryStatus === 'running'} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: brand.discoveryStatus === 'running' ? T.textFaint : T.textSub, cursor: brand.discoveryStatus === 'running' ? 'not-allowed' : 'pointer' }}>{brand.discoveryStatus === 'running' ? t('⟳ Running…') : t('↻ Refresh All')}</button>
             </div>
           </Card>
         ))}
@@ -385,6 +411,7 @@ function PortfolioTab({ brands, onSelectBrand, onAddBrand, onRefresh }) {
 
 // ─── Brand Profile Tab ──────────────────────────────────────────────────────────
 function BrandProfileTab({ slug, onRefresh, running }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const [editing, setEditing] = useState(false)
@@ -488,56 +515,56 @@ function BrandProfileTab({ slug, onRefresh, running }) {
 
   return (
     <div style={{ maxWidth: 800 }}>
-      {running && <RunningBanner moduleLabel="Analysis" detail="Competitor scraping and analysis is running. Competitive, Website, and Social tabs will update when complete." />}
+      {running && <RunningBanner moduleLabel={t('Analysis')} detail={t('Competitor scraping and analysis is running. Competitive, Website, and Social tabs will update when complete.')} />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Brand Profile</h2>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>{t('Brand Profile')}</h2>
         <div style={{ display: 'flex', gap: 10 }}>
           {editing
-            ? <><button onClick={saveAndReanalyze} disabled={saving || running} style={{ background: running ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: saving || running ? 'not-allowed' : 'pointer' }}>{saving ? 'Saving...' : 'Save & Re-analyze'}</button>
-                <button onClick={save} disabled={saving} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
-                <button onClick={() => { setEditing(false); setForm(data) }} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>Cancel</button></>
-            : <><button onClick={() => setEditing(true)} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>Edit</button>
-                <RefreshButton onClick={() => onRefresh('competitive_analysis')} loading={running} label="Re-discover" /></>
+            ? <><button onClick={saveAndReanalyze} disabled={saving || running} style={{ background: running ? '#a5b4fc' : '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: saving || running ? 'not-allowed' : 'pointer' }}>{saving ? t('Saving...') : t('Save & Re-analyze')}</button>
+                <button onClick={save} disabled={saving} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{saving ? t('Saving...') : t('Save Changes')}</button>
+                <button onClick={() => { setEditing(false); setForm(data) }} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>{t('Cancel')}</button></>
+            : <><button onClick={() => setEditing(true)} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>{t('Edit')}</button>
+                <RefreshButton onClick={() => onRefresh('competitive_analysis')} loading={running} label={t('Re-discover')} /></>
           }
         </div>
       </div>
 
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-          {[['Brand Name', 'name'], ['Website URL', 'url'], ['Industry', 'industry'], ['Tagline', 'tagline']].map(([label, key]) => (
+          {[[t('Brand Name'), 'name'], [t('Website URL'), 'url'], [t('Industry'), 'industry'], [t('Tagline'), 'tagline']].map(([label, key]) => (
             <div key={key}>
               <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>{label}</label>
               {editing && key !== 'url'
                 ? <input value={form[key] || ''} onChange={e => setForm({ ...form, [key]: e.target.value })} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 14, boxSizing: 'border-box' }} />
-                : <p style={{ color: T.text, fontSize: 14, marginTop: 2 }}>{data[key] || <span style={{ color: T.textFaint }}>Not set</span>}</p>
+                : <p style={{ color: T.text, fontSize: 14, marginTop: 2 }}>{data[key] || <span style={{ color: T.textFaint }}>{t('Not set')}</span>}</p>
               }
             </div>
           ))}
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Positioning</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>{t('Positioning')}</label>
             {editing
               ? <textarea value={form.positioning || ''} onChange={e => setForm({ ...form, positioning: e.target.value })} rows={2} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }} />
-              : <p style={{ color: T.text, fontSize: 14 }}>{data.positioning || <span style={{ color: T.textFaint }}>Not set</span>}</p>
+              : <p style={{ color: T.text, fontSize: 14 }}>{data.positioning || <span style={{ color: T.textFaint }}>{t('Not set')}</span>}</p>
             }
           </div>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Brand Archetype</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>{t('Brand Archetype')}</label>
             {editing
               ? <select value={form.brandArchetype || ''} onChange={e => setForm({ ...form, brandArchetype: e.target.value })} style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 14 }}>
-                  <option value="">Select...</option>
+                  <option value="">{t('Select...')}</option>
                   {archetypes.map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
-              : <p style={{ color: T.text, fontSize: 14 }}>{data.brandArchetype || <span style={{ color: T.textFaint }}>Not set</span>}</p>
+              : <p style={{ color: T.text, fontSize: 14 }}>{data.brandArchetype || <span style={{ color: T.textFaint }}>{t('Not set')}</span>}</p>
             }
           </div>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>Social Handles</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 4 }}>{t('Social Handles')}</label>
             {editing
               ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  <input placeholder="Instagram handle" value={form.social?.instagram || ''} onChange={e => setForm({ ...form, social: { ...form.social, instagram: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-                  <input placeholder="TikTok handle" value={form.social?.tiktok || ''} onChange={e => setForm({ ...form, social: { ...form.social, tiktok: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-                  <input placeholder="Facebook page handle" value={form.social?.facebook || ''} onChange={e => setForm({ ...form, social: { ...form.social, facebook: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-                  <input placeholder="Twitter/X handle" value={form.social?.twitter || ''} onChange={e => setForm({ ...form, social: { ...form.social, twitter: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                  <input placeholder={t('Instagram handle')} value={form.social?.instagram || ''} onChange={e => setForm({ ...form, social: { ...form.social, instagram: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                  <input placeholder={t('TikTok handle')} value={form.social?.tiktok || ''} onChange={e => setForm({ ...form, social: { ...form.social, tiktok: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                  <input placeholder={t('Facebook page handle')} value={form.social?.facebook || ''} onChange={e => setForm({ ...form, social: { ...form.social, facebook: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                  <input placeholder={t('Twitter/X handle')} value={form.social?.twitter || ''} onChange={e => setForm({ ...form, social: { ...form.social, twitter: e.target.value } })} style={{ flex: 1, minWidth: 160, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
                 </div>
               : <p style={{ color: T.text, fontSize: 14 }}>
                   {[
@@ -545,7 +572,7 @@ function BrandProfileTab({ slug, onRefresh, running }) {
                     data.social?.tiktok ? `@${data.social.tiktok} (TT)` : '',
                     data.social?.facebook ? `${data.social.facebook} (FB)` : '',
                     data.social?.twitter ? `@${data.social.twitter} (X)` : '',
-                  ].filter(Boolean).join(' · ') || <span style={{ color: T.textFaint }}>Not set</span>}
+                  ].filter(Boolean).join(' · ') || <span style={{ color: T.textFaint }}>{t('Not set')}</span>}
                 </p>
             }
           </div>
@@ -554,14 +581,14 @@ function BrandProfileTab({ slug, onRefresh, running }) {
 
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Identified Competitors ({(form.identifiedCompetitors || []).length})</h3>
-          {pendingCompetitors && <button onClick={saveCompetitorsAndRun} disabled={running || saving} style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{saving ? 'Saving…' : '✓ Save & Run Analysis'}</button>}
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Identified Competitors ({length})', { length: (form.identifiedCompetitors || []).length })}</h3>
+          {pendingCompetitors && <button onClick={saveCompetitorsAndRun} disabled={running || saving} style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{saving ? t('Saving…') : t('✓ Save & Run Analysis')}</button>}
         </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: T.surfaceAlt }}>
-                {['Competitor', 'Website URL', 'Instagram', 'TikTok', 'Facebook', ''].map(h => (
+                {[t('Competitor'), t('Website URL'), 'Instagram', 'TikTok', 'Facebook', ''].map(h => (
                   <th key={h} style={{ padding: '8px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                 ))}
               </tr>
@@ -590,10 +617,10 @@ function BrandProfileTab({ slug, onRefresh, running }) {
                     </div>
                   </td>
                   <td style={{ padding: '10px 12px', minWidth: 130 }}>
-                    <input value={c.facebookHandle || ''} onChange={e => update('facebookHandle', e.target.value)} placeholder="page handle" style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
+                    <input value={c.facebookHandle || ''} onChange={e => update('facebookHandle', e.target.value)} placeholder={t('page handle')} style={{ width: '100%', padding: '6px 8px', borderRadius: 6, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 12 }} />
                   </td>
                   <td style={{ padding: '10px 12px' }}>
-                    <button onClick={() => removeCompetitor(c.url)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: '#ef4444', cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>✕</button>
+                    <button onClick={() => removeCompetitor(c.url)} style={{ background: 'none', border: `1px solid #fca5a5`, borderRadius: 6, color: ink(T, '#ef4444'), cursor: 'pointer', fontSize: 12, padding: '4px 10px' }}>✕</button>
                   </td>
                 </tr>
               )})}
@@ -601,14 +628,14 @@ function BrandProfileTab({ slug, onRefresh, running }) {
           </table>
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 16, borderTop: `1px solid ${T.border}`, paddingTop: 16 }}>
-          <input placeholder="Competitor name" value={newCompName} onChange={e => setNewCompName(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+          <input placeholder={t('Competitor name')} value={newCompName} onChange={e => setNewCompName(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
           <input placeholder="https://www.competitor.com" value={newCompUrl} onChange={e => setNewCompUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCompetitorToList()} style={{ flex: 2, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-          <button onClick={addCompetitorToList} disabled={!newCompName || !newCompUrl} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: (!newCompName || !newCompUrl) ? 'not-allowed' : 'pointer', opacity: (!newCompName || !newCompUrl) ? 0.5 : 1 }}>+ Add</button>
+          <button onClick={addCompetitorToList} disabled={!newCompName || !newCompUrl} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: (!newCompName || !newCompUrl) ? 'not-allowed' : 'pointer', opacity: (!newCompName || !newCompUrl) ? 0.5 : 1 }}>{t('+ Add')}</button>
         </div>
         {pendingCompetitors && (
           <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
             <button onClick={saveCompetitorsAndRun} disabled={running || saving} style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-              {saving ? 'Saving…' : '✓ Save & Run Analysis'}
+              {saving ? t('Saving…') : t('✓ Save & Run Analysis')}
             </button>
           </div>
         )}
@@ -618,11 +645,11 @@ function BrandProfileTab({ slug, onRefresh, running }) {
       <Card style={{ marginTop: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Brand Guidelines</h3>
-            <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>Processed from your style guide PDF — informs all audit recommendations.</p>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Brand Guidelines')}</h3>
+            <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>{t('Processed from your style guide PDF - informs all audit recommendations.')}</p>
           </div>
           {guidelines && <button onClick={processStyleGuide} disabled={guidelinesRunning} style={{ background: guidelinesRunning ? T.surfaceAlt : T.accent, color: guidelinesRunning ? T.textMuted : '#fff', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: guidelinesRunning ? 'not-allowed' : 'pointer' }}>
-            {guidelinesRunning ? 'Processing…' : 'Reprocess'}
+            {guidelinesRunning ? t('Processing…') : t('Reprocess')}
           </button>}
         </div>
 
@@ -636,8 +663,8 @@ function BrandProfileTab({ slug, onRefresh, running }) {
           <label onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = T.accent }} onDragLeave={e => e.currentTarget.style.borderColor = T.border} onDrop={e => { e.preventDefault(); e.currentTarget.style.borderColor = T.border; const f = e.dataTransfer.files[0]; if (f) uploadPdf(f) }} style={{ display: 'block', border: `2px dashed ${T.border}`, borderRadius: 10, padding: '28px 20px', textAlign: 'center', cursor: 'pointer' }}>
             <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={e => { if (e.target.files[0]) uploadPdf(e.target.files[0]) }} />
             <p style={{ fontSize: 28, marginBottom: 8 }}>📄</p>
-            <p style={{ color: T.text, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{pdfUploading ? 'Uploading…' : 'Drop your brand guidelines PDF here'}</p>
-            <p style={{ color: T.textMuted, fontSize: 12 }}>or click to browse</p>
+            <p style={{ color: T.text, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{pdfUploading ? t('Uploading…') : t('Drop your brand guidelines PDF here')}</p>
+            <p style={{ color: T.textMuted, fontSize: 12 }}>{t('or click to browse')}</p>
           </label>
         )}
 
@@ -647,15 +674,15 @@ function BrandProfileTab({ slug, onRefresh, running }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {guidelines.brandVoice?.length > 0 && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Brand Voice</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>{t('Brand Voice')}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {guidelines.brandVoice.map(v => <span key={v} style={{ background: '#ede9fe', color: '#5b21b6', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>{v}</span>)}
+                    {guidelines.brandVoice.map(v => <span key={v} style={{ background: pb(T, '#ede9fe'), color: ink(T, '#5b21b6'), fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>{v}</span>)}
                   </div>
                 </div>
               )}
               {guidelines.messagingPillars?.length > 0 && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Messaging Pillars</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>{t('Messaging Pillars')}</p>
                   <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
                     {guidelines.messagingPillars.map((p, i) => <li key={i} style={{ fontSize: 12, color: T.textSub, marginBottom: 4 }}>{p}</li>)}
                   </ul>
@@ -663,33 +690,33 @@ function BrandProfileTab({ slug, onRefresh, running }) {
               )}
               {guidelines.tentpoles?.length > 0 && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Campaign Tentpoles</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>{t('Campaign Tentpoles')}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {guidelines.tentpoles.map(t => <span key={t.name} style={{ background: '#fef3c7', color: '#92400e', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>{t.name}</span>)}
+                    {guidelines.tentpoles.map(t => <span key={t.name} style={{ background: pb(T, '#fef3c7'), color: ink(T, '#92400e'), fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20 }}>{t.name}</span>)}
                   </div>
                 </div>
               )}
               {guidelines.targetAudience && guidelines.targetAudience !== 'Not specified' && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Target Audience</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>{t('Target Audience')}</p>
                   <p style={{ fontSize: 12, color: T.textSub }}>{guidelines.targetAudience}</p>
                 </div>
               )}
               {(guidelines.doList?.length > 0 || guidelines.dontList?.length > 0) && (
                 <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {guidelines.doList?.length > 0 && (
-                    <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '12px 14px' }}>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#065f46', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Always Do</p>
+                    <div style={{ background: pb(T, '#f0fdf4'), borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: ink(T, '#065f46'), textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>{t('Always Do')}</p>
                       <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-                        {guidelines.doList.map((d, i) => <li key={i} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>{d}</li>)}
+                        {guidelines.doList.map((d, i) => <li key={i} style={{ fontSize: 12, color: ink(T, '#374151'), marginBottom: 4 }}>{d}</li>)}
                       </ul>
                     </div>
                   )}
                   {guidelines.dontList?.length > 0 && (
-                    <div style={{ background: '#fff1f2', borderRadius: 8, padding: '12px 14px' }}>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#9f1239', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Never Do</p>
+                    <div style={{ background: pb(T, '#fff1f2'), borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: ink(T, '#9f1239'), textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>{t('Never Do')}</p>
                       <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
-                        {guidelines.dontList.map((d, i) => <li key={i} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>{d}</li>)}
+                        {guidelines.dontList.map((d, i) => <li key={i} style={{ fontSize: 12, color: ink(T, '#374151'), marginBottom: 4 }}>{d}</li>)}
                       </ul>
                     </div>
                   )}
@@ -697,12 +724,12 @@ function BrandProfileTab({ slug, onRefresh, running }) {
               )}
               {guidelines.visualDirection && guidelines.visualDirection !== 'Not specified' && (
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Visual Direction</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>{t('Visual Direction')}</p>
                   <p style={{ fontSize: 12, color: T.textSub }}>{guidelines.visualDirection}</p>
                 </div>
               )}
             </div>
-            <p style={{ fontSize: 11, color: T.textFaint, marginTop: 14 }}>Processed from {guidelines.sourceFile} on {new Date(guidelines.processedAt).toLocaleDateString()}</p>
+            <p style={{ fontSize: 11, color: T.textFaint, marginTop: 14 }}>{t('Processed from {sourceFile} on {toLocaleDateString}', { sourceFile: guidelines.sourceFile, toLocaleDateString: new Date(guidelines.processedAt).toLocaleDateString() })}</p>
           </div>
         )}
       </Card>
@@ -712,6 +739,7 @@ function BrandProfileTab({ slug, onRefresh, running }) {
 
 // ─── Competitive Analysis Tab ───────────────────────────────────────────────────
 function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const getModule = useModuleFetch()
@@ -723,28 +751,28 @@ function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
     return () => { live = false }
   }, [slug, dataVersion, getModule])
 
-  if (!data) return <EmptyState message="Competitive analysis not yet generated." cta="Run Competitive Analysis" onCta={() => onRefresh('competitive_analysis')} />
+  if (!data) return <EmptyState message={t('Competitive analysis not yet generated.')} cta={t('Run Competitive Analysis')} onCta={() => onRefresh('competitive_analysis')} />
 
   const pricingColors = { budget: 'green', mid: 'blue', premium: 'purple', luxury: 'red' }
 
   return (
     <div>
-      {running && <RunningBanner moduleLabel="Competitive Analysis" detail="Scraping competitor sites and analyzing strengths, opportunities, and positioning with Claude." />}
+      {running && <RunningBanner moduleLabel={t('Competitive Analysis')} detail={t('Scraping competitor sites and analyzing strengths, opportunities, and positioning with Claude.')} />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Competitive Analysis</h2>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>{t('Competitive Analysis')}</h2>
         <RefreshButton onClick={() => onRefresh('competitive_analysis')} loading={running} />
       </div>
 
       {data.positioningMap?.narrative && (
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Positioning Landscape</h3>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{t('Positioning Landscape')}</h3>
           <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.7 }}>{data.positioningMap.narrative}</p>
           {data.positioningMap.whiteSpaceOpportunities?.length > 0 && (
             <div style={{ marginTop: 16 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>White Space Opportunities</p>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('White Space Opportunities')}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {data.positioningMap.whiteSpaceOpportunities.map((o, i) => (
-                  <span key={i} style={{ background: '#ede9fe', color: '#5b21b6', fontSize: 12, padding: '4px 12px', borderRadius: 20 }}>{o}</span>
+                  <span key={i} style={{ background: pb(T, '#ede9fe'), color: ink(T, '#5b21b6'), fontSize: 12, padding: '4px 12px', borderRadius: 20 }}>{o}</span>
                 ))}
               </div>
             </div>
@@ -754,10 +782,10 @@ function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
 
       {data.topAssortmentGaps?.length > 0 && (
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Top Assortment Gaps</h3>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{t('Top Assortment Gaps')}</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {data.topAssortmentGaps.map((g, i) => (
-              <span key={i} style={{ background: '#fef3c7', color: '#92400e', fontSize: 12, padding: '4px 12px', borderRadius: 20 }}>{g}</span>
+              <span key={i} style={{ background: pb(T, '#fef3c7'), color: ink(T, '#92400e'), fontSize: 12, padding: '4px 12px', borderRadius: 20 }}>{g}</span>
             ))}
           </div>
         </Card>
@@ -774,16 +802,16 @@ function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
               <Badge label={comp.pricingTier || 'mid'} color={pricingColors[comp.pricingTier] || 'gray'} />
             </div>
             {comp.positioningStatement && <p style={{ color: T.textSub, fontSize: 13, fontStyle: 'italic', marginBottom: 12, borderLeft: `3px solid ${T.accent}`, paddingLeft: 10 }}>{comp.positioningStatement}</p>}
-            {comp.botBlocked && <div style={{ background: '#fef3c7', color: '#92400e', fontSize: 11, padding: '4px 10px', borderRadius: 6, marginBottom: 10 }}>⚠ Bot-protected — limited data</div>}
+            {comp.botBlocked && <div style={{ background: pb(T, '#fef3c7'), color: ink(T, '#92400e'), fontSize: 11, padding: '4px 10px', borderRadius: 6, marginBottom: 10 }}>{t('⚠ Bot-protected - limited data')}</div>}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#065f46', marginBottom: 6, textTransform: 'uppercase' }}>Strengths</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: ink(T, '#065f46'), marginBottom: 6, textTransform: 'uppercase' }}>{t('Strengths')}</p>
                 <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
                   {(comp.strengths || []).map((s, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 4, lineHeight: 1.4 }}>{s}</li>)}
                 </ul>
               </div>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed', marginBottom: 6, textTransform: 'uppercase' }}>Opportunities</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: ink(T, '#7c3aed'), marginBottom: 6, textTransform: 'uppercase' }}>{t('Opportunities')}</p>
                 <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
                   {(comp.opportunities || []).map((o, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 4, lineHeight: 1.4 }}>{o}</li>)}
                 </ul>
@@ -798,6 +826,7 @@ function CompetitiveTab({ slug, onRefresh, running, dataVersion }) {
 
 // ─── Personas Tab ───────────────────────────────────────────────────────────────
 function PersonasTab({ slug, onRefresh, running, dataVersion }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const [activePersona, setActivePersona] = useState(0)
@@ -864,17 +893,17 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
     const d = await res.json(); setSuggestions(d.suggestions || []); setLoadingSuggestions(false)
   }
 
-  if (!data) return <EmptyState message="Personas not yet generated." cta="Generate Personas" onCta={() => onRefresh('personas')} />
+  if (!data) return <EmptyState message={t('Personas not yet generated.')} cta={t('Generate Personas')} onCta={() => onRefresh('personas')} />
 
   const persona = data.personas?.[activePersona]
 
   return (
     <div>
-      {running && <RunningBanner moduleLabel="Customer Personas" detail="Generating personas from competitive, social, and site intelligence using Claude Opus." />}
+      {running && <RunningBanner moduleLabel={t('Customer Personas')} detail={t('Generating personas from competitive, social, and site intelligence using Claude Opus.')} />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Customer Personas</h2>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>{t('Customer Personas')}</h2>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={loadSuggestions} disabled={loadingSuggestions} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '7px 14px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>{loadingSuggestions ? 'Analyzing...' : '+ Suggest Adjacent'}</button>
+          <button onClick={loadSuggestions} disabled={loadingSuggestions} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '7px 14px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>{loadingSuggestions ? t('Analyzing...') : t('+ Suggest Adjacent')}</button>
           <RefreshButton onClick={() => onRefresh('personas')} loading={running} />
         </div>
       </div>
@@ -894,7 +923,7 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
               <h3 style={{ color: T.accent, fontSize: 17, fontWeight: 700, marginBottom: 4 }}>{persona.name}</h3>
               <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>{persona.ageRange} · {persona.income} · {persona.location}</p>
               <p style={{ fontSize: 13, color: T.textSub, fontStyle: 'italic', marginBottom: 16, borderLeft: `3px solid ${T.accent}`, paddingLeft: 10 }}>"{persona.quoteExample}"</p>
-              {[['Occupation', persona.occupation], ['Lifestyle', persona.lifestyle], ['Values', persona.values], ['Fashion Goals', persona.fashionGoals], ['Pain Points', persona.painPoints], ['Motivators', persona.motivators]].map(([label, items]) => items?.length ? (
+              {[[t('Occupation'), persona.occupation], [t('Lifestyle'), persona.lifestyle], [t('Values'), persona.values], [t('Fashion Goals'), persona.fashionGoals], [t('Pain Points'), persona.painPoints], [t('Motivators'), persona.motivators]].map(([label, items]) => items?.length ? (
                 <div key={label} style={{ marginBottom: 12 }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>{label}</p>
                   <p style={{ fontSize: 13, color: T.textSub }}>
@@ -903,9 +932,9 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
                 </div>
               ) : null)}
               {persona.brandFit && (
-                <div style={{ marginTop: 12, background: '#ede9fe', borderRadius: 8, padding: '10px 14px' }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 4 }}>Brand Fit</p>
-                  <p style={{ fontSize: 13, color: '#4c1d95' }}>{persona.brandFit}</p>
+                <div style={{ marginTop: 12, background: pb(T, '#ede9fe'), borderRadius: 8, padding: '10px 14px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: ink(T, '#5b21b6'), marginBottom: 4 }}>{t('Brand Fit')}</p>
+                  <p style={{ fontSize: 13, color: ink(T, '#4c1d95') }}>{persona.brandFit}</p>
                 </div>
               )}
             </Card>
@@ -914,11 +943,11 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
           <div style={{ position: 'sticky', top: 80, alignSelf: 'flex-start' }}>
             <Card style={{ display: 'flex', flexDirection: 'column', maxHeight: 480 }}>
               <div style={{ marginBottom: 12 }}>
-                <h3 style={{ color: T.text, fontSize: 14, fontWeight: 700 }}>Chat with {persona.name}</h3>
-                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>Ask about shopping habits, preferences, or brand reactions.</p>
+                <h3 style={{ color: T.text, fontSize: 14, fontWeight: 700 }}>{t('Chat with {name}', { name: persona.name })}</h3>
+                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2 }}>{t('Ask about shopping habits, preferences, or brand reactions.')}</p>
               </div>
               <div style={{ flex: 1, height: 300, overflowY: 'auto', marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
-                {chatMessages.length === 0 && <p style={{ color: T.textFaint, fontSize: 13, textAlign: 'center', marginTop: 60 }}>Start a conversation...</p>}
+                {chatMessages.length === 0 && <p style={{ color: T.textFaint, fontSize: 13, textAlign: 'center', marginTop: 60 }}>{t('Start a conversation...')}</p>}
                 {chatMessages.map((msg, i) => (
                   <div key={i} style={{ alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '88%', background: msg.role === 'user' ? T.accent : T.surfaceAlt, color: msg.role === 'user' ? '#fff' : T.text, padding: '8px 12px', borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px', fontSize: 13, lineHeight: 1.5, border: msg.role === 'assistant' ? `1px solid ${T.border}` : 'none' }}>
                     {msg.content || (msg.streaming ? <span style={{ opacity: 0.4 }}>●</span> : '')}{msg.streaming && msg.content && <span style={{ opacity: 0.4 }}> ●</span>}
@@ -927,8 +956,8 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
                 <div ref={chatEndRef} />
               </div>
               <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${T.border}`, paddingTop: 12 }}>
-                <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendChat()} placeholder={`Ask ${persona.name}...`} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
-                <button onClick={sendChat} disabled={streaming || !chatInput.trim()} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: streaming || !chatInput.trim() ? 0.6 : 1 }}>Send</button>
+                <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendChat()} placeholder={t('Ask {name}...', { name: persona.name })} style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${T.inputBorder}`, background: T.inputBg, color: T.text, fontSize: 13 }} />
+                <button onClick={sendChat} disabled={streaming || !chatInput.trim()} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: streaming || !chatInput.trim() ? 0.6 : 1 }}>{t('Send')}</button>
               </div>
             </Card>
           </div>
@@ -937,7 +966,7 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
 
       {suggestions && (
         <div style={{ marginTop: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Adjacent Segments to Consider</h3>
+          <h3 style={{ color: T.text, fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('Adjacent Segments to Consider')}</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {suggestions.map((s, i) => (
               <Card key={i}>
@@ -959,6 +988,7 @@ function PersonasTab({ slug, onRefresh, running, dataVersion }) {
 
 // ─── Social Audit Tab ───────────────────────────────────────────────────────────
 function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const [auditProgress, setAuditProgress] = useState(null)
@@ -991,13 +1021,13 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
     if (!iso) return ''
     const diff = Date.now() - new Date(iso).getTime()
     const d = Math.floor(diff / 86400000)
-    if (d < 30) return `${d}d ago`
+    if (d < 30) return t('{d}d ago', { d })
     const mo = Math.floor(d / 30)
-    if (mo < 12) return `${mo}mo ago`
-    return `${Math.floor(mo / 12)}y ago`
+    if (mo < 12) return t('{mo}mo ago', { mo })
+    return t('{floor}y ago', { floor: Math.floor(mo / 12) })
   }
 
-  if (!data) return <EmptyState message="Social audit not yet generated." cta="Run Social Audit" onCta={() => onRefresh('social_intelligence')} />
+  if (!data) return <EmptyState message={t('Social audit not yet generated.')} cta={t('Run Social Audit')} onCta={() => onRefresh('social_intelligence')} />
 
   const target = data.brands?.find(b => b.role === 'target')
   const allBrands = data.brands || []
@@ -1046,16 +1076,16 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
 
   // Strategy items mapped to business outcomes
   const OUTCOME_MAP = [
-    { key: 'discovery', label: 'Discovery', color: '#7c3aed', bg: '#ede9fe', keywords: ['hashtag', 'discover', 'reach', 'trend', 'explore', 'seo', 'search', 'new audience', 'organic'] },
-    { key: 'awareness', label: 'Brand Awareness', color: '#0369a1', bg: '#e0f2fe', keywords: ['brand', 'awareness', 'storytell', 'consistent', 'identity', 'voice', 'community', 'engag', 'follow'] },
-    { key: 'traffic', label: 'Site Traffic', color: '#065f46', bg: '#d1fae5', keywords: ['traffic', 'click', 'link', 'shop', 'product', 'website', 'convert', 'sale', 'promot', 'cta'] },
+    { key: 'discovery', label: t('Discovery'), color: ink(T, '#7c3aed'), bg: '#ede9fe', keywords: ['hashtag', 'discover', 'reach', 'trend', 'explore', 'seo', 'search', 'new audience', 'organic'] },
+    { key: 'awareness', label: t('Brand Awareness'), color: ink(T, '#0369a1'), bg: '#e0f2fe', keywords: ['brand', 'awareness', 'storytell', 'consistent', 'identity', 'voice', 'community', 'engag', 'follow'] },
+    { key: 'traffic', label: t('Site Traffic'), color: ink(T, '#065f46'), bg: '#d1fae5', keywords: ['traffic', 'click', 'link', 'shop', 'product', 'website', 'convert', 'sale', 'promot', 'cta'] },
   ]
   function getOutcome(text) {
-    const t = (text || '').toLowerCase()
+    const lc = (text || '').toLowerCase()
     for (const o of OUTCOME_MAP) {
-      if (o.keywords.some(k => t.includes(k))) return o
+      if (o.keywords.some(k => lc.includes(k))) return o
     }
-    return { key: 'action', label: 'Action', color: '#374151', bg: '#f3f4f6' }
+    return { key: 'action', label: t('Action'), color: ink(T, '#374151'), bg: '#f3f4f6' }
   }
 
   const strategyItems = [
@@ -1067,15 +1097,15 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
     <div>
       {/* Running indicator */}
       {running && (
-        <div style={{ background: '#dbeafe', border: '1px solid #93c5fd', borderRadius: 10, padding: '14px 20px', marginBottom: 24 }}>
+        <div style={{ background: pb(T, '#dbeafe'), border: '1px solid #93c5fd', borderRadius: 10, padding: '14px 20px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
             <span style={{ fontSize: 22, display: 'inline-block', animation: 'spin 1.2s linear infinite', flexShrink: 0, marginTop: 2 }}>⟳</span>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                <p style={{ color: '#1e40af', fontSize: 14, fontWeight: 700, margin: 0 }}>Social Media Audit — Running</p>
-                {auditProgress?.stepIdx > 0 && <span style={{ color: '#1e40af', fontSize: 12, fontWeight: 600 }}>{auditProgress.stepIdx} / {auditProgress.totalSteps}</span>}
+                <p style={{ color: ink(T, '#1e40af'), fontSize: 14, fontWeight: 700, margin: 0 }}>{t('Social Media Audit - Running')}</p>
+                {auditProgress?.stepIdx > 0 && <span style={{ color: ink(T, '#1e40af'), fontSize: 12, fontWeight: 600 }}>{auditProgress.stepIdx} / {auditProgress.totalSteps}</span>}
               </div>
-              <p style={{ color: '#1e3a8a', fontSize: 13, margin: '0 0 10px' }}>{auditProgress?.step || 'Scraping Instagram, TikTok, and Facebook for all brands...'}</p>
+              <p style={{ color: ink(T, '#1e3a8a'), fontSize: 13, margin: '0 0 10px' }}>{auditProgress?.step || t('Scraping Instagram, TikTok, and Facebook for all brands...')}</p>
               {auditProgress?.stepIdx > 0 && (
                 <div style={{ height: 5, borderRadius: 3, background: '#bfdbfe', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${Math.round((auditProgress.stepIdx / auditProgress.totalSteps) * 100)}%`, background: '#3b82f6', transition: 'width 0.6s ease' }} />
@@ -1089,56 +1119,56 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 2 }}>Social Intelligence</h2>
-          <p style={{ fontSize: 13, color: T.textSub }}>What competitors are doing — and where the market opportunities are</p>
+          <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700, marginBottom: 2 }}>{t('Social Intelligence')}</h2>
+          <p style={{ fontSize: 13, color: T.textSub }}>{t('What competitors are doing - and where the market opportunities are')}</p>
         </div>
         <RefreshButton onClick={() => onRefresh('social_intelligence')} loading={running} />
       </div>
 
       {/* ── Section 1: 3 KPI cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 28 }}>
         <Card style={{ padding: '16px 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Market Leader</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{t('Market Leader')}</p>
           {marketLeader ? (
             <>
               <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>{marketLeader.b.name}</p>
-              <p style={{ fontSize: 13, color: T.textSub }}>{marketLeader.bestEng.toLocaleString()} avg engagement · {PLATFORM_LABELS[marketLeader.bestPlatform] || 'Social'}</p>
+              <p style={{ fontSize: 13, color: T.textSub }}>{t('{bestEng} avg engagement ·', { bestEng: marketLeader.bestEng.toLocaleString() })} {PLATFORM_LABELS[marketLeader.bestPlatform] || t('Social')}</p>
               {marketLeader.igHandle && <a href={marketLeader.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.accent, textDecoration: 'none' }}>{marketLeader.igHandle.label} ↗</a>}
             </>
-          ) : <p style={{ color: T.textFaint, fontSize: 13 }}>No data yet</p>}
+          ) : <p style={{ color: T.textFaint, fontSize: 13 }}>{t('No data yet')}</p>}
         </Card>
 
         <Card style={{ padding: '16px 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Market Opportunity</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{t('Market Opportunity')}</p>
           {marketLeader && marketLeader.bestEng > 0 ? (
             <>
               <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>
-                {PLATFORM_LABELS[marketLeader.bestPlatform]} is most active
+                {t('{value} is most active', { value: PLATFORM_LABELS[marketLeader.bestPlatform] })}
               </p>
               <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>
-                {marketLeader.b.name} leads with {marketLeader.bestEng.toLocaleString()} avg engagement — the content types and themes driving that are documented below.
+                {t('{name} leads with {bestEng} avg engagement - the content types and themes driving that are documented below.', { name: marketLeader.b.name, bestEng: marketLeader.bestEng.toLocaleString() })}
               </p>
             </>
-          ) : <p style={{ color: T.textFaint, fontSize: 13 }}>No competitor data yet</p>}
+          ) : <p style={{ color: T.textFaint, fontSize: 13 }}>{t('No competitor data yet')}</p>}
         </Card>
 
         <Card style={{ padding: '16px 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Competitor Posts Analyzed</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{t('Competitor Posts Analyzed')}</p>
           <p style={{ fontSize: 17, fontWeight: 800, color: T.text, lineHeight: 1.2, marginBottom: 4 }}>
-            {allBrands.filter(b => !b.role || b.role !== 'target').reduce((s, b) => s + (b.summary?.postCount || 0) + (b.tiktokData?.summary?.postCount || 0), 0).toLocaleString()} posts
+            {t('{reduce} posts', { reduce: allBrands.filter(b => !b.role || b.role !== 'target').reduce((s, b) => s + (b.summary?.postCount || 0) + (b.tiktokData?.summary?.postCount || 0), 0).toLocaleString() })}
           </p>
-          <p style={{ fontSize: 13, color: T.textSub }}>{allBrands.filter(b => b.role !== 'target').length} competitors · across Instagram & TikTok</p>
+          <p style={{ fontSize: 13, color: T.textSub }}>{t('{length} competitors · across Instagram & TikTok', { length: allBrands.filter(b => b.role !== 'target').length })}</p>
         </Card>
       </div>
 
       {/* ── Section 2: Competitive Presence ── */}
       <Card style={{ marginBottom: 28, padding: '20px 24px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Competitive Presence</p>
-        <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>Avg engagement per post by channel — click any handle to view the account</p>
+        <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{t('Competitive Presence')}</p>
+        <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>{t('Avg engagement per post by channel - click any handle to view the account')}</p>
 
         {/* Column headers */}
         <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${T.border}` }}>
-          {['Brand', '📸 Instagram', '🎵 TikTok', '👥 Facebook', 'Top Theme'].map(h => (
+          {[t('Brand'), t('📸 Instagram'), t('🎵 TikTok'), t('👥 Facebook'), t('Top Theme')].map(h => (
             <span key={h} style={{ fontSize: 11, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</span>
           ))}
         </div>
@@ -1154,7 +1184,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                 </div>
                 <div>
                   <p style={{ fontSize: 13, fontWeight: row.isTarget ? 800 : 600, color: row.isTarget ? T.accent : T.text, marginBottom: 0 }}>{row.b.name}{row.isTarget ? ' ★' : ''}</p>
-                  {row.totalFreq > 0 && <p style={{ fontSize: 11, color: T.textMuted }}>{row.totalFreq}/wk avg</p>}
+                  {row.totalFreq > 0 && <p style={{ fontSize: 11, color: T.textMuted }}>{t('{totalFreq}/wk avg', { totalFreq: row.totalFreq })}</p>}
                 </div>
               </div>
               {/* Instagram */}
@@ -1166,7 +1196,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                   </>
                 ) : row.igHandle ? (
                   <a href={row.igHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>{row.igHandle.label} ↗</a>
-                ) : <span style={{ fontSize: 13, color: T.textFaint }}>—</span>}
+                ) : <span style={{ fontSize: 13, color: T.textFaint }}>-</span>}
               </div>
               {/* TikTok */}
               <div>
@@ -1177,19 +1207,19 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                   </>
                 ) : row.ttHandle ? (
                   <a href={row.ttHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>{row.ttHandle.label} ↗</a>
-                ) : <span style={{ fontSize: 13, color: T.textFaint }}>—</span>}
+                ) : <span style={{ fontSize: 13, color: T.textFaint }}>-</span>}
               </div>
               {/* Facebook */}
               <div>
                 {row.fbHandle ? (
                   <a href={row.fbHandle.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>{row.fbHandle.label} ↗</a>
-                ) : <span style={{ fontSize: 13, color: T.textFaint }}>—</span>}
+                ) : <span style={{ fontSize: 13, color: T.textFaint }}>-</span>}
               </div>
               {/* Top theme */}
               <div>
                 {row.themes[0] ? (
-                  <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '3px 8px', borderRadius: 10, fontWeight: 600 }}>{row.themes[0].theme}</span>
-                ) : <span style={{ fontSize: 12, color: T.textFaint }}>—</span>}
+                  <span style={{ fontSize: 11, background: pb(T, '#dbeafe'), color: ink(T, '#1e40af'), padding: '3px 8px', borderRadius: 10, fontWeight: 600 }}>{row.themes[0].theme}</span>
+                ) : <span style={{ fontSize: 12, color: T.textFaint }}>-</span>}
               </div>
             </div>
           )
@@ -1199,8 +1229,8 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
       {/* ── Section 3: What's Working ── */}
       {allTopPosts.length > 0 && (
         <Card style={{ marginBottom: 28, padding: '20px 24px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>What's Working</p>
-          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>Highest performing posts across all brands and channels</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{t('What\'s Working')}</p>
+          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>{t('Highest performing posts across all brands and channels')}</p>
           <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 8 }}>
             {allTopPosts.map((post, i) => {
               const [g1, g2] = GRAD_PAIRS[post.brandIdx % GRAD_PAIRS.length]
@@ -1217,7 +1247,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                     {post.imageUrl
                       ? <img src={post.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
                       : <span style={{ fontSize: isTikTok ? 28 : 36, userSelect: 'none' }}>{isTikTok ? '▶' : post.brandName[0]}</span>}
-                    <span style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>{engagement >= 1000 ? `${(engagement / 1000).toFixed(1)}k` : engagement}</span>
+                    <span style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>{engagement >= 1000 ? t('{value}k', { value: (engagement / 1000).toFixed(1) }) : engagement}</span>
                   </div>
                   <div style={{ padding: '8px 10px' }}>
                     <div style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
@@ -1225,7 +1255,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                       <span style={{ fontSize: 11, color: T.text }}>💬 {(post.comments || 0).toLocaleString()}</span>
                     </div>
                     {post.caption && <p style={{ fontSize: 11, color: T.textSub, lineHeight: 1.4, margin: '0 0 4px' }}>{post.caption.slice(0, 80)}{post.caption.length > 80 ? '…' : ''}</p>}
-                    {post.postUrl && <a href={post.postUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none' }}>View post ↗</a>}
+                    {post.postUrl && <a href={post.postUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: T.accent, textDecoration: 'none' }}>{t('View post ↗')}</a>}
                   </div>
                 </div>
               )
@@ -1237,8 +1267,8 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
       {/* ── Section 4: Where TRU Can Win ── */}
       {strategyItems.length > 0 && (
         <Card style={{ marginBottom: 24, padding: '20px 24px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Where {target?.name || 'You'} Can Win</p>
-          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>Opportunities ranked by impact on discovery, brand awareness, and site traffic</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: T.accent, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{t('Where')} {target?.name || t('You')} {t('Can Win')}</p>
+          <p style={{ fontSize: 13, color: T.textSub, marginBottom: 20 }}>{t('Opportunities ranked by impact on discovery, brand awareness, and site traffic')}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 12 }}>
             {strategyItems.map((item, i) => {
               const outcome = getOutcome((item.headline || '') + ' ' + (item.detail || ''))
@@ -1247,7 +1277,7 @@ function SocialAuditTab({ slug, onRefresh, running, dataVersion }) {
                   <span style={{ fontSize: 11, fontWeight: 700, color: outcome.color, background: outcome.bg, padding: '2px 8px', borderRadius: 10, display: 'inline-block', marginBottom: 8 }}>{outcome.label}</span>
                   <p style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 4, lineHeight: 1.4 }}>{item.headline}</p>
                   {item.detail && <p style={{ fontSize: 12, color: T.textSub, lineHeight: 1.6 }}>{item.detail.slice(0, 320)}{item.detail.length > 320 ? '…' : ''}</p>}
-                  {item.competitor && <p style={{ fontSize: 11, color: T.textMuted, marginTop: 6, fontWeight: 600 }}>See how: {item.competitor}</p>}
+                  {item.competitor && <p style={{ fontSize: 11, color: T.textMuted, marginTop: 6, fontWeight: 600 }}>{t('See how: {competitor}', { competitor: item.competitor })}</p>}
                 </div>
               )
             })}
@@ -1279,9 +1309,10 @@ const hostOf = url => { try { return new URL(url).hostname.toLowerCase() } catch
 const isJapanBrand = (brand, slug) => /-jp$/.test(slug || '') || hostOf(brand?.url).endsWith('.jp') || /japan/i.test(brand?.market || '')
 // The hardcoded revenue-unlock cards name Lebanese retailers. The profile is
 // not loaded in the Action Plan tab, so the slug, host and name decide.
-const isLebanonBrand = (brand, slug) => /(^|-)lb(-|$)/.test(slug || '') || hostOf(brand?.url).endsWith('.lb') || /lebanon/i.test(`${brand?.market || ''} ${brand?.name || ''}`)
+const isLebanonBrand = (brand, slug) => /(^|-)lb(-|$)/.test(slug || '') || hostOf(brand?.url).endsWith('.lb') || /^\s*lebanon\s*$/i.test(brand?.market || '')
 
 function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const getModule = useModuleFetch()
@@ -1317,7 +1348,7 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
   if (!data) return (
     <div>
       {blueprintBlock}
-      <EmptyState message="Website audit not yet generated." cta="Run Website Audit" onCta={() => onRefresh('site_intelligence')} />
+      <EmptyState message={t('Website audit not yet generated.')} cta={t('Run Website Audit')} onCta={() => onRefresh('site_intelligence')} />
     </div>
   )
 
@@ -1332,9 +1363,9 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
 
   return (
     <div>
-      {running && <RunningBanner moduleLabel="Website Audit" detail="Scraping brand and competitor sites with screenshots, running Lighthouse, then analyzing with Claude vision." />}
+      {running && <RunningBanner moduleLabel={t('Website Audit')} detail={t('Scraping brand and competitor sites with screenshots, running Lighthouse, then analyzing with Claude vision.')} />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>Website Audit</h2>
+        <h2 style={{ color: T.text, fontSize: 20, fontWeight: 700 }}>{t('Website Audit')}</h2>
         <RefreshButton onClick={() => onRefresh('site_intelligence')} loading={running} />
       </div>
 
@@ -1345,18 +1376,18 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
       {lh?.scores && !benchmark && (
         <Card style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Lighthouse Technical Audit</h3>
-            {data.hasScreenshot && <span style={{ fontSize: 12, color: '#059669', background: '#d1fae5', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>Visual analysis included</span>}
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Lighthouse Technical Audit')}</h3>
+            {data.hasScreenshot && <span style={{ fontSize: 12, color: ink(T, '#059669'), background: pb(T, '#d1fae5'), padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>{t('Visual analysis included')}</span>}
           </div>
           <div style={{ display: 'flex', gap: 16, marginBottom: lh.topIssues?.length ? 20 : 0 }}>
             <LighthouseScore label="SEO" score={lh.scores.seo} />
-            <LighthouseScore label="Performance" score={lh.scores.performance} />
-            <LighthouseScore label="Accessibility" score={lh.scores.accessibility} />
-            <LighthouseScore label="Best Practices" score={lh.scores.bestPractices} />
+            <LighthouseScore label={t('Performance')} score={lh.scores.performance} />
+            <LighthouseScore label={t('Accessibility')} score={lh.scores.accessibility} />
+            <LighthouseScore label={t('Best Practices')} score={lh.scores.bestPractices} />
           </div>
           {lh.topIssues?.length > 0 && (
             <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Top Issues to Fix</p>
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('Top Issues to Fix')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {lh.topIssues.slice(0, 8).map((issue, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1372,7 +1403,7 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
 
       {(data.topOpportunities || []).length > 0 && (
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{benchmark ? 'Recommended opportunities' : 'Top Opportunities'}</h3>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{benchmark ? t('Recommended opportunities') : t('Top Opportunities')}</h3>
           {data.topOpportunities.slice(0, 5).map((opp, i) => (
             <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '12px 0', borderBottom: i < 4 ? `1px solid ${T.border}` : 'none' }}>
               <span style={{ fontSize: 20, fontWeight: 800, color: T.accent, minWidth: 28 }}>{opp.rank || i + 1}</span>
@@ -1391,22 +1422,22 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
         {cv && (
           <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Crawler & AI Visibility</h3>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{t('Crawler & AI Visibility')}</h3>
             {benchmark || typeof cv.heroTextIsLive !== 'boolean' ? (
-              <p style={{ fontSize: 13, color: T.textSub, marginBottom: 10 }}><strong style={{ color: T.text }}>Hero text: </strong>Not observed in this run</p>
+              <p style={{ fontSize: 13, color: T.textSub, marginBottom: 10 }}><strong style={{ color: T.text }}>{t('Hero text:')} </strong>{t('Not observed in this run')}</p>
             ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <span style={{ fontSize: 18 }}>{cv.heroTextIsLive ? '✓' : '✗'}</span>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Hero text is {cv.heroTextIsLive ? 'live HTML' : 'image-embedded'}</p>
-                <p style={{ fontSize: 12, color: T.textMuted }}>{cv.heroTextIsLive ? 'Visible to crawlers and AI agents' : 'Invisible to crawlers — SEO risk'}</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{t('Hero text is')} {cv.heroTextIsLive ? t('live HTML') : t('image-embedded')}</p>
+                <p style={{ fontSize: 12, color: T.textMuted }}>{cv.heroTextIsLive ? t('Visible to crawlers and AI agents') : t('Invisible to crawlers - SEO risk')}</p>
               </div>
             </div>
             )}
             {!benchmark && isObserved(cv.contentInImagesLevel) && (
               <div style={{ marginBottom: 10 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>Content in Images</p>
-                <Badge label={`${cv.contentInImagesLevel} image content`} color={cv.contentInImagesLevel === 'low' ? 'green' : cv.contentInImagesLevel === 'medium' ? 'yellow' : 'red'} />
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>{t('Content in Images')}</p>
+                <Badge label={t('{contentInImagesLevel} image content', { contentInImagesLevel: cv.contentInImagesLevel })} color={cv.contentInImagesLevel === 'low' ? 'green' : cv.contentInImagesLevel === 'medium' ? 'yellow' : 'red'} />
               </div>
             )}
             {!benchmark && cv.aiReadabilityNote && <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>{cv.aiReadabilityNote}</p>}
@@ -1414,11 +1445,11 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
         )}
         {na && (!benchmark || na.missingCategories?.length > 0) && (
           <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Navigation Analysis</h3>
-            {!benchmark && isObserved(na.depth) && <Badge label={`${na.depth} navigation`} color={na.depth === 'deep' ? 'green' : na.depth === 'moderate' ? 'yellow' : 'gray'} />}
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{t('Navigation Analysis')}</h3>
+            {!benchmark && isObserved(na.depth) && <Badge label={t('{depth} navigation', { depth: na.depth })} color={na.depth === 'deep' ? 'green' : na.depth === 'moderate' ? 'yellow' : 'gray'} />}
             {!benchmark && na.topCategories?.length > 0 && (
               <div style={{ marginTop: 10 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>Top Categories</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>{t('Top Categories')}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {na.topCategories.slice(0, 8).map(c => <span key={c} style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{c}</span>)}
                 </div>
@@ -1426,9 +1457,9 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
             )}
             {na.missingCategories?.length > 0 && (
               <div style={{ marginTop: 10 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>{benchmark ? 'Recommended categories' : 'Missing Categories'}</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 6 }}>{benchmark ? t('Recommended categories') : t('Missing Categories')}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {na.missingCategories.slice(0, 6).map(c => <span key={c} style={benchmark ? { fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` } : { fontSize: 12, background: '#fee2e2', color: '#dc2626', padding: '3px 10px', borderRadius: 20 }}>{c}</span>)}
+                  {na.missingCategories.slice(0, 6).map(c => <span key={c} style={benchmark ? { fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` } : { fontSize: 12, background: pb(T, '#fee2e2'), color: ink(T, '#dc2626'), padding: '3px 10px', borderRadius: 20 }}>{c}</span>)}
                 </div>
               </div>
             )}
@@ -1440,7 +1471,7 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
         {data.messagingGaps?.length > 0 && (
           <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{benchmark ? 'Recommended messaging' : 'Messaging Gaps'}</h3>
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{benchmark ? t('Recommended messaging') : t('Messaging Gaps')}</h3>
             {data.messagingGaps.slice(0, 4).map((g, i) => (
               <div key={i} style={{ borderLeft: `3px solid #f59e0b`, paddingLeft: 12, marginBottom: 12 }}>
                 <p style={{ fontWeight: 700, color: T.text, fontSize: 13 }}>{g.gap}</p>
@@ -1451,8 +1482,8 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
         )}
         {data.ctaEffectiveness && !benchmark && (
           <Card>
-            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>CTA Effectiveness</h3>
-            {data.ctaEffectiveness.rating && <Badge label={data.ctaEffectiveness.rating === 'needs improvement' ? 'Needs Improvement' : data.ctaEffectiveness.rating} color={data.ctaEffectiveness.rating === 'strong' ? 'green' : data.ctaEffectiveness.rating === 'moderate' ? 'yellow' : 'red'} />}
+            <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>{t('CTA Effectiveness')}</h3>
+            {data.ctaEffectiveness.rating && <Badge label={data.ctaEffectiveness.rating === 'needs improvement' ? t('Needs Improvement') : data.ctaEffectiveness.rating} color={data.ctaEffectiveness.rating === 'strong' ? 'green' : data.ctaEffectiveness.rating === 'moderate' ? 'yellow' : 'red'} />}
             <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginTop: 10 }}>{data.ctaEffectiveness.observations}</p>
             {data.ctaEffectiveness.recommendation && <p style={{ color: T.accent, fontSize: 13, marginTop: 8, fontWeight: 600 }}>→ {data.ctaEffectiveness.recommendation}</p>}
           </Card>
@@ -1461,11 +1492,11 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
 
       {pcr && !benchmark && (
         <Card style={{ marginBottom: 24 }}>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Product Content Review</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{t('Product Content Review')}</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
             {pcr.brandsCovered?.length > 0 && (
               <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Brands / Lines</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('Brands / Lines')}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {pcr.brandsCovered.slice(0, 10).map(b => <span key={b} style={{ fontSize: 12, background: T.surfaceAlt, color: T.textSub, padding: '3px 10px', borderRadius: 20, border: `1px solid ${T.border}` }}>{b}</span>)}
                 </div>
@@ -1473,19 +1504,19 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
             )}
             {pcr.ageGroupCoverage?.length > 0 && (
               <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Audience / Age Groups</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('Audience / Age Groups')}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {pcr.ageGroupCoverage.map(a => <span key={a} style={{ fontSize: 12, background: '#ede9fe', color: '#7c3aed', padding: '3px 10px', borderRadius: 20 }}>{a}</span>)}
+                  {pcr.ageGroupCoverage.map(a => <span key={a} style={{ fontSize: 12, background: pb(T, '#ede9fe'), color: ink(T, '#7c3aed'), padding: '3px 10px', borderRadius: 20 }}>{a}</span>)}
                 </div>
               </div>
             )}
             <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Price Visibility</p>
-              {!isObserved(pcr.priceVisibility) && <p style={{ fontSize: 13, color: T.textSub }}>Not observed</p>}
+              <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('Price Visibility')}</p>
+              {!isObserved(pcr.priceVisibility) && <p style={{ fontSize: 13, color: T.textSub }}>{t('Not observed')}</p>}
               {isObserved(pcr.priceVisibility) && <Badge label={pcr.priceVisibility} color={pcr.priceVisibility === 'visible' ? 'green' : pcr.priceVisibility === 'partial' ? 'yellow' : 'red'} />}
               {pcr.contentGaps?.length > 0 && (
                 <div style={{ marginTop: 10 }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>Content Gaps</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 4 }}>{t('Content Gaps')}</p>
                   <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
                     {pcr.contentGaps.slice(0, 4).map((g, i) => <li key={i} style={{ fontSize: 12, color: T.textSub, marginBottom: 3 }}>{g}</li>)}
                   </ul>
@@ -1498,22 +1529,22 @@ function WebsiteAuditTab({ slug, brand, onRefresh, running, dataVersion }) {
 
       {competitors.length > 0 && (
         <Card>
-          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Navigation Comparison</h3>
+          <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{t('Navigation Comparison')}</h3>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: T.surfaceAlt }}>
-                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Brand</th>
-                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Hero Headline</th>
-                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Top Nav Categories</th>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>{t('Brand')}</th>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>{t('Hero Headline')}</th>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', color: T.textMuted, fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>{t('Top Nav Categories')}</th>
                 </tr>
               </thead>
               <tbody>
                 {[target, ...competitors].filter(b => b.name).map(b => (
                   <tr key={b.name} style={{ borderTop: `1px solid ${T.border}`, background: b.role === 'target' ? '#ede9fe22' : 'transparent' }}>
                     <td style={{ padding: '12px 16px', fontWeight: b.role === 'target' ? 700 : 400, color: T.text }}>{b.name}{b.role === 'target' && ' ★'}</td>
-                    <td style={{ padding: '12px 16px', color: T.textSub, fontStyle: 'italic', maxWidth: 200 }}>{benchmark && b.role === 'target' ? 'Not observed in this run' : (b.heroContent?.headline || '-')}</td>
-                    <td style={{ padding: '12px 16px', color: T.textSub }}>{benchmark && b.role === 'target' ? 'Not observed in this run' : ((b.featuredCategories || []).slice(0, 6).join(', ') || '-')}</td>
+                    <td style={{ padding: '12px 16px', color: T.textSub, fontStyle: 'italic', maxWidth: 200 }}>{benchmark && b.role === 'target' ? t('Not observed in this run') : (b.heroContent?.headline || '-')}</td>
+                    <td style={{ padding: '12px 16px', color: T.textSub }}>{benchmark && b.role === 'target' ? t('Not observed in this run') : ((b.featuredCategories || []).slice(0, 6).join(', ') || '-')}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1537,13 +1568,13 @@ const KW_CATEGORIES = [
   { key: 'aiDiscoveryQueries', label: 'AI Queries' },
 ]
 
-function computePageSeoScore(seoPage, brandName) {
+function computePageSeoScore(seoPage, brandName, t = fmt) {
   const signals = []
   let totalScore = 0
   const seo = seoPage || {}
-  // Title tag (25 pts) — detect brand-name-only vs genuinely short vs good
+  // Title tag (25 pts) - detect brand-name-only vs genuinely short vs good
   if (!seo.titleTag) {
-    signals.push({ field: 'Title Tag', value: '—', pts: 0, max: 25, status: 'fail', rec: 'No title tag at all — this is the headline Google shows in search results. Without it Google guesses, often using random text. Add a 50–60 character title describing what you sell and where.' })
+    signals.push({ field: t('Title Tag'), value: '-', pts: 0, max: 25, status: 'fail', rec: t('No title tag at all - this is the headline Google shows in search results. Without it Google guesses, often using random text. Add a 50–60 character title describing what you sell and where.') })
   } else {
     const bn = (brandName || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
     const tl = seo.titleTag.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
@@ -1555,32 +1586,32 @@ function computePageSeoScore(seoPage, brandName) {
     const isBrandOnly = bn && (tl === bn || tl.replace(new RegExp(bn, 'g'), '').trim() === '')
     if (isBrandOnly || brandRepeats) {
       totalScore += 10
-      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: brandRepeats
-        ? `Your title is your brand name twice over and nothing else, so it spends every one of Google's ~60 visible characters saying something a searcher already knew. Replace the duplicate with what you sell: "${brandName} | Toys, Games and Gifts for Every Age".`
-        : `Your title is only your brand name, so shoppers who don't already know you scroll past it. Say what you sell alongside the name: "${brandName} | Toys, Games and Gifts for Every Age".` })
+      signals.push({ field: t('Title Tag'), value: seo.titleTag, pts: 10, max: 25, status: 'warn', rec: brandRepeats
+        ? t('Your title is your brand name twice over and nothing else, so it spends every one of Google\'s ~60 visible characters saying something a searcher already knew. Replace the duplicate with what you sell: "{brandName} | Toys, Games and Gifts for Every Age".', { brandName })
+        : t('Your title is only your brand name, so shoppers who don\'t already know you scroll past it. Say what you sell alongside the name: "{brandName} | Toys, Games and Gifts for Every Age".', { brandName }) })
     } else if (seo.titleTag.length < 30) {
       totalScore += 5
-      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 5, max: 25, status: 'warn', rec: `Title is too short (${seo.titleTag.length} chars) — aim for 50–60 characters that describe what you sell and where you operate` })
+      signals.push({ field: t('Title Tag'), value: seo.titleTag, pts: 5, max: 25, status: 'warn', rec: t('Title is too short ({length} chars) - aim for 50–60 characters that describe what you sell and where you operate', { length: seo.titleTag.length }) })
     } else if (seo.titleTag.length <= 60) {
       totalScore += 25
-      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 25, max: 25, status: 'pass', rec: '' })
+      signals.push({ field: t('Title Tag'), value: seo.titleTag, pts: 25, max: 25, status: 'pass', rec: '' })
     } else {
       totalScore += 15
-      signals.push({ field: 'Title Tag', value: seo.titleTag, pts: 15, max: 25, status: 'warn', rec: `Title is too long (${seo.titleTag.length} chars) — Google cuts it off at around 60 characters in search results, hiding key info from shoppers` })
+      signals.push({ field: t('Title Tag'), value: seo.titleTag, pts: 15, max: 25, status: 'warn', rec: t('Title is too long ({length} chars) - Google cuts it off at around 60 characters in search results, hiding key info from shoppers', { length: seo.titleTag.length }) })
     }
   }
   // Meta description (20 pts)
   if (!seo.metaDescription) {
-    signals.push({ field: 'Meta Description', value: '—', pts: 0, max: 20, status: 'fail', rec: 'No meta description — this is the text snippet under your link in Google results. Without it, Google picks random body text, which looks unprofessional and gets fewer clicks. Write 140–160 characters that make people want to visit.' })
+    signals.push({ field: t('Meta Description'), value: '-', pts: 0, max: 20, status: 'fail', rec: t('No meta description - this is the text snippet under your link in Google results. Without it, Google picks random body text, which looks unprofessional and gets fewer clicks. Write 140–160 characters that make people want to visit.') })
   } else if (seo.metaDescription.length < 120) {
     totalScore += 10
-    signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 10, max: 20, status: 'warn', rec: `Too short (${seo.metaDescription.length} chars) — aim for 140–160 characters so Google shows your full message` })
+    signals.push({ field: t('Meta Description'), value: seo.metaDescription, pts: 10, max: 20, status: 'warn', rec: t('Too short ({length} chars) - aim for 140–160 characters so Google shows your full message', { length: seo.metaDescription.length }) })
   } else if (seo.metaDescription.length <= 160) {
     totalScore += 20
-    signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 20, max: 20, status: 'pass', rec: '' })
+    signals.push({ field: t('Meta Description'), value: seo.metaDescription, pts: 20, max: 20, status: 'pass', rec: '' })
   } else {
     totalScore += 12
-    signals.push({ field: 'Meta Description', value: seo.metaDescription, pts: 12, max: 20, status: 'warn', rec: `Too long (${seo.metaDescription.length} chars) — Google will cut it off; trim to 160 characters` })
+    signals.push({ field: t('Meta Description'), value: seo.metaDescription, pts: 12, max: 20, status: 'warn', rec: t('Too long ({length} chars) - Google will cut it off; trim to 160 characters', { length: seo.metaDescription.length }) })
   }
   // H1 (20 pts)
   //
@@ -1594,51 +1625,52 @@ function computePageSeoScore(seoPage, brandName) {
   const bnForH1 = (brandName || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
   const SEASONAL_H1 = /\b(sale|% ?off|clearance|black friday|cyber monday|christmas|xmas|holiday|easter|halloween|eid|ramadan|back to school|book week|mother'?s day|father'?s day|valentine|new year|boxing day|deal of the|ends (soon|today|sunday)|shop now|get .* ready|limited time|this week(end)?|save up to)\b/i
   if (!h1) {
-    signals.push({ field: 'H1 Heading', value: '—', pts: 0, max: 20, status: 'fail', rec: 'No H1 heading. Every page should have one main headline naming its subject. Search engines lean on it to understand what the page is about, so leaving it out wastes the strongest on-page signal you own.' })
+    signals.push({ field: t('H1 Heading'), value: '-', pts: 0, max: 20, status: 'fail', rec: t('No H1 heading. Every page should have one main headline naming its subject. Search engines lean on it to understand what the page is about, so leaving it out wastes the strongest on-page signal you own.') })
   } else if (SEASONAL_H1.test(h1)) {
     totalScore += 12
-    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 12, max: 20, status: 'warn', rec: `"${h1}" is a campaign headline, not a statement of what this page is. It will be replaced at the end of the promotion, so Google never gets a stable read on the page's subject. Make the H1 permanent, for example "Toys, Games and Gifts for Every Age", and run the seasonal message as an H2 or a banner above it.` })
+    signals.push({ field: t('H1 Heading'), value: seo.h1, pts: 12, max: 20, status: 'warn', rec: t('"{h1}" is a campaign headline, not a statement of what this page is. It will be replaced at the end of the promotion, so Google never gets a stable read on the page\'s subject. Make the H1 permanent, for example "Toys, Games and Gifts for Every Age", and run the seasonal message as an H2 or a banner above it.', { h1 }) })
   } else if (bnForH1 && h1Lower.replace(/[^a-z0-9 ]/g, '').trim() === bnForH1) {
     totalScore += 14
-    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 14, max: 20, status: 'warn', rec: `Your H1 repeats the brand name and nothing else. Google already knows the brand from the title and domain. Use the headline to say what you sell, which is the part it cannot infer.` })
+    signals.push({ field: t('H1 Heading'), value: seo.h1, pts: 14, max: 20, status: 'warn', rec: t('Your H1 repeats the brand name and nothing else. Google already knows the brand from the title and domain. Use the headline to say what you sell, which is the part it cannot infer.') })
   } else if (h1.split(/\s+/).length < 3) {
     totalScore += 14
-    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 14, max: 20, status: 'warn', rec: `"${h1}" is too thin to describe the page. Expand it to name the products and the audience, for example "Toys and Games for Kids of Every Age".` })
+    signals.push({ field: t('H1 Heading'), value: seo.h1, pts: 14, max: 20, status: 'warn', rec: t('"{h1}" is too thin to describe the page. Expand it to name the products and the audience, for example "Toys and Games for Kids of Every Age".', { h1 }) })
   } else {
     totalScore += 20
-    signals.push({ field: 'H1 Heading', value: seo.h1, pts: 20, max: 20, status: 'pass', rec: '' })
+    signals.push({ field: t('H1 Heading'), value: seo.h1, pts: 20, max: 20, status: 'pass', rec: '' })
   }
   // Canonical (10 pts)
   if (!seo.canonicalTag) {
     totalScore += 5
-    signals.push({ field: 'Canonical Tag', value: '—', pts: 5, max: 10, status: 'warn', rec: 'No canonical tag — when Google finds the same product at multiple URLs (e.g. with filters or sorting applied), it splits your ranking power across duplicates. One line of code tells Google which version to credit.' })
+    signals.push({ field: t('Canonical Tag'), value: '-', pts: 5, max: 10, status: 'warn', rec: t('No canonical tag - when Google finds the same product at multiple URLs (e.g. with filters or sorting applied), it splits your ranking power across duplicates. One line of code tells Google which version to credit.') })
   } else {
     totalScore += 10
-    signals.push({ field: 'Canonical Tag', value: seo.canonicalTag.slice(0, 60), pts: 10, max: 10, status: 'pass', rec: '' })
+    signals.push({ field: t('Canonical Tag'), value: seo.canonicalTag.slice(0, 60), pts: 10, max: 10, status: 'pass', rec: '' })
   }
   // Schema (15 pts)
   const hasRichSchema = seo.schemaMarkup?.some(s => /product|offer|breadcrumb|itemlist|faq/i.test(s))
   if (!seo.schemaMarkup?.length) {
-    signals.push({ field: 'Schema Markup', value: 'None', pts: 0, max: 15, status: 'fail', rec: 'No structured data — adding product and organization markup helps Google display star ratings, prices, and breadcrumbs directly in search results, increasing click-through rate without any extra ad spend.' })
+    signals.push({ field: t('Schema Markup'), value: t('None'), pts: 0, max: 15, status: 'fail', rec: t('No structured data - adding product and organization markup helps Google display star ratings, prices, and breadcrumbs directly in search results, increasing click-through rate without any extra ad spend.') })
   } else if (!hasRichSchema) {
     totalScore += 8
-    signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 8, max: 15, status: 'warn', rec: 'Only basic markup present — adding product schema lets Google show prices and availability directly in search results ("rich results"), which can significantly increase clicks compared to plain text results.' })
+    signals.push({ field: t('Schema Markup'), value: seo.schemaMarkup.join(', '), pts: 8, max: 15, status: 'warn', rec: t('Only basic markup present - adding product schema lets Google show prices and availability directly in search results ("rich results"), which can significantly increase clicks compared to plain text results.') })
   } else {
     totalScore += 15
-    signals.push({ field: 'Schema Markup', value: seo.schemaMarkup.join(', '), pts: 15, max: 15, status: 'pass', rec: '' })
+    signals.push({ field: t('Schema Markup'), value: seo.schemaMarkup.join(', '), pts: 15, max: 15, status: 'pass', rec: '' })
   }
   // Page speed (10 pts)
   const speedPts = { fast: 10, medium: 5, slow: 0 }[seo.pageSpeedSignal] ?? 3
   totalScore += speedPts
   if (speedPts < 10) {
-    signals.push({ field: 'Page Speed', value: seo.pageSpeedSignal || 'unknown', pts: speedPts, max: 10, status: speedPts === 0 ? 'fail' : 'warn', rec: seo.pageSpeedSignal === 'slow' ? 'Page loads slowly — Google uses speed as a direct ranking factor, especially on mobile. Every second of delay loses roughly 7% of visitors before they even see your products.' : 'Medium speed — consider image compression and reducing JavaScript to improve rankings and reduce bounce rate.' })
+    signals.push({ field: t('Page Speed'), value: seo.pageSpeedSignal || 'unknown', pts: speedPts, max: 10, status: speedPts === 0 ? 'fail' : 'warn', rec: seo.pageSpeedSignal === 'slow' ? t('Page loads slowly - Google uses speed as a direct ranking factor, especially on mobile. Every second of delay loses roughly 7% of visitors before they even see your products.') : t('Medium speed - consider image compression and reducing JavaScript to improve rankings and reduce bounce rate.') })
   } else {
-    signals.push({ field: 'Page Speed', value: 'fast', pts: 10, max: 10, status: 'pass', rec: '' })
+    signals.push({ field: t('Page Speed'), value: 'fast', pts: 10, max: 10, status: 'pass', rec: '' })
   }
   return { totalScore, signals }
 }
 
 function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const [view, setView] = useState('seo')
@@ -1657,9 +1689,15 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
     return () => { live = false }
   }, [slug, dataVersion, getModule])
 
-  if (!data) return <EmptyState message="Search & SEO analysis not yet generated." cta="Run Search & SEO Analysis" onCta={() => onRefresh('search_seo')} />
+  if (!data) return <EmptyState message={t('Search & SEO analysis not yet generated.')} cta={t('Run Search & SEO Analysis')} onCta={() => onRefresh('search_seo')} />
 
   const seo = data.onPageSeo || {}
+  // The brand's own site was not requested (operator blocks automated access) or
+  // only a block page came back: nothing on-page may be scored or claimed.
+  const ownUnobserved = seo.skipped === true || seo.blocked === true || data.sitemapAnalysis?.skipped === true
+  // Data written before 2026-11-17 marks the block page as blocked but not skipped;
+  // its priority actions and benchmark prose were written from that block page.
+  const legacyBlocked = seo.blocked === true && seo.skipped !== true
   const geo = data.geoSection || {}
   const kw = data.keywordUniverse || {}
   const ki = data.keywordIntelligence || null
@@ -1674,12 +1712,12 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
   return (
     <div>
-      {running && <RunningBanner moduleLabel="Search & SEO" detail="Generating keyword universe, scraping on-page SEO signals, and testing AI search visibility." />}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div style={{ display: 'flex', gap: 4 }}>
+      {running && <RunningBanner moduleLabel={t('Search & SEO')} detail={t('Generating keyword universe, scraping on-page SEO signals, and testing AI search visibility.')} />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {['seo', 'keywords', 'geo'].map(v => (
-            <button key={v} onClick={() => setView(v)} style={{ padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: v === view ? 700 : 600, background: v === view ? T.accent : T.surface, color: v === view ? '#fff' : T.text, border: `1px solid ${v === view ? T.accent : T.border}`, cursor: 'pointer' }}>
-              {v === 'seo' ? 'On-Page SEO' : v === 'keywords' ? `Keywords${kw.totalCount ? ` (${kw.totalCount})` : ''}` : 'AI Search Visibility'}
+            <button key={v} onClick={() => setView(v)} style={{ whiteSpace: 'nowrap', padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: v === view ? 700 : 600, background: v === view ? T.accent : T.surface, color: v === view ? '#fff' : T.text, border: `1px solid ${v === view ? T.accent : T.border}`, cursor: 'pointer' }}>
+              {v === 'seo' ? t('On-Page SEO') : v === 'keywords' ? t('Keywords{value}', { value: kw.totalCount ? ` (${kw.totalCount})` : '' }) : t('AI Search Visibility')}
             </button>
           ))}
         </div>
@@ -1688,7 +1726,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
       {view === 'seo' && (() => {
         const brandName = data.brandName || data.brandSlug?.replace(/-/g, ' ') || ''
-        const { totalScore, signals } = computePageSeoScore(seo, brandName)
+        const { totalScore, signals } = ownUnobserved ? { totalScore: 0, signals: [] } : computePageSeoScore(seo, brandName, t)
         const scoreColor = totalScore >= 75 ? '#059669' : totalScore >= 50 ? '#d97706' : '#dc2626'
 
         const pageTypeColor = { homepage: 'purple', category: 'blue', product: 'green' }
@@ -1697,18 +1735,27 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
         return (
           <div>
 
+            {/* Not observed: say why there is no score before any action is listed. */}
+            {ownUnobserved && (
+              <div role="note" className="bp-note" style={{ background: T.surfaceAlt, borderLeft: `3px solid ${T.accent}`, color: T.text, marginBottom: 20 }}>
+                <strong style={{ display: 'block', marginBottom: 4 }}>{t('No score: your site was not observed')}</strong>
+                {t('Your own site was not observed in this run (the operator blocks automated access), so there is no on-page SEO score. See the priority actions below and the Website blueprint verify-first checklist.')}
+                {legacyBlocked && <span style={{ display: 'block', marginTop: 4 }}>{t('These findings were built from a bot-block page in an earlier run and will be replaced by the next refresh.')}</span>}
+              </div>
+            )}
+
             {/* ── Priority Actions ── */}
-            {data.priorityActions?.length > 0 && (
+            {!legacyBlocked && data.priorityActions?.length > 0 && (
               <Card style={{ marginBottom: 20, borderLeft: '4px solid #6366f1' }}>
-                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Priority Actions</h3>
-                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>Ranked by business impact across all SEO signals — homepage, category pages, product pages, sitemap, and competitor comparison.</p>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{t('Priority Actions')}</h3>
+                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>{t('Ranked by business impact across all SEO signals - homepage, category pages, product pages, sitemap, and competitor comparison.')}</p>
                 {data.priorityActions.map((action, i) => (
                   <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 16, marginBottom: 16, borderBottom: i < data.priorityActions.length - 1 ? `1px solid ${T.border}` : 'none' }}>
                     <div style={{ width: 30, height: 30, borderRadius: '50%', background: T.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: T.accent, flexShrink: 0 }}>{action.rank}</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                         <ImpactBadge impact={(action.impact || 'medium').toLowerCase()} />
-                        <span style={{ fontSize: 11, color: T.textMuted, background: T.surfaceAlt, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>{action.effort || '—'}</span>
+                        {action.effort && <span style={{ fontSize: 11, color: T.textMuted, background: T.surfaceAlt, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>{tEnum(t, action.effort)}</span>}
                       </div>
                       <p style={{ fontSize: 14, fontWeight: 600, color: T.text, marginBottom: 4 }}>{action.action}</p>
                       <p style={{ fontSize: 12, color: T.textMuted, lineHeight: 1.6 }}>{action.why}</p>
@@ -1719,20 +1766,21 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
             )}
 
             {/* ── Homepage SEO Health Score ── */}
+            {ownUnobserved ? null : (
             <Card style={{ marginBottom: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginBottom: 24 }}>
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Homepage SEO Score</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{t('Homepage SEO Score')}</p>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                     <span style={{ fontSize: 52, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>{totalScore}</span>
                     <span style={{ fontSize: 20, color: T.textMuted, fontWeight: 400 }}>/100</span>
                   </div>
-                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Based on 6 on-page signals</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>{t('Based on 6 on-page signals')}</p>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>Issues to Fix</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('Issues to Fix')}</p>
                   {signals.filter(s => s.status !== 'pass').length === 0
-                    ? <p style={{ fontSize: 13, color: '#059669' }}>All signals passing</p>
+                    ? <p style={{ fontSize: 13, color: ink(T, '#059669') }}>{t('All signals passing')}</p>
                     : signals.filter(s => s.status !== 'pass').map((s, i) => (
                         <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
                           <span style={{ fontSize: 11, color: s.status === 'fail' ? '#dc2626' : '#d97706', fontWeight: 700, minWidth: 28 }}>{s.status === 'fail' ? '✗' : '!'}</span>
@@ -1745,7 +1793,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ background: T.surfaceAlt }}>
-                    {['Signal', 'Current Value', 'Score', 'What This Means'].map(h => (
+                    {[t('Signal'), t('Current Value'), t('Score'), t('What This Means')].map(h => (
                       <th key={h} style={{ padding: '8px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
                     ))}
                   </tr>
@@ -1754,29 +1802,30 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   {signals.map((s, i) => (
                     <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
                       <td style={{ padding: '10px 14px', fontWeight: 600, color: T.text }}>{s.field}</td>
-                      <td style={{ padding: '10px 14px', color: s.value === '—' ? T.textFaint : T.textSub, maxWidth: 200, wordBreak: 'break-word', fontStyle: s.value === '—' ? 'italic' : 'normal' }}>{s.value.length > 70 ? s.value.slice(0, 70) + '…' : s.value}</td>
+                      <td style={{ padding: '10px 14px', color: s.value === '-' ? T.textFaint : T.textSub, maxWidth: 200, wordBreak: 'break-word', fontStyle: s.value === '-' ? 'italic' : 'normal' }}>{tEnum(t, s.value.length > 70 ? s.value.slice(0, 70) + '…' : s.value)}</td>
                       <td style={{ padding: '10px 14px' }}>
                         <span style={{ fontSize: 12, fontWeight: 700, background: s.status === 'pass' ? '#d1fae5' : s.status === 'warn' ? '#fef3c7' : '#fee2e2', color: s.status === 'pass' ? '#059669' : s.status === 'warn' ? '#d97706' : '#dc2626', padding: '3px 10px', borderRadius: 12 }}>{s.pts}/{s.max}</span>
                       </td>
-                      <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12, lineHeight: 1.5 }}>{s.rec || '—'}</td>
+                      <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12, lineHeight: 1.5 }}>{s.rec || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </Card>
+            )}
 
             {/* ── Multi-Page Analysis ── */}
-            {data.pageAnalyses?.length > 1 && (
+            {!ownUnobserved && data.pageAnalyses?.length > 1 && (
               <Card style={{ marginBottom: 20 }}>
-                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Multi-Page SEO Analysis</h3>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{t('Multi-Page SEO Analysis')}</h3>
                 <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>
-                  We checked your homepage, category pages, and product pages. Issues appearing across multiple page types signal a site-wide problem, not just a homepage fix.
+                  {t('We checked your homepage, category pages, and product pages. Issues appearing across multiple page types signal a site-wide problem, not just a homepage fix.')}
                 </p>
                 {data.pageAnalyses.map((page, i) => {
-                  const { totalScore: pgScore } = computePageSeoScore(page, brandName)
+                  const pgBad = page.error || page.blocked || page.skipped
+                  const { totalScore: pgScore, signals: pgSignals } = pgBad ? { totalScore: 0, signals: [] } : computePageSeoScore(page, brandName, t)
                   const pgColor = pgScore >= 75 ? 'green' : pgScore >= 50 ? 'yellow' : 'red'
                   const isOpen = expandedPage === i
-                  const { signals: pgSignals } = computePageSeoScore(page, brandName)
                   const shortUrl = (page.url || '').replace(/^https?:\/\/[^/]+/, '').slice(0, 55) || '/'
                   return (
                     <div key={i} style={{ borderTop: `1px solid ${T.border}`, paddingTop: 12, marginTop: 12 }}>
@@ -1784,18 +1833,18 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
                         <Badge label={pageTypeLabel[page.pageType] || page.pageType} color={pageTypeColor[page.pageType] || 'gray'} />
                         <span style={{ flex: 1, fontSize: 13, color: T.textSub, fontFamily: 'monospace' }}>{shortUrl || '/'}</span>
-                        {page.error ? <Badge label="Could not scrape" color="gray" /> : <Badge label={`${pgScore}/100`} color={pgColor} />}
+                        {pgBad ? <Badge label={t('Could not scrape')} color="gray" /> : <Badge label={`${pgScore}/100`} color={pgColor} />}
                         <span style={{ color: T.textFaint, fontSize: 12, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
                       </button>
                       {isOpen && (
                         <div style={{ marginTop: 12 }}>
-                          {page.error
-                            ? <p style={{ fontSize: 13, color: T.textMuted, fontStyle: 'italic', padding: '8px 0' }}>Could not scrape this page — it may be JavaScript-rendered or bot-protected. Search engines may see the same empty content.</p>
+                          {pgBad
+                            ? <p style={{ fontSize: 13, color: T.textMuted, fontStyle: 'italic', padding: '8px 0' }}>{t('Could not scrape this page - it may be JavaScript-rendered or bot-protected. Search engines may see the same empty content.')}</p>
                             : (
                               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                                 <thead>
                                   <tr style={{ background: T.surfaceAlt }}>
-                                    {['Signal', 'Value', 'Score', 'Recommendation'].map(h => (
+                                    {[t('Signal'), t('Value'), t('Score'), t('Recommendation')].map(h => (
                                       <th key={h} style={{ padding: '6px 12px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
                                     ))}
                                   </tr>
@@ -1804,11 +1853,11 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                                   {pgSignals.map((s, j) => (
                                     <tr key={j} style={{ borderTop: `1px solid ${T.border}` }}>
                                       <td style={{ padding: '8px 12px', fontWeight: 600, color: T.text, whiteSpace: 'nowrap' }}>{s.field}</td>
-                                      <td style={{ padding: '8px 12px', color: s.value === '—' ? T.textFaint : T.textSub, maxWidth: 180, wordBreak: 'break-word', fontStyle: s.value === '—' ? 'italic' : 'normal' }}>{s.value.length > 60 ? s.value.slice(0, 60) + '…' : s.value}</td>
+                                      <td style={{ padding: '8px 12px', color: s.value === '-' ? T.textFaint : T.textSub, maxWidth: 180, wordBreak: 'break-word', fontStyle: s.value === '-' ? 'italic' : 'normal' }}>{s.value.length > 60 ? s.value.slice(0, 60) + '…' : s.value}</td>
                                       <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
                                         <span style={{ fontSize: 11, fontWeight: 700, background: s.status === 'pass' ? '#d1fae5' : s.status === 'warn' ? '#fef3c7' : '#fee2e2', color: s.status === 'pass' ? '#059669' : s.status === 'warn' ? '#d97706' : '#dc2626', padding: '2px 8px', borderRadius: 12 }}>{s.pts}/{s.max}</span>
                                       </td>
-                                      <td style={{ padding: '8px 12px', color: T.textMuted, lineHeight: 1.4 }}>{s.rec || '—'}</td>
+                                      <td style={{ padding: '8px 12px', color: T.textMuted, lineHeight: 1.4 }}>{s.rec || '-'}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1826,18 +1875,20 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
             {/* ── Sitemap Analysis ── */}
             {data.sitemapAnalysis && (
               <Card style={{ marginBottom: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: data.sitemapAnalysis.issues?.length ? 16 : 0 }}>
-                  <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Sitemap</h3>
-                  <Badge label={data.sitemapAnalysis.found ? 'Found' : 'Missing'} color={data.sitemapAnalysis.found ? 'green' : 'red'} />
-                  {data.sitemapAnalysis.found && data.sitemapAnalysis.totalUrls > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: !ownUnobserved && data.sitemapAnalysis.issues?.length ? 16 : 0 }}>
+                  <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Sitemap')}</h3>
+                  {ownUnobserved
+                    ? <Badge label={t('Not checked')} color="gray" />
+                    : <Badge label={data.sitemapAnalysis.found ? t('Found') : t('Missing')} color={data.sitemapAnalysis.found ? 'green' : 'red'} />}
+                  {!ownUnobserved && data.sitemapAnalysis.found && data.sitemapAnalysis.totalUrls > 0 && (
                     <span style={{ fontSize: 12, color: T.textMuted }}>
-                      {data.sitemapAnalysis.totalUrls} URLs
-                      {data.sitemapAnalysis.byType?.product > 0 && ` · ${data.sitemapAnalysis.byType.product} products`}
-                      {data.sitemapAnalysis.byType?.collection > 0 && ` · ${data.sitemapAnalysis.byType.collection} categories`}
+                      {t('{totalUrls} URLs', { totalUrls: data.sitemapAnalysis.totalUrls })}
+                      {data.sitemapAnalysis.byType?.product > 0 && (' ' + t('· {product} products', { product: data.sitemapAnalysis.byType.product }))}
+                      {data.sitemapAnalysis.byType?.collection > 0 && (' ' + t('· {collection} categories', { collection: data.sitemapAnalysis.byType.collection }))}
                     </span>
                   )}
                 </div>
-                {data.sitemapAnalysis.issues?.length > 0 && (
+                {!ownUnobserved && data.sitemapAnalysis.issues?.length > 0 && (
                   <div>
                     {data.sitemapAnalysis.issues.map((issue, i) => (
                       <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
@@ -1847,8 +1898,8 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                     ))}
                   </div>
                 )}
-                {data.sitemapAnalysis.found && !data.sitemapAnalysis.issues?.length && (
-                  <p style={{ fontSize: 13, color: '#059669', marginTop: 4 }}>Sitemap looks healthy — all major URL types present and listed in robots.txt.</p>
+                {!ownUnobserved && data.sitemapAnalysis.found && !data.sitemapAnalysis.issues?.length && (
+                  <p style={{ fontSize: 13, color: ink(T, '#059669'), marginTop: 4 }}>{t('Sitemap looks healthy - all major URL types present and listed in robots.txt.')}</p>
                 )}
               </Card>
             )}
@@ -1856,12 +1907,12 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
             {/* ── Competitor SEO Comparison ── */}
             {data.competitors?.length > 0 && (
               <Card style={{ marginBottom: 20 }}>
-                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Competitor SEO Comparison</h3>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 16 }}>{t('Competitor SEO Comparison')}</h3>
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
                       <tr style={{ background: T.surfaceAlt }}>
-                        {['Competitor', 'Title Tag', 'H1', 'Schema', 'Speed'].map(h => (
+                        {[t('Competitor'), t('Title Tag'), 'H1', t('Schema'), t('Speed')].map(h => (
                           <th key={h} style={{ padding: '8px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
@@ -1869,10 +1920,16 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                     <tbody>
                       <tr style={{ borderTop: `1px solid ${T.border}`, background: '#ede9fe22' }}>
                         <td style={{ padding: '10px 14px', fontWeight: 700, color: T.text }}>{data.onPageSeo?.url?.replace(/https?:\/\/(www\.)?/, '').split('/')[0]} ★</td>
-                        <td style={{ padding: '10px 14px', color: seo.titleTag ? T.text : T.textFaint, fontStyle: seo.titleTag ? 'normal' : 'italic' }}>{seo.titleTag?.slice(0, 40) || 'Missing'}</td>
-                        <td style={{ padding: '10px 14px' }}><Badge label={seo.h1 ? 'Yes' : 'Missing'} color={seo.h1 ? 'green' : 'red'} /></td>
-                        <td style={{ padding: '10px 14px', color: T.textSub }}>{seo.schemaMarkup?.join(', ') || '—'}</td>
+                        {ownUnobserved ? (
+                          <td colSpan={4} style={{ padding: '10px 14px', color: T.textSub, fontStyle: 'italic' }}>
+                            {t('Your site was not observed in this run, so no signals were read.')}
+                          </td>
+                        ) : (<>
+                        <td style={{ padding: '10px 14px', color: seo.titleTag ? T.text : T.textFaint, fontStyle: seo.titleTag ? 'normal' : 'italic' }}>{seo.titleTag?.slice(0, 40) || t('Missing')}</td>
+                        <td style={{ padding: '10px 14px' }}><Badge label={seo.h1 ? t('Yes') : t('Missing')} color={seo.h1 ? 'green' : 'red'} /></td>
+                        <td style={{ padding: '10px 14px', color: T.textSub }}>{seo.schemaMarkup?.join(', ') || '-'}</td>
                         <td style={{ padding: '10px 14px' }}><Badge label={seo.pageSpeedSignal || 'unknown'} color={speedColors[seo.pageSpeedSignal] || 'gray'} /></td>
+                        </>)}
                       </tr>
                       {/* A site behind a bot wall gave us its interstitial, not its SEO. Showing
                           "Just a moment..." as a title tag and "Missing" as an H1 invents facts about
@@ -1881,15 +1938,15 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                         <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
                           <td style={{ padding: '10px 14px', color: T.text }}>{c.name}</td>
                           <td colSpan={4} style={{ padding: '10px 14px', color: T.textFaint, fontStyle: 'italic' }}>
-                            Site blocked our scan, so no signals were read. Nothing here counts for or against them.
+                            {t('Site blocked our scan, so no signals were read. Nothing here counts for or against them.')}
                           </td>
                         </tr>
                       ) : (
                         <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
                           <td style={{ padding: '10px 14px', color: T.text }}>{c.name}</td>
-                          <td style={{ padding: '10px 14px', color: c.titleTag ? T.textSub : T.textFaint, fontStyle: c.titleTag ? 'normal' : 'italic' }}>{c.titleTag?.slice(0, 40) || 'Not found'}</td>
-                          <td style={{ padding: '10px 14px' }}><Badge label={c.h1 ? 'Yes' : 'Missing'} color={c.h1 ? 'green' : 'red'} /></td>
-                          <td style={{ padding: '10px 14px', color: T.textSub }}>{c.schemaMarkup?.join(', ') || '—'}</td>
+                          <td style={{ padding: '10px 14px', color: c.titleTag ? T.textSub : T.textFaint, fontStyle: c.titleTag ? 'normal' : 'italic' }}>{c.titleTag?.slice(0, 40) || t('Not found')}</td>
+                          <td style={{ padding: '10px 14px' }}><Badge label={c.h1 ? t('Yes') : t('Missing')} color={c.h1 ? 'green' : 'red'} /></td>
+                          <td style={{ padding: '10px 14px', color: T.textSub }}>{c.schemaMarkup?.join(', ') || '-'}</td>
                           <td style={{ padding: '10px 14px' }}><Badge label={c.pageSpeedSignal || 'unknown'} color={speedColors[c.pageSpeedSignal] || 'gray'} /></td>
                         </tr>
                       ))}
@@ -1900,34 +1957,36 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
             )}
 
             {/* ── Competitor Benchmarks ── */}
-            {data.competitorBenchmarks?.length > 0 && (
+            {!legacyBlocked && data.competitorBenchmarks?.length > 0 && (
               <Card>
-                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Where Competitors Outperform You</h3>
-                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>Real examples from your competitors showing what better SEO looks like — and what it costs you to fall behind.</p>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{t('Where Competitors Outperform You')}</h3>
+                <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 20 }}>{t('Real examples from your competitors showing what better SEO looks like - and what it costs you to fall behind.')}</p>
                 {data.competitorBenchmarks.map((b, i) => (
                   <div key={i} style={{ paddingBottom: 20, marginBottom: 20, borderBottom: i < data.competitorBenchmarks.length - 1 ? `1px solid ${T.border}` : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                       <Badge label={b.signal} color="yellow" />
                       <span style={{ fontSize: 12, color: T.textMuted }}>→</span>
                       <Badge label={b.competitorName} color="blue" />
-                      <span style={{ fontSize: 12, color: T.textMuted }}>does this better</span>
+                      <span style={{ fontSize: 12, color: T.textMuted }}>{t('does this better')}</span>
                     </div>
                     <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6, marginBottom: 12 }}>{b.callout}</p>
                     <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
                       <div>
-                        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 3 }}>Their Value</p>
-                        <p style={{ fontSize: 13, color: '#059669', fontWeight: 600 }}>{b.competitorValue || '—'}</p>
+                        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 3 }}>{t('Their Value')}</p>
+                        <p style={{ fontSize: 13, color: ink(T, '#059669'), fontWeight: 600 }}>{b.competitorValue || '-'}</p>
                       </div>
                       <div>
-                        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 3 }}>Your Value</p>
-                        <p style={{ fontSize: 13, color: b.targetValue ? '#d97706' : '#dc2626', fontWeight: 600, fontStyle: b.targetValue ? 'normal' : 'italic' }}>{b.targetValue || 'Missing'}</p>
+                        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 3 }}>{t('Your Value')}</p>
+                        {ownUnobserved
+                          ? <p style={{ fontSize: 13, color: T.textMuted, fontWeight: 600, fontStyle: 'italic' }}>{t('Not observed in this run')}</p>
+                          : <p style={{ fontSize: 13, color: b.targetValue ? '#d97706' : '#dc2626', fontWeight: 600, fontStyle: b.targetValue ? 'normal' : 'italic' }}>{b.targetValue || t('Missing')}</p>}
                       </div>
                     </div>
                     {/* A comparison that stops at the diagnosis leaves the reader to invent the fix. */}
                     {b.recommendation && (
                       <div style={{ marginTop: 14, background: T.surfaceAlt, borderLeft: '3px solid #059669', borderRadius: 6, padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                          <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>What to do</p>
+                          <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('What to do')}</p>
                           {b.effort && <Badge label={b.effort} color={b.effort === 'Quick Win' ? 'green' : b.effort === 'Large' ? 'red' : 'yellow'} />}
                         </div>
                         <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6 }}>{b.recommendation}</p>
@@ -1945,7 +2004,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
         <div>
           {!ki && (
             <Card style={{ marginBottom: 16, borderLeft: '4px solid #d97706' }}>
-              <p style={{ color: T.textSub, fontSize: 13 }}>Keyword intelligence not yet generated. Re-run Search & SEO analysis to unlock opportunity clusters, content gaps, and ranked recommendations.</p>
+              <p style={{ color: T.textSub, fontSize: 13 }}>{t('Keyword intelligence not yet generated. Re-run Search & SEO analysis to unlock opportunity clusters, content gaps, and ranked recommendations.')}</p>
             </Card>
           )}
 
@@ -1954,10 +2013,10 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
             const clusters = ki.clusters || []
             const gaps = ki.topContentGaps || []
             const filterBtns = [
-              { key: 'all', label: 'All Clusters' },
-              { key: 'quickwins', label: `Quick Wins (${clusters.filter(c => c.isQuickWin).length})` },
-              { key: 'gaps', label: `Content Gaps (${clusters.filter(c => !c.hasExistingPage).length})` },
-              { key: 'high', label: `High Opportunity (${clusters.filter(c => c.opportunity === 'high').length})` },
+              { key: 'all', label: t('All Clusters') },
+              { key: 'quickwins', label: t('Quick Wins ({length})', { length: clusters.filter(c => c.isQuickWin).length }) },
+              { key: 'gaps', label: t('Content Gaps ({length})', { length: clusters.filter(c => !c.hasExistingPage).length }) },
+              { key: 'high', label: t('High Opportunity ({length})', { length: clusters.filter(c => c.opportunity === 'high').length }) },
             ]
             const filtered = clusters.filter(c => {
               if (kwFilter === 'quickwins') return c.isQuickWin
@@ -1970,10 +2029,10 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                 {/* Opportunity Summary Bar */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
                   {[
-                    { label: 'Quick Wins', value: summary.quickWins ?? clusters.filter(c => c.isQuickWin).length, color: '#059669', desc: 'Existing pages to optimize' },
-                    { label: 'Content to Create', value: summary.contentToCreate ?? clusters.filter(c => !c.hasExistingPage && c.opportunity !== 'low').length, color: '#2563eb', desc: 'New pages needed' },
-                    { label: 'Content Gaps', value: summary.contentGaps ?? gaps.length, color: '#dc2626', desc: 'High-value missed searches' },
-                    { label: 'Total Opportunities', value: summary.totalOpportunities ?? clusters.length, color: '#7c3aed', desc: 'Keyword clusters identified' },
+                    { label: t('Quick Wins'), value: summary.quickWins ?? clusters.filter(c => c.isQuickWin).length, color: ink(T, '#059669'), desc: t('Existing pages to optimize') },
+                    { label: t('Content to Create'), value: summary.contentToCreate ?? clusters.filter(c => !c.hasExistingPage && c.opportunity !== 'low').length, color: ink(T, '#2563eb'), desc: t('New pages needed') },
+                    { label: t('Content Gaps'), value: summary.contentGaps ?? gaps.length, color: ink(T, '#dc2626'), desc: t('High-value missed searches') },
+                    { label: t('Total Opportunities'), value: summary.totalOpportunities ?? clusters.length, color: ink(T, '#7c3aed'), desc: t('Keyword clusters identified') },
                   ].map(s => (
                     <Card key={s.label} style={{ textAlign: 'center', padding: 16 }}>
                       <p style={{ fontSize: 32, fontWeight: 800, color: s.color, lineHeight: 1, marginBottom: 4 }}>{s.value}</p>
@@ -1986,14 +2045,14 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                 {/* Top Content Gaps */}
                 {gaps.length > 0 && (
                   <Card style={{ marginBottom: 20 }}>
-                    <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Top Content Gaps</h3>
-                    <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>High-value searches where your site has no matching page — each is a missed ranking opportunity.</p>
+                    <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{t('Top Content Gaps')}</h3>
+                    <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 16 }}>{t('High-value searches where your site has no matching page - each is a missed ranking opportunity.')}</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {gaps.map((g, i) => (
                         <div key={i} style={{ borderLeft: '4px solid #dc2626', paddingLeft: 14, paddingTop: 4, paddingBottom: 4 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                             <span style={{ fontWeight: 700, fontSize: 14, color: T.text }}>{g.title}</span>
-                            <span style={{ fontSize: 11, background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{g.estimatedMonthlySearches} searches/mo</span>
+                            <span style={{ fontSize: 11, background: pb(T, '#fef2f2'), color: ink(T, '#dc2626'), padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{t('{estimatedMonthlySearches} searches/mo', { estimatedMonthlySearches: g.estimatedMonthlySearches })}</span>
                             <span style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 10 }}>{CONTENT_TYPE_LABELS[g.recommendedContentType] || g.recommendedContentType}</span>
                           </div>
                           <p style={{ fontSize: 13, color: T.textSub, marginBottom: 6 }}>{g.description}</p>
@@ -2013,8 +2072,8 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                 {/* Keyword Clusters */}
                 <Card style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                    <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Keyword Clusters by Opportunity</h3>
-                    <span style={{ fontSize: 12, color: T.textMuted }}>{filtered.length} of {clusters.length} clusters</span>
+                    <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Keyword Clusters by Opportunity')}</h3>
+                    <span style={{ fontSize: 12, color: T.textMuted }}>{t('{length} of {length2} clusters', { length: filtered.length, length2: clusters.length })}</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
                     {filterBtns.map(f => (
@@ -2031,18 +2090,18 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                           <button onClick={() => setExpandedCluster(isOpen ? null : c.id)} style={{ width: '100%', background: isOpen ? T.surfaceAlt : T.surface, border: 'none', padding: '12px 16px', cursor: 'pointer', textAlign: 'left' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                               <span style={{ fontWeight: 700, fontSize: 14, color: T.text, flex: 1 }}>{c.name}</span>
-                              {c.isQuickWin && <span style={{ fontSize: 11, background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>Quick Win</span>}
-                              {!c.hasExistingPage && <span style={{ fontSize: 11, background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>No Page</span>}
+                              {c.isQuickWin && <span style={{ fontSize: 11, background: pb(T, '#ecfdf5'), color: ink(T, '#059669'), padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>{t('Quick Win')}</span>}
+                              {!c.hasExistingPage && <span style={{ fontSize: 11, background: pb(T, '#fef2f2'), color: ink(T, '#dc2626'), padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{t('No Page')}</span>}
                               <span style={{ fontSize: 11, background: `${OPPORTUNITY_COLORS[c.opportunity]}22`, color: OPPORTUNITY_COLORS[c.opportunity], padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
-                                {c.opportunity?.charAt(0).toUpperCase() + c.opportunity?.slice(1)} Opportunity
+                                {t('{value} Opportunity', { value: c.opportunity?.charAt(0).toUpperCase() + c.opportunity?.slice(1) })}
                               </span>
                               <span style={{ fontSize: 11, background: `${COMPETITION_COLORS[c.competition]}22`, color: COMPETITION_COLORS[c.competition], padding: '2px 8px', borderRadius: 10 }}>
-                                {c.competition?.charAt(0).toUpperCase() + c.competition?.slice(1)} Competition
+                                {t('{value} Competition', { value: c.competition?.charAt(0).toUpperCase() + c.competition?.slice(1) })}
                               </span>
                               <span style={{ fontSize: 11, background: T.surfaceAlt, color: T.textSub, padding: '2px 8px', borderRadius: 10, border: `1px solid ${T.border}` }}>
                                 {c.intent}
                               </span>
-                              <span style={{ fontSize: 12, color: T.textMuted }}>{c.estimatedMonthlySearches} searches/mo</span>
+                              <span style={{ fontSize: 12, color: T.textMuted }}>{t('{estimatedMonthlySearches} searches/mo', { estimatedMonthlySearches: c.estimatedMonthlySearches })}</span>
                               <span style={{ fontSize: 16, color: T.textMuted, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
                             </div>
                           </button>
@@ -2050,11 +2109,11 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                             <div style={{ padding: '14px 16px', borderTop: `1px solid ${T.border}`, background: T.surface }}>
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12 }}>
                                 <div>
-                                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Content Gap</p>
+                                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{t('Content Gap')}</p>
                                   <p style={{ fontSize: 13, color: T.textSub }}>{c.contentGap}</p>
                                 </div>
                                 <div>
-                                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Recommended Action</p>
+                                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{t('Recommended Action')}</p>
                                   <p style={{ fontSize: 13, color: T.textSub }}>{c.recommendation}</p>
                                 </div>
                               </div>
@@ -2071,7 +2130,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                         </div>
                       )
                     })}
-                    {filtered.length === 0 && <p style={{ color: T.textFaint, fontSize: 13, padding: 8 }}>No clusters match this filter.</p>}
+                    {filtered.length === 0 && <p style={{ color: T.textFaint, fontSize: 13, padding: 8 }}>{t('No clusters match this filter.')}</p>}
                   </div>
                 </Card>
               </>
@@ -2082,9 +2141,9 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
           <Card style={{ marginBottom: 16 }}>
             <button onClick={() => setShowAllKeywords(!showAllKeywords)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Browse All Keywords</h3>
+                <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Browse All Keywords')}</h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {kw.totalCount > 0 && <span style={{ fontSize: 13, color: T.textMuted }}>{kw.totalCount} total terms</span>}
+                  {kw.totalCount > 0 && <span style={{ fontSize: 13, color: T.textMuted }}>{t('{totalCount} total terms', { totalCount: kw.totalCount })}</span>}
                   <span style={{ fontSize: 16, color: T.textMuted }}>{showAllKeywords ? '▲' : '▼'}</span>
                 </div>
               </div>
@@ -2097,7 +2156,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                     if (!count) return null
                     return (
                       <button key={key} onClick={() => setKwCat(key)} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: kwCat === key ? 700 : 600, background: kwCat === key ? T.accent : T.surface, color: kwCat === key ? '#fff' : T.text, border: `1px solid ${kwCat === key ? T.accent : T.border}`, cursor: 'pointer' }}>
-                        {label} <span style={{ opacity: 0.7 }}>({count})</span>
+                        {t(label)} <span style={{ opacity: 0.7 }}>({count})</span>
                       </button>
                     )
                   })}
@@ -2106,7 +2165,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   {(kw[kwCat] || []).map(k => (
                     <span key={k} style={{ background: T.surfaceAlt, color: T.textSub, fontSize: 12, padding: '5px 14px', borderRadius: 20, border: `1px solid ${T.border}` }}>{k}</span>
                   ))}
-                  {!(kw[kwCat] || []).length && <p style={{ color: T.textFaint, fontSize: 13 }}>No terms in this category yet.</p>}
+                  {!(kw[kwCat] || []).length && <p style={{ color: T.textFaint, fontSize: 13 }}>{t('No terms in this category yet.')}</p>}
                 </div>
               </div>
             )}
@@ -2117,10 +2176,10 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
       {view === 'geo' && (
         <div>
           {/* Context banner */}
-          <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
-            <p style={{ color: '#1d4ed8', fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Why this matters: SEO is the foundation of AI search</p>
-            <p style={{ color: '#1e40af', fontSize: 13, lineHeight: 1.7, margin: 0 }}>
-              AI assistants like ChatGPT, Claude, and Google AI Overviews pull answers from pages that rank well in traditional search. <strong>Fixing your SEO first</strong> — title tags, H1s, structured content, age/occasion pages — is the fastest path to appearing in both Google results and AI-generated recommendations. The queries below show exactly where you're being mentioned (or missed) by AI agents today.
+          <div style={{ background: pb(T, '#eff6ff'), border: '1px solid #bfdbfe', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+            <p style={{ color: ink(T, '#1d4ed8'), fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{t('Why this matters: SEO is the foundation of AI search')}</p>
+            <p style={{ color: ink(T, '#1e40af'), fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+              {t('AI assistants like ChatGPT, Claude, and Google AI Overviews pull answers from pages that rank well in traditional search.')} <strong>{t('Fixing your SEO first')}</strong> {t('- title tags, H1s, structured content, age/occasion pages - is the fastest path to appearing in both Google results and AI-generated recommendations. The queries below show exactly where you\'re being mentioned (or missed) by AI agents today.')}
             </p>
           </div>
 
@@ -2133,19 +2192,19 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   <div key={agent} style={{ textAlign: 'center' }}>
                     <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{agent === 'claude' ? 'Claude' : 'Perplexity'}</p>
                     <p style={{ fontSize: 48, fontWeight: 800, color: score >= 60 ? '#059669' : score >= 30 ? '#d97706' : '#dc2626', lineHeight: 1 }}>{score}%</p>
-                    <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>queries mentioned</p>
+                    <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>{t('queries mentioned')}</p>
                   </div>
                 )
               })}
               {agents.length > 1 && (
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Combined</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>{t('Combined')}</p>
                   <p style={{ fontSize: 48, fontWeight: 800, color: (geo.combinedScore ?? 0) >= 60 ? '#059669' : (geo.combinedScore ?? 0) >= 30 ? '#d97706' : '#dc2626', lineHeight: 1 }}>{geo.combinedScore ?? 0}%</p>
-                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>avg score</p>
+                  <p style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>{t('avg score')}</p>
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 200 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>How to improve</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', marginBottom: 8 }}>{t('How to improve')}</p>
                 <ul style={{ margin: 0, padding: '0 0 0 16px' }}>
                   {(geo.gapRecommendations || []).slice(0, 5).map((r, i) => <li key={i} style={{ fontSize: 13, color: T.textSub, marginBottom: 6, lineHeight: 1.4 }}>{typeof r === 'string' ? r : r.recommendation || r.gap || ''}</li>)}
                 </ul>
@@ -2155,7 +2214,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
           <Card>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>Query-by-Query AI Mention Audit</h3>
+              <h3 style={{ color: T.text, fontSize: 15, fontWeight: 700 }}>{t('Query-by-Query AI Mention Audit')}</h3>
               {agents.length > 1 && (
                 <div style={{ display: 'flex', gap: 4 }}>
                   {agents.map(a => (
@@ -2169,7 +2228,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: T.surfaceAlt }}>
-                  {['Query', 'Category', 'Mentioned?', 'Sentiment', 'Competitors Also Mentioned'].map(h => (
+                  {[t('Query'), t('Category'), t('Mentioned?'), t('Sentiment'), t('Competitors Also Mentioned')].map(h => (
                     <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
@@ -2179,9 +2238,9 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
                   <tr key={i} style={{ borderTop: `1px solid ${T.border}`, background: !q.brandMentioned ? '#fee2e211' : 'transparent' }}>
                     <td style={{ padding: '10px 14px', color: T.text, maxWidth: 220 }}>{q.query}</td>
                     <td style={{ padding: '10px 14px', color: T.textMuted }}>{q.category}</td>
-                    <td style={{ padding: '10px 14px' }}><Badge label={q.brandMentioned ? 'Yes' : 'No'} color={q.brandMentioned ? 'green' : 'red'} /></td>
+                    <td style={{ padding: '10px 14px' }}><Badge label={q.brandMentioned ? t('Yes') : t('No')} color={q.brandMentioned ? 'green' : 'red'} /></td>
                     <td style={{ padding: '10px 14px' }}>{q.sentiment !== 'not_mentioned' && <Badge label={q.sentiment} color={q.sentiment === 'positive' ? 'green' : q.sentiment === 'negative' ? 'red' : 'gray'} />}</td>
-                    <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12 }}>{(q.competitorMentions || []).join(', ') || '—'}</td>
+                    <td style={{ padding: '10px 14px', color: T.textMuted, fontSize: 12 }}>{(q.competitorMentions || []).join(', ') || '-'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2195,6 +2254,7 @@ function SearchSeoTab({ slug, onRefresh, running, dataVersion }) {
 
 // ─── Action Plan Tab ────────────────────────────────────────────────────────────
 function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion, pdfMode }) {
+  const t = useTr()
   const T = useT()
   const [data, setData] = useState(null)
   const [compData, setCompData] = useState(null)
@@ -2208,6 +2268,11 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
   const [shareDays, setShareDays] = useState(7)      // 30 is the ceiling the server enforces
   const getModule = useModuleFetch()
   const siteBenchmark = siteData?.auditBasis === 'benchmark'
+  // Chapter 5 diagnoses the brand's own pages. Nothing is claimed when they were not
+  // observed, and the Lebanese worked examples belong to the Lebanon brand only.
+  const seoOwn = seoData?.onPageSeo || null
+  const seoUnobserved = siteBenchmark || seoOwn?.skipped === true || seoOwn?.blocked === true || seoData?.sitemapAnalysis?.skipped === true
+  const seoLebanon = isLebanonBrand(brand, slug)
   const dark = T.bg === DARK_T.bg
 
   useEffect(() => {
@@ -2257,7 +2322,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
     await navigator.clipboard.writeText(d.shareUrl).catch(() => {})
   }
 
-  if (!data) return <EmptyState message="Action plan not yet generated." cta="Generate Action Plan" onCta={() => onRefresh('action_plan')} />
+  if (!data) return <EmptyState message={t('Action plan not yet generated.')} cta={t('Generate Action Plan')} onCta={() => onRefresh('action_plan')} />
 
   const moduleSourceColors = { competitive: 'purple', social: 'blue', website: 'yellow', search: 'green', personas: 'red' }
 
@@ -2274,18 +2339,18 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
 
   // Module status pills
   const modulePills = [
-    { label: 'Competitive', has: !!compData },
-    { label: 'Social', has: !!socialData },
-    { label: 'Website', has: !!siteData },
+    { label: t('Competitive'), has: !!compData },
+    { label: t('Social'), has: !!socialData },
+    { label: t('Website'), has: !!siteData },
     { label: 'SEO', has: !!seoData },
-    { label: 'Personas', has: !!personasData },
+    { label: t('Personas'), has: !!personasData },
   ]
 
   // Placeholder for missing data
   function NoData() {
     return (
       <div style={{ background: T.surfaceAlt, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px 20px' }}>
-        <p style={{ color: T.textFaint, fontSize: 13, fontStyle: 'italic', margin: 0 }}>Data not yet generated for this section. Run the analysis to populate.</p>
+        <p style={{ color: T.textFaint, fontSize: 13, fontStyle: 'italic', margin: 0 }}>{t('Data not yet generated for this section. Run the analysis to populate.')}</p>
       </div>
     )
   }
@@ -2319,119 +2384,119 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
   const KW_CATEGORIES = [
     {
       key: 'categoryTerms',
-      label: 'Category Keywords',
+      label: t('Category Keywords'),
       color: 'blue',
       accentColor: '#1d4ed8',
       accentBg: '#eff6ff',
-      why: 'These are the highest-opportunity keywords in your market. Shoppers who don\'t know which store to use type these — ranking here means reaching customers before your competitors do.',
-      how: 'Add these to your homepage headings, main category page titles, and meta descriptions. Each major category should have its own dedicated page optimized around these terms.',
+      why: t('These are the highest-opportunity keywords in your market. Shoppers who don\'t know which store to use type these - ranking here means reaching customers before your competitors do.'),
+      how: t('Add these to your homepage headings, main category page titles, and meta descriptions. Each major category should have its own dedicated page optimized around these terms.'),
     },
     {
       key: 'ageGroupTerms',
-      label: 'Age Group Keywords',
+      label: t('Age Group Keywords'),
       color: 'blue',
       accentColor: '#0369a1',
       accentBg: '#f0f9ff',
-      why: 'Parents shop by age. "Toys for 3 year olds" and "gifts for 8 year old" are among the most common toy searches — parents want to know something is right for their child\'s stage.',
-      how: 'Create age-based landing pages (e.g. "Toys for 3-5 Year Olds"). Add age ranges to product descriptions and category page copy. Competitors who do this consistently outrank stores that don\'t.',
+      why: t('Parents shop by age. "Toys for 3 year olds" and "gifts for 8 year old" are among the most common toy searches - parents want to know something is right for their child\'s stage.'),
+      how: t('Create age-based landing pages (e.g. "Toys for 3-5 Year Olds"). Add age ranges to product descriptions and category page copy. Competitors who do this consistently outrank stores that don\'t.'),
     },
     {
       key: 'occasionTerms',
-      label: 'Occasion & Gift Keywords',
+      label: t('Occasion & Gift Keywords'),
       color: 'green',
       accentColor: '#065f46',
       accentBg: '#f0fdf4',
-      why: 'Gift-driven searches spike around birthdays, the holidays your market observes, and back to school. Someone searching "birthday gift for 7 year old" is ready to buy, so these convert well.',
-      how: 'Build a landing page per key occasion, such as christmas toys or birthday gifts by age, and keep the URL live year-round so it accrues authority. Update hero banners 2 to 3 weeks before each occasion.',
+      why: t('Gift-driven searches spike around birthdays, the holidays your market observes, and back to school. Someone searching "birthday gift for 7 year old" is ready to buy, so these convert well.'),
+      how: t('Build a landing page per key occasion, such as christmas toys or birthday gifts by age, and keep the URL live year-round so it accrues authority. Update hero banners 2 to 3 weeks before each occasion.'),
     },
     {
       key: 'topBrands',
-      label: 'Brand Keywords',
+      label: t('Brand Keywords'),
       color: 'purple',
       accentColor: '#5b21b6',
       accentBg: '#f5f3ff',
-      why: 'Shoppers searching for a brand you stock, such as "lego duplo" or "barbie dreamhouse", are brand-loyal and high-intent. If your site is not optimized for the brand names you carry, you lose these customers to retailers who are.',
-      how: 'Ensure every brand you carry has its own category page with the brand name in the title, H1, and URL. Add brand logos and descriptions. Cross-link between brand pages and product listings.',
+      why: t('Shoppers searching for a brand you stock, such as "lego duplo" or "barbie dreamhouse", are brand-loyal and high-intent. If your site is not optimized for the brand names you carry, you lose these customers to retailers who are.'),
+      how: t('Ensure every brand you carry has its own category page with the brand name in the title, H1, and URL. Add brand logos and descriptions. Cross-link between brand pages and product listings.'),
     },
     {
       key: 'brandTerms',
-      label: 'Your Brand Keywords',
+      label: t('Your Brand Keywords'),
       color: 'purple',
       accentColor: '#7c3aed',
       accentBg: '#faf5ff',
-      why: 'Searches where people already know your name. These should be the easiest rankings to own — but if your website isn\'t properly optimized, competitors can appear above you for your own brand name.',
-      how: 'Ensure your brand name appears in the homepage title tag, H1, and meta description. Claim and fully complete your Google Business Profile. Keep your NAP (Name, Address, Phone) consistent across all platforms.',
+      why: t('Searches where people already know your name. These should be the easiest rankings to own - but if your website isn\'t properly optimized, competitors can appear above you for your own brand name.'),
+      how: t('Ensure your brand name appears in the homepage title tag, H1, and meta description. Claim and fully complete your Google Business Profile. Keep your NAP (Name, Address, Phone) consistent across all platforms.'),
     },
     {
       key: 'localTerms',
-      label: 'Local Keywords',
+      label: t('Local Keywords'),
       color: 'gray',
       accentColor: '#374151',
       accentBg: '#f9fafb',
-      why: 'Searches like "toy store near me", "toy shop open now" or a city name plus your category come from someone ready to buy today. Note that locals rarely add their own country to a search, so the terms that matter are "near me", delivery and collection phrasing, and city or suburb names.',
-      how: 'Name your cities and suburbs on the homepage, contact page and any store pages. Set up Google Business Profile with accurate locations and hours. Publish content covering local delivery and collection options, local holidays and local pricing.',
+      why: t('Searches like "toy store near me", "toy shop open now" or a city name plus your category come from someone ready to buy today. Note that locals rarely add their own country to a search, so the terms that matter are "near me", delivery and collection phrasing, and city or suburb names.'),
+      how: t('Name your cities and suburbs on the homepage, contact page and any store pages. Set up Google Business Profile with accurate locations and hours. Publish content covering local delivery and collection options, local holidays and local pricing.'),
     },
     {
       key: 'competitorGapTerms',
-      label: 'Competitor Gap Keywords',
+      label: t('Competitor Gap Keywords'),
       color: 'red',
       accentColor: '#b91c1c',
       accentBg: '#fff5f5',
-      why: 'These are terms your competitors currently rank for but you don\'t. Every search on this list is a customer you\'re losing right now. They represent the fastest path to incremental traffic.',
-      how: 'Audit which competitors rank for each term, then create or improve pages that target those specific keywords. Even ranking on page 1 for 20% of these terms can meaningfully move your organic traffic.',
+      why: t('These are terms your competitors currently rank for but you don\'t. Every search on this list is a customer you\'re losing right now. They represent the fastest path to incremental traffic.'),
+      how: t('Audit which competitors rank for each term, then create or improve pages that target those specific keywords. Even ranking on page 1 for 20% of these terms can meaningfully move your organic traffic.'),
     },
     {
       key: 'aiDiscoveryQueries',
-      label: 'AI Search Queries',
+      label: t('AI Search Queries'),
       color: 'blue',
       accentColor: '#0284c7',
       accentBg: '#f0f9ff',
-      why: 'These are the questions people ask ChatGPT, Google AI Overview, and Perplexity when looking for toy recommendations. AI assistants are increasingly the first stop for shopping decisions — appearing in these answers builds brand awareness with buyers who haven\'t decided yet.',
-      how: 'Write blog posts or FAQ pages that answer these questions directly, for example "the best toys for a 5 year old". Clear, structured answers that name your brand are more likely to be cited by an AI assistant. This is a long-term investment that compounds.',
+      why: t('These are the questions people ask ChatGPT, Google AI Overview, and Perplexity when looking for toy recommendations. AI assistants are increasingly the first stop for shopping decisions - appearing in these answers builds brand awareness with buyers who haven\'t decided yet.'),
+      how: t('Write blog posts or FAQ pages that answer these questions directly, for example "the best toys for a 5 year old". Clear, structured answers that name your brand are more likely to be cited by an AI assistant. This is a long-term investment that compounds.'),
     },
   ]
 
   return (
     <div style={{ maxWidth: 860, margin: '0 auto' }}>
-      {running && <RunningBanner moduleLabel="Action Plan" detail="Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes." />}
+      {running && <RunningBanner moduleLabel={t('Action Plan')} detail={t('Synthesizing all module outputs into a prioritized executive summary and roadmap using Claude Opus. This takes 2–3 minutes.')} />}
 
       {/* ── COVER HEADER ── */}
       <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: '28px 32px', marginBottom: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ color: T.text, fontSize: 24, fontWeight: 800, margin: 0 }}>{brandName || 'Brand'}</h1>
-            <p style={{ color: T.textMuted, fontSize: 16, fontWeight: 400, marginTop: 6, marginBottom: 6 }}>Brand Intelligence Report</p>
+            <h1 style={{ color: T.text, fontSize: 24, fontWeight: 800, margin: 0 }}>{brandName || t('Brand')}</h1>
+            <p style={{ color: T.textMuted, fontSize: 16, fontWeight: 400, marginTop: 6, marginBottom: 6 }}>{t('Brand Intelligence Report')}</p>
             <p style={{ color: T.textFaint, fontSize: 12 }}>
               {data.generatedAt
-                ? `Generated ${new Date(data.generatedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
-                : `Report date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}
+                ? t('Generated {toLocaleDateString}', { toLocaleDateString: new Date(data.generatedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) })
+                : t('Report date: {toLocaleDateString}', { toLocaleDateString: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) })}
             </p>
           </div>
           {!pdfMode && (
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <button onClick={exportPdf} disabled={exporting} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: exporting ? 0.6 : 1 }}>
-                {exporting ? 'Generating PDF...' : '↓ Export PDF'}
+                {exporting ? t('Generating PDF...') : t('↓ Export PDF')}
               </button>
               <select value={shareDays} onChange={e => setShareDays(Number(e.target.value))}
-                title="How long the share link stays alive"
+                title={t('How long the share link stays alive')}
                 style={{ border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: T.textSub, background: 'none', cursor: 'pointer' }}>
-                <option value={1}>1 day</option>
-                <option value={7}>7 days</option>
-                <option value={14}>14 days</option>
-                <option value={30}>30 days</option>
+                <option value={1}>{t('1 day')}</option>
+                <option value={7}>{t('7 days')}</option>
+                <option value={14}>{t('14 days')}</option>
+                <option value={30}>{t('30 days')}</option>
               </select>
               <button onClick={copyShareLink} style={{ background: 'none', border: `1px solid ${T.border}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, color: T.textSub, cursor: 'pointer' }}>
-                Share Link
+                {t('Share Link')}
               </button>
-              <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label="Regenerate" />
+              <RefreshButton onClick={() => onRefresh('action_plan')} loading={running} label={t('Regenerate')} />
             </div>
           )}
         </div>
         {shareUrl && !pdfMode && (
-          <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: 8, padding: '10px 16px', marginTop: 16, fontSize: 13 }}>
-            Share link copied: <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: '#065f46', fontWeight: 600 }}>{shareUrl}</a>
+          <div style={{ background: pb(T, '#d1fae5'), color: ink(T, '#065f46'), borderRadius: 8, padding: '10px 16px', marginTop: 16, fontSize: 13 }}>
+            {t('Share link copied:')} <a href={shareUrl} target="_blank" rel="noreferrer" style={{ color: ink(T, '#065f46'), fontWeight: 600 }}>{shareUrl}</a>
             {shareExpires && <span style={{ display: 'block', marginTop: 4, fontWeight: 600 }}>
-              Stops working on {new Date(shareExpires).toLocaleDateString()}. Anyone with this link can read the full report until then.
+              {t('Stops working on {toLocaleDateString}. Anyone with this link can read the full report until then.', { toLocaleDateString: new Date(shareExpires).toLocaleDateString() })}
             </span>}
           </div>
         )}
@@ -2448,7 +2513,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
       </div>
 
       {/* ── 1. EXECUTIVE SUMMARY ── */}
-      <SectionHeader label="Overview" title="Executive Summary" />
+      <SectionHeader label={t('Overview')} title={t('Executive Summary')} />
       <Card style={{ borderLeft: `4px solid ${T.accent}` }}>
         {data.executiveSummary
           ? <p style={{ color: T.text, fontSize: 15, lineHeight: 1.85, fontWeight: 400, margin: 0 }}>{data.executiveSummary}</p>
@@ -2456,9 +2521,9 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
       </Card>
 
       {/* ── 2. YOUR CUSTOMERS ── */}
-      <SectionHeader label="Chapter 1" title="Your Customers — Who You're Selling To" />
+      <SectionHeader label={t('Chapter 1')} title={t('Your Customers - Who You\'re Selling To')} />
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        Every decision in this report connects back to these customers. Understanding who they are — what they worry about, what drives them to buy, and where they spend their time — is the foundation for everything that follows.
+        {t('Every decision in this report connects back to these customers. Understanding who they are - what they worry about, what drives them to buy, and where they spend their time - is the foundation for everything that follows.')}
       </p>
       {personasData && (personasData.personas || []).length > 0 ? (
         <>
@@ -2488,25 +2553,25 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                 )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                   {(persona.painPoints || []).length > 0 && (
-                    <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 14px' }}>
-                      <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What frustrates them</p>
+                    <div style={{ background: pb(T, '#fff5f5'), border: '1px solid #fecaca', borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ color: ink(T, '#ef4444'), fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('What frustrates them')}</p>
                       <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        {persona.painPoints.map((p, j) => <li key={j} style={{ color: '#7f1d1d', fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{p}</li>)}
+                        {persona.painPoints.map((p, j) => <li key={j} style={{ color: ink(T, '#7f1d1d'), fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{p}</li>)}
                       </ul>
                     </div>
                   )}
                   {(persona.motivators || []).length > 0 && (
-                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '12px 14px' }}>
-                      <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What drives them to buy</p>
+                    <div style={{ background: pb(T, '#f0fdf4'), border: '1px solid #bbf7d0', borderRadius: 8, padding: '12px 14px' }}>
+                      <p style={{ color: ink(T, '#10b981'), fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('What drives them to buy')}</p>
                       <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        {persona.motivators.map((m, j) => <li key={j} style={{ color: '#14532d', fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{m}</li>)}
+                        {persona.motivators.map((m, j) => <li key={j} style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.55, marginBottom: 3 }}>{m}</li>)}
                       </ul>
                     </div>
                   )}
                 </div>
                 {(persona.shoppingBehaviors || []).length > 0 && (
                   <div style={{ marginBottom: 12 }}>
-                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>How they shop</p>
+                    <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('How they shop')}</p>
                     <ul style={{ margin: 0, paddingLeft: 16 }}>
                       {persona.shoppingBehaviors.map((b, j) => <li key={j} style={{ color: T.textSub, fontSize: 13, lineHeight: 1.55, marginBottom: 3 }}>{b}</li>)}
                     </ul>
@@ -2515,7 +2580,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: persona.brandFit ? 12 : 0 }}>
                   {(persona.contentTopics || []).length > 0 && (
                     <div>
-                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Content they engage with</p>
+                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('Content they engage with')}</p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                         {persona.contentTopics.map((t, j) => <Pill key={j} text={t} color="blue" />)}
                       </div>
@@ -2523,7 +2588,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                   )}
                   {(persona.preferredChannels || []).length > 0 && (
                     <div>
-                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Where they spend time</p>
+                      <p style={{ color: T.textMuted, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('Where they spend time')}</p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                         {persona.preferredChannels.map((ch, j) => <Pill key={j} text={ch} color="purple" />)}
                       </div>
@@ -2531,7 +2596,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                   )}
                 </div>
                 {persona.brandFit && (
-                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginTop: 12, marginBottom: 0, padding: '10px 14px', background: `${T.accent}0a`, borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}><strong>Brand fit:</strong> {persona.brandFit}</p>
+                  <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginTop: 12, marginBottom: 0, padding: '10px 14px', background: `${T.accent}0a`, borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}><strong>{t('Brand fit:')}</strong> {persona.brandFit}</p>
                 )}
               </Card>
             ))}
@@ -2540,9 +2605,9 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
       ) : <NoData />}
 
       {/* ── 3. THE COMPETITION ── */}
-      <SectionHeader label="Chapter 2" title="The Competition — Who You're Up Against" />
+      <SectionHeader label={t('Chapter 2')} title={t('The Competition - Who You\'re Up Against')} />
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        These are the brands competing for the same customers described above. Understanding their positioning — what they stand for, where they're strong, and where they leave gaps — reveals exactly where you can differentiate.
+        {t('These are the brands competing for the same customers described above. Understanding their positioning - what they stand for, where they\'re strong, and where they leave gaps - reveals exactly where you can differentiate.')}
       </p>
       {compData ? (
         <>
@@ -2565,17 +2630,17 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
                     {(c.strengths || []).length > 0 && (
                       <div>
-                        <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Where they're strong</p>
+                        <p style={{ color: ink(T, '#10b981'), fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('Where they\'re strong')}</p>
                         <ul style={{ margin: 0, paddingLeft: 18 }}>
-                          {c.strengths.map((s, j) => <li key={j} style={{ color: '#065f46', fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{s}</li>)}
+                          {c.strengths.map((s, j) => <li key={j} style={{ color: ink(T, '#065f46'), fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{s}</li>)}
                         </ul>
                       </div>
                     )}
                     {(c.weaknesses || []).length > 0 && (
                       <div>
-                        <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Where they're vulnerable</p>
+                        <p style={{ color: ink(T, '#ef4444'), fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('Where they\'re vulnerable')}</p>
                         <ul style={{ margin: 0, paddingLeft: 18 }}>
-                          {c.weaknesses.map((w, j) => <li key={j} style={{ color: '#991b1b', fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{w}</li>)}
+                          {c.weaknesses.map((w, j) => <li key={j} style={{ color: ink(T, '#991b1b'), fontSize: 12, lineHeight: 1.6, marginBottom: 3 }}>{w}</li>)}
                         </ul>
                       </div>
                     )}
@@ -2587,27 +2652,27 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
         </>
       ) : <NoData />}
 
-      {/* ── 4. SOCIAL — WHAT'S WORKING ── */}
-      <SectionHeader label="Chapter 3" title="Social Media — What's Working in This Market" />
+      {/* ── 4. SOCIAL - WHAT'S WORKING ── */}
+      <SectionHeader label={t('Chapter 3')} title={t('Social Media - What\'s Working in This Market')} />
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        Your competitors are active on Instagram and TikTok and building real audiences. The engagement numbers and content patterns below are based on scraped competitor data — they show exactly what resonates with your shared customer base and where gaps exist that you can be first to own.
+        {t('Your competitors are active on Instagram and TikTok and building real audiences. The engagement numbers and content patterns below are based on scraped competitor data - they show exactly what resonates with your shared customer base and where gaps exist that you can be first to own.')}
       </p>
       {socialData ? (
         <>
-          {/* Competitor social snapshot — show only competitors with data */}
+          {/* Competitor social snapshot - show only competitors with data */}
           {(socialData.brands || []).filter(b => b.role !== 'target' && ((b.summary?.avgEngagement || 0) > 0 || (b.tiktokData?.summary?.avgEngagement || 0) > 0)).length > 0 && (
             <Card style={{ marginBottom: 20, padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px 10px', borderBottom: `1px solid ${T.border}` }}>
-                <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Competitor Engagement — What the Bar Looks Like</p>
-                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2, marginBottom: 0 }}>Average engagement per post across competitors — shows the level of audience activity you're entering</p>
+                <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>{t('Competitor Engagement - What the Bar Looks Like')}</p>
+                <p style={{ color: T.textMuted, fontSize: 12, marginTop: 2, marginBottom: 0 }}>{t('Average engagement per post across competitors - shows the level of audience activity you\'re entering')}</p>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr>
-                      <th style={thSt}>Competitor</th>
-                      <th style={{ ...thSt, textAlign: 'right' }}>Instagram Avg Engagement</th>
-                      <th style={{ ...thSt, textAlign: 'right' }}>TikTok Avg Engagement</th>
+                      <th style={thSt}>{t('Competitor')}</th>
+                      <th style={{ ...thSt, textAlign: 'right' }}>{t('Instagram Avg Engagement')}</th>
+                      <th style={{ ...thSt, textAlign: 'right' }}>{t('TikTok Avg Engagement')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2617,8 +2682,8 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                       return (
                         <tr key={i}>
                           <td style={{ ...tdSt, color: T.textSub }}>{brand.name}</td>
-                          <td style={{ ...tdSt, textAlign: 'right' }}>{igEng != null ? (typeof igEng === 'number' ? igEng.toLocaleString() : igEng) : '—'}</td>
-                          <td style={{ ...tdSt, textAlign: 'right' }}>{ttEng != null ? (typeof ttEng === 'number' ? ttEng.toLocaleString() : ttEng) : '—'}</td>
+                          <td style={{ ...tdSt, textAlign: 'right' }}>{igEng != null ? (typeof igEng === 'number' ? igEng.toLocaleString() : igEng) : '-'}</td>
+                          <td style={{ ...tdSt, textAlign: 'right' }}>{ttEng != null ? (typeof ttEng === 'number' ? ttEng.toLocaleString() : ttEng) : '-'}</td>
                         </tr>
                       )
                     })}
@@ -2630,8 +2695,8 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
 
           {(socialData.whiteSpaceOpportunities || []).length > 0 && (
             <>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 24 }}>Content gaps no competitor is filling</p>
-              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>These are topics your customers want content about that nobody in this market is creating — first-mover advantage is available.</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 24 }}>{t('Content gaps no competitor is filling')}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>{t('These are topics your customers want content about that nobody in this market is creating - first-mover advantage is available.')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {socialData.whiteSpaceOpportunities.map((opp, i) => (
                   <Card key={i} style={{ padding: '16px 20px' }}>
@@ -2651,8 +2716,8 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
 
           {(socialData.competitionStrategy || []).length > 0 && (
             <>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 28 }}>Tactics to compete and win</p>
-              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Specific moves — inspired by what's working for competitors — that are available to you right now.</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 28 }}>{t('Tactics to compete and win')}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>{t('Specific moves - inspired by what\'s working for competitors - that are available to you right now.')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {socialData.competitionStrategy.map((s, i) => (
                   <Card key={i} style={{ padding: '14px 18px' }}>
@@ -2661,7 +2726,7 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                       {s.priority && <Badge label={s.priority} color={s.priority === 'high' || s.priority === 'critical' ? 'red' : s.priority === 'medium' ? 'yellow' : 'gray'} />}
                     </div>
                     {s.rationale && <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, marginBottom: s.competitorInspiration ? 6 : 0 }}>{s.rationale}</p>}
-                    {s.competitorInspiration && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}><strong>Inspired by:</strong> {s.competitorInspiration}</p>}
+                    {s.competitorInspiration && <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}><strong>{t('Inspired by:')}</strong> {s.competitorInspiration}</p>}
                   </Card>
                 ))}
               </div>
@@ -2671,14 +2736,14 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
       ) : <NoData />}
 
       {/* ── 5. YOUR DIGITAL PRESENCE ── */}
-      <SectionHeader label="Chapter 4" title={siteBenchmark ? 'Your Digital Presence: Where to Focus' : "Your Digital Presence: Where You're Losing Customers"} />
+      <SectionHeader label={t('Chapter 4')} title={siteBenchmark ? t('Your Digital Presence: Where to Focus') : t('Your Digital Presence: Where You\'re Losing Customers')} />
       {siteBenchmark ? (
         <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-          Your own website could not be observed in this run, so this section does not say what it contains. It shows what leading competitors do and what the market evidence recommends, with a checklist to confirm each point on your live site.
+          {t('Your own website could not be observed in this run, so this section does not say what it contains. It shows what leading competitors do and what the market evidence recommends, with a checklist to confirm each point on your live site.')}
         </p>
       ) : (
       <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginTop: -8, marginBottom: 24 }}>
-        A customer who lands on your website has already found you — but the site has to convert them. This section surfaces the specific gaps that are costing you sales today: missing customer segments, content your competitors have that you don't, and messaging that isn't landing.
+        {t('A customer who lands on your website has already found you - but the site has to convert them. This section surfaces the specific gaps that are costing you sales today: missing customer segments, content your competitors have that you don\'t, and messaging that isn\'t landing.')}
       </p>
       
       )}
@@ -2687,65 +2752,65 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
           {siteBenchmark && <BenchmarkNotice T={T} note={siteData.auditNote} />}
           {/* Invisible to Google / AI */}
           {!siteBenchmark && siteData.crawlerVisibility?.heroTextIsLive === false && (
-            <div style={{ background: '#fff7ed', border: '1px solid #fdba74', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
-              <p style={{ color: '#9a3412', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>Critical: Your homepage hero is invisible to Google and AI</p>
-              <p style={{ color: '#7c2d12', fontSize: 13, lineHeight: 1.65, margin: 0 }}>{siteData.crawlerVisibility.aiReadabilityNote}</p>
+            <div style={{ background: pb(T, '#fff7ed'), border: '1px solid #fdba74', borderRadius: 10, padding: '16px 20px', marginBottom: 20 }}>
+              <p style={{ color: ink(T, '#9a3412'), fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{t('Critical: Your homepage hero is invisible to Google and AI')}</p>
+              <p style={{ color: ink(T, '#7c2d12'), fontSize: 13, lineHeight: 1.65, margin: 0 }}>{siteData.crawlerVisibility.aiReadabilityNote}</p>
             </div>
           )}
 
-          {/* Content expansion opportunities — 3 built-out opportunity cards */}
+          {/* Content expansion opportunities - 3 built-out opportunity cards */}
           {siteData.productContentReview && !siteBenchmark && isLebanonBrand(brand, slug) && (
             <div style={{ marginBottom: 20 }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Three revenue unlocks hiding in plain sight</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t('Three revenue unlocks hiding in plain sight')}</p>
               <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-                Each of these is a page or category that competitors with smaller budgets have already built — and that shoppers in your market are actively searching for.
+                {t('Each of these is a page or category that competitors with smaller budgets have already built - and that shoppers in your market are actively searching for.')}
               </p>
               <div className="bi-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {/* Opportunity 1 */}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   <div style={{ background: '#0ea5e9', padding: '14px 18px' }}>
-                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 1</p>
-                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Add an Infant & Toddler Category (0–2 Years)</p>
+                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>{t('Opportunity 1')}</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>{t('Add an Infant & Toddler Category (0–2 Years)')}</p>
                   </div>
                   <div style={{ padding: '14px 18px' }}>
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                      New-parent spending is at its peak in the 0–2 age window — strollers, bouncers, sensory toys, first books. Chez Les Petits, Wild Willy Toys, The Toy Store LB, Mumzworld, and FirstCry Lebanon all have dedicated Baby & Toddler sections. Toys R Us Lebanon doesn't — meaning you're ceding the highest-spending parent demographic to every competitor at once.
+                      {t('New-parent spending is at its peak in the 0–2 age window - strollers, bouncers, sensory toys, first books. Chez Les Petits, Wild Willy Toys, The Toy Store LB, Mumzworld, and FirstCry Lebanon all have dedicated Baby & Toddler sections. Toys R Us Lebanon doesn\'t - meaning you\'re ceding the highest-spending parent demographic to every competitor at once.')}
                     </p>
                     <div style={{ background: dark ? '#0c2a3d' : '#f0f9ff', borderRadius: 8, padding: '10px 14px' }}>
-                      <p style={{ color: dark ? '#7dd3fc' : '#0369a1', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: dark ? '#e0f2fe' : '#0c4a6e', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create a dedicated "Ages 0–2" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities on Instagram. One page, immediate SEO lift, long-term customer acquisition.</p>
+                      <p style={{ color: dark ? '#7dd3fc' : '#0369a1', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('How:')}</p>
+                      <p style={{ color: dark ? '#e0f2fe' : '#0c4a6e', fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Create a dedicated "Ages 0–2" landing page, tag existing products with the age range, and run a gift-guide campaign targeting new-parent communities on Instagram. One page, immediate SEO lift, long-term customer acquisition.')}</p>
                     </div>
                   </div>
                 </Card>
                 {/* Opportunity 2 */}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   <div style={{ background: '#8b5cf6', padding: '14px 18px' }}>
-                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 2</p>
-                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Add a Gift Finder</p>
+                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>{t('Opportunity 2')}</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>{t('Add a Gift Finder')}</p>
                   </div>
                   <div style={{ padding: '14px 18px' }}>
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                      Finding the right gift is the #1 reason people visit a toy store. JouéClub Lebanon, The Toy Store LB, and Hamley's all have a Gift Finder in their navigation — a tool that filters by age, gender, and budget. Toys R Us Lebanon doesn't. Every shopper who arrives asking "what should I buy for a 7-year-old?" leaves to find an answer somewhere else.
+                      {t('Finding the right gift is the #1 reason people visit a toy store. JouéClub Lebanon, The Toy Store LB, and Hamley\'s all have a Gift Finder in their navigation - a tool that filters by age, gender, and budget. Toys R Us Lebanon doesn\'t. Every shopper who arrives asking "what should I buy for a 7-year-old?" leaves to find an answer somewhere else.')}
                     </p>
                     <div style={{ background: dark ? '#2e1065' : '#f5f3ff', borderRadius: 8, padding: '10px 14px' }}>
-                      <p style={{ color: dark ? '#c4b5fd' : '#5b21b6', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: dark ? '#ede9fe' : '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Build a simple Gift Finder page with 3 filters: age bracket, interest category, and price range. It can be as simple as a filtered product grid. Add it to main navigation. This is the single highest-converting page type in toy retail: it captures intent at the exact moment of purchase decision.</p>
+                      <p style={{ color: dark ? '#c4b5fd' : '#5b21b6', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('How:')}</p>
+                      <p style={{ color: dark ? '#ede9fe' : '#3b0764', fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Build a simple Gift Finder page with 3 filters: age bracket, interest category, and price range. It can be as simple as a filtered product grid. Add it to main navigation. This is the single highest-converting page type in toy retail: it captures intent at the exact moment of purchase decision.')}</p>
                     </div>
                   </div>
                 </Card>
                 {/* Opportunity 3 */}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   <div style={{ background: '#10b981', padding: '14px 18px' }}>
-                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>Opportunity 3</p>
-                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>Build Age-Based Landing Pages</p>
+                    <p style={{ color: '#fff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4, opacity: 0.85 }}>{t('Opportunity 3')}</p>
+                    <p style={{ color: '#fff', fontSize: 14, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>{t('Build Age-Based Landing Pages')}</p>
                   </div>
                   <div style={{ padding: '14px 18px' }}>
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                      "Toys for 6-year-olds" is one of the highest-intent toy searches in every market. Parents and grandparents search by age — not by brand or category. Age-based landing pages (3–5, 6–8, 9–12, Teens) are how toy retailers capture this intent and rank for it on Google.
+                      {t('"Toys for 6-year-olds" is one of the highest-intent toy searches in every market. Parents and grandparents search by age - not by brand or category. Age-based landing pages (3–5, 6–8, 9–12, Teens) are how toy retailers capture this intent and rank for it on Google.')}
                     </p>
                     <div style={{ background: dark ? '#052e1c' : '#f0fdf4', borderRadius: 8, padding: '10px 14px' }}>
-                      <p style={{ color: dark ? '#6ee7b7' : '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>How:</p>
-                      <p style={{ color: dark ? '#d1fae5' : '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Create 4–5 static landing pages organized by age bracket, tagged with relevant SEO keywords. Cross-link from homepage and navigation. These pages compound over time, once indexed, they drive organic traffic indefinitely.</p>
+                      <p style={{ color: dark ? '#6ee7b7' : '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('How:')}</p>
+                      <p style={{ color: dark ? '#d1fae5' : '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Create 4–5 static landing pages organized by age bracket, tagged with relevant SEO keywords. Cross-link from homepage and navigation. These pages compound over time, once indexed, they drive organic traffic indefinitely.')}</p>
                     </div>
                   </div>
                 </Card>
@@ -2753,17 +2818,17 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
             </div>
           )}
 
-          {/* Messaging gaps — reframed as messaging opportunities */}
+          {/* Messaging gaps - reframed as messaging opportunities */}
           {(siteData.messagingGaps || []).length > 0 && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? 'Recommended messaging moves' : 'Messaging moves that will set you apart'}</p>
-              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{siteBenchmark ? 'Value messages competitors communicate. Your own site was not observed, so confirm on the live site before acting.' : 'These are value messages your competitors are already communicating: adding them to your site is a fast, high-leverage way to increase trust and conversion.'}</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? t('Recommended messaging moves') : t('Messaging moves that will set you apart')}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{siteBenchmark ? t('Value messages competitors communicate. Your own site was not observed, so confirm on the live site before acting.') : t('These are value messages your competitors are already communicating: adding them to your site is a fast, high-leverage way to increase trust and conversion.')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {siteData.messagingGaps.map((mg, i) => (
                   <div key={i} style={{ padding: '12px 16px', background: T.surfaceAlt, borderRadius: 8, borderLeft: `3px solid ${T.accent}` }}>
                     <p style={{ color: T.accent, fontSize: 13, fontWeight: 700, marginBottom: mg.gap || mg.competitorExample ? 4 : 0 }}>{mg.recommendation || mg.gap}</p>
-                    {mg.recommendation && mg.gap && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.competitorExample ? 4 : 0, margin: 0 }}>{siteBenchmark ? 'Why' : 'Currently missing'}: {mg.gap}</p>}
-                    {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 4, marginBottom: 0 }}>Competitor example: {mg.competitorExample}</p>}
+                    {mg.recommendation && mg.gap && <p style={{ color: T.textMuted, fontSize: 12, marginBottom: mg.competitorExample ? 4 : 0, margin: 0 }}>{siteBenchmark ? t('Why') : t('Currently missing')}: {mg.gap}</p>}
+                    {mg.competitorExample && <p style={{ color: T.textMuted, fontSize: 12, marginTop: 4, marginBottom: 0 }}>{t('Competitor example: {competitorExample}', { competitorExample: mg.competitorExample })}</p>}
                   </div>
                 ))}
               </div>
@@ -2773,15 +2838,15 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
           {/* Navigation gaps */}
           {(siteData.navGaps || []).length > 0 && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? 'Recommended navigation categories' : "Navigation categories your competitors have that you don't"}</p>
-              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{siteBenchmark ? 'Categories competitors give a clear place in their navigation. Your own site was not observed, so check which of these it already has.' : <>When a customer arrives looking for something your navigation doesn't clearly offer, they leave. These are the specific categories where competitors are capturing traffic you're missing.</>}</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? t('Recommended navigation categories') : t('Navigation categories your competitors have that you don\'t')}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{siteBenchmark ? t('Categories competitors give a clear place in their navigation. Your own site was not observed, so check which of these it already has.') : <>{t('When a customer arrives looking for something your navigation doesn\'t clearly offer, they leave. These are the specific categories where competitors are capturing traffic you\'re missing.')}</>}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {siteData.navGaps.map((gap, i) => (
                   <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 14px', background: T.surfaceAlt, borderRadius: 8 }}>
                     <Badge label={gap.priority || 'medium'} color={gap.priority === 'high' ? 'red' : gap.priority === 'low' ? 'green' : 'yellow'} />
                     <div style={{ flex: 1 }}>
                       <span style={{ color: T.text, fontSize: 13, fontWeight: 600 }}>{gap.category}</span>
-                      {(gap.competitorsWithIt || []).length > 0 && <span style={{ color: T.textMuted, fontSize: 12, marginLeft: 8 }}>— available at {gap.competitorsWithIt.join(', ')}</span>}
+                      {(gap.competitorsWithIt || []).length > 0 && <span style={{ color: T.textMuted, fontSize: 12, marginLeft: 8 }}>{t('- available at {competitorsWithIt}', { competitorsWithIt: gap.competitorsWithIt.join(', ') })}</span>}
                     </div>
                   </div>
                 ))}
@@ -2792,30 +2857,30 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
           {/* Hero strengths and gaps */}
           {siteData.heroMessagingAnalysis && (siteBenchmark ? (siteData.heroMessagingAnalysis.competitorBestPractices || []).length > 0 : ((siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 || (siteData.heroMessagingAnalysis.targetGaps || []).length > 0)) && (
             <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 16 }}>{siteBenchmark ? 'What leading competitors do on their homepages' : "Homepage first impression: what's working and what's not"}</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 16 }}>{siteBenchmark ? t('What leading competitors do on their homepages') : t('Homepage first impression: what\'s working and what\'s not')}</p>
               <div style={{ display: siteBenchmark ? 'none' : 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {(siteData.heroMessagingAnalysis.targetStrengths || []).length > 0 && (
                   <div>
-                    <p style={{ color: '#10b981', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What's landing</p>
+                    <p style={{ color: ink(T, '#10b981'), fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{t('What\'s landing')}</p>
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {siteData.heroMessagingAnalysis.targetStrengths.map((s, i) => <li key={i} style={{ color: '#065f46', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{s}</li>)}
+                      {siteData.heroMessagingAnalysis.targetStrengths.map((s, i) => <li key={i} style={{ color: ink(T, '#065f46'), fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{s}</li>)}
                     </ul>
                   </div>
                 )}
                 {(siteData.heroMessagingAnalysis.targetGaps || []).length > 0 && (
                   <div>
-                    <p style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>What's missing</p>
+                    <p style={{ color: ink(T, '#ef4444'), fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{t('What\'s missing')}</p>
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {siteData.heroMessagingAnalysis.targetGaps.map((g, i) => <li key={i} style={{ color: '#991b1b', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{g}</li>)}
+                      {siteData.heroMessagingAnalysis.targetGaps.map((g, i) => <li key={i} style={{ color: ink(T, '#991b1b'), fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{g}</li>)}
                     </ul>
                   </div>
                 )}
               </div>
               {(siteData.heroMessagingAnalysis.competitorBestPractices || []).length > 0 && (
                 <div style={{ marginTop: siteBenchmark ? 0 : 16, paddingTop: siteBenchmark ? 0 : 16, borderTop: siteBenchmark ? 'none' : `1px solid ${T.border}` }}>
-                  <p style={{ color: '#3b82f6', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{siteBenchmark ? 'Observed on competitor sites' : 'What competitors do better'}</p>
+                  <p style={{ color: '#3b82f6', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{siteBenchmark ? t('Observed on competitor sites') : t('What competitors do better')}</p>
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {siteData.heroMessagingAnalysis.competitorBestPractices.map((b, i) => <li key={i} style={{ color: '#1e40af', fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{b}</li>)}
+                    {siteData.heroMessagingAnalysis.competitorBestPractices.map((b, i) => <li key={i} style={{ color: ink(T, '#1e40af'), fontSize: 13, lineHeight: 1.6, marginBottom: 4 }}>{b}</li>)}
                   </ul>
                 </div>
               )}
@@ -2825,8 +2890,8 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
           {/* Top opportunities from site */}
           {(siteData.topOpportunities || []).length > 0 && (
             <Card style={{ padding: '20px 24px' }}>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? 'Recommended site improvements' : 'Highest-impact site improvements'}</p>
-              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>Ranked by potential to increase traffic and conversions.</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{siteBenchmark ? t('Recommended site improvements') : t('Highest-impact site improvements')}</p>
+              <p style={{ color: T.textMuted, fontSize: 13, marginBottom: 16 }}>{t('Ranked by potential to increase traffic and conversions.')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {siteData.topOpportunities.map((opp, i) => (
                   <div key={i} style={{ display: 'flex', gap: 14, padding: '12px 16px', background: T.surfaceAlt, borderRadius: 10, border: `1px solid ${T.border}`, alignItems: 'flex-start' }}>
@@ -2846,22 +2911,40 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
         </>
       ) : <NoData />}
 
-      {/* ── 6. SEARCH — HOW CUSTOMERS FIND YOU ── */}
-      <SectionHeader label="Chapter 5" title="Search & SEO — Your Biggest Untapped Growth Channel" />
+      {/* ── 6. SEARCH - HOW CUSTOMERS FIND YOU ── */}
+      <SectionHeader label={t('Chapter 5')} title={t('Search & SEO - Your Biggest Untapped Growth Channel')} />
+      {seoUnobserved ? (
       <div style={{ marginTop: -8, marginBottom: 24 }}>
-        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 12 }}>
-          We crawled your site and your competitors' sites. What we found is a clean sweep of fixable technical problems — the kind that are invisible to you but very visible to Google. Each one below is confirmed from the actual page data, not estimated.
-        </p>
         <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 0 }}>
-          Fix these and you build the foundation for both organic search and AI search at once. When ChatGPT, Google AI Overviews, or Claude answer "best toy store in Lebanon," they pull from pages that already rank well in traditional search. The work is the same — do it once, win twice.
+          {t('Your own website could not be observed in this run, so this section does not say what is wrong with it. It shows the search and AI-visibility evidence the tool did collect, and what to verify on your live site.')}
         </p>
       </div>
+      ) : seoLebanon ? (
+      <div style={{ marginTop: -8, marginBottom: 24 }}>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 12 }}>
+          {t('We crawled your site and your competitors\' sites. What we found is a clean sweep of fixable technical problems - the kind that are invisible to you but very visible to Google. Each one below is confirmed from the actual page data, not estimated.')}
+        </p>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 0 }}>
+          {t('Fix these and you build the foundation for both organic search and AI search at once. When ChatGPT, Google AI Overviews, or Claude answer "best toy store in Lebanon," they pull from pages that already rank well in traditional search. The work is the same - do it once, win twice.')}
+        </p>
+      </div>
+      ) : (
+      <div style={{ marginTop: -8, marginBottom: 24 }}>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 12 }}>
+          {t('We crawled your site and your competitors\' sites. What we found is a clean sweep of fixable technical problems - the kind that are invisible to you but very visible to Google. Each one below is confirmed from the actual page data, not estimated.')}
+        </p>
+        <p style={{ color: T.textSub, fontSize: 14, lineHeight: 1.75, marginBottom: 0 }}>
+          {t('Fix these and you build the foundation for both organic search and AI search at once. When ChatGPT, Google AI Overviews, or Claude answer "best toy store," they pull from pages that already rank well in traditional search. The work is the same: do it once, win twice.')}
+        </p>
+      </div>
+      )}
       {seoData ? (
         <>
-          {/* ── Verified Technical Fixes — from actual crawl data ── */}
-          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>What the crawl actually found — confirmed issues, not estimates</p>
+          {/* ── Verified Technical Fixes - from actual crawl data ── */}
+          {!seoUnobserved && (<>
+          <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t('What the crawl actually found - confirmed issues, not estimates')}</p>
           <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-            These were verified by directly fetching your pages. Every issue below is real.
+            {t('These were verified by directly fetching your pages. Every issue below is real.')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 32 }}>
 
@@ -2873,17 +2956,18 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
               if (!allSameH1 && !allSameTitle) return null
               return (
                 <div key="dup-titles" style={{ background: T.surface, border: '1px solid #fca5a5', borderRadius: 12, overflow: 'hidden' }}>
-                  <div style={{ background: '#fef2f2', borderBottom: '1px solid #fca5a5', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <span style={{ background: '#dc2626', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>CRITICAL</span>
-                    <p style={{ color: '#991b1b', fontSize: 14, fontWeight: 800, margin: 0 }}>Every category page has the same title and H1 — Google sees them as duplicates</p>
+                  <div style={{ background: pb(T, '#fef2f2'), borderBottom: '1px solid #fca5a5', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <span style={{ background: '#dc2626', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>{t('CRITICAL')}</span>
+                    <p style={{ color: ink(T, '#991b1b'), fontSize: 14, fontWeight: 800, margin: 0 }}>{t('Every category page has the same title and H1 - Google sees them as duplicates')}</p>
                   </div>
                   <div style={{ padding: '14px 20px' }}>
                     <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                      Your Arts & Crafts page, Clothing page, and every other category page all have the same title tag: <strong>"{catPages[0].titleTag}"</strong> and the same H1: <strong>"{catPages[0].h1 || '(none)'}"</strong>. To Google, they look like identical pages. This means they compete against each other and none of them rank for anything.
+                      {seoLebanon ? t('Your Arts & Crafts page, Clothing page, and every other category page all have the same title tag:') : t('Every category page we checked has the same title tag:')} <strong>"{catPages[0].titleTag}"</strong> {t('and the same H1:')} <strong>"{catPages[0].h1 || t('(none)')}"</strong>{t('. To Google, they look like identical pages. This means they compete against each other and none of them rank for anything.')}
                     </p>
-                    <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
-                      <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
-                      <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Each category page needs a unique title and H1 that includes the category name and "Lebanon." Example: <em>"Arts & Crafts Toys Lebanon | Toys R Us"</em> with H1 <em>"Arts & Crafts Toys for Kids in Lebanon."</em> This is a template change — one developer fix applies to all pages at once.</p>
+                    <div style={{ background: pb(T, '#f0fdf4'), borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                      <p style={{ color: ink(T, '#065f46'), fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('Fix:')}</p>
+                      {seoLebanon ? <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Each category page needs a unique title and H1 that includes the category name and "Lebanon." Example:')} <em>{t('"Arts & Crafts Toys Lebanon | Toys R Us"')}</em> {t('with H1')} <em>{t('"Arts & Crafts Toys for Kids in Lebanon."')}</em> {t('This is a template change - one developer fix applies to all pages at once.')}</p>
+                        : <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Each category page needs a unique title and H1 that includes the category name. This is a template change: one developer fix applies to all pages at once.')}</p>}
                     </div>
                   </div>
                 </div>
@@ -2891,19 +2975,20 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
             })()}
 
             {/* Fix 2: No meta descriptions anywhere */}
-            {(seoData.pageAnalyses || []).every(p => !p.metaDescription) && seoData.pageAnalyses.length > 0 && (
+            {(seoData.pageAnalyses || []).every(p => !p.metaDescription) && seoData.pageAnalyses?.length > 0 && (
               <div style={{ background: T.surface, border: '1px solid #fca5a5', borderRadius: 12, overflow: 'hidden' }}>
-                <div style={{ background: '#fef2f2', borderBottom: '1px solid #fca5a5', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <span style={{ background: '#dc2626', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>CRITICAL</span>
-                  <p style={{ color: '#991b1b', fontSize: 14, fontWeight: 800, margin: 0 }}>No meta descriptions on any page — Google writes your search snippet for you</p>
+                <div style={{ background: pb(T, '#fef2f2'), borderBottom: '1px solid #fca5a5', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ background: '#dc2626', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>{t('CRITICAL')}</span>
+                  <p style={{ color: ink(T, '#991b1b'), fontSize: 14, fontWeight: 800, margin: 0 }}>{t('No meta descriptions on any page - Google writes your search snippet for you')}</p>
                 </div>
                 <div style={{ padding: '14px 20px' }}>
                   <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                    The meta description is the 2-line preview text under your link in Google results. It's how you tell a searcher "click here, not the competitor below you." Every page on your site — homepage, every category page — has a blank meta description. Google fills it in with random body text, which looks unprofessional and gets significantly fewer clicks.
+                    {t('The meta description is the 2-line preview text under your link in Google results. It\'s how you tell a searcher "click here, not the competitor below you." Every page on your site - homepage, every category page - has a blank meta description. Google fills it in with random body text, which looks unprofessional and gets significantly fewer clicks.')}
                   </p>
-                  <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
-                    <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
-                    <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Homepage example: <em>"Lebanon's official Toys R Us — thousands of toys for every age, fast delivery across Lebanon. Shop LEGO, Barbie, Hot Wheels and more."</em> Category pages can use a template: <em>"Shop [Category] toys in Lebanon at Toys R Us. Huge range, trusted brands, fast delivery."</em> 140–160 characters each.</p>
+                  <div style={{ background: pb(T, '#f0fdf4'), borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                    <p style={{ color: ink(T, '#065f46'), fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('Fix:')}</p>
+                    {seoLebanon ? <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Homepage example:')} <em>{t('"Lebanon\'s official Toys R Us - thousands of toys for every age, fast delivery across Lebanon. Shop LEGO, Barbie, Hot Wheels and more."')}</em> {t('Category pages can use a template:')} <em>{t('"Shop [Category] toys in Lebanon at Toys R Us. Huge range, trusted brands, fast delivery."')}</em> {t('140–160 characters each.')}</p>
+                      : <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Write a unique description for the homepage and use a template for category pages that names the category and what makes the store worth the click. 140 to 160 characters each.')}</p>}
                   </div>
                 </div>
               </div>
@@ -2912,17 +2997,19 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
             {/* Fix 3: Homepage has no H1 */}
             {seoData.onPageSeo && !seoData.onPageSeo.h1 && (
               <div style={{ background: T.surface, border: '1px solid #fcd34d', borderRadius: 12, overflow: 'hidden' }}>
-                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <span style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>HIGH</span>
-                  <p style={{ color: '#78350f', fontSize: 14, fontWeight: 800, margin: 0 }}>Homepage hero text is baked into an image — invisible to Google</p>
+                <div style={{ background: pb(T, '#fffbeb'), borderBottom: '1px solid #fcd34d', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>{t('HIGH')}</span>
+                  <p style={{ color: ink(T, '#78350f'), fontSize: 14, fontWeight: 800, margin: 0 }}>{t('Homepage hero text is baked into an image - invisible to Google')}</p>
                 </div>
                 <div style={{ padding: '14px 20px' }}>
                   <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                    Your homepage H1 is empty. The headline "Fun for the whole family!" exists only as part of a banner image — Google and AI search crawlers can't read it. The homepage title tag is just <strong>"Toys R Us"</strong> with nothing else. A competitor searching for "toy store Lebanon" in Google is not finding you through your homepage headline because there isn't one.
+                    {seoLebanon ? <>{t('Your homepage H1 is empty. The headline "Fun for the whole family!" exists only as part of a banner image - Google and AI search crawlers can\'t read it. The homepage title tag is just')} <strong>{t('"Toys R Us"')}</strong> {t('with nothing else. A competitor searching for "toy store Lebanon" in Google is not finding you through your homepage headline because there isn\'t one.')}</>
+                      : t('Your homepage H1 is empty, so Google and AI search crawlers have no live headline that says what the store sells.')}
                   </p>
-                  <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
-                    <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
-                    <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Add a live-text H1 overlaid on or adjacent to the hero: <em>"Lebanon's Favourite Toy Store — Thousands of Toys for Every Age."</em> Update the page title to <em>"Toys R Us Lebanon — Official Toy Store | Shop Online"</em>. This is a front-end change, not a platform migration.</p>
+                  <div style={{ background: pb(T, '#f0fdf4'), borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                    <p style={{ color: ink(T, '#065f46'), fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('Fix:')}</p>
+                    {seoLebanon ? <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Add a live-text H1 overlaid on or adjacent to the hero:')} <em>{t('"Lebanon\'s Favourite Toy Store - Thousands of Toys for Every Age."')}</em> {t('Update the page title to')} <em>{t('"Toys R Us Lebanon - Official Toy Store | Shop Online"')}</em>{t('. This is a front-end change, not a platform migration.')}</p>
+                      : <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Add a live-text H1 on or next to the hero that names what you sell and who it is for, and make the page title name the brand and the category. This is a front-end change, not a platform migration.')}</p>}
                   </div>
                 </div>
               </div>
@@ -2931,29 +3018,31 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
             {/* Fix 4: Product catalog missing from sitemap */}
             {seoData.sitemapAnalysis && seoData.sitemapAnalysis.found && (seoData.sitemapAnalysis.byType?.product === 0) && (
               <div style={{ background: T.surface, border: '1px solid #fcd34d', borderRadius: 12, overflow: 'hidden' }}>
-                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <span style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>HIGH</span>
-                  <p style={{ color: '#78350f', fontSize: 14, fontWeight: 800, margin: 0 }}>Your sitemap has {seoData.sitemapAnalysis.totalUrls?.toLocaleString()} URLs — but 0 product pages</p>
+                <div style={{ background: pb(T, '#fffbeb'), borderBottom: '1px solid #fcd34d', padding: '14px 20px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ background: '#d97706', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, flexShrink: 0 }}>{t('HIGH')}</span>
+                  <p style={{ color: ink(T, '#78350f'), fontSize: 14, fontWeight: 800, margin: 0 }}>{t('Your sitemap has {totalUrls} URLs - but 0 product pages', { totalUrls: seoData.sitemapAnalysis.totalUrls?.toLocaleString() })}</p>
                 </div>
                 <div style={{ padding: '14px 20px' }}>
                   <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>
-                    A sitemap tells Google which pages exist on your site. Yours has {seoData.sitemapAnalysis.totalUrls?.toLocaleString()} URLs but zero product pages. That means Google may not know your product catalog exists at all. Every product page that's missing from the sitemap is a product that can't rank in search. It's also not referenced in your robots.txt, so Google has to discover it on its own rather than being told where to look.
+                    {t('A sitemap tells Google which pages exist on your site. Yours has {totalUrls} URLs but zero product pages. That means Google may not know your product catalog exists at all. Every product page that\'s missing from the sitemap is a product that can\'t rank in search. It\'s also not referenced in your robots.txt, so Google has to discover it on its own rather than being told where to look.', { totalUrls: seoData.sitemapAnalysis.totalUrls?.toLocaleString() })}
                   </p>
-                  <div style={{ background: '#f0fdf4', borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
-                    <p style={{ color: '#065f46', fontSize: 12, fontWeight: 700, marginBottom: 4 }}>Fix:</p>
-                    <p style={{ color: '#14532d', fontSize: 12, lineHeight: 1.6, margin: 0 }}>Ask your developer to regenerate the sitemap to include all product and category URLs, then add <em>Sitemap: https://toysrus.com.lb/sitemap.xml</em> to robots.txt. Submit the sitemap directly in Google Search Console. This is a one-time configuration fix.</p>
+                  <div style={{ background: pb(T, '#f0fdf4'), borderRadius: 8, padding: '10px 14px', borderLeft: '3px solid #10b981' }}>
+                    <p style={{ color: ink(T, '#065f46'), fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{t('Fix:')}</p>
+                    {seoLebanon ? <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Ask your developer to regenerate the sitemap to include all product and category URLs, then add')} <em>{t('Sitemap: https://toysrus.com.lb/sitemap.xml')}</em> {t('to robots.txt. Submit the sitemap directly in Google Search Console. This is a one-time configuration fix.')}</p>
+                      : <p style={{ color: ink(T, '#14532d'), fontSize: 12, lineHeight: 1.6, margin: 0 }}>{t('Ask your developer to regenerate the sitemap to include all product and category URLs, reference it in robots.txt and submit it in Google Search Console. This is a one-time configuration fix.')}</p>}
                   </div>
                 </div>
               </div>
             )}
           </div>
+          </>)}
 
-          {/* Keyword targets — clearly framed as suggested, not verified */}
+          {/* Keyword targets - clearly framed as suggested, not verified */}
           {seoData.keywordUniverse && (
             <>
-              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Keyword targets to go after once the foundation is fixed</p>
+              <p style={{ color: T.text, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t('Keyword targets to go after once the foundation is fixed')}</p>
               <p style={{ color: T.textMuted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-                These are suggested keyword clusters based on your product categories, age groups, and market. They don't have verified search volume behind them — treat them as a starting map, not a definitive list. A proper keyword audit with Google Search Console or a tool like Ahrefs will show you which ones have the most traffic.
+                {t('These are suggested keyword clusters based on your product categories, age groups, and market. They don\'t have verified search volume behind them - treat them as a starting map, not a definitive list. A proper keyword audit with Google Search Console or a tool like Ahrefs will show you which ones have the most traffic.')}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
                 {KW_CATEGORIES.map(({ key, label, accentColor, accentBg, why, how }) => {
@@ -2961,19 +3050,19 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
                   if (!terms.length) return null
                   return (
                     <div key={key} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden' }}>
-                      <div style={{ background: accentBg, borderBottom: `1px solid ${T.border}`, padding: '14px 20px' }}>
-                        <p style={{ color: accentColor, fontSize: 13, fontWeight: 800, margin: 0, marginBottom: 4 }}>{label}</p>
-                        <p style={{ color: accentColor, fontSize: 13, lineHeight: 1.65, margin: 0, opacity: 0.85 }}>{why}</p>
+                      <div style={{ background: pb(T, accentBg), borderBottom: `1px solid ${T.border}`, padding: '14px 20px' }}>
+                        <p style={{ color: ink(T, accentColor), fontSize: 13, fontWeight: 800, margin: 0, marginBottom: 4 }}>{label}</p>
+                        <p style={{ color: ink(T, accentColor), fontSize: 13, lineHeight: 1.65, margin: 0, opacity: 0.85 }}>{why}</p>
                       </div>
                       <div style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 14 }}>
                           {terms.map((t, i) => (
-                            <span key={i} style={{ background: accentBg, color: accentColor, fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20, border: `1px solid ${accentColor}22` }}>{t}</span>
+                            <span key={i} style={{ background: pb(T, accentBg), color: ink(T, accentColor), fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20, border: `1px solid ${accentColor}22` }}>{t}</span>
                           ))}
                         </div>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: T.surfaceAlt, borderRadius: 8, padding: '10px 14px' }}>
                           <span style={{ color: T.accent, fontWeight: 700, fontSize: 14, flexShrink: 0 }}>→</span>
-                          <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}><strong>How to use these:</strong> {how}</p>
+                          <p style={{ color: T.textSub, fontSize: 13, lineHeight: 1.6, margin: 0 }}><strong>{t('How to use these:')}</strong> {how}</p>
                         </div>
                       </div>
                     </div>
@@ -2996,17 +3085,18 @@ function ActionPlanTab({ slug, brand, brandName, onRefresh, running, dataVersion
 const SEG_ON = { light: { bg: '#4f46e5', fg: '#ffffff' }, dark: { bg: '#818cf8', fg: '#0f172a' } }
 
 function LanguageToggle({ lang, onChange }) {
+  const t = useTr()
   const T = useT()
   const on_ = T === DARK_T ? SEG_ON.dark : SEG_ON.light
   return (
-    <div role="group" aria-label="Data language" style={{ display: 'flex', border: `1px solid ${T.inputBorder}`, borderRadius: 8, flexShrink: 0, background: T.inputBg }}>
+    <div role="group" aria-label={t('Data language')} style={{ display: 'flex', border: `1px solid ${T.inputBorder}`, borderRadius: 8, flexShrink: 0, background: T.inputBg }}>
       {LANGS.map((l, i) => {
         const on = lang === l.id
         return (
-          <button key={l.id} type="button" className="bi-ctl bi-seg" aria-pressed={on} title={`Show data in ${l.name}`}
+          <button key={l.id} type="button" className="bi-ctl bi-seg" aria-pressed={on} title={t('Show data in {name}', { name: t(l.name) })}
                   onClick={() => { if (!on) onChange(l.id) }}
                   style={{ background: on ? on_.bg : 'transparent', color: on ? on_.fg : T.textSub, border: 'none', borderRadius: i === 0 ? '7px 0 0 7px' : i === LANGS.length - 1 ? '0 7px 7px 0' : 0, padding: '5px 10px', fontSize: 12, fontWeight: on ? 700 : 500, cursor: on ? 'default' : 'pointer', whiteSpace: 'nowrap' }}>
-            {l.label}
+            {t(l.label)}
           </button>
         )
       })}
@@ -3021,6 +3111,7 @@ const REPORT_ITEMS = [
 const REPORT_TIMEOUT_MS = 3 * 60 * 1000
 
 function ReportMenu({ slug, busy, onDownload }) {
+  const t = useTr()
   const T = useT()
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
@@ -3038,14 +3129,14 @@ function ReportMenu({ slug, busy, onDownload }) {
   return (
     <div ref={wrapRef} style={{ position: 'relative', flexShrink: 0 }}>
       <button type="button" className="bi-ctl" aria-haspopup="menu" aria-expanded={open} disabled={disabled}
-              title={slug ? 'Download the full report as a PDF' : 'Pick a brand to download its report'}
+              title={slug ? t('Download the full report as a PDF') : t('Pick a brand to download its report')}
               onClick={() => setOpen(o => !o)}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 164, background: T.inputBg, border: `1px solid ${T.inputBorder}`, color: T.textSub, borderRadius: 8, padding: '5px 10px', fontSize: 12, fontWeight: 600, cursor: disabled ? 'default' : 'pointer', opacity: disabled && !busy ? 0.5 : 1, whiteSpace: 'nowrap' }}>
         {busy && <span aria-hidden="true" style={{ width: 10, height: 10, border: `2px solid ${T.border}`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
-        {busy ? 'Generating report…' : 'Download report ▾'}
+        {busy ? t('Generating report…') : t('Download report ▾')}
       </button>
       {open && !disabled && (
-        <div role="menu" aria-label="Download report"
+        <div role="menu" aria-label={t('Download report')}
              style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 170, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', padding: 4, zIndex: 200 }}>
           {REPORT_ITEMS.map(it => (
             <button key={it.id} type="button" className="bi-ctl" role="menuitem"
@@ -3053,7 +3144,7 @@ function ReportMenu({ slug, busy, onDownload }) {
                     style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', color: T.text, fontSize: 13, padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
                     onMouseEnter={e => { e.currentTarget.style.background = T.surfaceAlt }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'none' }}>
-              {it.label}
+              {t(it.label)}
             </button>
           ))}
         </div>
@@ -3083,6 +3174,7 @@ export default function App() {
 
   // Data language. Persisted when storage allows, 'orig' otherwise.
   const [lang, setLangState] = useState(readStoredLang)
+  const t = tFor(lang)
   const setLang = l => { setLangState(l); storeLang(l) }
   // slug|lang|module → 'missing' (no translations.json), 'stale' (module
   // refreshed after translations were built) or null, from X-Translations.
@@ -3123,8 +3215,8 @@ export default function App() {
       setTimeout(() => URL.revokeObjectURL(url), 2000)
     } catch (e) {
       setReportError(e && e.name === 'AbortError'
-        ? 'The report took too long to generate. Try again in a minute.'
-        : (e && e.message) || 'Report download failed.')
+        ? t('The report took too long to generate. Try again in a minute.')
+        : (e && e.message) || t('Report download failed.'))
     } finally {
       clearTimeout(timer)
       setReportBusy(null)
@@ -3269,8 +3361,8 @@ export default function App() {
 
       <div style={{ minHeight: '100vh', background: pdfMode ? '#fff' : T.bg }}>
         {/* Nav */}
-        <nav style={{ background: T.navBg, padding: '0 24px', display: pdfMode ? 'none' : 'flex', alignItems: 'center', gap: 16, height: 56, position: 'sticky', top: 0, zIndex: 100 }}>
-          <span style={{ color: T.navText, fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', marginRight: 8 }}>Brand Intelligence</span>
+        <nav className="bi-nav" style={{ background: T.navBg, padding: '0 24px', display: pdfMode ? 'none' : 'flex', alignItems: 'center', gap: 16, height: 56, position: 'sticky', top: 0, zIndex: 100 }}>
+          <span className="bi-nav-logo" style={{ color: T.navText, fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', marginRight: 8 }}>{t('Brand Intelligence')}</span>
 
           {/* Brand switcher. Not rendered for an account that holds no section:
               every brand WHP tracks is a list they have no screen to open, and
@@ -3281,28 +3373,28 @@ export default function App() {
               onChange={e => { if (e.target.value) { selectBrand(e.target.value) } else { setActiveBrand(null); setTab(canSee('portfolio') ? 'portfolio' : firstBrandTab()) } }}
               style={{ background: 'rgba(255,255,255,0.1)', color: T.navText, border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', fontSize: 13, cursor: 'pointer' }}
             >
-              <option value="">All Brands</option>
+              <option value="">{t('All Brands')}</option>
               {brands.map(b => <option key={b.slug} value={b.slug}>{b.name}</option>)}
             </select>
           )}
 
           {canSee('portfolio') && !noAreas && (
-            <button onClick={() => setShowAddBrand(true)} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add Brand</button>
+            <button onClick={() => setShowAddBrand(true)} style={{ background: T.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{t('+ Add Brand')}</button>
           )}
 
-          <div style={{ flex: 1 }} />
+          <div className="bi-nav-spacer" style={{ flex: 1 }} />
 
           {/* Tab nav (only show brand tabs when a brand is selected) */}
-          <div style={{ display: 'flex', gap: 2 }}>
+          <div className="bi-nav-tabs" style={{ display: 'flex', gap: 2 }}>
             {canSee('portfolio') && (
-              <button onClick={() => { setActiveBrand(null); setTab('portfolio') }} style={{ background: tab === 'portfolio' && !activeBrand ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === 'portfolio' ? 1 : 0.6 }}>Portfolio</button>
+              <button onClick={() => { setActiveBrand(null); setTab('portfolio') }} style={{ background: tab === 'portfolio' && !activeBrand ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, cursor: 'pointer', opacity: tab === 'portfolio' ? 1 : 0.6 }}>{t('Portfolio')}</button>
             )}
             {/* Without Portfolio there is no brand-less screen, so before a brand
                 is picked this person used to see no nav at all and a message
                 about a section nothing on screen named. Their sections render
                 either way; picking a brand is what fills them. */}
-            {(activeBrand || (meLoaded && !canSee('portfolio'))) && nonPortfolioTabs.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{ background: tab === t.id ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 12px', fontSize: 13, cursor: 'pointer', opacity: tab === t.id ? 1 : 0.6 }}>{t.label}</button>
+            {(activeBrand || (meLoaded && !canSee('portfolio'))) && nonPortfolioTabs.map(tb => (
+              <button key={tb.id} onClick={() => setTab(tb.id)} style={{ background: tab === tb.id ? 'rgba(255,255,255,0.15)' : 'none', color: T.navText, border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, cursor: 'pointer', opacity: tab === tb.id ? 1 : 0.6 }}>{t(tb.nav || tb.label)}</button>
             ))}
           </div>
 
@@ -3317,7 +3409,7 @@ export default function App() {
           {meLoaded && (
             <>
               {me && <span style={{ color: T.navText, fontSize: 12, opacity: 0.75 }}>{me.email || me.username}</span>}
-              <button onClick={signOut} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.3)', color: T.navText, borderRadius: 6, padding: '5px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Sign out</button>
+              <button onClick={signOut} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.3)', color: T.navText, borderRadius: 6, padding: '5px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>{t('Sign out')}</button>
             </>
           )}
         </nav>
@@ -3328,7 +3420,7 @@ export default function App() {
             <span style={{ color: T.text, fontWeight: 700, fontSize: 15 }}>{activeBrandData.name}</span>
             {activeBrandData.industry && <span style={{ color: T.textMuted, fontSize: 13 }}>{activeBrandData.industry}</span>}
             <HealthBadge status={activeBrandData.healthStatus} />
-            {activeBrandData.discoveryStatus === 'running' && <span style={{ color: '#3b82f6', fontSize: 12, fontWeight: 600 }}>🔍 Discovery running...</span>}
+            {activeBrandData.discoveryStatus === 'running' && <span style={{ color: '#3b82f6', fontSize: 12, fontWeight: 600 }}>{t('🔍 Discovery running...')}</span>}
             {/* Language and report controls. Here rather than in the nav row,
                 which is already full at 1280px; they only apply to a brand. */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexWrap: 'wrap' }}>
@@ -3344,19 +3436,19 @@ export default function App() {
         {!pdfMode && (trMissing || trStale || reportBusy || reportError) && (
           <div role="status" aria-live="polite" style={{ background: T.surfaceAlt, borderBottom: `1px solid ${T.border}`, padding: '0 24px', minHeight: 32, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 16px', fontSize: 12, lineHeight: '18px' }}>
             {trMissing && (
-              <span style={{ color: T.textSub, padding: '7px 0' }}>Translations are not ready for this brand yet. Showing the original text.</span>
+              <span style={{ color: T.textSub, padding: '7px 0' }}>{t('Translations are not ready for this brand yet. Showing the original text.')}</span>
             )}
             {trStale && (
-              <span style={{ color: T.textSub, padding: '7px 0' }}>Some text changed since the last translation and is shown untranslated.</span>
+              <span style={{ color: T.textSub, padding: '7px 0' }}>{t('Some text changed since the last translation and is shown untranslated.')}</span>
             )}
             {reportBusy && (
-              <span style={{ color: T.textSub, padding: '7px 0' }}>Generating the {reportBusy === 'ja' ? 'Japanese' : 'English'} report. This can take up to a minute.</span>
+              <span style={{ color: T.textSub, padding: '7px 0' }}>{t('Generating the')} {reportBusy === 'ja' ? t('Japanese') : t('English')} {t('report. This can take up to a minute.')}</span>
             )}
             {reportError && (
               <span style={{ color: darkMode ? '#fca5a5' : '#b91c1c', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flex: '1 1 auto' }}>
                 {/* #B91C1C on #F3F4F6 is 5.88:1, #FCA5A5 on #0F172A is 9.41:1 */}
                 <span style={{ padding: '7px 0' }}>{reportError}</span>
-                <button type="button" className="bi-ctl" onClick={() => setReportError('')} aria-label="Dismiss report error"
+                <button type="button" className="bi-ctl" onClick={() => setReportError('')} aria-label={t('Dismiss report error')}
                         style={{ background: 'none', border: 'none', color: 'inherit', fontSize: 16, lineHeight: '18px', padding: '0 4px', cursor: 'pointer', flexShrink: 0 }}>×</button>
               </span>
             )}
@@ -3386,8 +3478,8 @@ export default function App() {
             // a brand is picked, so nothing on screen said which one they were
             // being asked to pick a brand for.
             canSee('portfolio')
-              ? <EmptyState message={`Select a brand to view ${tabLabel(tab)}.`} cta="Go to Portfolio" onCta={() => setTab('portfolio')} />
-              : <EmptyState message={`Select a brand to view ${tabLabel(tab)}.`} />
+              ? <EmptyState message={t('Select a brand to view {tab}.', { tab: tabLabel(tab, t) })} cta={t('Go to Portfolio')} onCta={() => setTab('portfolio')} />
+              : <EmptyState message={t('Select a brand to view {tab}.', { tab: tabLabel(tab, t) })} />
           )}
         </main>
       </div>

@@ -332,6 +332,8 @@ function manualCaptureMatcher(brandUrl) {
 function noDirectRequestReason(brand) {
   if (brand && brand.manualCapture) return 'manual capture in use';
   if (brand && brand.skipApifyRetry) return 'site blocks automated access (skipApifyRetry)';
+  // host based: the same site may be a competitor in another brand's set
+  if (brand && brand.url && !require('../utils/no_contact').hostAllowed(brand.url)) return 'site blocks automated access (host not requested)';
   return null;
 }
 

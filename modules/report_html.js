@@ -246,6 +246,8 @@ const DICT = {
     ev_terms: '{n} search-demand terms',
     ev_personas: '{n} personas',
     notObservedRun: 'Not observed in this run',
+    notRequested: 'Not requested',
+    notRequestedNote: "The brand's own pages were not requested in this run, so their title, headings and sitemap are not shown.",
     recCategories: 'Recommended categories',
     recContent: 'Recommended content',
     pec: 'Priority, effort, confidence',
@@ -501,6 +503,8 @@ const DICT = {
     ev_terms: '需要検索語{n}件',
     ev_personas: 'ペルソナ{n}件',
     notObservedRun: '今回の実行では確認できませんでした',
+    notRequested: '取得対象外',
+    notRequestedNote: '今回の実行では自社サイトのページを取得していないため、タイトル、見出し、サイトマップは表示していません。',
     recCategories: '推奨カテゴリー',
     recContent: '推奨コンテンツ',
     pec: '優先度・工数・確度',
@@ -1065,20 +1069,35 @@ function secSearch(ctx) {
   const pages = [];
   if (isObj(s.onPageSeo)) pages.push({ name: str(s.brandName) || ctx.brandName, role: 'target', ...s.onPageSeo });
   for (const c of arr(s.competitors).filter(isObj)) pages.push({ ...c, role: 'competitor' });
-  if (pages.length) {
-    if (blockInfo.blocked) parts.push(`<div class="callout callout-warn">${esc(t('targetBlocked'))}</div>`);
-    parts.push(h3(t('onPage')) + table([t('name'), t('titleTag'), t('h1'), t('metaDesc')], pages.map(p => [
-      `<strong>${esc(p.name)}</strong>${p.role === 'target' ? ` <span class="tag">${esc(t('target'))}</span>` : ''}${p.blocked ? blockedTag(t) : ''}`,
-      esc(clip(p.titleTag, 90)), esc(clip(p.h1, 70)), esc(clip(p.metaDescription, 160))])));
+  // A blocked or skipped page's tags belong to the block page (or were never fetched), not to the site.
+  const unseen = (p) => p.blocked === true || p.skipped === true;
+  const target = pages.find(p => p.role === 'target');
+  const targetUnseen = !!(target && unseen(target));
+  const sitemapSkipped = isObj(s.sitemapAnalysis) && s.sitemapAnalysis.skipped === true;
+  const notRequested = (target && target.skipped === true) || sitemapSkipped;
+  const dash = '<span class="muted">-</span>';
+  if (pages.length || notRequested) {
+    const lines = [];
+    if (blockInfo.blocked || targetUnseen) lines.push(esc(t('targetBlocked')));
+    if (notRequested) lines.push(esc(t('notRequestedNote')));
+    if (lines.length) parts.push(`<div class="callout callout-note">${lines.join('<br>')}</div>`);
   }
-  if (isObj(s.sitemapAnalysis)) {
+  if (pages.length) {
+    parts.push(h3(t('onPage')) + table([t('name'), t('titleTag'), t('h1'), t('metaDesc')], pages.map(p => {
+      const name = `<strong>${esc(p.name)}</strong>${p.role === 'target' ? ` <span class="tag">${esc(t('target'))}</span>` : ''}${unseen(p) ? blockedTag(t) : ''}`;
+      if (!unseen(p)) return [name, esc(clip(p.titleTag, 90)), esc(clip(p.h1, 70)), esc(clip(p.metaDescription, 160))];
+      const title = p.role === 'target' && p.skipped === true ? `<span class="muted">${esc(t('notRequested'))}</span>` : dash;
+      return [name, title, dash, dash];
+    })));
+  }
+  if (isObj(s.sitemapAnalysis) && !sitemapSkipped) {
     const sm = s.sitemapAnalysis;
     parts.push(h3(t('sitemap')) + kv([[t('found'), esc(sm.found === true ? t('yes') : sm.found === false ? t('no') : '')], [t('urlsListed'), esc(fmtNum(sm.totalUrls, lang, 0))]]) + ul(sm.issues, 6));
   }
   const pa = arr(s.priorityActions).filter(isObj);
   if (pa.length) parts.push(h3(t('priorityActions')) + table([t('rank'), t('action'), t('why'), t('impact'), t('effort')], pa.map((a, i) => [esc(str(a.rank) || String(i + 1)), `<strong>${esc(a.action)}</strong>`, esc(a.why), esc(vocab(a.impact, t)), esc(vocab(a.effort, t))])));
   const bm = arr(s.competitorBenchmarks).filter(isObj);
-  if (bm.length) parts.push(h3(t('benchmarks')) + table([t('signal'), t('competitor'), t('theirs'), t('ours'), t('recommendation')], bm.map(b => [esc(b.signal), esc(b.competitorName), esc(clip(b.competitorValue, 90)), esc(clip(b.targetValue, 90)), esc(b.recommendation)])));
+  if (bm.length) parts.push(h3(t('benchmarks')) + table([t('signal'), t('competitor'), t('theirs'), t('ours'), t('recommendation')], bm.map(b => [esc(b.signal), esc(b.competitorName), esc(clip(b.competitorValue, 90)), targetUnseen ? dash : esc(clip(b.targetValue, 90)), esc(b.recommendation)])));
   const ki = isObj(s.keywordIntelligence) ? s.keywordIntelligence : null;
   const clusters = ki ? arr(ki.clusters).filter(isObj) : [];
   if (clusters.length) parts.push(h3(t('keywordClusters')) + table([t('name'), t('intent'), t('monthlySearches'), t('keywords'), t('recommendation')], clusters.map(c => [`<strong>${esc(c.name)}</strong>`, esc(c.intent), esc(c.estimatedMonthlySearches), esc(arr(c.keywords).map(str).filter(Boolean).slice(0, 8).join(', ')), esc(c.recommendation)])));

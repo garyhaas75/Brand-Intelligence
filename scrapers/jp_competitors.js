@@ -163,6 +163,8 @@ function jpCompetitorsFor(targetUrl) {
   const target = bareHost(targetUrl);
   return JP_COMPETITORS
     .filter(c => !target || bareHost(c.url) !== target)
+    // a site this tool must not request is never offered as a competitor to scan
+    .filter(c => require('../utils/no_contact').hostAllowed(c.url))
     .map(c => ({ ...c, verifiedAt: { ...c.verifiedAt } }));
 }
 

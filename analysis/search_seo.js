@@ -90,6 +90,7 @@ function detectBlocked(seo) {
 // ─── Sitemap analysis ─────────────────────────────────────────────────────────
 
 async function analyzeSitemap(baseUrl) {
+  if (!require('../utils/no_contact').hostAllowed(baseUrl)) return { skipped: true, found: null, url: null, totalUrls: 0, byType: { product: 0, collection: 0 }, issues: [], reason: require('../utils/no_contact').NO_CONTACT_REASON };
   const result = {
     found: false,
     url: null,
@@ -212,6 +213,7 @@ async function analyzeSitemap(baseUrl) {
 // ─── Multi-page URL discovery ─────────────────────────────────────────────────
 
 async function discoverMultiPageUrls(profile) {
+  if (!require('../utils/no_contact').targetContactAllowed(profile)) return { categoryUrls: [], productUrls: [] };
   const result = { categoryUrls: [], productUrls: [] };
   try {
     const siteIntel = loadBrandData(profile.slug, 'site_intelligence.json');
@@ -273,6 +275,7 @@ async function discoverMultiPageUrls(profile) {
 // ─── On-page SEO scraping ─────────────────────────────────────────────────────
 
 async function scrapeOnPageSeoWithBrowser(url, browser) {
+  if (!require('../utils/no_contact').hostAllowed(url)) return { url, skipped: true, blocked: true, error: null, reason: require('../utils/no_contact').NO_CONTACT_REASON, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: '', pageSpeedSignal: 'unknown' };
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1440, height: 900 },
@@ -309,6 +312,7 @@ async function scrapeOnPageSeoWithBrowser(url, browser) {
 }
 
 async function scrapeOnPageSeo(url) {
+  if (!require('../utils/no_contact').hostAllowed(url)) return { url, skipped: true, blocked: true, error: null, reason: require('../utils/no_contact').NO_CONTACT_REASON, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: '', pageSpeedSignal: 'unknown' };
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   try {
     return await scrapeOnPageSeoWithBrowser(url, browser);
@@ -863,7 +867,8 @@ Return ONLY a JSON array:
 
 // ─── Priority actions ─────────────────────────────────────────────────────────
 
-function buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, pageAnalyses) {
+function buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, pageAnalyses, profile) {
+  if (onPageSeo && onPageSeo.skipped) return buildUnrequestedPriorityActions(profile);
   const actions = [];
   if (!onPageSeo.metaDescription) {
     actions.push({ rank: 1, action: 'Write a meta description for every page — 140–160 characters summarizing what you sell and why shoppers should choose you.', impact: 'High', why: 'This is the text Google shows under your link in search results. Without it, Google picks random page text, which looks unprofessional and gets far fewer clicks.', effort: 'Quick Win' });
@@ -883,8 +888,26 @@ function buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, pageAnalyses) 
   return actions.slice(0, 5);
 }
 
+/**
+ * When the brand's own site was not requested there is nothing to diagnose. These actions are
+ * recommendations: verify first, then fix, based on how the competitors we did see are built.
+ */
+function buildUnrequestedPriorityActions(profile = {}) {
+  const name = (profile && profile.name) || 'the brand';
+  const lang = isJapanMarket(profile) ? ' in Japanese' : '';
+  const mk = (rank, action, impact, effort, why) => ({ rank, action, impact, effort, timeframe: effort, why });
+  return [
+    mk(1, 'Confirm that Google and the AI shopping assistants can reach the site: check the Search Console crawl stats and the bot-protection rules for the Googlebot, Bingbot and AI crawler user agents.', 'High', 'Quick Win', 'If the site blocks search crawlers it cannot rank, whatever else is done. This tool did not request the site, so this must be checked by the site team.'),
+    mk(2, `Check the homepage title tag and meta description in the page source, and make sure both name ${name} and the main categories.`, 'High', 'Quick Win', 'These are the first words a shopper reads in search results. The site was not requested, so their current state is unknown.'),
+    mk(3, 'Check that an XML sitemap exists, is listed in robots.txt and is submitted in Search Console.', 'High', '1-2 weeks', 'It tells search engines which pages exist. Its current state is unknown because the site was not requested.'),
+    mk(4, 'Check for canonical tags and Product and BreadcrumbList structured data on category and product pages.', 'Medium', '1-2 weeks', 'They prevent duplicate-page ranking splits and enable rich results. Competitors that publish them are listed in the website blueprint.'),
+    mk(5, `Use the competitor and keyword findings in this report to plan category and age-stage landing pages${lang}.`, 'Medium', '1+ month', 'The keyword universe and the competitor structures are evidence-based even though the site itself was not observed.'),
+  ];
+}
+
 async function generatePriorityActions(anthropic, profile, allData) {
   const { onPageSeo, pageAnalyses, sitemapAnalysis, competitorSeos, geoSection, competitorBenchmarks } = allData;
+  if (onPageSeo && onPageSeo.skipped) return buildUnrequestedPriorityActions(profile);
 
   // Build a concise narrative summary to keep token usage low
   const pagesSummary = pageAnalyses.length > 0
@@ -958,7 +981,7 @@ Valid values: impact = "High" | "Medium" | "Low", effort = "Quick Win" | "1-2 we
   } catch (err) { log(`Priority actions error: ${err.message}`); }
 
   // Fallback: derive actions from raw data
-  return buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, pageAnalyses);
+  return buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, pageAnalyses, profile);
 }
 
 // ─── Main orchestrator ────────────────────────────────────────────────────────
@@ -976,23 +999,38 @@ async function run() {
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+  // A brand whose operator blocks automated access is never requested (home page, sitemap, robots.txt,
+  // category pages). The result says so plainly instead of scoring a block page.
+  const contactTarget = require('../utils/no_contact').targetContactAllowed(profile);
+  if (!contactTarget) log(`Not requesting ${profile.url}: ${require('../utils/no_contact').NO_CONTACT_REASON}`);
+
   // 1. Discover multi-page URLs
   log('Discovering multi-page URLs from site intelligence...');
-  const { categoryUrls, productUrls } = await discoverMultiPageUrls(profile).catch(err => {
+  const { categoryUrls, productUrls } = contactTarget ? await discoverMultiPageUrls(profile).catch(err => {
     log(`URL discovery error: ${err.message}`);
     return { categoryUrls: [], productUrls: [] };
-  });
+  }) : { categoryUrls: [], productUrls: [] };
 
   // 2. Sitemap analysis
-  log(`Analyzing sitemap for ${profile.url}...`);
-  const sitemapAnalysis = await analyzeSitemap(profile.url).catch(err => {
-    log(`Sitemap error: ${err.message}`);
-    return null;
-  });
+  let sitemapAnalysis;
+  if (contactTarget) {
+    log(`Analyzing sitemap for ${profile.url}...`);
+    sitemapAnalysis = await analyzeSitemap(profile.url).catch(err => {
+      log(`Sitemap error: ${err.message}`);
+      return null;
+    });
+  } else {
+    sitemapAnalysis = { skipped: true, found: null, url: null, totalUrls: 0, byType: { product: 0, collection: 0 }, issues: [], reason: require('../utils/no_contact').NO_CONTACT_REASON };
+  }
 
   // 3. Scrape homepage
-  log(`Scraping on-page SEO for ${profile.url}...`);
-  const onPageSeo = await scrapeOnPageSeo(profile.url);
+  let onPageSeo;
+  if (contactTarget) {
+    log(`Scraping on-page SEO for ${profile.url}...`);
+    onPageSeo = await scrapeOnPageSeo(profile.url);
+  } else {
+    onPageSeo = { url: profile.url, skipped: true, blocked: true, error: null, reason: require('../utils/no_contact').NO_CONTACT_REASON, titleTag: '', metaDescription: '', h1: '', h2s: [], schemaMarkup: [], canonicalTag: '', pageSpeedSignal: 'unknown' };
+  }
 
   // 4. Scrape category + product pages
   const multiPageGroups = [
@@ -1047,7 +1085,7 @@ async function run() {
 
   // 8. Competitor benchmarks
   log('Generating competitor benchmarks...');
-  const competitorBenchmarks = await generateCompetitorBenchmarks(anthropic, profile, onPageSeo, competitorSeos).catch(err => {
+  const competitorBenchmarks = onPageSeo.skipped ? [] : await generateCompetitorBenchmarks(anthropic, profile, onPageSeo, competitorSeos).catch(err => {
     log(`Benchmarks error: ${err.message}`);
     return [];
   });
@@ -1058,7 +1096,7 @@ async function run() {
     onPageSeo, pageAnalyses: allPageAnalyses, sitemapAnalysis, competitorSeos, geoSection, competitorBenchmarks,
   }).catch(err => {
     log(`Priority actions error: ${err.message}`);
-    return buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, allPageAnalyses);
+    return buildFallbackPriorityActions(onPageSeo, sitemapAnalysis, allPageAnalyses, profile);
   });
 
   const now = new Date().toISOString();
@@ -1091,6 +1129,7 @@ async function run() {
 }
 
 module.exports = {
+  buildUnrequestedPriorityActions,
   isJapanMarket,
   serpParamsFor,
   buildKeywordUniversePrompt,

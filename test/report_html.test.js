@@ -477,3 +477,44 @@ test('Japan-only sections are not listed as missing for a brand in another marke
   assert.doesNotMatch(text(lb), /No data yet for:[^.]*(Marketplace|Demand)/i);
   assert.match(text(jp), /Website blueprint/, 'a Japan brand still lists the blueprint as not yet available');
 });
+
+// ---------- search: blocked and skipped target pages ----------
+
+test('old block-page shape: the block page title and H1 are never printed as the site tags', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.search_seo.onPageSeo = { url: 'https://test-toys.example/', titleTag: 'Attention Required! | Cloudflare', h1: 'Sorry, you have been blocked', metaDescription: 'blocked meta', blocked: true };
+  data.search_seo.competitorBenchmarks[0].targetValue = 'Attention Required! | Cloudflare';
+  for (const lang of ['en', 'ja']) {
+    const html = render({ lang, data });
+    const sec = html.slice(html.indexOf('id="sec-search"'), html.indexOf('id="sec-demand"'));
+    assert.ok(!sec.includes('Attention Required'), `${lang}: block title`);
+    assert.ok(!sec.includes('Sorry, you have been blocked'), `${lang}: block h1`);
+    assert.ok(!sec.includes('blocked meta'), `${lang}: block meta`);
+    assert.ok(sec.includes(escHtml(DICT[lang].blocked)), `${lang}: blocked tag kept`);
+    assert.ok(sec.includes('Rival Toys home'), `${lang}: competitor row still real`);
+  }
+});
+
+test('skipped shape: sitemap block omitted, Not requested shown once with the callout', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.search_seo.onPageSeo = { url: 'https://test-toys.example/', skipped: true, blocked: true, reason: 'skipApifyRetry' };
+  data.search_seo.sitemapAnalysis = { skipped: true, found: null, totalUrls: 0, issues: [] };
+  for (const lang of ['en', 'ja']) {
+    const d = DICT[lang];
+    const html = render({ lang, data });
+    const sec = html.slice(html.indexOf('id="sec-search"'), html.indexOf('id="sec-demand"'));
+    assert.ok(!sec.includes(`<h3>${escHtml(d.sitemap)}</h3>`), `${lang}: sitemap omitted`);
+    assert.strictEqual(sec.split(escHtml(d.notRequestedNote)).length - 1, 1, `${lang}: note once`);
+    assert.ok(sec.includes(escHtml(d.notRequested)), `${lang}: Not requested in title cell`);
+    assert.ok(sec.includes('class="callout callout-note"'), `${lang}: calm callout`);
+  }
+});
+
+test('observed target row still prints its real title, H1 and meta description', () => {
+  const data = JSON.parse(JSON.stringify(full.data));
+  data.search_seo.onPageSeo = { titleTag: 'Test Toys official store', h1: 'Toys for every age', metaDescription: 'Shop toys and baby goods.' };
+  const html = render({ data });
+  const sec = html.slice(html.indexOf('id="sec-search"'), html.indexOf('id="sec-demand"'));
+  for (const v of ['Test Toys official store', 'Toys for every age', 'Shop toys and baby goods.']) assert.ok(sec.includes(v), v);
+  assert.ok(sec.includes(`<h3>${escHtml(DICT.en.sitemap)}</h3>`));
+});

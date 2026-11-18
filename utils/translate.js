@@ -163,6 +163,7 @@ function buildPrompt(batch, direction, opts = {}) {
       ? '- Only if a string contains no Japanese characters at all, return it unchanged.'
       : '- If a string is already fully in the target language, return it unchanged.',
     ...(opts.strict ? ['- A previous answer still contained Japanese characters. Check every string again and remove every one of them.'] : []),
+    ...(typeof opts.context === 'string' && opts.context.trim() ? ['Context: ' + opts.context.trim()] : []),
     'Input is a JSON object mapping index to source string.',
     'Reply with ONLY a JSON object mapping the same indexes to the translated strings, every index present, no other text.',
   ].join('\n');
@@ -232,14 +233,14 @@ async function callOnce(client, batch, direction, opts) {
 
 const HAS_JAPANESE = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
 
-async function callBatch(client, batch, direction, residualRetry = true) {
-  const out = await callOnce(client, batch, direction, {});
+async function callBatch(client, batch, direction, residualRetry = true, context) {
+  const out = await callOnce(client, batch, direction, { context });
   if (direction !== 'en' || !residualRetry) return out;
   // English output must have no Japanese left. Ask again, once, for just the offenders.
   const bad = out.map((t, i) => (HAS_JAPANESE.test(t) ? i : -1)).filter(i => i >= 0);
   if (!bad.length) return out;
   try {
-    const retry = await callOnce(client, bad.map(i => batch[i]), direction, { strict: true });
+    const retry = await callOnce(client, bad.map(i => batch[i]), direction, { strict: true, context });
     bad.forEach((i, k) => { if (retry[k] && retry[k].trim()) out[i] = retry[k]; });
   } catch (_) { /* keep the first answer rather than fail the whole batch */ }
   return out;
@@ -332,7 +333,7 @@ async function translateStrings(strings, direction, opts = {}) {
         stats.sent += attempt === 1 ? batch.length : 0;
         stats.chars += batch.reduce((n, s) => n + s.length, 0);
         try {
-          out = await callBatch(client, batch, direction, opts.residualRetry !== false);
+          out = await callBatch(client, batch, direction, opts.residualRetry !== false, opts.context);
         } catch (e) {
           lastErr = e;
           log(`[translate] ${direction} batch ${idx + 1}/${batches.length} attempt ${attempt} failed: ${e.message}`);

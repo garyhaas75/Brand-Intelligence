@@ -143,7 +143,10 @@ test('jp competitor list: verified entries carry a status, target removed', () =
   const forTru = jpCompetitorsFor('https://toysrus.co.jp/some/path');
   assert.ok(!forTru.some(c => /toysrus\.co\.jp$/.test(new URL(c.url).hostname)));
   assert.equal(forTru.length, JP_COMPETITORS.length - 1);
-  assert.ok(jpCompetitorsFor('https://www.kiddyland.co.jp/').some(c => c.type === 'target'));
+  // The toysrus.co.jp entry (type target) is never offered to ANY other brand: that host must not be requested
+  // (utils/no_contact.js), so it is not a competitor anyone can scan.
+  assert.ok(!jpCompetitorsFor('https://www.kiddyland.co.jp/').some(c => /toysrus\.co\.jp/.test(c.url)));
+  assert.equal(jpCompetitorsFor('https://www.kiddyland.co.jp/').length, JP_COMPETITORS.length - 2 + (JP_COMPETITORS.some(c => /kiddyland\.co\.jp/.test(c.url)) ? 0 : 1));
 });
 
 test('brand discovery seeds JP toy competitors only for a matching market and industry', () => {

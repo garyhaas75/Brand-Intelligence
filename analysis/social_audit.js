@@ -252,6 +252,7 @@ function loadFixture(fixture) {
 // One page load, every anchor classified. Used for X, YouTube and LINE when
 // neither the profile nor the structured data supplied them.
 async function detectHandlesFromPage(brandUrl) {
+  if (!require('../utils/no_contact').hostAllowed(brandUrl)) return emptySocialLinks();
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
   try {
@@ -263,6 +264,7 @@ async function detectHandlesFromPage(brandUrl) {
 }
 
 async function detectInstagramHandle(brandUrl) {
+  if (!require('../utils/no_contact').hostAllowed(brandUrl)) return null;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
   try {
@@ -295,6 +297,7 @@ async function detectInstagramHandle(brandUrl) {
 }
 
 async function detectTikTokHandle(brandUrl) {
+  if (!require('../utils/no_contact').hostAllowed(brandUrl)) return null;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
   try {
@@ -313,6 +316,7 @@ async function detectTikTokHandle(brandUrl) {
 }
 
 async function detectFacebookHandle(brandUrl) {
+  if (!require('../utils/no_contact').hostAllowed(brandUrl)) return null;
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
   try {
@@ -1878,7 +1882,10 @@ async function runAudit(options = {}) {
     };
     let result;
     try {
-      result = await doProcess(brand, anthropic, advance, { ...(options.processBrandOpts || {}), dryRun, cache, dataDir });
+      // The brand's own site is never requested when its operator blocks automated access (handles then
+      // come from the profile and from structured data we already have), see utils/no_contact.js
+      const noContactTarget = brand.role === 'target' && !require('../utils/no_contact').targetContactAllowed(profile);
+      result = await doProcess(brand, anthropic, advance, { ...(options.processBrandOpts || {}), ...(noContactTarget ? { skipPageDetection: true } : {}), dryRun, cache, dataDir });
     } catch (err) {
       log(`  ${brand.name} failed: ${err.message}`);
       result = failedBrandStub(brand, err);
